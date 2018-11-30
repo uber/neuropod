@@ -29,6 +29,6 @@ public:
         = 0;
 
     // Run inference
-    virtual std::unique_ptr<TensorStore> infer(const std::unique_ptr<TensorStore> &inputs) = 0;
+    virtual std::unique_ptr<TensorStore> infer(const TensorStore &inputs) = 0;
 };
-}
+} // namespace neuropods
