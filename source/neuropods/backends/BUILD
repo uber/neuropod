@@ -1,0 +1,22 @@
+#
+# Uber, Inc. (c) 2018
+#
+
+# All the targets in this folder are internal types
+# This means we only want them to be accessible from
+# within neuropods
+
+cc_library(
+    name = "neuropod_backend",
+    srcs = [],
+    hdrs = [
+        "neuropod_backend.hh",
+    ],
+    visibility = [
+        "//neuropods:__subpackages__",
+    ],
+    deps = [
+        "//neuropods/internal:neuropod_tensor",
+        "//neuropods/internal:tensor_store",
+    ],
+)
