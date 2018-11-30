@@ -95,3 +95,11 @@ class PythonNeuropodExecutor(object):
                         type(value)))
 
         return out
+
+    def __enter__(self):
+        # Needed in order to be used as a contextmanager
+        return self
+
+    def __exit__(self, *args):
+        # Needed in order to be used as a contextmanager
+        pass

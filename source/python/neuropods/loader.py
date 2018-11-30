@@ -2,12 +2,9 @@
 # Uber, Inc. (c) 2018
 #
 
-from contextlib import contextmanager
-
 from neuropods.backends import config_utils
 
 
-@contextmanager
 def load_neuropod(neuropod_path):
     """
     Load a neuropod package. Returns a NeuropodExecutor
@@ -20,7 +17,7 @@ def load_neuropod(neuropod_path):
 
     if platform == "python":
         from neuropods.backends.python.executor import PythonNeuropodExecutor
-        yield PythonNeuropodExecutor(neuropod_path)
+        return PythonNeuropodExecutor(neuropod_path)
     else:
         raise ValueError("Invalid platform found in neuropod config: {}".format(platform))
 
