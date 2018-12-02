@@ -8,6 +8,7 @@
 
 #include "neuropods/backends/neuropod_backend.hh"
 #include "neuropods/internal/neuropod_tensor.hh"
+#include "neuropods/internal/neuropod_input_data.hh"
 #include "neuropods/internal/tensor_store.hh"
 
 namespace neuropods
@@ -91,23 +92,26 @@ T *NeuropodInputBuilder::allocate_tensor(const std::string &         node_name,
     return boost::get<T *>(tensor->get_data_ptr());
 }
 
-std::unique_ptr<TensorStore> NeuropodInputBuilder::build()
+std::unique_ptr<NeuropodInputData, NeuropodInputDataDeleter> NeuropodInputBuilder::build()
 {
-    return std::move(pimpl->data);
+    // Can't use make_unique because of a custom deleter
+    std::unique_ptr<NeuropodInputData, NeuropodInputDataDeleter> out(new NeuropodInputData());
+    out->data = std::move(pimpl->data);
+    return out;
 }
 
 // Instantiate the templates
-#define INIT_TEMPLATES_FOR_TYPE(CPP_TYPE, NEUROPOD_TYPE)                                                                \
-    template NeuropodInputBuilder &NeuropodInputBuilder::add_tensor<CPP_TYPE>(const std::string &          node_name,   \
-                                                                              const std::vector<CPP_TYPE> &input_data,  \
+#define INIT_TEMPLATES_FOR_TYPE(CPP_TYPE, NEUROPOD_TYPE)                                                               \
+    template NeuropodInputBuilder &NeuropodInputBuilder::add_tensor<CPP_TYPE>(const std::string &          node_name,  \
+                                                                              const std::vector<CPP_TYPE> &input_data, \
                                                                               const std::vector<int64_t> & input_dims); \
-                                                                                                                        \
-    template NeuropodInputBuilder &NeuropodInputBuilder::add_tensor<CPP_TYPE>(const std::string &node_name,             \
-                                                                              const CPP_TYPE *   input_data,            \
-                                                                              size_t             input_data_size,       \
-                                                                              const std::vector<int64_t> &input_dims);  \
-                                                                                                                        \
-    template CPP_TYPE *NeuropodInputBuilder::allocate_tensor(                                                           \
+                                                                                                                       \
+    template NeuropodInputBuilder &NeuropodInputBuilder::add_tensor<CPP_TYPE>(const std::string &node_name,            \
+                                                                              const CPP_TYPE *   input_data,           \
+                                                                              size_t             input_data_size,      \
+                                                                              const std::vector<int64_t> &input_dims); \
+                                                                                                                       \
+    template CPP_TYPE *NeuropodInputBuilder::allocate_tensor(                                                          \
         const std::string &node_name, size_t input_data_size, const std::vector<int64_t> &input_dims);
 
 FOR_EACH_TYPE_MAPPING(INIT_TEMPLATES_FOR_TYPE);

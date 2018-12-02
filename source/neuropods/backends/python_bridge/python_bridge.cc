@@ -154,4 +154,6 @@ std::unique_ptr<TensorStore> PythonBridge::infer(const TensorStore &inputs)
     }
 }
 
+REGISTER_NEUROPOD_BACKEND(PythonBridge, "python", "pytorch")
+
 } // namespace neuropods

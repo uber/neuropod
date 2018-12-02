@@ -8,6 +8,7 @@
 #include <string>
 #include <vector>
 
+#include "neuropods/internal/backend_registration.hh"
 #include "neuropods/internal/tensor_types.hh"
 
 namespace neuropods

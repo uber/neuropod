@@ -16,6 +16,7 @@ cc_library(
         "//neuropods:__subpackages__",
     ],
     deps = [
+        "//neuropods/internal:backend_registration",
         "//neuropods/internal:neuropod_tensor",
         "//neuropods/internal:tensor_store",
     ],

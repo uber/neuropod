@@ -1,0 +1,40 @@
+//
+// Uber, Inc. (c) 2018
+//
+
+#pragma once
+
+#include <memory>
+#include <string>
+#include <vector>
+
+namespace neuropods
+{
+
+class NeuropodBackend;
+
+// A function that takes in a path to a neuropod and returns a pointer to a NeuropodBackend
+typedef std::unique_ptr<NeuropodBackend> (*BackendFactoryFunction)(const std::string &neuropod_path);
+
+// A template to create a factory for any backend
+// This is used in the macro below
+template <typename T>
+std::unique_ptr<NeuropodBackend> createNeuropodBackend(const std::string &neuropod_path)
+{
+    return std::make_unique<T>(neuropod_path);
+}
+
+// Register a backend for a set of specific types
+// This is used in the macro below
+bool register_backend(const std::vector<std::string> &supported_types, BackendFactoryFunction factory_fn);
+
+// Get a backend factory function for a type
+BackendFactoryFunction get_backend_for_type(const std::string &type);
+
+// A macro to easily define a backend
+// Example: REGISTER_NEUROPOD_BACKEND(MyPythonBackend, "pytorch", "python")
+#define REGISTER_NEUROPOD_BACKEND(CLS, ... /* supported types */) \
+    bool is_registered_##CLS = register_backend({__VA_ARGS__}, createNeuropodBackend<CLS>);
+
+
+} // namespace neuropods

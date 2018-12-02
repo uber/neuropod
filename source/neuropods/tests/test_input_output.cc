@@ -5,6 +5,7 @@
 #include "gtest/gtest.h"
 
 #include "neuropods/backends/test_backend/test_neuropod_backend.hh"
+#include "neuropods/internal/neuropod_input_data.hh"
 #include "neuropods/internal/tensor_store.hh"
 #include "neuropods/neuropod_input_builder.hh"
 #include "neuropods/neuropod_output_data.hh"
@@ -67,7 +68,8 @@ TEST(test_input_builder, add_tensors_and_build)
     }
 
 
-    auto tensor_store = builder.build();
+    auto input_data   = builder.build();
+    auto tensor_store = std::move(input_data->data);
 
     // Validate the internal state for a
     {
@@ -105,14 +107,14 @@ TEST(test_output_data, verify_tensors)
 {
     neuropods::NeuropodInputBuilder builder(std::make_shared<neuropods::TestNeuropodBackend>());
 
-    auto tensor_store = builder.add_tensor("a", a_data, a_shape)
-                            .add_tensor("b", b_data, b_shape)
-                            .add_tensor("c", c_data, 4, c_shape)
-                            .add_tensor("d", d_data, 4, d_shape)
-                            .build();
+    auto input_data = builder.add_tensor("a", a_data, a_shape)
+                          .add_tensor("b", b_data, b_shape)
+                          .add_tensor("c", c_data, 4, c_shape)
+                          .add_tensor("d", d_data, 4, d_shape)
+                          .build();
 
     // Create a NeuropodOutputData from the tensor store
-    neuropods::NeuropodOutputData output_data(std::move(tensor_store));
+    neuropods::NeuropodOutputData output_data(std::move(input_data->data));
 
     // Validate the internal state for a
     {

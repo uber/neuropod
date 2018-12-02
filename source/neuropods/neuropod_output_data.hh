@@ -8,11 +8,10 @@
 #include <string>
 #include <vector>
 
+#include "fwd_declarations.hh"
+
 namespace neuropods
 {
-
-// This is opaque to the user
-struct TensorStore;
 
 // The return type of `infer`
 class NeuropodOutputData

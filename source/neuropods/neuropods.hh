@@ -15,9 +15,6 @@
 namespace neuropods
 {
 
-// This is opaque to the user
-struct TensorStore;
-
 class Neuropod
 {
 private:
@@ -57,7 +54,8 @@ public:
 
     // Run inference
     // You should use a `NeuropodInputBuilder` to generate the input
-    std::unique_ptr<NeuropodOutputData> infer(const std::unique_ptr<TensorStore> &inputs);
+    std::unique_ptr<NeuropodOutputData> infer(
+        const std::unique_ptr<NeuropodInputData, NeuropodInputDataDeleter> &inputs);
 };
 
 } // namespace neuropods

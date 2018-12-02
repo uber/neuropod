@@ -11,3 +11,12 @@ cc_test(
         "//neuropods/backends/test_backend",
     ],
 )
+
+cc_test(
+    name = "test_models",
+    srcs = ["test_models.cc"],
+    deps = [
+        "//neuropods",
+        "//neuropods/backends/python_bridge",
+    ],
+)

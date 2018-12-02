@@ -11,6 +11,7 @@ namespace neuropods
 {
 
 TestNeuropodBackend::TestNeuropodBackend() {}
+TestNeuropodBackend::TestNeuropodBackend(const std::string &neuropod_path) {}
 TestNeuropodBackend::~TestNeuropodBackend() = default;
 
 // Allocate a tensor of a specific type
@@ -26,5 +27,7 @@ std::unique_ptr<TensorStore> TestNeuropodBackend::infer(const TensorStore &input
 {
     return std::make_unique<TensorStore>();
 }
+
+REGISTER_NEUROPOD_BACKEND(TestNeuropodBackend, "noop")
 
 } // namespace neuropods

@@ -8,14 +8,10 @@
 #include <memory>
 #include <vector>
 
+#include "fwd_declarations.hh"
+
 namespace neuropods
 {
-
-class Neuropod;
-
-// These are opaque to the user
-struct TensorStore;
-class NeuropodBackend;
 
 // A NeuropodInputBuilder is used to supply input data to a Neuropod
 class NeuropodInputBuilder final
@@ -54,7 +50,7 @@ public:
     T *allocate_tensor(const std::string &node_name, size_t input_data_size, const std::vector<int64_t> &input_dims);
 
     // Get the data
-    std::unique_ptr<TensorStore> build();
+    std::unique_ptr<NeuropodInputData, NeuropodInputDataDeleter> build();
 };
 
 } // namespace neuropods
