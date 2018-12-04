@@ -90,5 +90,6 @@ class TestPytorchPackaging(unittest.TestCase):
         with self.assertRaises(ValueError):
             self.package_simple_addition_model(do_fail=True)
 
+
 if __name__ == '__main__':
     unittest.main()
