@@ -24,7 +24,7 @@ def create_virtualenv(venv_path, packages_to_install=[], verbose=False):
         subprocess.call(['/usr/bin/env', 'virtualenv', venv_path], env={}, stdout=stdout)
 
         # Install the specified pip packages
-        for package in ['pip'] + packages_to_install:
+        for package in ['pip', 'six'] + packages_to_install:
             subprocess.call([os.path.join(venv_path, 'bin', 'pip'), 'install', '-U', package], env={}, stdout=stdout)
 
         # Copy the neuropods library into the virtualenv

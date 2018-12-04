@@ -9,6 +9,8 @@ import json
 
 import numpy as np
 
+from neuropods.backends.neuropod_executor import NeuropodExecutor
+
 
 def _validate_not_importable(package):
     """
@@ -34,7 +36,7 @@ def _validate_not_importable(package):
         package = package.rsplit(".", 1)[0]
 
 
-class PythonNeuropodExecutor(object):
+class PythonNeuropodExecutor(NeuropodExecutor):
     """
     Executes a python neuropod
     """
@@ -69,7 +71,7 @@ class PythonNeuropodExecutor(object):
         # Get the entrypoint function and run it with the data path
         self.model = entrypoint_package.__dict__[entrypoint_fn_name](data_path)
 
-    def infer(self, inputs):
+    def forward(self, inputs):
         """
         Run inference using the specifed inputs.
 
@@ -80,11 +82,7 @@ class PythonNeuropodExecutor(object):
         :returns:   A dict mapping output names to values. This is checked to ensure that it
                     matches the spec in the neuropod config for the loaded model.
         """
-        # TODO: validate inputs
-
         out = self.model(**inputs)
-
-        # TODO: validate outputs
 
         # Make sure everything is a numpy array
         for key, value in out.items():
@@ -95,11 +93,3 @@ class PythonNeuropodExecutor(object):
                         type(value)))
 
         return out
-
-    def __enter__(self):
-        # Needed in order to be used as a contextmanager
-        return self
-
-    def __exit__(self, *args):
-        # Needed in order to be used as a contextmanager
-        pass

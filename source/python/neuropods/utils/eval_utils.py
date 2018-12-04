@@ -6,6 +6,7 @@ import logging
 import numpy as np
 from testpath.tempdir import TemporaryDirectory
 
+from neuropods.loader import load_neuropod
 from neuropods.utils.env_utils import create_virtualenv, eval_in_virtualenv
 
 logger = logging.getLogger(__name__)
@@ -26,7 +27,17 @@ def print_output_summary(out):
             raise ValueError("All outputs must be numpy arrays! Output `{}` was of type `{}`".format(key, type(value)))
 
 
-def load_and_test_neuropod(neuropod_path, test_input_data, test_expected_out=None, test_deps=[], test_virtualenv=None):
+def eval_in_process(neuropod_path, test_input_data):
+    """
+    Used to run evaluation without a virtualenv
+    """
+    with load_neuropod(neuropod_path) as model:
+        # Run inference and return the output
+        return model.infer(test_input_data)
+
+
+def load_and_test_neuropod(neuropod_path, test_input_data, test_expected_out=None,
+                           use_virtualenv=False, test_deps=[], test_virtualenv=None):
     """
     Loads a neuropod in a virtualenv and verifies that inference runs.
     If expected output is specified, the output of the model is checked against
@@ -34,15 +45,20 @@ def load_and_test_neuropod(neuropod_path, test_input_data, test_expected_out=Non
 
     Raises a ValueError if the outputs don't match the expected values
     """
-    # Run the model in a virtualenv
-    if test_virtualenv is None:
-        # Create a temporary virtualenv if one is not specified
-        with TemporaryDirectory() as virtualenv_dir:
-            create_virtualenv(virtualenv_dir, packages_to_install=test_deps)
-            out = eval_in_virtualenv(neuropod_path, test_input_data, virtualenv_dir)
+
+    if use_virtualenv:
+        # Run the model in a virtualenv
+        if test_virtualenv is None:
+            # Create a temporary virtualenv if one is not specified
+            with TemporaryDirectory() as virtualenv_dir:
+                create_virtualenv(virtualenv_dir, packages_to_install=test_deps)
+                out = eval_in_virtualenv(neuropod_path, test_input_data, virtualenv_dir)
+        else:
+            # Otherwise run in the specified virtualenv
+            out = eval_in_virtualenv(neuropod_path, test_input_data, test_virtualenv)
     else:
-        # Otherwise run in the specified virtualenv
-        out = eval_in_virtualenv(neuropod_path, test_input_data, test_virtualenv)
+        # Run the evaluation in the current process
+        out = eval_in_process(neuropod_path, test_input_data)
 
     # Check the output
     if test_expected_out is not None:

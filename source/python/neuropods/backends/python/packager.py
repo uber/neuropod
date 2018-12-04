@@ -159,4 +159,11 @@ def create_python_neuropod(
     if test_input_data is not None:
         # Load and run the neuropod to make sure that packaging worked correctly
         # Throws a ValueError if the output doesn't match the expected output (if specified)
-        load_and_test_neuropod(neuropod_path, test_input_data, test_expected_out, test_deps, test_virtualenv)
+        load_and_test_neuropod(
+            neuropod_path,
+            test_input_data,
+            test_expected_out,
+            use_virtualenv=True,
+            test_deps=test_deps,
+            test_virtualenv=test_virtualenv,
+        )
