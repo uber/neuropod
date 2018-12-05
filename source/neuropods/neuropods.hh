@@ -25,6 +25,9 @@ public:
     // Load a neuropod
     explicit Neuropod(const std::string &neuropod_path);
 
+    // Use a specific backend to execute the neuropod
+    Neuropod(const std::string &neuropod_path, const std::string &backend_name);
+
     // Allows a proxy to be passed in if we want to run the backends
     // on a remote machine or in a different process
     //

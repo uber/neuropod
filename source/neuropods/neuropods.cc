@@ -22,8 +22,14 @@ Neuropod::Neuropod(const std::string &neuropod_path) : pimpl(std::make_unique<Ne
 {
     // TODO(vip): construct the right backend based on the neuropod at the specified
     // path.
-    // For now, run everything with the python backend
-    pimpl->backend = get_backend_for_type("python")(neuropod_path);
+    // For now, run everything with the python bridge
+    pimpl->backend = get_backend_by_name("PythonBridge")(neuropod_path);
+}
+
+Neuropod::Neuropod(const std::string &neuropod_path, const std::string &backend_name)
+    : pimpl(std::make_unique<Neuropod::impl>())
+{
+    pimpl->backend = get_backend_by_name(backend_name)(neuropod_path);
 }
 
 Neuropod::Neuropod(std::shared_ptr<NeuropodProxy> backend_proxy) : pimpl(std::make_unique<Neuropod::impl>())

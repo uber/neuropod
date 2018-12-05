@@ -26,15 +26,20 @@ std::unique_ptr<NeuropodBackend> createNeuropodBackend(const std::string &neurop
 
 // Register a backend for a set of specific types
 // This is used in the macro below
-bool register_backend(const std::vector<std::string> &supported_types, BackendFactoryFunction factory_fn);
+bool register_backend(const std::string &             name,
+                      const std::vector<std::string> &supported_types,
+                      BackendFactoryFunction          factory_fn);
 
-// Get a backend factory function for a type
+// Get a backend factory function for a neuropod type (e.g. "python", "tensorflow", "torchscript")
 BackendFactoryFunction get_backend_for_type(const std::string &type);
+
+// Get a backend factory function by backend name (e.g. "PythonBridge", "TestNeuropodBackend")
+BackendFactoryFunction get_backend_by_name(const std::string &name);
 
 // A macro to easily define a backend
 // Example: REGISTER_NEUROPOD_BACKEND(MyPythonBackend, "pytorch", "python")
 #define REGISTER_NEUROPOD_BACKEND(CLS, ... /* supported types */) \
-    bool is_registered_##CLS = register_backend({__VA_ARGS__}, createNeuropodBackend<CLS>);
+    bool is_registered_##CLS = register_backend(#CLS, {__VA_ARGS__}, createNeuropodBackend<CLS>);
 
 
 } // namespace neuropods

@@ -13,10 +13,22 @@ cc_test(
 )
 
 cc_test(
-    name = "test_models",
-    srcs = ["test_models.cc"],
+    name = "test_python_bridge",
+    srcs = ["test_python_bridge.cc"],
     deps = [
-        "//neuropods",
+        ":neuropods_test_utils",
         "//neuropods/backends/python_bridge",
+    ],
+)
+
+cc_library(
+    name = "neuropods_test_utils",
+    hdrs = ["test_utils.hh"],
+    deps = [
+        "@gtest//:main",
+        "//neuropods",
+    ],
+    data = [
+        "//neuropods/tests/test_data"
     ],
 )

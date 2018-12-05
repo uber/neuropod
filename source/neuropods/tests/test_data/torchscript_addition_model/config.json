@@ -1,0 +1,1 @@
+{"output_spec": [{"dtype": "float32", "shape": [null], "name": "out"}], "platform": "torchscript", "input_spec": [{"dtype": "float32", "shape": [null], "name": "x"}, {"dtype": "float32", "shape": [null], "name": "y"}]}

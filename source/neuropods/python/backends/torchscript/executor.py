@@ -56,6 +56,6 @@ class TorchScriptNeuropodExecutor(NeuropodExecutor):
                         key,
                         type(value)))
 
-            converted_out[key] = value.numpy()
+            converted_out[key.encode("ascii")] = value.numpy()
 
         return converted_out
