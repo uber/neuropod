@@ -21,6 +21,15 @@ cc_test(
     ],
 )
 
+cc_test(
+    name = "test_torchscript_backend",
+    srcs = ["test_torchscript_backend.cc"],
+    deps = [
+        ":neuropods_test_utils",
+        "//neuropods/backends/torchscript:torchscript_backend",
+    ],
+)
+
 cc_library(
     name = "neuropods_test_utils",
     hdrs = ["test_utils.hh"],
