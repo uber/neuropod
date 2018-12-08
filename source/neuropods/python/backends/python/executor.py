@@ -47,7 +47,7 @@ class PythonNeuropodExecutor(NeuropodExecutor):
 
         :param  neuropod_path:  The path to a python neuropod package
         """
-        super(PythonNeuropodExecutor, self).__init__()
+        super(PythonNeuropodExecutor, self).__init__(neuropod_path)
         self.neuropod_path = neuropod_path
 
         # Load the model config

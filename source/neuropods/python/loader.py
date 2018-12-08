@@ -21,6 +21,9 @@ def load_neuropod(neuropod_path):
     elif platform == "torchscript":
         from neuropods.backends.torchscript.executor import TorchScriptNeuropodExecutor
         return TorchScriptNeuropodExecutor(neuropod_path)
+    elif platform == "tensorflow":
+        from neuropods.backends.tensorflow.executor import TensorflowNeuropodExecutor
+        return TensorflowNeuropodExecutor(neuropod_path)
     else:
         raise ValueError("Invalid platform found in neuropod config: {}".format(platform))
 

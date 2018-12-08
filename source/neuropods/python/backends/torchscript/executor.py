@@ -19,7 +19,7 @@ class TorchScriptNeuropodExecutor(NeuropodExecutor):
 
         :param  neuropod_path:  The path to a python neuropod package
         """
-        super(TorchScriptNeuropodExecutor, self).__init__()
+        super(TorchScriptNeuropodExecutor, self).__init__(neuropod_path)
 
         # Load the model
         self.model = torch.jit.load(os.path.join(neuropod_path, "0", "data", "model.pt"))

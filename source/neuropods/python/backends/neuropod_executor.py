@@ -5,12 +5,18 @@
 import abc
 import six
 
+from neuropods.backends import config_utils
+
 
 @six.add_metaclass(abc.ABCMeta)
 class NeuropodExecutor(object):
     """
     Base class for an Executor
     """
+
+    def __init__(self, neuropod_path):
+        # Read the neuropod config
+        self.neuropod_config = config_utils.read_neuropod_config(neuropod_path)
 
     def infer(self, inputs):
         """
