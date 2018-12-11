@@ -28,6 +28,9 @@ class NeuropodExecutor(object):
         # Run the backend specific inference function
         out = self.forward(inputs)
 
+        # Make sure the key is ascii
+        out = {key.encode("ascii"): value for key, value in out.items()}
+
         # TODO(vip): validate outputs
 
         return out
