@@ -17,7 +17,7 @@ void test_addition_model(const std::string &neuropod_path, const std::string &ba
     std::vector<int64_t> shape = {2, 2};
 
     const float x_data[] = {1, 2, 3, 4};
-    float       y_data[] = {7, 8, 9, 10};
+    const float y_data[] = {7, 8, 9, 10};
     float       target[] = {8, 10, 12, 14};
 
     if (do_fail)
