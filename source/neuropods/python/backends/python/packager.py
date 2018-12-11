@@ -22,7 +22,8 @@ def create_python_neuropod(
         test_input_data=None,
         test_expected_out=None,
         test_deps=[],
-        test_virtualenv=None):
+        test_virtualenv=None,
+        skip_virtualenv=False):
     """
     Packages arbitrary python code as a neuropod package.
 
@@ -105,6 +106,8 @@ def create_python_neuropod(
 
     :param  test_virtualenv:    The path to a virtualenv already containing the required deps to run the test in.
                                 If not specified, a new temporary virtualenv is created.
+
+    :param  skip_virtualenv:    If set to true, runs the test locally instead of in a virtualenv
     """
     try:
         # Create the neuropod folder
@@ -163,7 +166,7 @@ def create_python_neuropod(
             neuropod_path,
             test_input_data,
             test_expected_out,
-            use_virtualenv=True,
+            use_virtualenv=not skip_virtualenv,
             test_deps=test_deps,
             test_virtualenv=test_virtualenv,
         )
