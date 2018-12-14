@@ -20,6 +20,7 @@ cc_library(
     deps = [
         ":neuropods_fwd_declarations",
         "//neuropods/backends:neuropod_backend",
+        "//neuropods/internal:neuropod_config_utils",
         "//neuropods/internal:neuropod_input_data",
         "//neuropods/internal:neuropod_tensor",
         "//neuropods/internal:tensor_store",

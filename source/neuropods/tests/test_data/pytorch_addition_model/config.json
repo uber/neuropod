@@ -1,1 +1,18 @@
-{"output_spec": [{"dtype": "float32", "shape": [null], "name": "out"}], "platform": "python", "input_spec": [{"dtype": "float32", "shape": [null], "name": "x"}, {"dtype": "float32", "shape": [null], "name": "y"}]}
+{
+    "name": "addition_model",
+    "platform": "python",
+    "input_spec": [{
+        "dtype": "float32",
+        "shape": [null, null],
+        "name": "x"
+    }, {
+        "dtype": "float32",
+        "shape": [null, null],
+        "name": "y"
+    }],
+    "output_spec": [{
+        "dtype": "float32",
+        "shape": [null, null],
+        "name": "out"
+    }]
+}

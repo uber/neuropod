@@ -41,3 +41,13 @@ cc_library(
         "//neuropods/tests/test_data"
     ],
 )
+
+cc_test(
+    name = "test_config_utils",
+    srcs = ["test_config_utils.cc"],
+    deps = [
+        "@gtest//:main",
+        "//neuropods",
+        "//neuropods/internal:neuropod_config_utils",
+    ],
+)

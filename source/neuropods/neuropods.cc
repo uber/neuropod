@@ -5,6 +5,7 @@
 #include "neuropods.hh"
 
 #include "neuropods/internal/backend_registration.hh"
+#include "neuropods/internal/config_utils.hh"
 #include "neuropods/internal/neuropod_input_data.hh"
 #include "neuropods/internal/neuropod_tensor.hh"
 #include "neuropods/internal/tensor_store.hh"
@@ -20,15 +21,15 @@ struct Neuropod::impl
 
 Neuropod::Neuropod(const std::string &neuropod_path) : pimpl(std::make_unique<Neuropod::impl>())
 {
-    // TODO(vip): construct the right backend based on the neuropod at the specified
-    // path.
-    // For now, run everything with the python bridge
-    pimpl->backend = get_backend_by_name("PythonBridge")(neuropod_path);
+    // Find the right backend to use and load the neuropod
+    ModelConfig mc = load_model_config(neuropod_path);
+    pimpl->backend = get_backend_for_type(mc.platform)(neuropod_path);
 }
 
 Neuropod::Neuropod(const std::string &neuropod_path, const std::string &backend_name)
     : pimpl(std::make_unique<Neuropod::impl>())
 {
+    load_model_config(neuropod_path);
     pimpl->backend = get_backend_by_name(backend_name)(neuropod_path);
 }
 

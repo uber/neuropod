@@ -19,3 +19,9 @@ py_test(
     srcs = ["test_tensorflow_packaging.py"],
     deps = [],
 )
+
+py_test(
+    name = "test_config_utils",
+    srcs = ["test_config_utils.py"],
+    deps = [],
+)

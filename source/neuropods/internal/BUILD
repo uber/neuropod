@@ -7,6 +7,23 @@
 # within neuropods
 
 cc_library(
+    name = "neuropod_config_utils",
+    srcs = [
+        "config_utils.cc",
+    ],
+    hdrs = [
+        "config_utils.hh",
+    ],
+    visibility = [
+        "//neuropods:__subpackages__",
+    ],
+    deps = [
+        "//neuropods/internal:neuropod_tensor",
+        "@libjsoncpp_repo//:libjsoncpp",
+    ],
+)
+
+cc_library(
     name = "neuropod_tensor",
     hdrs = [
         "neuropod_tensor.hh",
