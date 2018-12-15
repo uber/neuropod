@@ -25,3 +25,9 @@ py_test(
     srcs = ["test_config_utils.py"],
     deps = [],
 )
+
+py_test(
+    name = "test_tensor_validation",
+    srcs = ["test_tensor_validation.py"],
+    deps = [],
+)

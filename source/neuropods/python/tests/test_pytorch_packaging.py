@@ -59,8 +59,8 @@ class TestPytorchPackaging(unittest.TestCase):
                     {"name": "out", "dtype": "float32", "shape": (None,)},
                 ],
                 test_input_data={
-                    "x": np.arange(5),
-                    "y": np.arange(5),
+                    "x": np.arange(5, dtype=np.float32),
+                    "y": np.arange(5, dtype=np.float32),
                 },
                 test_expected_out={
                     "out": np.zeros(5) if do_fail else np.arange(5) + np.arange(5)
