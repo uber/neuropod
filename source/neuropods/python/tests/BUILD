@@ -7,3 +7,9 @@ py_test(
     srcs = ["test_torchscript_packaging.py"],
     deps = [],
 )
+
+py_test(
+    name = "test_pytorch_packaging",
+    srcs = ["test_pytorch_packaging.py"],
+    deps = [],
+)

@@ -10,7 +10,6 @@ from tempfile import mkdtemp
 from testpath.tempdir import TemporaryDirectory
 
 from neuropods.backends.pytorch.packager import create_pytorch_neuropod
-from neuropods.utils.env_utils import create_virtualenv
 
 ADDITION_MODEL_SOURCE = """
 import torch
@@ -28,16 +27,6 @@ def get_model(_):
 
 
 class TestPytorchPackaging(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
-        # Reuse one virtualenv for all tests
-        cls._virtualenv = mkdtemp()
-        create_virtualenv(cls._virtualenv, ["torch", "numpy"])
-
-    @classmethod
-    def tearDownClass(cls):
-        shutil.rmtree(cls._virtualenv)
-
     def package_simple_addition_model(self, do_fail=False):
         with TemporaryDirectory() as test_dir:
             neuropod_path = os.path.join(test_dir, "test_neuropod")
@@ -77,7 +66,10 @@ class TestPytorchPackaging(unittest.TestCase):
                     "out": np.zeros(5) if do_fail else np.arange(5) + np.arange(5)
                 },
                 test_deps=['torch', 'numpy'],
-                test_virtualenv=self._virtualenv,
+                # This runs the test in the current process instead of in a new virtualenv
+                # We are using this to ensure the test will work even if the CI environment
+                # is restrictive
+                skip_virtualenv=True,
             )
 
     def test_simple_addition_model(self):
