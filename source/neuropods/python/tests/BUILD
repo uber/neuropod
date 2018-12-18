@@ -13,3 +13,9 @@ py_test(
     srcs = ["test_pytorch_packaging.py"],
     deps = [],
 )
+
+py_test(
+    name = "test_tensorflow_packaging",
+    srcs = ["test_tensorflow_packaging.py"],
+    deps = [],
+)
