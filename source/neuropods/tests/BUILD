@@ -33,6 +33,9 @@ cc_test(
 cc_library(
     name = "neuropods_test_utils",
     hdrs = ["test_utils.hh"],
+    visibility = [
+        "//visibility:public",
+    ],
     deps = [
         "@gtest//:main",
         "//neuropods",

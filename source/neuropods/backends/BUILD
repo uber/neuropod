@@ -13,7 +13,7 @@ cc_library(
         "neuropod_backend.hh",
     ],
     visibility = [
-        "//neuropods:__subpackages__",
+        "//visibility:public",
     ],
     deps = [
         "//neuropods/internal:backend_registration",
