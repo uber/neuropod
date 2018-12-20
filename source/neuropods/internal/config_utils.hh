@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -37,7 +38,7 @@ struct ModelConfig
     const std::vector<TensorSpec> outputs;
 };
 
-ModelConfig load_model_config(const std::string &neuropod_path);
-ModelConfig load_model_config(std::istream &input_stream);
+std::unique_ptr<ModelConfig> load_model_config(const std::string &neuropod_path);
+std::unique_ptr<ModelConfig> load_model_config(std::istream &input_stream);
 
 } // namespace neuropods

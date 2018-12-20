@@ -135,7 +135,7 @@ ModelConfig::ModelConfig(const std::string &            name,
 
 ModelConfig::~ModelConfig() = default;
 
-ModelConfig load_model_config(const std::string &neuropod_path)
+std::unique_ptr<ModelConfig> load_model_config(const std::string &neuropod_path)
 {
     auto path = get_config_path(neuropod_path);
 
@@ -154,7 +154,7 @@ ModelConfig load_model_config(const std::string &neuropod_path)
     return load_model_config(ifs);
 }
 
-ModelConfig load_model_config(std::istream &input_stream)
+std::unique_ptr<ModelConfig> load_model_config(std::istream &input_stream)
 {
     // Parse it
     Json::Reader reader;
@@ -200,7 +200,7 @@ ModelConfig load_model_config(std::istream &input_stream)
             spec["name"].asString(), get_dims_from_json(spec["shape"]), convert_to_tensor_type(spec["dtype"]));
     }
 
-    return ModelConfig(name, platform, inputs, outputs);
+    return std::make_unique<ModelConfig>(name, platform, inputs, outputs);
 }
 
 } // namespace neuropods

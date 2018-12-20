@@ -22,15 +22,15 @@ struct Neuropod::impl
 Neuropod::Neuropod(const std::string &neuropod_path) : pimpl(std::make_unique<Neuropod::impl>())
 {
     // Find the right backend to use and load the neuropod
-    ModelConfig mc = load_model_config(neuropod_path);
-    pimpl->backend = get_backend_for_type(mc.platform)(neuropod_path);
+    auto mc        = load_model_config(neuropod_path);
+    pimpl->backend = get_backend_for_type(mc->platform)(neuropod_path, std::move(mc));
 }
 
 Neuropod::Neuropod(const std::string &neuropod_path, const std::string &backend_name)
     : pimpl(std::make_unique<Neuropod::impl>())
 {
-    load_model_config(neuropod_path);
-    pimpl->backend = get_backend_by_name(backend_name)(neuropod_path);
+    auto mc        = load_model_config(neuropod_path);
+    pimpl->backend = get_backend_by_name(backend_name)(neuropod_path, std::move(mc));
 }
 
 Neuropod::Neuropod(std::shared_ptr<NeuropodProxy> backend_proxy) : pimpl(std::make_unique<Neuropod::impl>())

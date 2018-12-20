@@ -17,7 +17,7 @@ class TestNeuropodBackend : public NeuropodBackend
 {
 public:
     TestNeuropodBackend();
-    explicit TestNeuropodBackend(const std::string &neuropod_path);
+    TestNeuropodBackend(const std::string &neuropod_path, std::unique_ptr<ModelConfig> model_config);
     ~TestNeuropodBackend();
 
     // Allocate a tensor of a specific type

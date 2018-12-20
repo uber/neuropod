@@ -57,7 +57,7 @@ std::unique_ptr<TorchNeuropodTensor> get_tensor_from_key_value_pair(at::ivalue::
 
 } // namespace
 
-TorchNeuropodBackend::TorchNeuropodBackend(const std::string &neuropod_path)
+TorchNeuropodBackend::TorchNeuropodBackend(const std::string &neuropod_path, std::unique_ptr<ModelConfig> model_config)
     : model_(load_model_from_path(get_graph_path(neuropod_path)))
 {
 }

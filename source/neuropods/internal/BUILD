@@ -79,4 +79,7 @@ cc_library(
     visibility = [
         "//neuropods:__subpackages__",
     ],
+    deps = [
+        ":neuropod_config_utils",
+    ],
 )

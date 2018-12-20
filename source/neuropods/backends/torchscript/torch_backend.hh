@@ -25,7 +25,7 @@ private:
     std::shared_ptr<torch::jit::script::Module> model_;
 
 public:
-    explicit TorchNeuropodBackend(const std::string &neuropod_path);
+    TorchNeuropodBackend(const std::string &neuropod_path, std::unique_ptr<ModelConfig> model_config);
 
     ~TorchNeuropodBackend();
 

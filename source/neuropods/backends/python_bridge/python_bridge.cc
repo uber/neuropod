@@ -61,7 +61,9 @@ void maybe_register_python_shutdown()
 
 } // namespace
 
-PythonBridge::PythonBridge(const std::string &neuropod_path, const std::vector<std::string> &python_path_additions)
+PythonBridge::PythonBridge(const std::string &             neuropod_path,
+                           std::unique_ptr<ModelConfig>    model_config,
+                           const std::vector<std::string> &python_path_additions)
 {
     try
     {
