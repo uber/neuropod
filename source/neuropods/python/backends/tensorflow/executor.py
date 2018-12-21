@@ -49,10 +49,12 @@ class TensorflowNeuropodExecutor(NeuropodExecutor):
 
         :param  inputs:     A dict mapping input names to values. This must match the input
                             spec in the neuropod config for the loaded model.
-                            Ex: {'x1': [5], 'x2': [6]}
+                            Ex: {'x1': np.array([5]), 'x2': np.array([6])}
+                            *Note:* all the keys in this dict must be strings and all the
+                            values must be numpy arrays
 
-        :returns:   A dict mapping output names to values. This is checked to ensure that it
-                    matches the spec in the neuropod config for the loaded model.
+        :returns:   A dict mapping output names to values. All the keys
+                    in this dict are strings and all the values are numpy arrays.
         """
 
         # get the input and output nodes
