@@ -14,7 +14,14 @@ logger = logging.getLogger(__name__)
 
 def check_output_matches_expected(out, expected_out):
     for key, value in expected_out.items():
-        if not np.allclose(value, out[key]):
+        if value.dtype.type == np.string_:
+            # All strings are equal
+            success_condition = (value == out[key]).all()
+        else:
+            # All the values are close
+            success_condition = np.allclose(value, out[key])
+
+        if not success_condition:
             raise ValueError("{} does not match expected value!".format(key))
 
 

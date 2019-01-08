@@ -21,6 +21,12 @@ py_test(
 )
 
 py_test(
+    name = "test_tensorflow_strings",
+    srcs = ["test_tensorflow_strings.py"],
+    deps = [],
+)
+
+py_test(
     name = "test_config_utils",
     srcs = ["test_config_utils.py"],
     deps = [],

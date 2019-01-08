@@ -113,6 +113,18 @@ class TestSpecValidation(unittest.TestCase):
             # `True` is invalid in a shape specification
             validate_tensors_against_specs(test_input, SPEC)
 
+    def test_string_tensors(self):
+        test_input = {
+            "x": np.array([["some", "string", "tensor"]], dtype=np.string_),
+        }
+
+        SPEC = [
+            {"name": "x", "dtype": "string", "shape": (1, 3)},
+        ]
+
+        # Shouldn't raise a ValueError
+        validate_tensors_against_specs(test_input, SPEC)
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -3,6 +3,7 @@
 #
 
 import json
+import numpy as np
 import os
 import tensorflow as tf
 
@@ -82,5 +83,13 @@ class TensorflowNeuropodExecutor(NeuropodExecutor):
 
         # Run inference
         outputs = self.sess.run(output_dict, feed_dict=feed_dict)
+
+        # TensorFlow returns string tensors with type object
+        for spec in self.neuropod_config["output_spec"]:
+            name = spec["name"]
+            dtype = np.dtype(spec["dtype"])
+            if dtype.type == np.string_ and outputs[name].dtype == 'object' and type(outputs[name].item(0)) == str:
+                # If the tensor is supposed to be of type string, is of type object, and contains strings
+                outputs[name] = outputs[name].astype('string')
 
         return outputs

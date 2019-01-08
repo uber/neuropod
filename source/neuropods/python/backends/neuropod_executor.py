@@ -29,7 +29,7 @@ def validate_tensors_against_specs(tensors, tensor_specs):
         tensor = tensors[name]
 
         # Validate the data type
-        if tensor.dtype != dtype:
+        if tensor.dtype.type != dtype.type:
             raise ValueError(
                 "Tensor '{}' is expected to be of type {}, but was of type {}".format(
                     name, dtype, tensor.dtype))
