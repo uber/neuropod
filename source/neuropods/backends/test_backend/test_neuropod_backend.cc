@@ -19,7 +19,7 @@ std::unique_ptr<NeuropodTensor> TestNeuropodBackend::allocate_tensor(const std::
                                                                      const std::vector<int64_t> &input_dims,
                                                                      TensorType                  tensor_type)
 {
-    return std::make_unique<TestNeuropodTensor>(node_name, input_dims, tensor_type);
+    return make_tensor<TestNeuropodTensor>(tensor_type, node_name, input_dims);
 }
 
 // Run inference

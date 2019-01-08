@@ -16,19 +16,20 @@ namespace neuropods
 
 
 // This is used along with the TestNeuropodBackend in tests
-class TestNeuropodTensor : public NeuropodTensor
+template <typename T>
+class TestNeuropodTensor : public TypedNeuropodTensor<T>
 {
 private:
     // A pointer to the data contained in the tensor
     void *data_;
 
 public:
-    TestNeuropodTensor(const std::string &name, const std::vector<int64_t> &dims, TensorType tensor_type);
+    TestNeuropodTensor(const std::string &name, const std::vector<int64_t> &dims);
 
     ~TestNeuropodTensor();
 
     // Get a pointer to the underlying data
-    TensorDataPointer get_data_ptr();
+    T *get_raw_data_ptr();
 };
 
 } // namespace neuropods

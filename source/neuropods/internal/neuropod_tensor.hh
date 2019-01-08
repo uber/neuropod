@@ -19,7 +19,9 @@ namespace neuropods
 // All the supported types of data for tensors
 typedef boost::variant<FOR_EACH_TYPE_MAPPING_DELIM(PTR, COMMA_DELIM)> TensorDataPointer;
 
-// Each backend implements a subclass of this class
+// A type erased version of a TypedNeuropodTensor. See the documentation for
+// TypedNeuropodTensor for more details.
+// Backends should not extend this class directly for their tensor implementations
 // Note: This class is internal to neuropods and should not be exposed to users
 class NeuropodTensor
 {
@@ -79,6 +81,75 @@ public:
     }
 
     TensorType get_tensor_type() const { return tensor_type_; }
+};
+
+namespace
+{
+
+// Utility to get a neuropod tensor type from a c++ type
+template <typename T>
+TensorType get_tensor_type_from_cpp()
+{
+}
+
+#define GET_TENSOR_TYPE_FN(CPP_TYPE, NEUROPOD_TYPE) \
+    template <>                                     \
+    TensorType get_tensor_type_from_cpp<CPP_TYPE>() \
+    {                                               \
+        return NEUROPOD_TYPE;                       \
+    }
+
+FOR_EACH_TYPE_MAPPING(GET_TENSOR_TYPE_FN)
+
+} // namespace
+
+// A TypedNeuropodTensor is a NeuropodTensor of a specific type.
+// Backends should extend this class directly for their tensor implementations
+// Note: This class is internal to neuropods and should not be exposed to users
+template <typename T>
+class TypedNeuropodTensor : public NeuropodTensor
+{
+public:
+    TypedNeuropodTensor(const std::string &name, const std::vector<int64_t> dims)
+        : NeuropodTensor(name, get_tensor_type_from_cpp<T>(), dims)
+    {
+    }
+
+    virtual ~TypedNeuropodTensor() {}
+
+    TensorDataPointer get_data_ptr() final { return get_raw_data_ptr(); }
+
+    virtual T *get_raw_data_ptr() = 0;
+};
+
+// Utility to make a tensor of a specific type
+template <template <class> class TensorClass, typename... Params>
+std::unique_ptr<NeuropodTensor> make_tensor(TensorType tensor_type, Params &&... params)
+{
+#define MAKE_TENSOR(CPP_TYPE, NEUROPOD_TYPE)                                              \
+    case NEUROPOD_TYPE:                                                                   \
+    {                                                                                     \
+        return std::make_unique<TensorClass<CPP_TYPE>>(std::forward<Params>(params)...); \
+    }
+
+    // Make a tensor of the correct type and return it
+    switch (tensor_type)
+    {
+        FOR_EACH_TYPE_MAPPING(MAKE_TENSOR)
+    }
+#undef MAKE_TENSOR
+}
+
+// Utility superclass for getting data from a tensor
+// without having to downcast to a specific TypedNeuropodTensor
+template <typename T>
+class NativeDataContainer
+{
+public:
+    NativeDataContainer() {}
+    virtual ~NativeDataContainer() {}
+
+    virtual T get_native_data() = 0;
 };
 
 } // namespace neuropods

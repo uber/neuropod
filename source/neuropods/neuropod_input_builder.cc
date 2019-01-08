@@ -58,33 +58,13 @@ NeuropodInputBuilder &NeuropodInputBuilder::add_tensor(const std::string &      
     return *this;
 }
 
-namespace
-{
-
-// Utility to get a neuropod tensor type from a c++ type
-template <typename T>
-TensorType get_tensor_type()
-{
-}
-
-#define GET_TENSOR_TYPE_FN(CPP_TYPE, NEUROPOD_TYPE) \
-    template <>                                     \
-    TensorType get_tensor_type<CPP_TYPE>()          \
-    {                                               \
-        return NEUROPOD_TYPE;                       \
-    }
-
-FOR_EACH_TYPE_MAPPING(GET_TENSOR_TYPE_FN)
-
-} // namespace
-
 template <typename T>
 T *NeuropodInputBuilder::allocate_tensor(const std::string &         node_name,
                                          size_t                      input_data_size,
                                          const std::vector<int64_t> &input_dims)
 {
     std::shared_ptr<NeuropodTensor> tensor
-        = pimpl->backend->allocate_tensor(node_name, input_dims, get_tensor_type<T>());
+        = pimpl->backend->allocate_tensor(node_name, input_dims, get_tensor_type_from_cpp<T>());
 
     // Add it to the vector of tensors stored in the builder
     pimpl->data->tensors.emplace_back(tensor);

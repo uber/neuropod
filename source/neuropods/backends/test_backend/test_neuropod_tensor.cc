@@ -7,49 +7,27 @@
 namespace neuropods
 {
 
-namespace
+template <typename T>
+TestNeuropodTensor<T>::TestNeuropodTensor(const std::string &name, const std::vector<int64_t> &dims)
+    : TypedNeuropodTensor<T>(name, dims)
 {
-size_t get_size_bytes(TensorType tensor_type)
-{
-#define GET_SIZE(CPP_TYPE, NEUROPOD_TYPE) \
-    case NEUROPOD_TYPE:                   \
-    {                                     \
-        return sizeof(CPP_TYPE);          \
-    }
-
-    switch (tensor_type)
-    {
-        FOR_EACH_TYPE_MAPPING(GET_SIZE)
-    }
-}
-} // namespace
-
-TestNeuropodTensor::TestNeuropodTensor(const std::string &         name,
-                                       const std::vector<int64_t> &dims,
-                                       TensorType                  tensor_type)
-    : NeuropodTensor(name, tensor_type, dims)
-{
-    data_ = malloc(get_num_elements() * get_size_bytes(tensor_type));
+    data_ = malloc(this->get_num_elements() * sizeof(T));
 }
 
-TestNeuropodTensor::~TestNeuropodTensor()
+template <typename T>
+TestNeuropodTensor<T>::~TestNeuropodTensor()
 {
     free(data_);
 }
 
-
-TensorDataPointer TestNeuropodTensor::get_data_ptr()
+template <typename T>
+T *TestNeuropodTensor<T>::get_raw_data_ptr()
 {
-#define CAST_TENSOR(CPP_TYPE, NEUROPOD_TYPE)   \
-    case NEUROPOD_TYPE:                        \
-    {                                          \
-        return static_cast<CPP_TYPE *>(data_); \
-    }
-
-    switch (get_tensor_type())
-    {
-        FOR_EACH_TYPE_MAPPING(CAST_TENSOR)
-    }
+    return static_cast<T *>(data_);
 }
 
+// Instantiate the templates
+#define INIT_TEMPLATES_FOR_TYPE(CPP_TYPE, NEUROPOD_TYPE) template class TestNeuropodTensor<CPP_TYPE>;
+
+FOR_EACH_TYPE_MAPPING(INIT_TEMPLATES_FOR_TYPE);
 } // namespace neuropods
