@@ -7,6 +7,8 @@
 #include <sstream>
 #include <stdexcept>
 
+#include "neuropods/backends/python_bridge/type_utils.hh"
+
 namespace neuropods
 {
 
@@ -21,51 +23,6 @@ void setup_numpy_if_needed()
         import_array();
         py::numeric::array::set_module_and_type("numpy", "ndarray");
     }
-}
-
-#define FOR_NP_NEUROPOD_MAPPING(FN) \
-    FN(FLOAT_TENSOR, NPY_FLOAT)     \
-    FN(DOUBLE_TENSOR, NPY_DOUBLE)   \
-    FN(STRING_TENSOR, NPY_STRING)   \
-                                    \
-    FN(INT8_TENSOR, NPY_INT8)       \
-    FN(INT16_TENSOR, NPY_INT16)     \
-    FN(INT32_TENSOR, NPY_INT32)     \
-    FN(INT64_TENSOR, NPY_INT64)     \
-                                    \
-    FN(UINT8_TENSOR, NPY_UINT8)     \
-    FN(UINT16_TENSOR, NPY_UINT16)   \
-    FN(UINT32_TENSOR, NPY_UINT32)   \
-    FN(UINT64_TENSOR, NPY_UINT64)
-
-
-int get_numpy_type_from_neuropod_type(TensorType type)
-{
-#define NEUROPOD_TO_NUMPY(NEUROPOD_TYPE, NUMPY_TYPE) \
-    case NEUROPOD_TYPE:                              \
-        return NUMPY_TYPE;
-
-    switch (type)
-    {
-        FOR_NP_NEUROPOD_MAPPING(NEUROPOD_TO_NUMPY)
-    }
-}
-
-
-TensorType get_neuropod_type_from_numpy_type(int type)
-{
-#define NUMPY_TO_NEUROPOD(NEUROPOD_TYPE, NUMPY_TYPE) \
-    case NUMPY_TYPE:                                 \
-        return NEUROPOD_TYPE;
-
-    switch (type)
-    {
-        FOR_NP_NEUROPOD_MAPPING(NUMPY_TO_NEUROPOD)
-    }
-
-    std::stringstream ss;
-    ss << "Unsupported numpy type: " << type;
-    throw std::runtime_error(ss.str());
 }
 
 std::vector<int64_t> get_dims_from_numpy(PyArrayObject *nparray)
@@ -105,10 +62,9 @@ PyArrayObject *get_nparray_from_obj(py::object boost_obj)
 }
 
 // Allocate a new numpy array
-NumpyNeuropodTensor::NumpyNeuropodTensor(const std::string &         name,
-                                         const std::vector<int64_t> &dims,
-                                         TensorType                  tensor_type)
-    : NeuropodTensor(name, tensor_type, dims)
+template <typename T>
+NumpyNeuropodTensor<T>::NumpyNeuropodTensor(const std::string &name, const std::vector<int64_t> &dims)
+    : TypedNeuropodTensor<T>(name, dims)
 {
     setup_numpy_if_needed();
 
@@ -121,7 +77,7 @@ NumpyNeuropodTensor::NumpyNeuropodTensor(const std::string &         name,
         const_cast<npy_intp *>(dims.data()),
 
         // numpy typenum
-        get_numpy_type_from_neuropod_type(tensor_type));
+        get_numpy_type_from_neuropod_type(get_tensor_type_from_cpp<T>()));
 
     py::handle<>       handle(obj);
     py::numeric::array arr(handle);
@@ -130,8 +86,9 @@ NumpyNeuropodTensor::NumpyNeuropodTensor(const std::string &         name,
 };
 
 // Wrap an existing array
-NumpyNeuropodTensor::NumpyNeuropodTensor(const std::string &name, PyArrayObject *obj)
-    : NeuropodTensor(name, get_neuropod_type_from_numpy_type(PyArray_TYPE(obj)), get_dims_from_numpy(obj))
+template <typename T>
+NumpyNeuropodTensor<T>::NumpyNeuropodTensor(const std::string &name, PyArrayObject *obj)
+    : TypedNeuropodTensor<T>(name, get_dims_from_numpy(obj))
 {
     py::handle<>       handle(reinterpret_cast<PyObject *>(obj));
     py::numeric::array arr(handle);
@@ -139,27 +96,29 @@ NumpyNeuropodTensor::NumpyNeuropodTensor(const std::string &name, PyArrayObject 
     nparray = arr;
 }
 
+template <typename T>
+NumpyNeuropodTensor<T>::~NumpyNeuropodTensor() = default;
 
-NumpyNeuropodTensor::~NumpyNeuropodTensor() = default;
-
-TensorDataPointer NumpyNeuropodTensor::get_data_ptr()
+template <typename T>
+T *NumpyNeuropodTensor<T>::get_raw_data_ptr()
 {
     auto arr = reinterpret_cast<PyArrayObject *>(nparray.ptr());
 
     // Get a pointer to the underlying data
     void *data = PyArray_DATA(arr);
 
-#define CAST_TENSOR(CPP_TYPE, NEUROPOD_TYPE)  \
-    case NEUROPOD_TYPE:                       \
-    {                                         \
-        return static_cast<CPP_TYPE *>(data); \
-    }
-
-    // Cast it to the correct type and return
-    switch (get_tensor_type())
-    {
-        FOR_EACH_TYPE_MAPPING(CAST_TENSOR)
-    }
+    return static_cast<T *>(data);
 }
+
+template <typename T>
+py::object NumpyNeuropodTensor<T>::get_native_data()
+{
+    return nparray;
+}
+
+// Instantiate the templates
+#define INIT_TEMPLATES_FOR_TYPE(CPP_TYPE, NEUROPOD_TYPE) template class NumpyNeuropodTensor<CPP_TYPE>;
+
+FOR_EACH_TYPE_MAPPING(INIT_TEMPLATES_FOR_TYPE);
 
 } // namespace neuropods

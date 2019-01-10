@@ -23,11 +23,12 @@ PyArrayObject *get_nparray_from_obj(py::object boost_obj);
 
 // This class is internal to neuropods and should not be exposed
 // to users
-class NumpyNeuropodTensor : public NeuropodTensor
+template <typename T>
+class NumpyNeuropodTensor : public TypedNeuropodTensor<T>, public NativeDataContainer<py::object>
 {
 public:
     // Allocate a numpy array
-    NumpyNeuropodTensor(const std::string &name, const std::vector<int64_t> &dims, TensorType tensor_type);
+    NumpyNeuropodTensor(const std::string &name, const std::vector<int64_t> &dims);
 
     // Wrap an existing array
     NumpyNeuropodTensor(const std::string &name, PyArrayObject *nparray);
@@ -35,7 +36,9 @@ public:
     ~NumpyNeuropodTensor();
 
     // Get a pointer to the underlying data
-    TensorDataPointer get_data_ptr();
+    T *get_raw_data_ptr();
+
+    py::object get_native_data();
 
     // The underlying numpy array
     py::object nparray;

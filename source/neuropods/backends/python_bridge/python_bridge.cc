@@ -10,6 +10,7 @@
 #include <vector>
 
 #include "neuropods/backends/python_bridge/numpy_neuropod_tensor.hh"
+#include "neuropods/backends/python_bridge/type_utils.hh"
 #include "neuropods/internal/tensor_store.hh"
 
 namespace neuropods
@@ -107,7 +108,7 @@ std::unique_ptr<NeuropodTensor> PythonBridge::allocate_tensor(const std::string 
                                                               const std::vector<int64_t> &input_dims,
                                                               TensorType                  tensor_type)
 {
-    return std::make_unique<NumpyNeuropodTensor>(node_name, input_dims, tensor_type);
+    return make_tensor<NumpyNeuropodTensor>(tensor_type, node_name, input_dims);
 }
 
 // Run inference
@@ -119,7 +120,8 @@ std::unique_ptr<TensorStore> PythonBridge::infer(const TensorStore &inputs)
         py::dict model_inputs;
         for (const std::shared_ptr<NeuropodTensor> &tensor : inputs.tensors)
         {
-            model_inputs[tensor->get_name()] = static_cast<NumpyNeuropodTensor *>(tensor.get())->nparray;
+            model_inputs[tensor->get_name()]
+                = std::dynamic_pointer_cast<NativeDataContainer<py::object>>(tensor)->get_native_data();
         }
 
         // Create local python variables with the loaded neuropod and the input dict
@@ -143,8 +145,9 @@ std::unique_ptr<TensorStore> PythonBridge::infer(const TensorStore &inputs)
             const int         key_len   = py::extract<int>(out_keys[i].attr("__len__")());
             const std::string key       = std::string(key_c_str, key_len);
 
-            PyArrayObject *nparray = get_nparray_from_obj(model_outputs[key]);
-            to_return->tensors.emplace_back(std::make_shared<NumpyNeuropodTensor>(key, nparray));
+            PyArrayObject *nparray     = get_nparray_from_obj(model_outputs[key]);
+            TensorType     tensor_type = get_neuropod_type_from_numpy_type(PyArray_TYPE(nparray));
+            to_return->tensors.emplace_back(make_tensor<NumpyNeuropodTensor>(tensor_type, key, nparray));
         }
 
         return to_return;

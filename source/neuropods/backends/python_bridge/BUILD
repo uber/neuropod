@@ -7,6 +7,8 @@ cc_library(
     srcs = [
         "numpy_neuropod_tensor.cc",
         "python_bridge.cc",
+        "type_utils.cc",
+        "type_utils.hh",
     ],
     hdrs = [
         "numpy_neuropod_tensor.hh",
