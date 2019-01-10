@@ -7,6 +7,8 @@ cc_library(
     srcs = [
         "torch_backend.cc",
         "torch_tensor.cc",
+        "type_utils.cc",
+        "type_utils.hh",
     ],
     hdrs = [
         "torch_backend.hh",

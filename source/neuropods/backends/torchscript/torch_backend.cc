@@ -9,6 +9,7 @@
 #include <stdexcept>
 
 #include "neuropods/backends/torchscript/torch_tensor.hh"
+#include "neuropods/backends/torchscript/type_utils.hh"
 #include "neuropods/internal/tensor_store.hh"
 
 namespace neuropods
@@ -48,11 +49,12 @@ std::string get_graph_path(const std::string &neuropod_path)
     return neuropod_path + "/0/data/model.pt";
 }
 
-std::unique_ptr<TorchNeuropodTensor> get_tensor_from_key_value_pair(at::ivalue::Tuple *tuple)
+std::unique_ptr<NeuropodTensor> get_tensor_from_key_value_pair(at::ivalue::Tuple *tuple)
 {
-    const std::string &name   = tuple->elements()[0].toString()->string();
-    auto               tensor = tuple->elements()[1].toTensor();
-    return std::make_unique<TorchNeuropodTensor>(name, tensor);
+    const std::string &name        = tuple->elements()[0].toString()->string();
+    auto               tensor      = tuple->elements()[1].toTensor();
+    auto               tensor_type = get_neuropod_type_from_torch_type(tensor.scalar_type());
+    return make_tensor<TorchNeuropodTensor>(tensor_type, name, tensor);
 }
 
 } // namespace
@@ -71,7 +73,7 @@ std::unique_ptr<NeuropodTensor> TorchNeuropodBackend::allocate_tensor(const std:
                                                                       TensorType                  tensor_type)
 {
     torch::NoGradGuard guard;
-    return std::make_unique<TorchNeuropodTensor>(node_name, input_dims, tensor_type);
+    return make_tensor<TorchNeuropodTensor>(tensor_type, node_name, input_dims);
 }
 
 // Run inference
@@ -88,7 +90,8 @@ std::unique_ptr<TensorStore> TorchNeuropodBackend::infer(const TensorStore &inpu
     for (const std::shared_ptr<NeuropodTensor> &tensor : inputs.tensors)
     {
         const auto  input_name = tensor->get_name();
-        const auto &input_data = static_cast<TorchNeuropodTensor *>(tensor.get())->tensor;
+        const auto &input_data
+            = std::dynamic_pointer_cast<NativeDataContainer<torch::jit::IValue>>(tensor)->get_native_data();
 
         auto arg_index = schema.argumentIndexWithName(input_name);
         if (!arg_index.has_value())
