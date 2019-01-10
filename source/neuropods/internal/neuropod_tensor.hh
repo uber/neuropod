@@ -4,7 +4,9 @@
 
 #pragma once
 
-#include <boost/variant.hpp>
+#include <ostream>
+#include <sstream>
+#include <stdexcept>
 #include <string>
 #include <vector>
 
@@ -16,8 +18,29 @@
 namespace neuropods
 {
 
-// All the supported types of data for tensors
-typedef boost::variant<FOR_EACH_TYPE_MAPPING_DELIM(PTR, COMMA_DELIM)> TensorDataPointer;
+namespace
+{
+
+// Utility to get a neuropod tensor type from a c++ type
+template <typename T>
+TensorType get_tensor_type_from_cpp()
+{
+}
+
+#define GET_TENSOR_TYPE_FN(CPP_TYPE, NEUROPOD_TYPE) \
+    template <>                                     \
+    TensorType get_tensor_type_from_cpp<CPP_TYPE>() \
+    {                                               \
+        return NEUROPOD_TYPE;                       \
+    }
+
+FOR_EACH_TYPE_MAPPING(GET_TENSOR_TYPE_FN)
+
+} // namespace
+
+// Forward declare TypedNeuropodTensor
+template <typename T>
+class TypedNeuropodTensor;
 
 // A type erased version of a TypedNeuropodTensor. See the documentation for
 // TypedNeuropodTensor for more details.
@@ -58,9 +81,6 @@ public:
         return out;
     }
 
-    // Get a pointer to the underlying data
-    virtual TensorDataPointer get_data_ptr() = 0;
-
     // Get the dimensions of the tensor
     const std::vector<int64_t> &get_dims() const { return dims_; }
 
@@ -81,27 +101,28 @@ public:
     }
 
     TensorType get_tensor_type() const { return tensor_type_; }
-};
 
-namespace
-{
+    // Downcast a NeuropodTensor to a TypedNeuropodTensor of a specific type
+    // The requested type is checked to make sure it matches the actual type
+    template <typename T>
+    TypedNeuropodTensor<T> *as_typed_tensor()
+    {
+        TensorType requested = get_tensor_type_from_cpp<T>();
+        TensorType actual    = get_tensor_type();
 
-// Utility to get a neuropod tensor type from a c++ type
-template <typename T>
-TensorType get_tensor_type_from_cpp()
-{
-}
+        if (requested != actual)
+        {
+            std::stringstream ss;
+            ss << "Tried to downcast a tensor of type ";
+            ss << actual;
+            ss << " to a TypedNeuropodTensor of type ";
+            ss << requested;
+            throw std::runtime_error(ss.str());
+        }
 
-#define GET_TENSOR_TYPE_FN(CPP_TYPE, NEUROPOD_TYPE) \
-    template <>                                     \
-    TensorType get_tensor_type_from_cpp<CPP_TYPE>() \
-    {                                               \
-        return NEUROPOD_TYPE;                       \
+        return static_cast<TypedNeuropodTensor<T> *>(this);
     }
-
-FOR_EACH_TYPE_MAPPING(GET_TENSOR_TYPE_FN)
-
-} // namespace
+};
 
 // A TypedNeuropodTensor is a NeuropodTensor of a specific type.
 // Backends should extend this class directly for their tensor implementations
@@ -116,8 +137,6 @@ public:
     }
 
     virtual ~TypedNeuropodTensor() {}
-
-    TensorDataPointer get_data_ptr() final { return get_raw_data_ptr(); }
 
     virtual T *get_raw_data_ptr() = 0;
 };

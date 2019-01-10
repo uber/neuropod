@@ -22,7 +22,10 @@ void NeuropodOutputData::get_data_pointer_and_size(const std::string &node_name,
 {
     auto tensor = tensor_store->find(node_name);
 
-    pointer = boost::get<T *>(tensor->get_data_ptr());
+    // Downcast to a TypedNeuropodTensor so we can get the data pointer
+    auto typed_tensor = tensor->as_typed_tensor<T>();
+
+    pointer = typed_tensor->get_raw_data_ptr();
     size    = tensor->get_num_elements();
 }
 

@@ -69,7 +69,10 @@ T *NeuropodInputBuilder::allocate_tensor(const std::string &         node_name,
     // Add it to the vector of tensors stored in the builder
     pimpl->data->tensors.emplace_back(tensor);
 
-    return boost::get<T *>(tensor->get_data_ptr());
+    // Downcast to a TypedNeuropodTensor so we can get the data pointer
+    auto typed_tensor = tensor->as_typed_tensor<T>();
+
+    return typed_tensor->get_raw_data_ptr();
 }
 
 std::unique_ptr<NeuropodInputData, NeuropodInputDataDeleter> NeuropodInputBuilder::build()

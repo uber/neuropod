@@ -37,8 +37,11 @@ void check_ptrs_eq(const T *data, size_t size, const T *target_data, size_t targ
 template <typename T>
 void check_tensor_eq_ptr(const std::shared_ptr<neuropods::NeuropodTensor> &tensor, const T *target_data, size_t size)
 {
+    // Downcast to a TypedNeuropodTensor so we can get the data pointer
+    const auto typed_tensor = tensor->as_typed_tensor<T>();
+
     // Get a pointer to the internal data
-    const auto tensor_data_ptr = boost::get<T *>(tensor->get_data_ptr());
+    const auto tensor_data_ptr = typed_tensor->get_raw_data_ptr();
 
     // Check that the size and data match expected values
     EXPECT_EQ(tensor->get_num_elements(), size);
