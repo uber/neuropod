@@ -97,6 +97,6 @@ std::unique_ptr<NeuropodInputData, NeuropodInputDataDeleter> NeuropodInputBuilde
     template CPP_TYPE *NeuropodInputBuilder::allocate_tensor(                                                          \
         const std::string &node_name, size_t input_data_size, const std::vector<int64_t> &input_dims);
 
-FOR_EACH_TYPE_MAPPING(INIT_TEMPLATES_FOR_TYPE);
+FOR_EACH_TYPE_MAPPING_EXCEPT_STRING(INIT_TEMPLATES_FOR_TYPE);
 
 } // namespace neuropods

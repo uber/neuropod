@@ -34,7 +34,7 @@ TensorType get_tensor_type_from_cpp()
         return NEUROPOD_TYPE;                       \
     }
 
-FOR_EACH_TYPE_MAPPING(GET_TENSOR_TYPE_FN)
+FOR_EACH_TYPE_MAPPING_INCLUDING_STRING(GET_TENSOR_TYPE_FN)
 
 } // namespace
 
@@ -154,7 +154,7 @@ std::unique_ptr<NeuropodTensor> make_tensor(TensorType tensor_type, Params &&...
     // Make a tensor of the correct type and return it
     switch (tensor_type)
     {
-        FOR_EACH_TYPE_MAPPING(MAKE_TENSOR)
+        FOR_EACH_TYPE_MAPPING_INCLUDING_STRING(MAKE_TENSOR)
     }
 #undef MAKE_TENSOR
 }

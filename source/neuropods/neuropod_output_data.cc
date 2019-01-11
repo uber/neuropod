@@ -56,6 +56,6 @@ std::vector<int64_t> NeuropodOutputData::get_shape(const std::string &node_name)
         const std::string &node_name, const CPP_TYPE *&pointer, size_t &size) const; \
     template std::vector<CPP_TYPE> NeuropodOutputData::get_data_as_vector(const std::string &node_name) const;
 
-FOR_EACH_TYPE_MAPPING(INIT_TEMPLATES_FOR_TYPE);
+FOR_EACH_TYPE_MAPPING_EXCEPT_STRING(INIT_TEMPLATES_FOR_TYPE);
 
 } // namespace neuropods

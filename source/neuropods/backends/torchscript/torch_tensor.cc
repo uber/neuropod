@@ -80,6 +80,6 @@ torch::jit::IValue TorchNeuropodTensor<T>::get_native_data()
 // Instantiate the templates
 #define INIT_TEMPLATES_FOR_TYPE(CPP_TYPE, NEUROPOD_TYPE) template class TorchNeuropodTensor<CPP_TYPE>;
 
-FOR_EACH_TYPE_MAPPING(INIT_TEMPLATES_FOR_TYPE);
+FOR_EACH_TYPE_MAPPING_INCLUDING_STRING(INIT_TEMPLATES_FOR_TYPE);
 
 } // namespace neuropods
