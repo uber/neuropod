@@ -6,13 +6,12 @@ cc_library(
     name = "torchscript_backend",
     srcs = [
         "torch_backend.cc",
-        "torch_tensor.cc",
+        "torch_tensor.hh",
         "type_utils.cc",
         "type_utils.hh",
     ],
     hdrs = [
         "torch_backend.hh",
-        "torch_tensor.hh",
     ],
     visibility = [
         "//neuropods:__subpackages__",
