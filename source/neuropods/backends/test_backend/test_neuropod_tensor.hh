@@ -24,12 +24,15 @@ private:
     void *data_;
 
 public:
-    TestNeuropodTensor(const std::string &name, const std::vector<int64_t> &dims);
+    TestNeuropodTensor(const std::string &name, const std::vector<int64_t> &dims) : TypedNeuropodTensor<T>(name, dims)
+    {
+        data_ = malloc(this->get_num_elements() * sizeof(T));
+    }
 
-    ~TestNeuropodTensor();
+    ~TestNeuropodTensor() { free(data_); }
 
     // Get a pointer to the underlying data
-    T *get_raw_data_ptr();
+    T *get_raw_data_ptr() { return static_cast<T *>(data_); }
 };
 
 } // namespace neuropods
