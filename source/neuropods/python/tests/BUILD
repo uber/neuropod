@@ -15,6 +15,12 @@ py_test(
 )
 
 py_test(
+    name = "test_pytorch_strings",
+    srcs = ["test_pytorch_strings.py"],
+    deps = [],
+)
+
+py_test(
     name = "test_tensorflow_packaging",
     srcs = ["test_tensorflow_packaging.py"],
     deps = [],
