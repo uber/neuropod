@@ -41,6 +41,26 @@ NeuropodInputBuilder &NeuropodInputBuilder::add_tensor(const std::string &      
     return add_tensor(node_name, input_data.data(), input_data.size(), input_dims);
 }
 
+// Specialization for strings
+template <>
+NeuropodInputBuilder &NeuropodInputBuilder::add_tensor(const std::string &             node_name,
+                                                       const std::vector<std::string> &input_data,
+                                                       const std::vector<int64_t> &    input_dims)
+{
+    std::shared_ptr<NeuropodTensor> tensor = pimpl->backend->allocate_tensor(node_name, input_dims, STRING_TENSOR);
+
+    // Add it to the vector of tensors stored in the builder
+    pimpl->data->tensors.emplace_back(tensor);
+
+    // Downcast to a TypedNeuropodTensor so we can set the data
+    auto typed_tensor = tensor->as_typed_tensor<std::string>();
+
+    // Set the data
+    typed_tensor->set(input_data);
+
+    // (for easy chaining)
+    return *this;
+}
 
 template <typename T>
 NeuropodInputBuilder &NeuropodInputBuilder::add_tensor(const std::string &         node_name,

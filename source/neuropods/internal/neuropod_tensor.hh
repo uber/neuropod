@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <functional>
+#include <numeric>
 #include <ostream>
 #include <sstream>
 #include <stdexcept>
@@ -91,13 +93,8 @@ public:
     // by multiplying all the dims together
     size_t get_num_elements() const
     {
-        size_t tensor_size = 1;
-        for (const auto dim_size : get_dims())
-        {
-            tensor_size *= dim_size;
-        }
-
-        return tensor_size;
+        const auto dims = get_dims();
+        return std::accumulate(dims.begin(), dims.end(), 1, std::multiplies<int64_t>());
     }
 
     TensorType get_tensor_type() const { return tensor_type_; }
@@ -139,7 +136,54 @@ public:
     virtual ~TypedNeuropodTensor() {}
 
     virtual T *get_raw_data_ptr() = 0;
+
+    std::vector<T> get_data_as_vector()
+    {
+        std::vector<T> out;
+
+        // Get the size and a pointer to the data
+        size_t   size         = get_num_elements();
+        const T *data_pointer = get_raw_data_ptr();
+
+        // Copy into the vector
+        out.insert(out.end(), &data_pointer[0], &data_pointer[size]);
+
+        return out;
+    }
 };
+
+// A specialization for strings
+template <>
+class TypedNeuropodTensor<std::string> : public NeuropodTensor
+{
+public:
+    TypedNeuropodTensor(const std::string &name, const std::vector<int64_t> dims)
+        : NeuropodTensor(name, STRING_TENSOR, dims)
+    {
+    }
+
+    virtual ~TypedNeuropodTensor() {}
+
+    // We can't get a raw pointer from a string tensor
+    // virtual std::string *get_raw_data_ptr() = 0;
+
+    // TODO(vip): make this pure virtual once all the existing backends have
+    // implementations.
+    // Set the data in the string tensor
+    virtual void set(const std::vector<std::string> &data)
+    {
+        throw std::runtime_error("Children must implement `set`");
+    }
+
+    // TODO(vip): make this pure virtual once all the existing backends have
+    // implementations.
+    // Get the data in the string tensor
+    virtual std::vector<std::string> get_data_as_vector()
+    {
+        throw std::runtime_error("Children must implement `get_data_as_vector`");
+    };
+};
+
 
 // Utility to make a tensor of a specific type
 template <template <class> class TensorClass, typename... Params>
