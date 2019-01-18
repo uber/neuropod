@@ -6,6 +6,7 @@
 
 #define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION
 
+#include <algorithm>
 #include <boost/python.hpp>
 #include <numpy/arrayobject.h>
 #include <string>
@@ -117,6 +118,125 @@ public:
         void *data = PyArray_DATA(arr);
 
         return static_cast<T *>(data);
+    }
+
+    py::object get_native_data() { return nparray_; }
+
+    // The underlying numpy array
+    py::object nparray_;
+};
+
+
+// Specialization for strings
+template <>
+class NumpyNeuropodTensor<std::string> : public TypedNeuropodTensor<std::string>, public NativeDataContainer<py::object>
+{
+public:
+    // Allocate a numpy array
+    NumpyNeuropodTensor(const std::string &name, const std::vector<int64_t> &dims)
+        : TypedNeuropodTensor<std::string>(name, dims)
+    {
+        setup_numpy_if_needed();
+    };
+
+    // Wrap an existing array
+    NumpyNeuropodTensor(const std::string &name, PyArrayObject *nparray)
+        : TypedNeuropodTensor<std::string>(name, get_dims_from_numpy(nparray))
+    {
+        py::handle<>       handle(reinterpret_cast<PyObject *>(nparray));
+        py::numeric::array arr(handle);
+
+        nparray_ = arr;
+    }
+
+
+    ~NumpyNeuropodTensor() = default;
+
+    void set(const std::vector<std::string> &data)
+    {
+        // Get the length of the longest string
+        size_t max_len = 0;
+        for (const auto &item : data)
+        {
+            max_len = std::max(max_len, item.length());
+        }
+
+        // Allocate the numpy array
+        const auto dims = get_dims();
+        PyObject * obj  = PyArray_New(
+            // Type
+            &PyArray_Type,
+
+            // num dims
+            dims.size(),
+
+            // The dimensions
+            const_cast<npy_intp *>(dims.data()),
+
+            // numpy typenum
+            NPY_STRING,
+
+            // strides
+            nullptr,
+
+            // data
+            nullptr,
+
+            // itemsize
+            max_len,
+
+            // flags
+            0,
+
+            // PyObject
+            nullptr);
+
+        // Cast to a PyArrayObject
+        auto pyarr = reinterpret_cast<PyArrayObject *>(obj);
+
+        // Zero fill
+        PyArray_FILLWBYTE(pyarr, 0);
+
+        // Get a pointer to the underlying data
+        char *arr_data = static_cast<char *>(PyArray_DATA(pyarr));
+
+        // Set the data
+        char *arr_data_ptr = arr_data;
+        for (const auto &item : data)
+        {
+            memcpy(arr_data_ptr, item.c_str(), item.length() * sizeof(char));
+            arr_data_ptr += max_len;
+        }
+
+        py::handle<>       handle(obj);
+        py::numeric::array arr(handle);
+
+        nparray_ = arr;
+    }
+
+    std::vector<std::string> get_data_as_vector()
+    {
+        auto arr = reinterpret_cast<PyArrayObject *>(nparray_.ptr());
+
+        int max_len = PyArray_ITEMSIZE(arr);
+        int numel   = get_num_elements();
+
+        // Get a pointer to the underlying data
+        char *data = static_cast<char *>(PyArray_DATA(arr));
+
+
+        std::vector<std::string> out;
+        std::string              chars_to_strip("\0", 1);
+        for (int i = 0; i < numel * max_len; i += max_len)
+        {
+            std::string item(data + i, max_len);
+
+            // Remove null padding at the end
+            item.erase(item.find_last_not_of(chars_to_strip) + 1);
+            out.emplace_back(item);
+        }
+
+        return out;
     }
 
     py::object get_native_data() { return nparray_; }

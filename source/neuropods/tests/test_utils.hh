@@ -6,24 +6,20 @@
 
 #include <algorithm>
 #include <string>
+#include <vector>
 
 #include "gtest/gtest.h"
 
 #include "neuropods/neuropods.hh"
 
-void test_addition_model(const std::string &neuropod_path, const std::string &backend, bool do_fail)
+void test_addition_model(const std::string &neuropod_path, const std::string &backend)
 {
     // Some sample input data
     std::vector<int64_t> shape = {2, 2};
 
     const float x_data[] = {1, 2, 3, 4};
     const float y_data[] = {7, 8, 9, 10};
-    float       target[] = {8, 10, 12, 14};
-
-    if (do_fail)
-    {
-        target[0] += 1;
-    }
+    const float target[] = {8, 10, 12, 14};
 
     // Load the neuropod
     neuropods::Neuropod neuropod(neuropod_path, backend);
@@ -41,25 +37,41 @@ void test_addition_model(const std::string &neuropod_path, const std::string &ba
 
     // Check that the output data matches
     EXPECT_EQ(out_vector.size(), 4);
-
-    if (do_fail)
-    {
-        EXPECT_FALSE(std::equal(out_vector.begin(), out_vector.end(), target));
-    }
-    else
-    {
-        EXPECT_TRUE(std::equal(out_vector.begin(), out_vector.end(), target));
-    }
+    EXPECT_TRUE(std::equal(out_vector.begin(), out_vector.end(), target));
 
     // Check that the shape matches
     EXPECT_TRUE(out_shape == shape);
 }
 
-void test_addition_model(const std::string &neuropod_path, const std::string &backend)
-{
-    // Tests that the output matches the target
-    test_addition_model(neuropod_path, backend, true);
 
-    // Output shouldn't match the target
-    test_addition_model(neuropod_path, backend, false);
+void test_strings_model(const std::string &neuropod_path, const std::string &backend)
+{
+    // Tests a model that concatenates string tensors
+    // Some sample input data
+    std::vector<int64_t> shape = {3};
+
+    const std::vector<std::string> x_data = {"apple", "banana", "carrot"};
+    const std::vector<std::string> y_data = {"sauce", "pudding", "cake"};
+    std::vector<std::string>       target = {"apple sauce", "banana pudding", "carrot cake"};
+
+    // Load the neuropod
+    neuropods::Neuropod neuropod(neuropod_path, backend);
+
+    // Get an input builder and add some data
+    auto input_builder = neuropod.get_input_builder();
+    auto input_data    = input_builder->add_tensor("x", x_data, shape).add_tensor("y", y_data, shape).build();
+
+    // Run inference
+    const auto output_data = neuropod.infer(input_data);
+
+    // Get the data in the output tensor
+    const std::vector<std::string> out_vector = output_data->get_data_as_vector<std::string>("out");
+    const std::vector<int64_t>     out_shape  = output_data->get_shape("out");
+
+    // Check that the output data matches
+    EXPECT_EQ(out_vector.size(), 3);
+    EXPECT_TRUE(out_vector == target);
+
+    // Check that the shape matches
+    EXPECT_TRUE(out_shape == shape);
 }
