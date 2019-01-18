@@ -1,0 +1,29 @@
+{
+    "output_spec": [
+        {
+            "dtype": "string", 
+            "shape": [
+                null
+            ], 
+            "name": "out"
+        }
+    ], 
+    "platform": "python", 
+    "input_spec": [
+        {
+            "dtype": "string", 
+            "shape": [
+                null
+            ], 
+            "name": "x"
+        }, 
+        {
+            "dtype": "string", 
+            "shape": [
+                null
+            ], 
+            "name": "y"
+        }
+    ], 
+    "name": "strings_model"
+}
