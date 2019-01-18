@@ -9,6 +9,12 @@ py_test(
 )
 
 py_test(
+    name = "test_torchscript_strings",
+    srcs = ["test_torchscript_strings.py"],
+    deps = [],
+)
+
+py_test(
     name = "test_pytorch_packaging",
     srcs = ["test_pytorch_packaging.py"],
     deps = [],
