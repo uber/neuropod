@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "neuropods/backends/neuropod_backend.hh"
+#include "neuropods/fwd_declarations.hh"
 
 namespace neuropods
 {

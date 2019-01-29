@@ -2,13 +2,10 @@
 # Uber, Inc. (c) 2018
 #
 
+load("@bazel_tools//tools/build_defs/pkg:pkg.bzl", "pkg_tar")
+
 cc_library(
-    name = "neuropods",
-    srcs = [
-        "neuropod_input_builder.cc",
-        "neuropod_output_data.cc",
-        "neuropods.cc",
-    ],
+    name = "neuropods_hdrs",
     hdrs = [
         "neuropod_input_builder.hh",
         "neuropod_output_data.hh",
@@ -37,4 +34,67 @@ cc_library(
     visibility = [
         "//visibility:public",
     ],
+)
+
+cc_binary(
+    name = "libneuropods.so",
+    linkshared = True,
+    linkstatic = True,
+    srcs = [
+        "neuropod_input_builder.cc",
+        "neuropod_output_data.cc",
+        "neuropods.cc",
+    ],
+    visibility = [
+        "//visibility:public",
+    ],
+    deps = [
+        ":neuropods_hdrs",
+        "//neuropods/internal:backend_registration_impl",
+    ]
+)
+
+# TODO(vip): do this in a cleaner way. `remap_paths` didn't appear to work
+pkg_tar(
+    name = "libneuropods_proxy_hdrs",
+    package_dir = "proxy/",
+    srcs = [
+        "//neuropods/proxy:neuropod_proxy.hh",
+    ],
+)
+
+pkg_tar(
+    name = "libneuropods_hdrs",
+    package_dir = "include/neuropods/",
+    srcs = [
+        # Headers
+        ":neuropod_input_builder.hh",
+        ":neuropod_output_data.hh",
+        ":neuropods.hh",
+        ":fwd_declarations.hh",
+        "//neuropods/proxy:neuropod_proxy.hh",
+    ],
+    deps = [
+        ":libneuropods_proxy_hdrs",
+    ]
+)
+
+pkg_tar(
+    name = "libneuropods_libs",
+    package_dir = "lib/",
+    srcs = [
+        # Libs
+        ":libneuropods.so",
+        "//neuropods/backends/python_bridge:libneuropod_pythonbridge_backend.so",
+        "//neuropods/backends/torchscript:libneuropod_torchscript_backend.so",
+    ]
+)
+
+pkg_tar(
+    name = "libneuropods",
+    extension = "tar.gz",
+    deps = [
+        ":libneuropods_hdrs",
+        ":libneuropods_libs",
+    ]
 )

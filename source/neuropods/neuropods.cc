@@ -6,6 +6,7 @@
 
 #include "neuropods/internal/backend_registration.hh"
 #include "neuropods/internal/config_utils.hh"
+#include "neuropods/backends/neuropod_backend.hh"
 #include "neuropods/internal/neuropod_input_data.hh"
 #include "neuropods/internal/neuropod_tensor.hh"
 #include "neuropods/internal/tensor_store.hh"

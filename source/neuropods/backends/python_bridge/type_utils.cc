@@ -40,6 +40,10 @@ int get_numpy_type_from_neuropod_type(TensorType type)
     {
         FOR_NP_NEUROPOD_MAPPING(NEUROPOD_TO_NUMPY)
     }
+
+    std::stringstream ss;
+    ss << "Unsupported Neuropod type: " << type;
+    throw std::runtime_error(ss.str());
 }
 
 

@@ -25,12 +25,11 @@ namespace
 
 // Utility to get a neuropod tensor type from a c++ type
 template <typename T>
-TensorType get_tensor_type_from_cpp()
-{
-}
+TensorType get_tensor_type_from_cpp() = delete;
 
 #define GET_TENSOR_TYPE_FN(CPP_TYPE, NEUROPOD_TYPE) \
     template <>                                     \
+    [[gnu::unused]]                                 \
     TensorType get_tensor_type_from_cpp<CPP_TYPE>() \
     {                                               \
         return NEUROPOD_TYPE;                       \
@@ -199,6 +198,8 @@ std::unique_ptr<NeuropodTensor> make_tensor(TensorType tensor_type, Params &&...
     switch (tensor_type)
     {
         FOR_EACH_TYPE_MAPPING_INCLUDING_STRING(MAKE_TENSOR)
+    default:
+        throw std::runtime_error("Unsupported tensor type!");
     }
 #undef MAKE_TENSOR
 }

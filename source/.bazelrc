@@ -1,0 +1,3 @@
+# Build with C++14 support
+build --cxxopt='-std=c++14'
+
