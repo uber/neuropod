@@ -8,7 +8,7 @@
 #include <string>
 #include <vector>
 
-#include "fwd_declarations.hh"
+#include "neuropods/fwd_declarations.hh"
 
 namespace neuropods
 {

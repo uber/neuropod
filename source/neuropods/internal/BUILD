@@ -18,7 +18,7 @@ cc_library(
         "//neuropods:__subpackages__",
     ],
     deps = [
-        "//neuropods/internal:neuropod_tensor",
+        ":neuropod_tensor",
         "@libjsoncpp_repo//:libjsoncpp",
     ],
 )
@@ -70,9 +70,6 @@ cc_library(
 
 cc_library(
     name = "backend_registration",
-    srcs = [
-        "backend_registration.cc",
-    ],
     hdrs = [
         "backend_registration.hh",
     ],
@@ -81,5 +78,18 @@ cc_library(
     ],
     deps = [
         ":neuropod_config_utils",
+    ],
+)
+
+cc_library(
+    name = "backend_registration_impl",
+    srcs = [
+        "backend_registration.cc",
+    ],
+    visibility = [
+        "//neuropods:__subpackages__",
+    ],
+    deps = [
+        ":backend_registration",
     ],
 )

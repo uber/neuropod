@@ -1,0 +1,30 @@
+#
+# Uber, Inc. (c) 2018
+#
+
+package(
+    default_visibility = ["//visibility:public"],
+)
+
+cc_library(
+    name = "libtorch_hdrs",
+    hdrs = glob([
+        "include/ATen/**",
+        "include/c10/**",
+        "include/caffe2/**",
+        "include/torch/**",
+        "include/torch/csrc/**",
+        "include/torch/csrc/jit/**",
+        "include/torch/csrc/api/include/**",
+    ]),
+    includes = [
+        "include",
+        "include/torch/csrc/api/include",
+    ],
+)
+
+cc_import(
+    name = "libtorch",
+    interface_library = "lib/libtorch.so",
+    system_provided = True,
+)

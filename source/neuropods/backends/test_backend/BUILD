@@ -3,11 +3,7 @@
 #
 
 cc_library(
-    name = "test_backend",
-    srcs = [
-        "test_neuropod_backend.cc",
-        "test_neuropod_tensor.hh",
-    ],
+    name = "test_backend_hdrs",
     hdrs = [
         "test_neuropod_backend.hh",
     ],
@@ -17,4 +13,22 @@ cc_library(
     deps = [
         "//neuropods/backends:neuropod_backend",
     ],
+)
+
+cc_binary(
+    name = "libneuropod_test_backend.so",
+    srcs = [
+        "test_neuropod_backend.cc",
+        "test_neuropod_tensor.hh",
+        "//neuropods:libneuropods.so",
+    ],
+    linkshared = True,
+    linkstatic = True,
+    linkopts = ["-Wl,-rpath ."],
+    visibility = [
+        "//neuropods:__subpackages__",
+    ],
+    deps = [
+        ":test_backend_hdrs"
+    ]
 )

@@ -6,6 +6,10 @@
 # This means we only want them to be accessible from
 # within neuropods
 
+package(
+    default_visibility = ["//visibility:public"],
+)
+
 cc_library(
     name = "neuropod_proxy",
     srcs = [],
@@ -16,6 +20,6 @@ cc_library(
         "//neuropods:__subpackages__",
     ],
     deps = [
-        "//neuropods/backends:neuropod_backend",
+        "//neuropods:neuropods_fwd_declarations",
     ],
 )
