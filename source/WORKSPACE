@@ -1,11 +1,19 @@
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
 http_archive(
-    name = "libtorch_repo",
+    name = "libtorch_repo_linux",
     build_file = "@//deps:BUILD.libtorch",
     sha256 = "c165d6ece8af0c66ab99693f89ded8b85abb89d4869d5e5e9ad7be1d879f1c5a",
     strip_prefix = "libtorch",
     url = "https://download.pytorch.org/libtorch/cpu/libtorch-shared-with-deps-latest.zip",
+)
+
+http_archive(
+    name = "libtorch_repo_darwin",
+    build_file = "@//deps:BUILD.libtorch",
+    sha256 = "300d0313b61d0da479794916d0af71fcc4ce115588e0a111ec0c82fe1721e4df",
+    strip_prefix = "libtorch",
+    url = "https://download.pytorch.org/libtorch/cpu/libtorch-macos-latest.zip",
 )
 
 http_archive(
@@ -17,11 +25,19 @@ http_archive(
 )
 
 http_archive(
-    name = "python_numpy_repo",
+    name = "python_numpy_repo_linux",
     build_file = "@//deps:BUILD.numpy",
     sha256 = "99699e3e7df919fc6bbdfbdbc2ccef86a955c6d782f1b284e656ae735317c1b1",
     type = "zip",
     url = "https://files.pythonhosted.org/packages/1e/1f/42ec033fe7522ea5e16352b5491cca5d08bd05fd1d19b5be9dd9d2a3a15d/numpy-1.8.2-cp27-cp27m-manylinux1_x86_64.whl",
+)
+
+http_archive(
+    name = "python_numpy_repo_darwin",
+    build_file = "@//deps:BUILD.numpy",
+    sha256 = "860afb63f154777e69908b9daef7d10929f8257526aee9553f6548ed962cd5e7",
+    type = "zip",
+    url = "https://files.pythonhosted.org/packages/6e/00/667a21ff386d4cc6a77bf16d51623dbc9315a50204f6ed01458b10d1fd34/numpy-1.8.2-cp27-none-macosx_10_6_intel.macosx_10_9_intel.macosx_10_9_x86_64.whl",
 )
 
 http_archive(

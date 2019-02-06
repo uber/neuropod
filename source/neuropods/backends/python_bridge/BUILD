@@ -21,6 +21,8 @@ cc_binary(
     deps = [
         "//neuropods/backends:neuropod_backend",
         "@boost_repo//:boost",
-        "@python_numpy_repo//:python_numpy",
-    ]
+    ] + select({
+        "@bazel_tools//src/conditions:darwin": ["@python_numpy_repo_darwin//:python_numpy"],
+        "//conditions:default": ["@python_numpy_repo_linux//:python_numpy"],
+    })
 )

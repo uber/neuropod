@@ -20,7 +20,14 @@ cc_binary(
     ],
     deps = [
         "//neuropods/backends:neuropod_backend",
-        "@libtorch_repo//:libtorch_hdrs",
-        "@libtorch_repo//:libtorch",
-    ]
+    ] + select({
+        "@bazel_tools//src/conditions:darwin": [
+            "@libtorch_repo_darwin//:libtorch_hdrs",
+            "@libtorch_repo_darwin//:libtorch",
+        ],
+        "//conditions:default": [
+            "@libtorch_repo_linux//:libtorch_hdrs",
+            "@libtorch_repo_linux//:libtorch",
+        ],
+    })
 )
