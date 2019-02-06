@@ -1,10 +1,11 @@
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
-# TODO(vip): don't use a local repository. Switch to a prebuilt archive
-new_local_repository(
+http_archive(
     name = "libtorch_repo",
-    path = "/usr/deps/libtorch",
     build_file = "@//deps:BUILD.libtorch",
+    sha256 = "c165d6ece8af0c66ab99693f89ded8b85abb89d4869d5e5e9ad7be1d879f1c5a",
+    strip_prefix = "libtorch",
+    url = "https://download.pytorch.org/libtorch/cpu/libtorch-shared-with-deps-latest.zip",
 )
 
 http_archive(
