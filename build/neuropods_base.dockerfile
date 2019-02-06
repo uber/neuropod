@@ -15,7 +15,7 @@ RUN echo "deb [arch=amd64] http://storage.googleapis.com/bazel-apt stable jdk1.8
 
 # Install bazel and other native deps
 RUN apt-get update && \
-    apt-get install -y bazel python-dev libboost-python-dev && \
+    apt-get install -y bazel python-dev && \
     rm -rf /var/lib/apt/lists/*
 
 # Run a bazel command to extract the bazel installation

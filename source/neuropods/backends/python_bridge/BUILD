@@ -20,7 +20,7 @@ cc_binary(
     ],
     deps = [
         "//neuropods/backends:neuropod_backend",
-        "@boost//:python",
+        "@boost_repo//:boost",
         "@python_numpy_repo//:python_numpy",
     ]
 )

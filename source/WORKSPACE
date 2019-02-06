@@ -23,11 +23,13 @@ http_archive(
     url = "https://files.pythonhosted.org/packages/1e/1f/42ec033fe7522ea5e16352b5491cca5d08bd05fd1d19b5be9dd9d2a3a15d/numpy-1.8.2-cp27-cp27m-manylinux1_x86_64.whl",
 )
 
-# TODO(vip): don't use a local repository. Switch to a prebuilt archive
-new_local_repository(
-    name = "boost",
-    path = "/usr",
+http_archive(
+    name = "boost_repo",
     build_file = "@//deps:BUILD.boost",
+    sha256 = "8361ddefbc1c9c2e449ec94cb8e0da6649d076102cde4ea11adfdd2a73e8411e",
+    type = "zip",
+    url = "https://downloads.sourceforge.net/project/boost/boost/1.54.0/boost_1_54_0.zip",
+    strip_prefix = "boost_1_54_0",
 )
 
 # TODO(vip): don't use a local repository. Switch to a prebuilt archive
