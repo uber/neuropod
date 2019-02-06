@@ -8,8 +8,12 @@ package(
 
 cc_library(
     name = "boost",
+    srcs = glob([
+        # Boost.Python is not header-only
+        "libs/python/src/**/*.cpp",
+    ]),
     hdrs = glob([
-        "boost/**/*.hpp"
+        "boost/**/*.hpp",
     ]),
     includes = [
         "."
