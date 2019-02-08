@@ -1,4 +1,5 @@
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+load("//bazel:python.bzl", "python_repository")
 
 http_archive(
     name = "libtorch_repo_linux",
@@ -49,10 +50,8 @@ http_archive(
     strip_prefix = "boost_1_54_0",
 )
 
-# TODO(vip): don't use a local repository. Switch to a prebuilt archive
-new_local_repository(
+python_repository(
     name = "python_repo",
-    path = "/usr",
     build_file = "@//deps:BUILD.python",
 )
 
