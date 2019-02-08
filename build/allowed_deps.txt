@@ -1,0 +1,15 @@
+# This file lists all the SO files that the final build artifacts are allowed to directly depend on
+# The content below must exactly match `readelf -d /usr/src/dist_test/lib/*.so | grep NEEDED | sort | uniq`
+# (ignoring lines that start with #). See `neuropods.dockerfile` for more details
+#
+# This check ensures that we don't accidentally link against other shared objects
+#
+ 0x0000000000000001 (NEEDED)             Shared library: [ld-linux-x86-64.so.2]
+ 0x0000000000000001 (NEEDED)             Shared library: [libboost_python-py27.so.1.58.0]
+ 0x0000000000000001 (NEEDED)             Shared library: [libc.so.6]
+ 0x0000000000000001 (NEEDED)             Shared library: [libgcc_s.so.1]
+ 0x0000000000000001 (NEEDED)             Shared library: [libm.so.6]
+ 0x0000000000000001 (NEEDED)             Shared library: [libneuropods.so]
+ 0x0000000000000001 (NEEDED)             Shared library: [libpython2.7.so.1.0]
+ 0x0000000000000001 (NEEDED)             Shared library: [libstdc++.so.6]
+ 0x0000000000000001 (NEEDED)             Shared library: [libtorch.so.1]
