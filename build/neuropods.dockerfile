@@ -19,9 +19,6 @@ RUN python setup.py bdist_wheel && pip install dist/*.whl
 WORKDIR /usr/src/source
 RUN bazel build //...:all
 
-# Run native tests
-RUN bazel test //...
-
 # Copy the build artificts into a dist folder
 RUN mkdir -p /usr/src/dist && \
     cp bazel-bin/neuropods/libneuropods.tar.gz python/dist/*.whl /usr/src/dist
@@ -31,3 +28,11 @@ RUN mkdir -p /tmp/dist_test && \
     tar -xvf /usr/src/dist/libneuropods.tar.gz -C /tmp/dist_test && \
     readelf -d /tmp/dist_test/lib/*.so | grep NEEDED | sort | uniq |\
     diff -I '^#.*' /usr/src/build/allowed_deps.txt -
+
+# Make sure the tests can find all the `.so` files for the backends
+RUN echo "/tmp/dist_test/lib" > /etc/ld.so.conf.d/libneuropods.conf && \
+    echo "/usr/src/source/bazel-source/external/libtorch_repo_linux/lib" > /etc/ld.so.conf.d/libtorch.conf && \
+    ldconfig
+
+# Run native tests
+RUN bazel test --test_output=errors //...

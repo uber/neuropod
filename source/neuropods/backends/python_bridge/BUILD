@@ -14,7 +14,10 @@ cc_binary(
     ],
     linkshared = True,
     linkstatic = True,
-    linkopts = ["-Wl,-rpath ."],
+    linkopts = [
+        "-Wl,-rpath .",
+        "-ldl",
+    ],
     visibility = [
         "//neuropods:__subpackages__",
     ],

@@ -4,17 +4,17 @@ load("//bazel:python.bzl", "python_repository")
 http_archive(
     name = "libtorch_repo_linux",
     build_file = "@//deps:BUILD.libtorch",
-    sha256 = "c165d6ece8af0c66ab99693f89ded8b85abb89d4869d5e5e9ad7be1d879f1c5a",
+    sha256 = "71cd435d664799cfe5d1c53ad1fd63b7cfc5b64ca934ee6dc2d76badd399e7f5",
     strip_prefix = "libtorch",
-    url = "https://download.pytorch.org/libtorch/cpu/libtorch-shared-with-deps-latest.zip",
+    url = "https://download.pytorch.org/libtorch/cpu/libtorch-shared-with-deps-1.0.0.zip",
 )
 
 http_archive(
     name = "libtorch_repo_darwin",
     build_file = "@//deps:BUILD.libtorch",
-    sha256 = "300d0313b61d0da479794916d0af71fcc4ce115588e0a111ec0c82fe1721e4df",
+    sha256 = "fe6be5edcc77a7853eadff7bed82955200512810b415150ca2c49fbd7c987c6d",
     strip_prefix = "libtorch",
-    url = "https://download.pytorch.org/libtorch/cpu/libtorch-macos-latest.zip",
+    url = "https://download.pytorch.org/libtorch/cpu/libtorch-macos-1.0.0.zip",
 )
 
 http_archive(

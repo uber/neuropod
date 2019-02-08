@@ -92,4 +92,5 @@ cc_library(
     deps = [
         ":backend_registration",
     ],
+    linkopts = ["-ldl"],
 )
