@@ -38,7 +38,7 @@ ENV CC=/usr/bin/gcc-4.9 CXX=/usr/bin/g++-4.9
 
 # Install deps for the python interface
 WORKDIR /usr/src/source/python
-RUN pip install -U setuptools && \
+RUN pip install -U pip setuptools && \
     python setup.py egg_info && \
     cat neuropods.egg-info/requires.txt  | sed '/^\[/ d' | paste -sd " " - | xargs pip install
 
