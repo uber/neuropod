@@ -21,13 +21,6 @@ RUN apt-get update && \
 # Run a bazel command to extract the bazel installation
 RUN bazel version
 
-# Download and install libtorch
-RUN mkdir -p /usr/deps && \
-    wget https://download.pytorch.org/libtorch/cpu/libtorch-shared-with-deps-latest.zip && \
-    unzip -d /usr/deps libtorch-shared-with-deps-latest.zip && \
-    echo "/usr/deps/libtorch/lib" > /etc/ld.so.conf.d/libtorch.conf && \
-    ldconfig
-
 # Create a source dir and copy the code in
 RUN mkdir -p /usr/src
 COPY . /usr/src

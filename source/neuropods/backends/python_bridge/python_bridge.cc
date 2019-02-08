@@ -4,6 +4,7 @@
 
 #include "python_bridge.hh"
 
+#include <dlfcn.h>
 #include <exception>
 #include <sstream>
 #include <stdlib.h>
@@ -73,6 +74,10 @@ PythonBridge::PythonBridge(const std::string &             neuropod_path,
 
         // Modify PYTHONPATH
         set_python_path(python_path_additions);
+
+        // Workaround for this issue:
+        // https://stackoverflow.com/questions/11842920/undefined-symbol-pyexc-importerror-when-embedding-python-in-c
+        dlopen("libpython2.7.so", RTLD_LAZY | RTLD_GLOBAL);
 
         // Initialize the embedded python interpreter
         Py_Initialize();
