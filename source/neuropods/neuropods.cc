@@ -10,7 +10,6 @@
 #include "neuropods/internal/neuropod_input_data.hh"
 #include "neuropods/internal/neuropod_tensor.hh"
 #include "neuropods/internal/tensor_store.hh"
-#include "neuropods/proxy/neuropod_proxy.hh"
 
 namespace neuropods
 {
@@ -34,9 +33,9 @@ Neuropod::Neuropod(const std::string &neuropod_path, const std::string &backend_
     pimpl->backend = get_backend_by_name(backend_name)(neuropod_path, std::move(mc));
 }
 
-Neuropod::Neuropod(std::shared_ptr<NeuropodProxy> backend_proxy) : pimpl(std::make_unique<Neuropod::impl>())
+Neuropod::Neuropod(std::shared_ptr<NeuropodBackend> backend) : pimpl(std::make_unique<Neuropod::impl>())
 {
-    pimpl->backend = std::move(backend_proxy);
+    pimpl->backend = std::move(backend);
 }
 
 Neuropod::~Neuropod() = default;
