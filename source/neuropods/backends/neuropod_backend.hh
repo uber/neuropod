@@ -15,7 +15,7 @@ namespace neuropods
 {
 
 class NeuropodTensor;
-class TensorStore;
+struct TensorStore;
 
 // The interface that every neuropod backend implements
 class NeuropodBackend

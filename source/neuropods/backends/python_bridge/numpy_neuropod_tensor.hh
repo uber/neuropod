@@ -84,8 +84,8 @@ public:
             // num dims
             dims.size(),
 
-            // The dimensions
-            const_cast<npy_intp *>(dims.data()),
+            // The dimensions, on OSX npy_intp is 32 bit, so we need to reinterpret_cast
+            reinterpret_cast<npy_intp *>(const_cast<int64_t *>(dims.data())),
 
             // numpy typenum
             get_numpy_type_from_neuropod_type(get_tensor_type_from_cpp<T>()));
@@ -170,8 +170,8 @@ public:
             // num dims
             dims.size(),
 
-            // The dimensions
-            const_cast<npy_intp *>(dims.data()),
+            // The dimensions, on OSX npy_intp is 32 bit, so we need to reinterpret_cast
+            reinterpret_cast<npy_intp *>(const_cast<int64_t *>(dims.data())),
 
             // numpy typenum
             NPY_STRING,

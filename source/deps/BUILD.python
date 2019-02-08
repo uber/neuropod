@@ -8,9 +8,10 @@ package(
 
 cc_library(
     name = "python",
-    srcs = [
-        "lib/x86_64-linux-gnu/libpython2.7.so"
-    ],
+    srcs = select({
+        "@bazel_tools//src/conditions:darwin": ["lib/libpython2.7.dylib"],
+        "//conditions:default": ["lib/x86_64-linux-gnu/libpython2.7.so"],
+    }),
     hdrs = glob([
         "include/python2.7/*.h"
     ]),

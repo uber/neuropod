@@ -7,19 +7,19 @@ package(
 )
 
 cc_library(
-    name = "python",
-    srcs = [
-        "lib/x86_64-linux-gnu/libboost_python.so",
-    ],
+    name = "boost",
+    srcs = glob([
+        # Boost.Python is not header-only
+        "libs/python/src/**/*.cpp",
+    ]),
     hdrs = glob([
-        "include/boost/*.hpp"
+        "boost/**/*.hpp",
     ]),
     includes = [
-        "include/boost"
+        "."
     ],
-    include_prefix = "boost",
     visibility = ["//visibility:public"],
     deps = [
-        "@python_repo//:python"
+        "@python_repo//:python",
     ],
 )
