@@ -21,3 +21,13 @@ RUN bazel build //...:all
 
 # Run native tests
 RUN bazel test //...
+
+# Copy the build artificts into a dist folder
+RUN mkdir -p /usr/src/dist && \
+    cp bazel-bin/neuropods/libneuropods.tar.gz python/dist/*.whl /usr/src/dist
+
+# Make sure we only depend on .so files we whitelist (and we depend on all the whitelisted ones)
+RUN mkdir -p /tmp/dist_test && \
+    tar -xvf /usr/src/dist/libneuropods.tar.gz -C /tmp/dist_test && \
+    readelf -d /tmp/dist_test/lib/*.so | grep NEEDED | sort | uniq |\
+    diff -I '^#.*' /usr/src/build/allowed_deps.txt -
