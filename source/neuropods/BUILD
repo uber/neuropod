@@ -21,7 +21,6 @@ cc_library(
         "//neuropods/internal:neuropod_input_data",
         "//neuropods/internal:neuropod_tensor",
         "//neuropods/internal:tensor_store",
-        "//neuropods/proxy:neuropod_proxy",
     ],
 )
 
@@ -54,15 +53,6 @@ cc_binary(
     ]
 )
 
-# TODO(vip): do this in a cleaner way. `remap_paths` didn't appear to work
-pkg_tar(
-    name = "libneuropods_proxy_hdrs",
-    package_dir = "proxy/",
-    srcs = [
-        "//neuropods/proxy:neuropod_proxy.hh",
-    ],
-)
-
 pkg_tar(
     name = "libneuropods_hdrs",
     package_dir = "include/neuropods/",
@@ -72,11 +62,7 @@ pkg_tar(
         ":neuropod_output_data.hh",
         ":neuropods.hh",
         ":fwd_declarations.hh",
-        "//neuropods/proxy:neuropod_proxy.hh",
     ],
-    deps = [
-        ":libneuropods_proxy_hdrs",
-    ]
 )
 
 pkg_tar(

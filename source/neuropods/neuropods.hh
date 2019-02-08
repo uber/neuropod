@@ -8,7 +8,6 @@
 #include <vector>
 #include <memory>
 
-#include "neuropods/proxy/neuropod_proxy.hh"
 #include "neuropods/neuropod_input_builder.hh"
 #include "neuropods/neuropod_output_data.hh"
 
@@ -28,8 +27,9 @@ public:
     // Use a specific backend to execute the neuropod
     Neuropod(const std::string &neuropod_path, const std::string &backend_name);
 
-    // Allows a proxy to be passed in if we want to run the backends
-    // on a remote machine or in a different process
+    // Allows an already-initialized backend to be passed in. This enables backends that need
+    // non-standard arguments. For example, this can be used to build a proxy that runs a
+    // Neuropod on a remote machine or in a different process.
     //
     // +--------------------------------+                   +----------------------------------+
     // |                                |                   |                                  |
@@ -42,13 +42,13 @@ public:
     //
     //
     //
-    // Example usage:
-    //   auto proxy = std::make_shared<NeuropodGRPCProxy>(neuropod_path, ...);
+    // Example:
+    //   auto proxy = std::make_shared<NeuropodGRPCProxy>(neuropod_path, some_remote_config, ...);
     //   Neuropod neuropod(proxy);
     //
-    // Note: the NeuropodProxy that is passed in below is already initialized with a path.
+    // Note: the backend that is passed in is already initialized with a path.
     // Therefore, we don't need the user to pass in a path here.
-    explicit Neuropod(std::shared_ptr<NeuropodProxy> backend_proxy);
+    explicit Neuropod(std::shared_ptr<NeuropodBackend> backend);
 
     ~Neuropod();
 
