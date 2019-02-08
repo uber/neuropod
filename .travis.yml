@@ -1,0 +1,14 @@
+dist: trusty
+language: minimal
+services:
+  - docker
+
+install:
+  # TODO(vip): prebuild the base image and pull it here instead of rebuilding
+  # every time
+  - docker build -f build/neuropods_base.dockerfile -t neuropods_base .
+
+script:
+  # This builds both the C++ and python versions and runs tests
+  - docker build -f build/neuropods.dockerfile -t neuropods .
+
