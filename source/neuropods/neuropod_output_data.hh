@@ -8,7 +8,7 @@
 #include <string>
 #include <vector>
 
-#include "neuropods/fwd_declarations.hh"
+#include "neuropods/internal/tensor_store.hh"
 
 namespace neuropods
 {

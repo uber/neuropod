@@ -50,23 +50,6 @@ cc_library(
 )
 
 cc_library(
-    name = "neuropod_input_data",
-    srcs = [
-        "neuropod_input_data.cc",
-    ],
-    hdrs = [
-        "neuropod_input_data.hh",
-    ],
-    visibility = [
-        "//neuropods:__subpackages__",
-    ],
-    deps = [
-        ":tensor_store",
-        "//neuropods:neuropods_fwd_declarations",
-    ],
-)
-
-cc_library(
     name = "backend_registration",
     hdrs = [
         "backend_registration.hh",
