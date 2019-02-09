@@ -15,23 +15,10 @@ cc_library(
         "//visibility:public",
     ],
     deps = [
-        ":neuropods_fwd_declarations",
         "//neuropods/backends:neuropod_backend",
         "//neuropods/internal:neuropod_config_utils",
-        "//neuropods/internal:neuropod_input_data",
         "//neuropods/internal:neuropod_tensor",
         "//neuropods/internal:tensor_store",
-    ],
-)
-
-cc_library(
-    name = "neuropods_fwd_declarations",
-    srcs = [],
-    hdrs = [
-        "fwd_declarations.hh",
-    ],
-    visibility = [
-        "//visibility:public",
     ],
 )
 
@@ -61,7 +48,6 @@ pkg_tar(
         ":neuropod_input_builder.hh",
         ":neuropod_output_data.hh",
         ":neuropods.hh",
-        ":fwd_declarations.hh",
     ],
     deps = [
         "//neuropods/internal:libneuropods_internal_hdrs",

@@ -57,8 +57,7 @@ public:
 
     // Run inference
     // You should use a `NeuropodInputBuilder` to generate the input
-    std::unique_ptr<NeuropodOutputData> infer(
-        const std::unique_ptr<NeuropodInputData, NeuropodInputDataDeleter> &inputs);
+    std::unique_ptr<NeuropodOutputData> infer(const std::unique_ptr<TensorStore> &inputs);
 };
 
 } // namespace neuropods

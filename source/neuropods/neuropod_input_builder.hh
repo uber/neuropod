@@ -8,7 +8,8 @@
 #include <memory>
 #include <vector>
 
-#include "neuropods/fwd_declarations.hh"
+#include "neuropods/backends/neuropod_backend.hh"
+#include "neuropods/internal/tensor_store.hh"
 
 namespace neuropods
 {
@@ -50,7 +51,7 @@ public:
     T *allocate_tensor(const std::string &node_name, size_t input_data_size, const std::vector<int64_t> &input_dims);
 
     // Get the data
-    std::unique_ptr<NeuropodInputData, NeuropodInputDataDeleter> build();
+    std::unique_ptr<TensorStore> build();
 };
 
 } // namespace neuropods

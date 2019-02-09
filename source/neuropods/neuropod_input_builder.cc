@@ -8,7 +8,6 @@
 
 #include "neuropods/backends/neuropod_backend.hh"
 #include "neuropods/internal/neuropod_tensor.hh"
-#include "neuropods/internal/neuropod_input_data.hh"
 #include "neuropods/internal/tensor_store.hh"
 
 namespace neuropods
@@ -95,12 +94,9 @@ T *NeuropodInputBuilder::allocate_tensor(const std::string &         node_name,
     return typed_tensor->get_raw_data_ptr();
 }
 
-std::unique_ptr<NeuropodInputData, NeuropodInputDataDeleter> NeuropodInputBuilder::build()
+std::unique_ptr<TensorStore> NeuropodInputBuilder::build()
 {
-    // Can't use make_unique because of a custom deleter
-    std::unique_ptr<NeuropodInputData, NeuropodInputDataDeleter> out(new NeuropodInputData());
-    out->data = std::move(pimpl->data);
-    return out;
+    return std::move(pimpl->data);
 }
 
 // Instantiate the templates
