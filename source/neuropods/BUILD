@@ -73,6 +73,7 @@ pkg_tar(
         ":libneuropods.so",
         "//neuropods/backends/python_bridge:libneuropod_pythonbridge_backend.so",
         "//neuropods/backends/torchscript:libneuropod_torchscript_backend.so",
+        "//neuropods/backends/tensorflow:libneuropod_tensorflow_backend.so",
     ]
 )
 

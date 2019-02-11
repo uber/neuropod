@@ -1,0 +1,23 @@
+#
+# Uber, Inc. (c) 2019
+#
+
+package(
+    default_visibility = ["//visibility:public"],
+)
+
+cc_library(
+    name = "tensorflow_c_hdrs",
+    srcs = [],
+    hdrs = ["include/tensorflow/c/c_api.h"],
+    strip_include_prefix = "include",
+)
+
+cc_import(
+    name = "libtensorflow",
+    interface_library = select({
+        "@bazel_tools//src/conditions:darwin": "lib/libtensorflow.dylib",
+        "//conditions:default": "lib/libtensorflow.so",
+    }),
+    system_provided = True,
+)
