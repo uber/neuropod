@@ -40,6 +40,17 @@ cc_test(
     ],
 )
 
+cc_test(
+    name = "test_tensorflow_backend",
+    srcs = [
+        "test_tensorflow_backend.cc",
+        "//neuropods:libneuropods.so",
+        "//neuropods/backends/tensorflow:libneuropod_tensorflow_backend.so",
+    ],
+    deps = [
+        ":neuropods_test_utils",
+    ],
+)
 
 cc_test(
     name = "test_default_backend",

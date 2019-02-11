@@ -33,9 +33,7 @@ void init_registrar_if_needed()
 // of a shared library that supports that type. These will only be loaded if a backend
 // for the requested type hasn't already been loaded
 const std::unordered_map<std::string, std::string> default_backend_for_type = {
-    // For now, run tensorflow models via the PythonBridge
-    // TODO(vip): update this once the native tensorflow backend lands
-    {"tensorflow", "libneuropod_pythonbridge_backend.so"},
+    {"tensorflow", "libneuropod_tensorflow_backend.so"},
     {"python", "libneuropod_pythonbridge_backend.so"},
     {"pytorch", "libneuropod_pythonbridge_backend.so"},
     {"torchscript", "libneuropod_torchscript_backend.so"},
