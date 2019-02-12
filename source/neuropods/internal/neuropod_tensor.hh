@@ -14,9 +14,6 @@
 
 #include "type_macros.hh"
 
-// Used below to create a variant that supports all the neuropod-supported pointer types
-#define PTR(CPP_TYPE, NEUROPOD_TYPE) CPP_TYPE *
-
 namespace neuropods
 {
 
@@ -46,7 +43,6 @@ class TypedNeuropodTensor;
 // A type erased version of a TypedNeuropodTensor. See the documentation for
 // TypedNeuropodTensor for more details.
 // Backends should not extend this class directly for their tensor implementations
-// Note: This class is internal to neuropods and should not be exposed to users
 class NeuropodTensor
 {
 private:
@@ -122,7 +118,6 @@ public:
 
 // A TypedNeuropodTensor is a NeuropodTensor of a specific type.
 // Backends should extend this class directly for their tensor implementations
-// Note: This class is internal to neuropods and should not be exposed to users
 template <typename T>
 class TypedNeuropodTensor : public NeuropodTensor
 {

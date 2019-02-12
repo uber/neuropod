@@ -63,6 +63,10 @@ pkg_tar(
         ":neuropods.hh",
         ":fwd_declarations.hh",
     ],
+    deps = [
+        "//neuropods/internal:libneuropods_internal_hdrs",
+        "//neuropods/backends:libneuropods_backends_hdrs",
+    ],
 )
 
 pkg_tar(
