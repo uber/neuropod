@@ -14,7 +14,6 @@ namespace neuropods
 {
 
 // A structure to store tensors
-// This is opaque to users of Neuropods
 struct TensorStore
 {
     std::vector<std::shared_ptr<NeuropodTensor>> tensors;

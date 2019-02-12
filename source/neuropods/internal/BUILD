@@ -2,9 +2,7 @@
 # Uber, Inc. (c) 2018
 #
 
-# All the targets in this folder are internal types
-# This means we only want them to be accessible from
-# within neuropods
+load("@bazel_tools//tools/build_defs/pkg:pkg.bzl", "pkg_tar")
 
 cc_library(
     name = "neuropod_config_utils",
@@ -93,4 +91,14 @@ cc_library(
         ":backend_registration",
     ],
     linkopts = ["-ldl"],
+)
+
+# Package all the header files
+pkg_tar(
+    name = "libneuropods_internal_hdrs",
+    package_dir = "internal/",
+    srcs = glob(["*.hh"]),
+    visibility = [
+        "//visibility:public",
+    ],
 )

@@ -13,6 +13,7 @@
 namespace neuropods
 {
 
+// A struct that stores a specification for a tensor
 struct TensorSpec
 {
     TensorSpec(const std::string &name, const std::vector<int64_t> dims, const TensorType type);
@@ -23,6 +24,7 @@ struct TensorSpec
     const TensorType           type;
 };
 
+// A struct that stores the expected inputs and outputs of a model
 struct ModelConfig
 {
     ModelConfig(const std::string &            name,
