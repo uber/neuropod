@@ -16,24 +16,29 @@ namespace neuropods
 struct Neuropod::impl
 {
     std::shared_ptr<NeuropodBackend> backend;
+    std::unique_ptr<ModelConfig> model_config;
 };
 
 Neuropod::Neuropod(const std::string &neuropod_path) : pimpl(std::make_unique<Neuropod::impl>())
 {
     // Find the right backend to use and load the neuropod
-    auto mc        = load_model_config(neuropod_path);
-    pimpl->backend = get_backend_for_type(mc->platform)(neuropod_path, std::move(mc));
+    pimpl->model_config = load_model_config(neuropod_path);
+    pimpl->backend      = get_backend_for_type(pimpl->model_config->platform)(neuropod_path, pimpl->model_config);
 }
 
 Neuropod::Neuropod(const std::string &neuropod_path, const std::string &backend_name)
     : pimpl(std::make_unique<Neuropod::impl>())
 {
-    auto mc        = load_model_config(neuropod_path);
-    pimpl->backend = get_backend_by_name(backend_name)(neuropod_path, std::move(mc));
+    // Load the neuropod using the specified backend
+    pimpl->model_config = load_model_config(neuropod_path);
+    pimpl->backend      = get_backend_by_name(backend_name)(neuropod_path, pimpl->model_config);
 }
 
-Neuropod::Neuropod(std::shared_ptr<NeuropodBackend> backend) : pimpl(std::make_unique<Neuropod::impl>())
+Neuropod::Neuropod(const std::string &neuropod_path, std::shared_ptr<NeuropodBackend> backend)
+    : pimpl(std::make_unique<Neuropod::impl>())
 {
+    // Load the model config and use the backend that was provided by the user
+    pimpl->model_config = load_model_config(neuropod_path);
     pimpl->backend = std::move(backend);
 }
 
@@ -51,6 +56,16 @@ std::unique_ptr<NeuropodOutputData> Neuropod::infer(const std::unique_ptr<Tensor
 
     // Wrap in a NeuropodOutputData so users can easily access the data
     return std::make_unique<NeuropodOutputData>(std::move(output_tensor_store));
+}
+
+const std::vector<TensorSpec> &Neuropod::get_inputs() const
+{
+    return pimpl->model_config->inputs;
+}
+
+const std::vector<TensorSpec> &Neuropod::get_outputs() const
+{
+    return pimpl->model_config->outputs;
 }
 
 } // namespace neuropods

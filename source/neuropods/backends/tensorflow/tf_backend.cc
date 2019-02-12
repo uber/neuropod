@@ -98,8 +98,8 @@ TF_Output get_graph_node_from_name(const std::string &node_name_with_index, cons
 
 } // namespace
 
-TensorflowNeuropodBackend::TensorflowNeuropodBackend(const std::string &          neuropod_path,
-                                                     std::unique_ptr<ModelConfig> model_config)
+TensorflowNeuropodBackend::TensorflowNeuropodBackend(const std::string &           neuropod_path,
+                                                     std::unique_ptr<ModelConfig> &model_config)
 {
     // Get the graph path and load the graph
     load_graph(get_graph_path(neuropod_path));

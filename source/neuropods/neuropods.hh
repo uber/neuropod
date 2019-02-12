@@ -8,6 +8,7 @@
 #include <vector>
 #include <memory>
 
+#include "neuropods/internal/config_utils.hh"
 #include "neuropods/neuropod_input_builder.hh"
 #include "neuropods/neuropod_output_data.hh"
 
@@ -46,9 +47,7 @@ public:
     //   auto proxy = std::make_shared<NeuropodGRPCProxy>(neuropod_path, some_remote_config, ...);
     //   Neuropod neuropod(proxy);
     //
-    // Note: the backend that is passed in is already initialized with a path.
-    // Therefore, we don't need the user to pass in a path here.
-    explicit Neuropod(std::shared_ptr<NeuropodBackend> backend);
+    explicit Neuropod(const std::string &neuropod_path, std::shared_ptr<NeuropodBackend> backend);
 
     ~Neuropod();
 
@@ -58,6 +57,10 @@ public:
     // Run inference
     // You should use a `NeuropodInputBuilder` to generate the input
     std::unique_ptr<NeuropodOutputData> infer(const std::unique_ptr<TensorStore> &inputs);
+
+    // Get the inputs and outputs of the loaded Neuropod
+    const std::vector<TensorSpec> &get_inputs() const;
+    const std::vector<TensorSpec> &get_outputs() const;
 };
 
 } // namespace neuropods

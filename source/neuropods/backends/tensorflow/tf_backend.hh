@@ -50,7 +50,7 @@ private:
     std::vector<std::string> output_names_;
 
 public:
-    explicit TensorflowNeuropodBackend(const std::string &neuropod_path, std::unique_ptr<ModelConfig> model_config);
+    explicit TensorflowNeuropodBackend(const std::string &neuropod_path, std::unique_ptr<ModelConfig> &model_config);
 
     ~TensorflowNeuropodBackend();
 
