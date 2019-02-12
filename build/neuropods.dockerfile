@@ -2,7 +2,10 @@
 # It starts from the `neuropods_base` image which contains some of the large
 # dependencies for Neuropods
 
-FROM neuropods_base
+# TODO(vip): After open sourcing, update the base image (and use `neuropods_base.dockerfile` to generate it)
+# For now, this public base image has all the deps installed (but has no references to neuropods)
+# FROM neuropods_base
+FROM vpanyam/dl_base:latest
 
 # Create a source dir and copy the code in
 RUN mkdir -p /usr/src
