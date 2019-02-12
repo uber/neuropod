@@ -14,6 +14,18 @@
 
 void test_addition_model(neuropods::Neuropod &neuropod)
 {
+    // Check the input and output tensor specs
+    auto input_specs  = neuropod.get_inputs();
+    auto output_specs = neuropod.get_outputs();
+    EXPECT_EQ(input_specs.at(0).name, "x");
+    EXPECT_EQ(input_specs.at(0).type, neuropods::FLOAT_TENSOR);
+
+    EXPECT_EQ(input_specs.at(1).name, "y");
+    EXPECT_EQ(input_specs.at(1).type, neuropods::FLOAT_TENSOR);
+
+    EXPECT_EQ(output_specs.at(0).name, "out");
+    EXPECT_EQ(output_specs.at(0).type, neuropods::FLOAT_TENSOR);
+
     // Some sample input data
     std::vector<int64_t> shape = {2, 2};
 
