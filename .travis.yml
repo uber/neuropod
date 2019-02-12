@@ -10,9 +10,8 @@ before_install:
   - sudo apt-get -y -o Dpkg::Options::="--force-confnew" install docker-ce
 
 install:
-  # TODO(vip): prebuild the base image and pull it here instead of rebuilding
-  # every time
-  - docker build -f build/neuropods_base.dockerfile -t neuropods_base .
+  # TODO(vip): update this image to be Neuropods specific once we open source
+  - docker pull vpanyam/dl_base:latest
 
 script:
   # This builds both the C++ and python versions and runs tests
