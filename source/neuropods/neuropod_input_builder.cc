@@ -22,10 +22,10 @@ struct NeuropodInputBuilder::impl
     std::unique_ptr<TensorStore> data;
 };
 
-NeuropodInputBuilder::NeuropodInputBuilder(std::shared_ptr<NeuropodBackend> backend) : pimpl(std::make_unique<impl>())
+NeuropodInputBuilder::NeuropodInputBuilder(std::shared_ptr<NeuropodBackend> backend) : pimpl(stdx::make_unique<impl>())
 {
     pimpl->backend = std::move(backend);
-    pimpl->data    = std::make_unique<TensorStore>();
+    pimpl->data    = stdx::make_unique<TensorStore>();
 }
 
 NeuropodInputBuilder::~NeuropodInputBuilder() = default;

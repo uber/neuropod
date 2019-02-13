@@ -12,7 +12,8 @@
 #include <string>
 #include <vector>
 
-#include "type_macros.hh"
+#include "neuropods/internal/memory_utils.hh"
+#include "neuropods/internal/type_macros.hh"
 
 namespace neuropods
 {
@@ -342,7 +343,7 @@ std::unique_ptr<NeuropodTensor> make_tensor(TensorType tensor_type, Params &&...
 #define MAKE_TENSOR(CPP_TYPE, NEUROPOD_TYPE)                                              \
     case NEUROPOD_TYPE:                                                                   \
     {                                                                                     \
-        return std::make_unique<TensorClass<CPP_TYPE>>(std::forward<Params>(params)...); \
+        return stdx::make_unique<TensorClass<CPP_TYPE>>(std::forward<Params>(params)...); \
     }
 
     // Make a tensor of the correct type and return it

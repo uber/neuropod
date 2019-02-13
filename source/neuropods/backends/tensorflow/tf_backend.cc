@@ -242,7 +242,7 @@ std::unique_ptr<TensorStore> TensorflowNeuropodBackend::infer(const TensorStore 
 
 
     // Read the outputs
-    auto to_return = std::make_unique<TensorStore>();
+    auto to_return = stdx::make_unique<TensorStore>();
     for (size_t i = 0; i < output_names_.size(); ++i)
     {
         const auto &output_name   = output_names_[i];

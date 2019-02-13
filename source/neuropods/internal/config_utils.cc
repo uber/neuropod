@@ -200,7 +200,7 @@ std::unique_ptr<ModelConfig> load_model_config(std::istream &input_stream)
             spec["name"].asString(), get_dims_from_json(spec["shape"]), convert_to_tensor_type(spec["dtype"]));
     }
 
-    return std::make_unique<ModelConfig>(name, platform, inputs, outputs);
+    return stdx::make_unique<ModelConfig>(name, platform, inputs, outputs);
 }
 
 } // namespace neuropods

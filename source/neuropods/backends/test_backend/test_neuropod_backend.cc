@@ -25,7 +25,7 @@ std::unique_ptr<NeuropodTensor> TestNeuropodBackend::allocate_tensor(const std::
 // Run inference
 std::unique_ptr<TensorStore> TestNeuropodBackend::infer(const TensorStore &inputs)
 {
-    return std::make_unique<TensorStore>();
+    return stdx::make_unique<TensorStore>();
 }
 
 REGISTER_NEUROPOD_BACKEND(TestNeuropodBackend, "noop")
