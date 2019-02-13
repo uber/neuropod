@@ -110,7 +110,7 @@ std::unique_ptr<TensorStore> TorchNeuropodBackend::infer(const TensorStore &inpu
     c10::IValue result = model_->forward(torch_inputs);
 
     // Get outputs
-    auto to_return = std::make_unique<TensorStore>();
+    auto to_return = stdx::make_unique<TensorStore>();
 
     auto outputs_tuple      = result.toTuple();
     bool is_tuple_of_tuples = outputs_tuple->elements()[0].isTuple();

@@ -9,6 +9,7 @@
 #include <vector>
 
 #include "neuropods/internal/config_utils.hh"
+#include "neuropods/internal/memory_utils.hh"
 
 namespace neuropods
 {
@@ -25,7 +26,7 @@ template <typename T>
 std::unique_ptr<NeuropodBackend> createNeuropodBackend(const std::string &           neuropod_path,
                                                        std::unique_ptr<ModelConfig> &config)
 {
-    return std::make_unique<T>(neuropod_path, config);
+    return stdx::make_unique<T>(neuropod_path, config);
 }
 
 // Register a backend for a set of specific types

@@ -16,8 +16,19 @@ cc_library(
         "//neuropods:__subpackages__",
     ],
     deps = [
+        ":memory_utils",
         ":neuropod_tensor",
         "@libjsoncpp_repo//:libjsoncpp",
+    ],
+)
+
+cc_library(
+    name = "memory_utils",
+    hdrs = [
+        "memory_utils.hh",
+    ],
+    visibility = [
+        "//neuropods:__subpackages__",
     ],
 )
 
@@ -30,6 +41,9 @@ cc_library(
     ],
     visibility = [
         "//neuropods:__subpackages__",
+    ],
+    deps = [
+        ":memory_utils",
     ],
 )
 
@@ -58,6 +72,7 @@ cc_library(
         "//neuropods:__subpackages__",
     ],
     deps = [
+        ":memory_utils",
         ":neuropod_config_utils",
     ],
 )

@@ -19,7 +19,7 @@ struct Neuropod::impl
     std::unique_ptr<ModelConfig> model_config;
 };
 
-Neuropod::Neuropod(const std::string &neuropod_path) : pimpl(std::make_unique<Neuropod::impl>())
+Neuropod::Neuropod(const std::string &neuropod_path) : pimpl(stdx::make_unique<Neuropod::impl>())
 {
     // Find the right backend to use and load the neuropod
     pimpl->model_config = load_model_config(neuropod_path);
@@ -27,7 +27,7 @@ Neuropod::Neuropod(const std::string &neuropod_path) : pimpl(std::make_unique<Ne
 }
 
 Neuropod::Neuropod(const std::string &neuropod_path, const std::string &backend_name)
-    : pimpl(std::make_unique<Neuropod::impl>())
+    : pimpl(stdx::make_unique<Neuropod::impl>())
 {
     // Load the neuropod using the specified backend
     pimpl->model_config = load_model_config(neuropod_path);
@@ -35,7 +35,7 @@ Neuropod::Neuropod(const std::string &neuropod_path, const std::string &backend_
 }
 
 Neuropod::Neuropod(const std::string &neuropod_path, std::shared_ptr<NeuropodBackend> backend)
-    : pimpl(std::make_unique<Neuropod::impl>())
+    : pimpl(stdx::make_unique<Neuropod::impl>())
 {
     // Load the model config and use the backend that was provided by the user
     pimpl->model_config = load_model_config(neuropod_path);
@@ -46,7 +46,7 @@ Neuropod::~Neuropod() = default;
 
 std::unique_ptr<NeuropodInputBuilder> Neuropod::get_input_builder()
 {
-    return std::make_unique<NeuropodInputBuilder>(pimpl->backend);
+    return stdx::make_unique<NeuropodInputBuilder>(pimpl->backend);
 }
 
 std::unique_ptr<NeuropodOutputData> Neuropod::infer(const std::unique_ptr<TensorStore> &inputs)
@@ -55,7 +55,7 @@ std::unique_ptr<NeuropodOutputData> Neuropod::infer(const std::unique_ptr<Tensor
     auto output_tensor_store = pimpl->backend->infer(*inputs);
 
     // Wrap in a NeuropodOutputData so users can easily access the data
-    return std::make_unique<NeuropodOutputData>(std::move(output_tensor_store));
+    return stdx::make_unique<NeuropodOutputData>(std::move(output_tensor_store));
 }
 
 const std::vector<TensorSpec> &Neuropod::get_inputs() const

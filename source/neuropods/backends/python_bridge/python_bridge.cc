@@ -142,7 +142,7 @@ std::unique_ptr<TensorStore> PythonBridge::infer(const TensorStore &inputs)
         py::dict model_outputs = py::extract<py::dict>(locals["model_outputs"]);
 
         // Convert from numpy to `NeuropodTensor`s
-        std::unique_ptr<TensorStore> to_return = std::make_unique<TensorStore>();
+        std::unique_ptr<TensorStore> to_return = stdx::make_unique<TensorStore>();
         py::list                     out_keys  = model_outputs.keys();
         for (int i = 0; i < py::len(out_keys); i++)
         {
