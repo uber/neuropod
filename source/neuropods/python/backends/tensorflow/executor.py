@@ -76,6 +76,11 @@ class TensorflowNeuropodExecutor(NeuropodExecutor):
         for node in self.neuropod_config["input_spec"]:
             neuropod_name = node["name"]
 
+            # TODO(yevgeni): treat all input fields as optional at the neuropod level. If a model
+            # requires a missing field it will fail therein.
+            if neuropod_name not in inputs:
+                continue
+
             # Get the graph node
             tf_name = self.node_name_mapping[neuropod_name]
             tf_node = self.graph.get_tensor_by_name(tf_name)

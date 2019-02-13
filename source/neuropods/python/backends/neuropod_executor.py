@@ -15,6 +15,15 @@ def validate_tensors_against_specs(tensors, tensor_specs):
     # resolve to the same value at runtime. See below for more detail
     symbol_actual_map = {}
 
+    spec_tensor_names = {str(t['name']) for t in tensor_specs}
+    input_tensor_names = set(tensors.keys())
+
+    unknown_tensor_names = input_tensor_names - spec_tensor_names
+    if unknown_tensor_names:
+        raise ValueError(
+            'Tensor name(s) \'{}\' are not found in the input spec'.format(
+                ', '.join(unknown_tensor_names)))
+
     # Iterate through all the tensor specs and validate
     # the matching tensor
     for spec in tensor_specs:
@@ -22,9 +31,10 @@ def validate_tensors_against_specs(tensors, tensor_specs):
         dtype = np.dtype(spec["dtype"])
         shape = spec["shape"]
 
-        # Check this tensor is in the supplied tensors
+        # TODO(yevgeni): treat all tensors as optional. If a particular model requires the input, it will fail therein.
         if name not in tensors:
-            raise ValueError("Missing required tensor: {}".format(name))
+            # raise ValueError("Missing required tensor: {}".format(name))
+            continue
 
         tensor = tensors[name]
 

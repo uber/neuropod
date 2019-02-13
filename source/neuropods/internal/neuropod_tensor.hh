@@ -62,6 +62,8 @@ public:
     {
     }
 
+    NeuropodTensor(const NeuropodTensor &) = delete;
+
     virtual ~NeuropodTensor() {}
 
     friend std::ostream &operator<<(std::ostream &out, const NeuropodTensor &tensor)
@@ -99,20 +101,75 @@ public:
     template <typename T>
     TypedNeuropodTensor<T> *as_typed_tensor()
     {
+        this->template assure_type<T>();
+        return dynamic_cast<TypedNeuropodTensor<T> *>(this);
+    }
+
+    template <typename T>
+    const TypedNeuropodTensor<T> *as_typed_tensor() const
+    {
+        this->template assure_type<T>();
+        return dynamic_cast<const TypedNeuropodTensor<T> *>(this);
+    }
+
+    // Returns a modifiable reference to the scalar represented by this object. Maybe we will make
+    // scalars be represented by a rank-0 object. For now we check it is rank(1) with dims[0]==1.
+    // An exception is thrown if the dimensions of the tensors are not {1}
+    template <typename T>
+    T &as_scalar()
+    {
+        this->template assure_type<T>();
+        // TODO(yevgeni): should change to assure_rank(0)
+        this->assure_rank(1);
+        if (this->get_dims()[0] != 1)
+        {
+            throw std::runtime_error("Tensor is expected to have shape of {1} to be"
+                                     "casted to a scalar.");
+        }
+        return (*this->template as_typed_tensor<T>())[0];
+    }
+
+    template <typename T>
+    const T &as_scalar() const
+    {
+        this->template assure_type<T>();
+        // TODO(yevgeni): should change to assure_rank(0)
+        this->assure_rank(1);
+        if (this->get_dims()[0] != 1)
+        {
+            throw std::runtime_error("Tensor is expected to have shape of {1} to be"
+                                     "casted to a scalar.");
+        }
+        return (*this->template as_typed_tensor<T>())[0];
+    }
+
+protected:
+    template <typename T>
+    void assure_type() const
+    {
         TensorType requested = get_tensor_type_from_cpp<T>();
         TensorType actual    = get_tensor_type();
 
         if (requested != actual)
         {
             std::stringstream ss;
-            ss << "Tried to downcast a tensor of type ";
-            ss << actual;
-            ss << " to a TypedNeuropodTensor of type ";
-            ss << requested;
+            ss << "Tried to downcast tensor \"" << get_name() << "\" of type " << actual
+               << " to a TypedNeuropodTensor of type " << requested;
             throw std::runtime_error(ss.str());
         }
+    }
+    void assure_rank(size_t expected_rank) const
+    {
+        const auto   dims = this->get_dims();
+        const size_t rank = dims.size();
+        if (rank != expected_rank)
+        {
+            std::stringstream error_message;
 
-        return static_cast<TypedNeuropodTensor<T> *>(this);
+            error_message << "Tensor '" << this->get_name() << " is expected to have rank of " << expected_rank
+                          << " while the actual rank is " << rank;
+            throw std::runtime_error(error_message.str());
+        }
     }
 };
 
@@ -129,7 +186,63 @@ public:
 
     virtual ~TypedNeuropodTensor() {}
 
-    virtual T *get_raw_data_ptr() = 0;
+    virtual T *      get_raw_data_ptr()       = 0;
+    virtual const T *get_raw_data_ptr() const = 0;
+
+    virtual const T &operator[](uint32_t r) const { return (*this)(r); }
+    virtual T &      operator[](uint32_t r) { return (*this)(r); }
+
+    virtual const T &operator()(uint32_t r) const
+    {
+        this->assure_rank(1);
+        return get_raw_data_ptr()[r];
+    }
+
+    virtual T &operator()(uint32_t r)
+    {
+        this->assure_rank(1);
+        return get_raw_data_ptr()[r];
+    }
+
+    virtual const T &operator()(uint32_t r, uint32_t c) const
+    {
+        this->assure_rank(2);
+        return get_raw_data_ptr()[r * this->get_dims()[1] + c];
+    }
+
+    virtual T &operator()(uint32_t r, uint32_t c)
+    {
+        this->assure_rank(2);
+        return get_raw_data_ptr()[r * this->get_dims()[1] + c];
+    }
+
+    const T *begin() const
+    {
+        assure_rank(1);
+        return &get_raw_data_ptr()[0];
+    }
+
+    T *begin()
+    {
+        assure_rank(1);
+        return &get_raw_data_ptr()[0];
+    }
+
+    const T *end() const
+    {
+        assure_rank(1);
+        return &get_raw_data_ptr()[get_dims()[0]];
+    }
+
+    T *end()
+    {
+        assure_rank(1);
+        return &get_raw_data_ptr()[get_dims()[0]];
+    }
+
+    T &as_scalar() { return NeuropodTensor::as_scalar<T>(); }
+
+    const T &as_scalar() const { return NeuropodTensor::as_scalar<T>(); }
 
     std::vector<T> get_data_as_vector()
     {
@@ -142,6 +255,49 @@ public:
         // Copy into the vector
         out.insert(out.end(), &data_pointer[0], &data_pointer[size]);
 
+        return out;
+    }
+
+    friend std::ostream &operator<<(std::ostream &out, const TypedNeuropodTensor<T> &tensor)
+    {
+        out << static_cast<const NeuropodTensor &>(tensor) << std::endl;
+
+        out << '[';
+
+        const auto num_elements = tensor.get_num_elements();
+        const T *  ptr          = tensor.get_raw_data_ptr();
+        if (num_elements < 6)
+        {
+            for (size_t i = 0; i < num_elements; ++i)
+            {
+                if (i > 0)
+                {
+                    out << ", ";
+                }
+                out << +ptr[i];
+            }
+        }
+        else
+        {
+            for (size_t i = 0; i < 3; ++i)
+            {
+                if (i > 0)
+                {
+                    out << ", ";
+                }
+                out << +ptr[i];
+            }
+            out << " ... ";
+            for (size_t i = num_elements - 3; i < num_elements; ++i)
+            {
+                if (i > num_elements - 3)
+                {
+                    out << ", ";
+                }
+                out << +ptr[i];
+            }
+        }
+        out << ']';
         return out;
     }
 };

@@ -44,11 +44,11 @@ public:
                                      size_t                      input_data_size,
                                      const std::vector<int64_t> &input_dims);
 
-    // Add a tensor with a size and shape
+    // Add a tensor of a certain shape
     // The InputBuilder will allocate the memory and return a
-    // pointer where the data should be written to
+    // TypedNeuropodTensor<T> object that can be used to write the data.
     template <typename T>
-    T *allocate_tensor(const std::string &node_name, size_t input_data_size, const std::vector<int64_t> &input_dims);
+    TypedNeuropodTensor<T> *allocate_tensor(const std::string &node_name, const std::vector<int64_t> &input_dims);
 
     // Get the data
     std::unique_ptr<TensorStore> build();

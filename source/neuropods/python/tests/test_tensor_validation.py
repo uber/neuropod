@@ -23,6 +23,7 @@ class TestSpecValidation(unittest.TestCase):
         # Shouldn't raise a ValueError
         validate_tensors_against_specs(test_input, TEST_SPEC)
 
+    @unittest.skip("We temporary made all tensors optional, until a proper mechanism is implemented")
     def test_missing_tensor(self):
         test_input = {
             "x": np.array([[1, 2], [3, 4]], dtype=np.float32),
@@ -32,8 +33,19 @@ class TestSpecValidation(unittest.TestCase):
             # Missing a tensor
             validate_tensors_against_specs(test_input, TEST_SPEC)
 
+    @unittest.skip("We temporary made all tensors optional, until a proper mechanism is implemented")
     def test_missing_tensors(self):
         test_input = {}
+
+        with self.assertRaises(ValueError):
+            # Missing tensors
+            validate_tensors_against_specs(test_input, TEST_SPEC)
+
+    def test_bogus_tensor_name(self):
+        test_input = {
+            "x": np.array([[1, 2], [3, 4]], dtype=np.float32),
+            "bogus": np.array([[1, 2], [3, 4]], dtype=np.float32),
+        }
 
         with self.assertRaises(ValueError):
             # Missing tensors
