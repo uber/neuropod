@@ -75,6 +75,9 @@ public:
     // Get a pointer to the underlying data
     T *get_raw_data_ptr() { return get_data_from_torch_tensor<T>(tensor); }
 
+    // Get a pointer to the underlying data
+    const T *get_raw_data_ptr() const { return get_data_from_torch_tensor<T>(tensor); }
+
     torch::jit::IValue get_native_data() { return tensor; }
 
     // The underlying torch tensor

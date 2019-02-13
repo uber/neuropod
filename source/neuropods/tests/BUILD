@@ -91,3 +91,32 @@ cc_test(
         "//neuropods/internal:neuropod_config_utils",
     ],
 )
+
+cc_test(
+    name = "test_internal_neuropod_tensor",
+    srcs = [
+        "test_internal_neuropod_tensor.cc",
+        "//neuropods/backends/test_backend:libneuropod_test_backend.so",
+    ],
+    deps = [
+        "@gtest//:main",
+        "//neuropods/backends/test_backend:test_backend_hdrs",
+        "//neuropods/internal:neuropod_tensor",
+    ],
+)
+
+cc_test(
+    name = "test_conversions_eigen",
+    srcs = [
+        "test_conversions_eigen.cc",
+        "//neuropods:libneuropods.so",
+        "//neuropods/backends/test_backend:libneuropod_test_backend.so",
+    ],
+    deps = [
+        "@gtest//:main",
+        "//neuropods:neuropods_hdrs",
+        "//neuropods/backends/test_backend:test_backend_hdrs",
+        "//neuropods/conversions:eigen",
+        "@eigen3_repo//:eigen3",
+    ],
+)

@@ -120,6 +120,16 @@ public:
         return static_cast<T *>(data);
     }
 
+    const T *get_raw_data_ptr() const
+    {
+        auto arr = reinterpret_cast<PyArrayObject *>(nparray_.ptr());
+
+        // Get a pointer to the underlying data
+        const void *data = PyArray_DATA(arr);
+
+        return static_cast<const T *>(data);
+    }
+
     py::object get_native_data() { return nparray_; }
 
     // The underlying numpy array

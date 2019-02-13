@@ -65,8 +65,8 @@ TEST(test_input_builder, add_tensors_and_build)
 
     // Test using allocate
     {
-        double *data = builder.allocate_tensor<double>("d", 4, d_shape);
-        memcpy(data, d_data, 4 * sizeof(double));
+        auto data = builder.allocate_tensor<double>("d", d_shape);
+        memcpy(data->get_raw_data_ptr(), d_data, 4 * sizeof(double));
     }
 
 
@@ -172,4 +172,12 @@ TEST(test_output_data, verify_tensors)
         // Shape
         check_vectors_eq(output_data.get_shape("d"), d_shape);
     }
+}
+
+TEST(test_input_builder, adding_tensor_with_the_same_name_should_fail)
+{
+    neuropods::NeuropodInputBuilder builder(std::make_shared<neuropods::TestNeuropodBackend>());
+
+    builder.allocate_tensor<int8_t>("a", {10});
+    EXPECT_THROW(builder.allocate_tensor<int8_t>("a", {10}), std::runtime_error);
 }

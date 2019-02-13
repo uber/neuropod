@@ -39,6 +39,7 @@ class TestTorchScriptPackaging(unittest.TestCase):
                 input_spec=[
                     {"name": "x", "dtype": "float32", "shape": (None,)},
                     {"name": "y", "dtype": "float32", "shape": (None,)},
+                    {"name": "optional", "dtype": "string", "shape": (None,)},
                 ],
                 output_spec=[
                     {"name": "out", "dtype": "float32", "shape": (None,)},
