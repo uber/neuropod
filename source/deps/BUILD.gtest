@@ -9,17 +9,25 @@ package(
 cc_library(
     name = "main",
     srcs = glob(
-        ["src/*.cc"],
-        exclude = ["src/gtest-all.cc"]
+        [
+            "googletest/src/*.cc",
+            "googlemock/src/*.cc",
+        ],
+        exclude = [
+            "googletest/src/gtest-all.cc",
+            "googlemock/src/gmock-all.cc",
+            "googlemock/src/gmock_main.cc",
+        ],
     ),
     hdrs = glob([
-        "include/**/*.h",
-        "src/*.h"
+        "**/*.h",
     ]),
     includes = [
-        "include"
+        "googlemock",
+        "googletest",
+        "googletest/include",
+        "googlemock/include",
     ],
-    copts = ["-Iexternal/gtest/include"],
     linkopts = ["-pthread"],
     visibility = ["//visibility:public"],
 )
