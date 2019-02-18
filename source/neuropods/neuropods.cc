@@ -19,11 +19,17 @@ struct Neuropod::impl
     std::unique_ptr<ModelConfig> model_config;
 };
 
-Neuropod::Neuropod(const std::string &neuropod_path) : pimpl(stdx::make_unique<Neuropod::impl>())
+Neuropod::Neuropod(const std::string &neuropod_path)
+    : Neuropod(neuropod_path, std::unordered_map<std::string, std::string>())
+{
+}
+
+Neuropod::Neuropod(const std::string &neuropod_path, const std::unordered_map<std::string, std::string> &default_backend_overrides)
+    : pimpl(stdx::make_unique<Neuropod::impl>())
 {
     // Find the right backend to use and load the neuropod
     pimpl->model_config = load_model_config(neuropod_path);
-    pimpl->backend      = get_backend_for_type(pimpl->model_config->platform)(neuropod_path, pimpl->model_config);
+    pimpl->backend      = get_backend_for_type(default_backend_overrides, pimpl->model_config->platform)(neuropod_path, pimpl->model_config);
 }
 
 Neuropod::Neuropod(const std::string &neuropod_path, const std::string &backend_name)
