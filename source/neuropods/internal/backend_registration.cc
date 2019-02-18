@@ -39,9 +39,16 @@ const std::unordered_map<std::string, std::string> default_backend_for_type = {
     {"torchscript", "libneuropod_torchscript_backend.so"},
 };
 
-void load_default_backend(const std::string &type)
+void load_default_backend(const std::unordered_map<std::string, std::string> &default_backend_overrides,
+                          const std::string &                                 type)
 {
-    auto backend_it = default_backend_for_type.find(type);
+    auto backend_it = default_backend_overrides.find(type);
+    if (backend_it == default_backend_overrides.end())
+    {
+        // This type is not in the overrides so check the default mapping
+        backend_it = default_backend_for_type.find(type);
+    }
+
     if (backend_it == default_backend_for_type.end())
     {
         std::stringstream ss;
@@ -79,7 +86,8 @@ bool register_backend(const std::string &             name,
     return true;
 }
 
-BackendFactoryFunction get_backend_for_type(const std::string &type)
+BackendFactoryFunction get_backend_for_type(const std::unordered_map<std::string, std::string> &default_backend_overrides,
+                                            const std::string &                                 type)
 {
     init_registrar_if_needed();
 
@@ -87,7 +95,7 @@ BackendFactoryFunction get_backend_for_type(const std::string &type)
     {
         // We don't have a backend loaded for the requested type
         // Try loading the default one
-        load_default_backend(type);
+        load_default_backend(default_backend_overrides, type);
     }
 
     auto backend_it = registered_backends_by_type->find(type);

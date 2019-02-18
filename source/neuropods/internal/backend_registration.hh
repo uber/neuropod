@@ -6,6 +6,7 @@
 
 #include <memory>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 #include "neuropods/internal/config_utils.hh"
@@ -36,7 +37,12 @@ bool register_backend(const std::string &             name,
                       BackendFactoryFunction          factory_fn);
 
 // Get a backend factory function for a neuropod type (e.g. "python", "tensorflow", "torchscript")
-BackendFactoryFunction get_backend_for_type(const std::string &type);
+// `default_backend_overrides` allows users to override the default backend for a given type.
+// This is a mapping from a neuropod type to the name of a shared library that supports that type.
+// Note: Libraries in this map will only be loaded if a backend for the requested type hasn't already
+// been loaded
+BackendFactoryFunction get_backend_for_type(const std::unordered_map<std::string, std::string> &default_backend_overrides,
+                                            const std::string &                                 type);
 
 // Get a backend factory function by backend name (e.g. "PythonBridge", "TestNeuropodBackend")
 BackendFactoryFunction get_backend_by_name(const std::string &name);
