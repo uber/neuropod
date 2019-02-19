@@ -7,7 +7,6 @@
 #include "neuropods/backends/test_backend/test_neuropod_backend.hh"
 #include "neuropods/internal/tensor_store.hh"
 #include "neuropods/neuropod_input_builder.hh"
-#include "neuropods/neuropod_output_data.hh"
 
 namespace
 {
@@ -98,79 +97,6 @@ TEST(test_input_builder, add_tensors_and_build)
         const auto ten = tensor_store->find("d");
         check_tensor_eq_ptr(ten, d_data, 4);
         check_vectors_eq(ten->get_dims(), d_shape);
-    }
-}
-
-
-// Verifies that NeuropodOutputData is correctly
-// reading the tensors in a TensorStore
-TEST(test_output_data, verify_tensors)
-{
-    neuropods::NeuropodInputBuilder builder(std::make_shared<neuropods::TestNeuropodBackend>());
-
-    auto tensor_store = builder.add_tensor("a", a_data, a_shape)
-                          .add_tensor("b", b_data, b_shape)
-                          .add_tensor("c", c_data, 4, c_shape)
-                          .add_tensor("d", d_data, 4, d_shape)
-                          .build();
-
-    // Create a NeuropodOutputData from the tensor store
-    neuropods::NeuropodOutputData output_data(std::move(tensor_store));
-
-    // Validate the internal state for a
-    {
-        // Pointer and size
-        const int32_t *pointer;
-        size_t         size;
-        output_data.get_data_pointer_and_size("a", pointer, size);
-        check_ptrs_eq(pointer, size, a_data.data(), a_data.size());
-
-        // Vector
-        std::vector<int32_t> vec = output_data.get_data_as_vector<int32_t>("a");
-        check_vectors_eq(vec, a_data);
-
-        // Shape
-        check_vectors_eq(output_data.get_shape("a"), a_shape);
-    }
-
-    // Validate the internal state for b
-    {
-        // Pointer and size
-        const int64_t *pointer;
-        size_t         size;
-        output_data.get_data_pointer_and_size("b", pointer, size);
-        check_ptrs_eq(pointer, size, b_data.data(), b_data.size());
-
-        // Vector
-        std::vector<int64_t> vec = output_data.get_data_as_vector<int64_t>("b");
-        check_vectors_eq(vec, b_data);
-
-        // Shape
-        check_vectors_eq(output_data.get_shape("b"), b_shape);
-    }
-
-    // Validate the internal state for c
-    {
-        // Pointer and size
-        const float *pointer;
-        size_t       size;
-        output_data.get_data_pointer_and_size("c", pointer, size);
-        check_ptrs_eq(pointer, size, c_data, 4);
-
-        // Shape
-        check_vectors_eq(output_data.get_shape("c"), c_shape);
-    }
-
-    // Validate the internal state for d
-    {
-        // Pointer and size
-        const double *pointer;
-        size_t        size;
-        output_data.get_data_pointer_and_size("d", pointer, size);
-        check_ptrs_eq(pointer, size, d_data, 4);
-
-        // Shape
-        check_vectors_eq(output_data.get_shape("d"), d_shape);
     }
 }
 

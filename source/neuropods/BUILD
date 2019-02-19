@@ -8,7 +8,6 @@ cc_library(
     name = "neuropods_hdrs",
     hdrs = [
         "neuropod_input_builder.hh",
-        "neuropod_output_data.hh",
         "neuropods.hh",
     ],
     visibility = [
@@ -28,7 +27,6 @@ cc_binary(
     linkstatic = True,
     srcs = [
         "neuropod_input_builder.cc",
-        "neuropod_output_data.cc",
         "neuropods.cc",
     ],
     visibility = [
@@ -46,7 +44,6 @@ pkg_tar(
     srcs = [
         # Headers
         ":neuropod_input_builder.hh",
-        ":neuropod_output_data.hh",
         ":neuropods.hh",
     ],
     deps = [

@@ -25,4 +25,16 @@ std::shared_ptr<NeuropodTensor> TensorStore::find(const std::string &name)
     return nullptr;
 }
 
+std::shared_ptr<NeuropodTensor> TensorStore::find_or_throw(const std::string &name)
+{
+    auto tensor = find(name);
+    if (!tensor)
+    {
+        std::stringstream ss;
+        ss << "Tensor not found for name '" << name << "'!";
+        throw std::runtime_error(ss.str());
+    }
+    return tensor;
+}
+
 } // namespace neuropods

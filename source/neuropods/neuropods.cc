@@ -55,13 +55,10 @@ std::unique_ptr<NeuropodInputBuilder> Neuropod::get_input_builder()
     return stdx::make_unique<NeuropodInputBuilder>(pimpl->backend);
 }
 
-std::unique_ptr<NeuropodOutputData> Neuropod::infer(const std::unique_ptr<TensorStore> &inputs)
+std::unique_ptr<TensorStore> Neuropod::infer(const std::unique_ptr<TensorStore> &inputs)
 {
     // Run inference
-    auto output_tensor_store = pimpl->backend->infer(*inputs);
-
-    // Wrap in a NeuropodOutputData so users can easily access the data
-    return stdx::make_unique<NeuropodOutputData>(std::move(output_tensor_store));
+    return pimpl->backend->infer(*inputs);
 }
 
 const std::vector<TensorSpec> &Neuropod::get_inputs() const

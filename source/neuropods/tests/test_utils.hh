@@ -41,8 +41,11 @@ void test_addition_model(neuropods::Neuropod &neuropod)
     const auto output_data = neuropod.infer(input_data);
 
     // Get the data in the output tensor
-    const std::vector<float>   out_vector = output_data->get_data_as_vector<float>("out");
-    const std::vector<int64_t> out_shape  = output_data->get_shape("out");
+    const std::vector<float>   out_vector = output_data->find_or_throw("out")
+                                                       ->as_typed_tensor<float>()
+                                                       ->get_data_as_vector();
+
+    const std::vector<int64_t> out_shape  = output_data->find_or_throw("out")->get_dims();
 
     // Check that the output data matches
     EXPECT_EQ(out_vector.size(), 4);
@@ -85,8 +88,11 @@ void test_strings_model(neuropods::Neuropod &neuropod)
     const auto output_data = neuropod.infer(input_data);
 
     // Get the data in the output tensor
-    const std::vector<std::string> out_vector = output_data->get_data_as_vector<std::string>("out");
-    const std::vector<int64_t>     out_shape  = output_data->get_shape("out");
+    const std::vector<std::string> out_vector = output_data->find_or_throw("out")
+                                                           ->as_typed_tensor<std::string>()
+                                                           ->get_data_as_vector();
+
+    const std::vector<int64_t>     out_shape  = output_data->find_or_throw("out")->get_dims();
 
     // Check that the output data matches
     EXPECT_EQ(out_vector.size(), 3);
