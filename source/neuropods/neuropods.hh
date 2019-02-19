@@ -10,7 +10,6 @@
 
 #include "neuropods/internal/config_utils.hh"
 #include "neuropods/neuropod_input_builder.hh"
-#include "neuropods/neuropod_output_data.hh"
 
 namespace neuropods
 {
@@ -56,7 +55,7 @@ public:
 
     // Run inference
     // You should use a `NeuropodInputBuilder` to generate the input
-    std::unique_ptr<NeuropodOutputData> infer(const std::unique_ptr<TensorStore> &inputs);
+    std::unique_ptr<TensorStore> infer(const std::unique_ptr<TensorStore> &inputs);
 
     // Get the inputs and outputs of the loaded Neuropod
     const std::vector<TensorSpec> &get_inputs() const;
