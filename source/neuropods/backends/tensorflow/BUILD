@@ -21,14 +21,7 @@ cc_binary(
     ],
     deps = [
         "//neuropods/backends:neuropod_backend",
-    ] + select({
-        "@bazel_tools//src/conditions:darwin": [
-            "@tensorflow_repo_darwin//:tensorflow_c_hdrs",
-            "@tensorflow_repo_darwin//:libtensorflow",
-        ],
-        "//conditions:default": [
-            "@tensorflow_repo_linux//:tensorflow_c_hdrs",
-            "@tensorflow_repo_linux//:libtensorflow",
-        ],
-    })
+        "@tensorflow_repo//:tensorflow_c_hdrs",
+        "@tensorflow_repo//:libtensorflow",
+    ]
 )

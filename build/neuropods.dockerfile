@@ -34,8 +34,8 @@ RUN mkdir -p /tmp/dist_test && \
 
 # Make sure the tests can find all the `.so` files for the backends
 RUN echo "/tmp/dist_test/lib" > /etc/ld.so.conf.d/libneuropods.conf && \
-    echo "/usr/src/source/bazel-source/external/libtorch_repo_linux/lib" > /etc/ld.so.conf.d/libtorch.conf && \
-    echo "/usr/src/source/bazel-source/external/tensorflow_repo_linux/lib" > /etc/ld.so.conf.d/tensorflow.conf && \
+    echo "/usr/src/source/bazel-source/external/libtorch_repo/lib" > /etc/ld.so.conf.d/libtorch.conf && \
+    echo "/usr/src/source/bazel-source/external/tensorflow_repo/lib" > /etc/ld.so.conf.d/tensorflow.conf && \
     ldconfig
 
 # Run native tests
