@@ -4,7 +4,7 @@ def _impl(repository_ctx):
         download_url = repository_ctx.os.environ["NEUROPODS_TENSORFLOW_URL"]
         download_sha = repository_ctx.os.environ.get("NEUROPODS_TENSORFLOW_SHA256", '')
     else:
-        version = repository_ctx.os.environ.get("NEUROPODS_TENSORFLOW_VERSION", repository_ctx.attr.default_version)
+        version = repository_ctx.os.environ.get("NEUROPODS_TENSORFLOW_VERSION", "") or repository_ctx.attr.default_version
         if repository_ctx.os.name.startswith("mac"):
             download_url = "https://storage.googleapis.com/tensorflow/libtensorflow/libtensorflow-cpu-darwin-x86_64-" + version + ".tar.gz"
         else:
