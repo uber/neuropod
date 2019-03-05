@@ -7,7 +7,7 @@
 FROM ubuntu:16.04
 
 # Install pip and bazel dependencies
-RUN apt-get update && apt-get install -y openjdk-8-jdk curl wget gcc-4.9 g++-4.9 python-pip
+RUN apt-get update && apt-get install -y openjdk-8-jdk curl wget gcc-4.9 g++-4.9 gcc-4.8 g++-4.8 python-pip
 
 # Add bazel sources
 RUN echo "deb [arch=amd64] http://storage.googleapis.com/bazel-apt stable jdk1.8" | tee /etc/apt/sources.list.d/bazel.list \
@@ -24,10 +24,6 @@ RUN bazel version
 # Create a source dir and copy the code in
 RUN mkdir -p /usr/src
 COPY . /usr/src
-
-# Make sure we build with gcc/g++ 4.9
-# (to make sure that libtorch works)
-ENV CC=/usr/bin/gcc-4.9 CXX=/usr/bin/g++-4.9
 
 # Install deps for the python interface
 WORKDIR /usr/src/source/python

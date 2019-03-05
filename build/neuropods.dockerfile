@@ -7,6 +7,31 @@
 # FROM neuropods_base
 FROM vpanyam/dl_base:latest
 
+# Set the GCC version used for this build
+ARG GCC_VERSION=4.9
+ENV CC=/usr/bin/gcc-${GCC_VERSION} CXX=/usr/bin/g++-${GCC_VERSION}
+
+# Optional overrides used by the bazel build
+ARG NEUROPODS_TENSORFLOW_VERSION
+ARG NEUROPODS_TENSORFLOW_URL
+ARG NEUROPODS_TENSORFLOW_SHA256
+ARG NEUROPODS_PYTORCH_VERSION
+ARG NEUROPODS_PYTORCH_URL
+ARG NEUROPODS_PYTORCH_SHA256
+
+ENV NEUROPODS_TENSORFLOW_VERSION=$NEUROPODS_TENSORFLOW_VERSION
+ENV NEUROPODS_TENSORFLOW_URL=$NEUROPODS_TENSORFLOW_URL
+ENV NEUROPODS_TENSORFLOW_SHA256=$NEUROPODS_TENSORFLOW_SHA256
+ENV NEUROPODS_PYTORCH_VERSION=$NEUROPODS_PYTORCH_VERSION
+ENV NEUROPODS_PYTORCH_URL=$NEUROPODS_PYTORCH_URL
+ENV NEUROPODS_PYTORCH_SHA256=$NEUROPODS_PYTORCH_SHA256
+
+# Install any pip packages that were requested
+# This lets us do things like using a different build of torch
+# TODO(vip): Move this into bazel
+ARG PIP_OVERRIDES
+RUN [ ! -z "${PIP_OVERRIDES}" ] && pip install ${PIP_OVERRIDES} || echo "No pip overrides specified."
+
 # Create a source dir and copy the code in
 RUN mkdir -p /usr/src
 COPY . /usr/src
