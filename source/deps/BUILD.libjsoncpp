@@ -17,6 +17,7 @@ cc_library(
         "src/lib_json/json_writer.cpp",
     ],
     hdrs = glob(["include/json/*.h"]),
+    include_prefix = "jsoncpp",
     includes = ["include"],
     visibility = ["//visibility:public"],
     deps = [":private"],

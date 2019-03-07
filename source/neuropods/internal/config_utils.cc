@@ -5,7 +5,7 @@
 #include "config_utils.hh"
 
 #include <fstream>
-#include <json/json.h>
+#include <jsoncpp/json/json.h>
 #include <sstream>
 #include <stdexcept>
 #include <unordered_map>
