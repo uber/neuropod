@@ -8,7 +8,6 @@
 #include <sstream>
 #include <stdexcept>
 
-#include "neuropods/backends/torchscript/torch_tensor.hh"
 #include "neuropods/backends/torchscript/type_utils.hh"
 #include "neuropods/internal/tensor_store.hh"
 
@@ -65,16 +64,6 @@ TorchNeuropodBackend::TorchNeuropodBackend(const std::string &neuropod_path, std
 }
 
 TorchNeuropodBackend::~TorchNeuropodBackend() = default;
-
-
-// Allocate a tensor of a specific type
-std::unique_ptr<NeuropodTensor> TorchNeuropodBackend::allocate_tensor(const std::string &         node_name,
-                                                                      const std::vector<int64_t> &input_dims,
-                                                                      TensorType                  tensor_type)
-{
-    torch::NoGradGuard guard;
-    return make_tensor<TorchNeuropodTensor>(tensor_type, node_name, input_dims);
-}
 
 // Run inference
 std::unique_ptr<TensorStore> TorchNeuropodBackend::infer(const TensorStore &inputs)

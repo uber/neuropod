@@ -9,6 +9,7 @@
 #include <vector>
 
 #include "neuropods/internal/backend_registration.hh"
+#include "neuropods/internal/neuropod_tensor.hh"
 #include "neuropods/internal/tensor_types.hh"
 
 namespace neuropods
@@ -32,4 +33,17 @@ public:
     // Run inference
     virtual std::unique_ptr<TensorStore> infer(const TensorStore &inputs) = 0;
 };
+
+template<template <class> class TensorImpl>
+class NeuropodBackendWithDefaultAllocator : public NeuropodBackend
+{
+public:
+    std::unique_ptr<NeuropodTensor> allocate_tensor(const std::string &         node_name,
+                                                    const std::vector<int64_t> &input_dims,
+                                                    TensorType                  tensor_type)
+    {
+        return make_tensor<TensorImpl>(tensor_type, node_name, input_dims);
+    }
+};
+
 } // namespace neuropods

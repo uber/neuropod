@@ -10,7 +10,6 @@
 #include <stdlib.h>
 #include <vector>
 
-#include "neuropods/backends/python_bridge/numpy_neuropod_tensor.hh"
 #include "neuropods/backends/python_bridge/type_utils.hh"
 #include "neuropods/internal/tensor_store.hh"
 
@@ -107,14 +106,6 @@ PythonBridge::PythonBridge(const std::string &             neuropod_path,
 }
 
 PythonBridge::~PythonBridge() = default;
-
-// Allocate a tensor of a specific type
-std::unique_ptr<NeuropodTensor> PythonBridge::allocate_tensor(const std::string &         node_name,
-                                                              const std::vector<int64_t> &input_dims,
-                                                              TensorType                  tensor_type)
-{
-    return make_tensor<NumpyNeuropodTensor>(tensor_type, node_name, input_dims);
-}
 
 // Run inference
 std::unique_ptr<TensorStore> PythonBridge::infer(const TensorStore &inputs)

@@ -11,6 +11,7 @@
 #include <tensorflow/c/c_api.h>
 
 #include "neuropods/backends/neuropod_backend.hh"
+#include "neuropods/backends/tensorflow/tf_tensor.hh"
 #include "neuropods/backends/tensorflow/tf_wrappers.hh"
 
 namespace neuropods
@@ -18,7 +19,7 @@ namespace neuropods
 
 
 // This backend can execute TensorFlow models
-class TensorflowNeuropodBackend : public NeuropodBackend
+class TensorflowNeuropodBackend : public NeuropodBackendWithDefaultAllocator<TensorflowNeuropodTensor>
 {
 private:
     // Setup setup inputs given a TensorStore
@@ -53,11 +54,6 @@ public:
     explicit TensorflowNeuropodBackend(const std::string &neuropod_path, std::unique_ptr<ModelConfig> &model_config);
 
     ~TensorflowNeuropodBackend();
-
-    // Allocate a tensor of a specific type
-    std::unique_ptr<NeuropodTensor> allocate_tensor(const std::string &         node_name,
-                                                    const std::vector<int64_t> &input_dims,
-                                                    TensorType                  tensor_type);
 
     // Run inference
     std::unique_ptr<TensorStore> infer(const TensorStore &inputs);
