@@ -10,7 +10,6 @@
 #include <sstream>
 #include <stdexcept>
 
-#include "neuropods/backends/tensorflow/tf_tensor.hh"
 #include "neuropods/backends/tensorflow/type_utils.hh"
 #include "neuropods/internal/tensor_store.hh"
 
@@ -169,15 +168,6 @@ void TensorflowNeuropodBackend::load_graph(const std::string &graph_path)
         ss << "Failed to load graph: " << graph_path;
         throw std::runtime_error(ss.str());
     }
-}
-
-
-// Allocate a tensor of a specific type
-std::unique_ptr<NeuropodTensor> TensorflowNeuropodBackend::allocate_tensor(const std::string &         node_name,
-                                                                           const std::vector<int64_t> &input_dims,
-                                                                           TensorType                  tensor_type)
-{
-    return make_tensor<TensorflowNeuropodTensor>(tensor_type, node_name, input_dims);
 }
 
 // Run inference
