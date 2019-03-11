@@ -19,6 +19,7 @@ def create_tensorflow_neuropod(
         output_spec,
         frozen_graph_path=None,
         graph_def=None,
+        init_op_names=None,
         test_input_data=None,
         test_expected_out=None):
     """
@@ -56,6 +57,11 @@ def create_tensorflow_neuropod(
 
     :param  graph_def:          A tensorflow GraphDef object. If this is not provided, `frozen_graph_path` must
                                 be set
+
+    :param init_op_names:       A list of initialization operator names. These operations are evaluated in the session
+                                used for inference right after the session is created. These operators may be used
+                                for initialization of variables.
+
 
     :param  test_input_data:    Optional sample input data. This is a dict mapping input names to
                                 values. If this is provided, inference will be run in an isolated environment
@@ -107,8 +113,14 @@ def create_tensorflow_neuropod(
     # We also need to save the node name mapping so we know how to run the model
     # This is tensorflow specific config so it's not saved in the overall neuropod config
     with open(os.path.join(neuropod_path, "0", "config.json"), "w") as config_file:
+        if init_op_names is None:
+            init_op_names = []
+        else:
+            init_op_names = init_op_names if isinstance(init_op_names, list) else [init_op_names]
+
         json.dump({
             "node_name_mapping": node_name_mapping,
+            "init_op_names": init_op_names,
         }, config_file)
 
     if test_input_data is not None:
