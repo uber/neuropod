@@ -1,1 +1,3 @@
 *.pyc
+source/python/.idea
+source/python/neuropods.egg-info/
