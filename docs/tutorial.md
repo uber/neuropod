@@ -253,11 +253,13 @@ auto input_data    = input_builder->add_tensor("x", x_data, 4, shape)
 // Run inference
 const auto output_data = neuropod.infer(input_data);
 
+const auto out_tensor = output_data->find_or_throw("out");
+
 // {6, 8, 10, 12}
-const auto out_vector = output_data->get_data_as_vector<float>("out");
+const auto out_vector = out_tensor->as_typed_tensor<float>();
 
 // {4}
-const auto out_shape  = output_data->get_shape("out");
+const auto out_shape  = out_tensor->get_dims();
 ```
 
 # Appendix
