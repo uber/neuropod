@@ -28,20 +28,23 @@ class TensorflowNeuropodExecutor(NeuropodExecutor):
             graph_def = tf.GraphDef()
             graph_def.ParseFromString(f.read())
 
-        # Setup the graph from the definition
-        self.graph = tf.Graph()
-        with self.graph.as_default():
-            tf.import_graph_def(graph_def, name="")
-
-        # Create a session
-        self.sess = tf.Session(graph=self.graph)
-
         # Load the TF specific config
         with open(os.path.join(neuropod_path, "0", "config.json"), "r") as config_file:
             model_config = json.load(config_file)
 
             # Get the node name mapping and store it
             self.node_name_mapping = model_config["node_name_mapping"]
+            init_op_names = model_config["init_op_names"]
+
+        # Setup the graph from the definition
+        self.graph = tf.Graph()
+        with self.graph.as_default():
+            tf.import_graph_def(graph_def, name="")
+            init_ops = [self.graph.get_operation_by_name(op_name) for op_name in init_op_names]
+
+        # Create a session
+        self.sess = tf.Session(graph=self.graph)
+        self.sess.run(init_ops)
 
     def forward(self, inputs):
         """
