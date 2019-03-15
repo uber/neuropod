@@ -108,15 +108,18 @@ std::unique_ptr<TensorStore> NeuropodInputBuilder::build()
 #define INIT_TEMPLATES_FOR_TYPE(CPP_TYPE, NEUROPOD_TYPE)                                                                        \
     template NeuropodInputBuilder &NeuropodInputBuilder::add_tensor<CPP_TYPE>(const std::string &          node_name,           \
                                                                               const std::vector<CPP_TYPE> &input_data,          \
-                                                                              const std::vector<int64_t> & input_dims);          \
+                                                                              const std::vector<int64_t> & input_dims);         \
                                                                                                                                 \
     template NeuropodInputBuilder &         NeuropodInputBuilder::add_tensor<CPP_TYPE>(const std::string &node_name,            \
-                                                                              const CPP_TYPE *   input_data,           \
-                                                                              size_t             input_data_size,      \
-                                                                              const std::vector<int64_t> &input_dims); \
+                                                                              const CPP_TYPE *   input_data,                    \
+                                                                              size_t             input_data_size,               \
+                                                                              const std::vector<int64_t> &input_dims);
+
+#define INIT_STRING_TEMPLATES_FOR_TYPE(CPP_TYPE, NEUROPOD_TYPE)                                                                 \
     template TypedNeuropodTensor<CPP_TYPE> *NeuropodInputBuilder::allocate_tensor(                                              \
         const std::string &node_name, const std::vector<int64_t> &input_dims);
 
 FOR_EACH_TYPE_MAPPING_EXCEPT_STRING(INIT_TEMPLATES_FOR_TYPE);
+FOR_EACH_TYPE_MAPPING_INCLUDING_STRING(INIT_STRING_TEMPLATES_FOR_TYPE);
 
 } // namespace neuropods
