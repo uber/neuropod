@@ -9,7 +9,7 @@ import unittest
 from testpath.tempdir import TemporaryDirectory
 
 from neuropods.backends.tensorflow.packager import create_tensorflow_neuropod
-
+from neuropods.tests.utils import get_string_concat_model_spec, check_strings_model
 
 def create_tf_strings_model():
     """
@@ -32,11 +32,6 @@ class TestTensorflowStrings(unittest.TestCase):
         with TemporaryDirectory() as test_dir:
             neuropod_path = os.path.join(test_dir, "test_neuropod")
 
-            if do_fail:
-                expected_out = np.array(["a", "b", "c"])
-            else:
-                expected_out = np.array(["apple sauce", "banana pudding", "carrot cake"])
-
             # `create_tensorflow_neuropod` runs inference with the test data immediately
             # after creating the neuropod. Raises a ValueError if the model output
             # does not match the expected output.
@@ -49,21 +44,12 @@ class TestTensorflowStrings(unittest.TestCase):
                     "y": "some_namespace/in_y:0",
                     "out": "some_namespace/out:0",
                 },
-                input_spec=[
-                    {"name": "x", "dtype": "string", "shape": (None,)},
-                    {"name": "y", "dtype": "string", "shape": (None,)},
-                ],
-                output_spec=[
-                    {"name": "out", "dtype": "string", "shape": (None,)},
-                ],
-                test_input_data={
-                    "x": np.array(["apple", "banana", "carrot"]),
-                    "y": np.array(["sauce", "pudding", "cake"]),
-                },
-                test_expected_out={
-                    "out": expected_out,
-                },
+                # Get the input/output spec along with test data
+                **get_string_concat_model_spec(do_fail=do_fail)
             )
+
+            # Run some additional checks
+            check_strings_model(neuropod_path)
 
     def test_strings_model(self):
         # Tests a case where packaging works correctly and

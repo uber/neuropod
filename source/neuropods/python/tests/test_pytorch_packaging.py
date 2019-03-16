@@ -10,6 +10,7 @@ from tempfile import mkdtemp
 from testpath.tempdir import TemporaryDirectory
 
 from neuropods.backends.pytorch.packager import create_pytorch_neuropod
+from neuropods.tests.utils import get_addition_model_spec, check_addition_model
 
 ADDITION_MODEL_SOURCE = """
 import torch
@@ -51,27 +52,17 @@ class TestPytorchPackaging(unittest.TestCase):
                 }],
                 entrypoint_package="addition_model",
                 entrypoint="get_model",
-                input_spec=[
-                    {"name": "x", "dtype": "float32", "shape": (None,)},
-                    {"name": "y", "dtype": "float32", "shape": (None,)},
-                    {"name": "optional", "dtype": "string", "shape": (None,)},
-                ],
-                output_spec=[
-                    {"name": "out", "dtype": "float32", "shape": (None,)},
-                ],
-                test_input_data={
-                    "x": np.arange(5, dtype=np.float32),
-                    "y": np.arange(5, dtype=np.float32),
-                },
-                test_expected_out={
-                    "out": np.zeros(5) if do_fail else np.arange(5) + np.arange(5)
-                },
                 test_deps=['torch', 'numpy'],
                 # This runs the test in the current process instead of in a new virtualenv
                 # We are using this to ensure the test will work even if the CI environment
                 # is restrictive
                 skip_virtualenv=True,
+                # Get the input/output spec along with test data
+                **get_addition_model_spec(do_fail=do_fail)
             )
+
+            # Run some additional checks
+            check_addition_model(neuropod_path)
 
     def test_simple_addition_model(self):
         # Tests a case where packaging works correctly and
