@@ -18,8 +18,11 @@ namespace neuropods
 class Neuropod
 {
 private:
-    struct impl;
-    std::unique_ptr<impl> pimpl;
+    // The neuropod model config
+    std::unique_ptr<ModelConfig> model_config_;
+
+    // The backend used to load and run the neuropod
+    std::shared_ptr<NeuropodBackend> backend_;
 
 public:
     // Load a neuropod.

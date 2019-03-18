@@ -18,8 +18,11 @@ namespace neuropods
 class NeuropodInputBuilder final
 {
 private:
-    struct impl;
-    std::unique_ptr<impl> pimpl;
+    // The backend used to allocate tensors
+    std::shared_ptr<NeuropodBackend> backend_;
+
+    // The tensor store that stores the created tensors
+    std::unique_ptr<TensorStore> data_;
 
 public:
     // You should not call this directly.
