@@ -23,11 +23,38 @@ cc_library(
     ],
 )
 
-cc_import(
+cc_library(
     name = "libtorch",
+    deps = [
+        ":libtorch_so",
+        ":libc10_so",
+        ":libcaffe2_so",
+    ],
+)
+
+cc_import(
+    name = "libtorch_so",
     interface_library = select({
         "@bazel_tools//src/conditions:darwin": "lib/libtorch.dylib",
         "//conditions:default": "lib/libtorch.so",
+    }),
+    system_provided = True,
+)
+
+cc_import(
+    name = "libc10_so",
+    interface_library = select({
+        "@bazel_tools//src/conditions:darwin": "lib/libc10.dylib",
+        "//conditions:default": "lib/libc10.so",
+    }),
+    system_provided = True,
+)
+
+cc_import(
+    name = "libcaffe2_so",
+    interface_library = select({
+        "@bazel_tools//src/conditions:darwin": "lib/libcaffe2.dylib",
+        "//conditions:default": "lib/libcaffe2.so",
     }),
     system_provided = True,
 )

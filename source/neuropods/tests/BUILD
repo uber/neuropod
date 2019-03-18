@@ -41,6 +41,17 @@ cc_test(
 )
 
 cc_test(
+    name = "test_torch_string_tensor",
+    srcs = [
+        "test_torch_string_tensor.cc",
+    ],
+    deps = [
+        "@gtest//:main",
+        "//neuropods/backends/torchscript:torchscript_backend_hdrs",
+    ],
+)
+
+cc_test(
     name = "test_tensorflow_backend",
     srcs = [
         "test_tensorflow_backend.cc",

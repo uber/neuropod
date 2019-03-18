@@ -22,12 +22,11 @@ TEST(test_default_backend, test_torchscript_addition_model)
     test_addition_model("neuropods/tests/test_data/torchscript_addition_model/");
 }
 
-// TODO(vip): enable once C++ support for torchscript string "tensors" (nested lists or tuples) lands
-// TEST(test_default_backend, test_torchscript_strings_model)
-// {
-//     // Test the TorchScript strings model
-//     test_strings_model("neuropods/tests/test_data/torchscript_strings_model/");
-// }
+TEST(test_default_backend, test_torchscript_strings_model)
+{
+    // Test the TorchScript strings model
+    test_strings_model("neuropods/tests/test_data/torchscript_strings_model/");
+}
 
 TEST(test_default_backend, test_tensorflow_addition_model)
 {
