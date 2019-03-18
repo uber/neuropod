@@ -28,12 +28,6 @@ struct TensorSpec
 // A struct that stores the expected inputs and outputs of a model
 struct ModelConfig
 {
-    ModelConfig(const std::string &            name,
-                const std::string &            platform,
-                const std::vector<TensorSpec> &inputs,
-                const std::vector<TensorSpec> &outputs);
-    ~ModelConfig();
-
     const std::string name;
     const std::string platform;
 

@@ -125,16 +125,6 @@ TensorSpec::TensorSpec(const std::string &name, const std::vector<int64_t> dims,
 
 TensorSpec::~TensorSpec() = default;
 
-ModelConfig::ModelConfig(const std::string &            name,
-                         const std::string &            platform,
-                         const std::vector<TensorSpec> &inputs,
-                         const std::vector<TensorSpec> &outputs)
-    : name(name), platform(platform), inputs(inputs), outputs(outputs)
-{
-}
-
-ModelConfig::~ModelConfig() = default;
-
 std::unique_ptr<ModelConfig> load_model_config(const std::string &neuropod_path)
 {
     auto path = get_config_path(neuropod_path);
@@ -200,7 +190,8 @@ std::unique_ptr<ModelConfig> load_model_config(std::istream &input_stream)
             spec["name"].asString(), get_dims_from_json(spec["shape"]), convert_to_tensor_type(spec["dtype"]));
     }
 
-    return stdx::make_unique<ModelConfig>(name, platform, inputs, outputs);
+    // Not directly using make_unique because of brace initialization
+    return stdx::make_unique<ModelConfig>(ModelConfig{name, platform, inputs, outputs});
 }
 
 } // namespace neuropods
