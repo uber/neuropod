@@ -13,62 +13,53 @@
 namespace neuropods
 {
 
-struct Neuropod::impl
-{
-    std::shared_ptr<NeuropodBackend> backend;
-    std::unique_ptr<ModelConfig> model_config;
-};
-
 Neuropod::Neuropod(const std::string &neuropod_path)
     : Neuropod(neuropod_path, std::unordered_map<std::string, std::string>())
 {
 }
 
+// Find the right backend to use and load the neuropod
 Neuropod::Neuropod(const std::string &neuropod_path, const std::unordered_map<std::string, std::string> &default_backend_overrides)
-    : pimpl(stdx::make_unique<Neuropod::impl>())
+    : model_config_(load_model_config(neuropod_path)),
+      backend_(get_backend_for_type(default_backend_overrides, model_config_->platform)(neuropod_path, model_config_))
 {
-    // Find the right backend to use and load the neuropod
-    pimpl->model_config = load_model_config(neuropod_path);
-    pimpl->backend      = get_backend_for_type(default_backend_overrides, pimpl->model_config->platform)(neuropod_path, pimpl->model_config);
 }
 
+// Load the neuropod using the specified backend
 Neuropod::Neuropod(const std::string &neuropod_path, const std::string &backend_name)
-    : pimpl(stdx::make_unique<Neuropod::impl>())
+    : model_config_(load_model_config(neuropod_path)),
+      backend_(get_backend_by_name(backend_name)(neuropod_path, model_config_))
 {
-    // Load the neuropod using the specified backend
-    pimpl->model_config = load_model_config(neuropod_path);
-    pimpl->backend      = get_backend_by_name(backend_name)(neuropod_path, pimpl->model_config);
 }
 
+// Load the model config and use the backend that was provided by the user
 Neuropod::Neuropod(const std::string &neuropod_path, std::shared_ptr<NeuropodBackend> backend)
-    : pimpl(stdx::make_unique<Neuropod::impl>())
+    : model_config_(load_model_config(neuropod_path)),
+      backend_(backend)
 {
-    // Load the model config and use the backend that was provided by the user
-    pimpl->model_config = load_model_config(neuropod_path);
-    pimpl->backend = std::move(backend);
 }
 
 Neuropod::~Neuropod() = default;
 
 std::unique_ptr<NeuropodInputBuilder> Neuropod::get_input_builder()
 {
-    return stdx::make_unique<NeuropodInputBuilder>(pimpl->backend);
+    return stdx::make_unique<NeuropodInputBuilder>(backend_);
 }
 
 std::unique_ptr<TensorStore> Neuropod::infer(const std::unique_ptr<TensorStore> &inputs)
 {
     // Run inference
-    return pimpl->backend->infer(*inputs);
+    return backend_->infer(*inputs);
 }
 
 const std::vector<TensorSpec> &Neuropod::get_inputs() const
 {
-    return pimpl->model_config->inputs;
+    return model_config_->inputs;
 }
 
 const std::vector<TensorSpec> &Neuropod::get_outputs() const
 {
-    return pimpl->model_config->outputs;
+    return model_config_->outputs;
 }
 
 } // namespace neuropods

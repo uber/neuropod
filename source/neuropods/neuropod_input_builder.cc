@@ -13,19 +13,9 @@
 namespace neuropods
 {
 
-struct NeuropodInputBuilder::impl
+NeuropodInputBuilder::NeuropodInputBuilder(std::shared_ptr<NeuropodBackend> backend)
+    : backend_(backend), data_(stdx::make_unique<TensorStore>())
 {
-    // The backend used to allocate memory
-    std::shared_ptr<NeuropodBackend> backend;
-
-    // The tensor store that stores the created tensors
-    std::unique_ptr<TensorStore> data;
-};
-
-NeuropodInputBuilder::NeuropodInputBuilder(std::shared_ptr<NeuropodBackend> backend) : pimpl(stdx::make_unique<impl>())
-{
-    pimpl->backend = std::move(backend);
-    pimpl->data    = stdx::make_unique<TensorStore>();
 }
 
 NeuropodInputBuilder::~NeuropodInputBuilder() = default;
@@ -46,10 +36,10 @@ NeuropodInputBuilder &NeuropodInputBuilder::add_tensor(const std::string &      
                                                        const std::vector<std::string> &input_data,
                                                        const std::vector<int64_t> &    input_dims)
 {
-    std::shared_ptr<NeuropodTensor> tensor = pimpl->backend->allocate_tensor(node_name, input_dims, STRING_TENSOR);
+    std::shared_ptr<NeuropodTensor> tensor = backend_->allocate_tensor(node_name, input_dims, STRING_TENSOR);
 
     // Add it to the vector of tensors stored in the builder
-    pimpl->data->tensors.emplace_back(tensor);
+    data_->tensors.emplace_back(tensor);
 
     // Downcast to a TypedNeuropodTensor so we can set the data
     auto typed_tensor = tensor->as_typed_tensor<std::string>();
@@ -82,7 +72,7 @@ template <typename T>
 TypedNeuropodTensor<T> *NeuropodInputBuilder::allocate_tensor(const std::string &         node_name,
                                                               const std::vector<int64_t> &input_dims)
 {
-    if (pimpl->data->find(node_name))
+    if (data_->find(node_name))
     {
         std::stringstream error_message;
         error_message << "Tensor " << node_name << " was already created.";
@@ -90,10 +80,10 @@ TypedNeuropodTensor<T> *NeuropodInputBuilder::allocate_tensor(const std::string 
     }
 
     std::shared_ptr<NeuropodTensor> tensor
-        = pimpl->backend->allocate_tensor(node_name, input_dims, get_tensor_type_from_cpp<T>());
+        = backend_->allocate_tensor(node_name, input_dims, get_tensor_type_from_cpp<T>());
 
     // Add it to the vector of tensors stored in the builder
-    pimpl->data->tensors.emplace_back(tensor);
+    data_->tensors.emplace_back(tensor);
 
     // Downcast to a TypedNeuropodTensor so we can get the data pointer
     return tensor->as_typed_tensor<T>();
@@ -101,7 +91,7 @@ TypedNeuropodTensor<T> *NeuropodInputBuilder::allocate_tensor(const std::string 
 
 std::unique_ptr<TensorStore> NeuropodInputBuilder::build()
 {
-    return std::move(pimpl->data);
+    return std::move(data_);
 }
 
 // Instantiate the templates
