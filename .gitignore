@@ -1,3 +1,9 @@
 *.pyc
 source/python/.idea
 source/python/neuropods.egg-info/
+.idea/
+bazel-bin
+bazel-genfiles
+bazel-out
+bazel-source
+bazel-testlogs
