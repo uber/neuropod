@@ -25,9 +25,11 @@ def create_torchscript_neuropod(
     :param  model_name:         The name of the model
 
     :param  module:             An instance of a PyTorch ScriptModule. This model should return the outputs
-                                as a tuple of key value pairs. This is because TorchScript doesn't support
-                                dicts yet. For example, a model may output something like this:
-                                    (("output1", value1), ("output2", value2))
+                                as a dictionary. For example, a model may output something like this:
+                                    {
+                                        "output1": value1,
+                                        "output2": value2,
+                                    }
 
     :param  input_spec:         A list of dicts specifying the input to the model. For each input, if shape
                                 is set to `None`, no validation is done on the shape. If shape is a tuple, the

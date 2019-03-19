@@ -186,12 +186,9 @@ class AdditionModel(torch.jit.ScriptModule):
     """
     @torch.jit.script_method
     def forward(self, x, y):
-        # dicts are not supported in TorchScript so we can't do this:
-        # return {
-        #     "out": x + y
-        # }
-        # Instead, we return the data as a tuple of key value pairs
-        return (("out", x + y),)
+        return {
+            "out": x + y
+        }
 ```
 
 To package this model, we can do the following:
