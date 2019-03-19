@@ -26,7 +26,9 @@ class StringsModel(torch.jit.ScriptModule):
             s = y[i]
             out.append(f + " " + s)
 
-        return (("out", out[1:]),)
+        return {
+            "out": out[1:]
+        }
 
 
 def package_strings_model(out_dir, do_fail=False):

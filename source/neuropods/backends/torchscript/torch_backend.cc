@@ -48,14 +48,6 @@ std::string get_graph_path(const std::string &neuropod_path)
     return neuropod_path + "/0/data/model.pt";
 }
 
-std::unique_ptr<NeuropodTensor> get_tensor_from_key_value_pair(at::ivalue::Tuple *tuple)
-{
-    const std::string &name        = tuple->elements()[0].toString()->string();
-    auto               tensor      = tuple->elements()[1].toTensor();
-    auto               tensor_type = get_neuropod_type_from_torch_type(tensor.scalar_type());
-    return make_tensor<TorchNeuropodTensor>(tensor_type, name, tensor);
-}
-
 } // namespace
 
 TorchNeuropodBackend::TorchNeuropodBackend(const std::string &neuropod_path, std::unique_ptr<ModelConfig> &model_config)
@@ -101,21 +93,19 @@ std::unique_ptr<TensorStore> TorchNeuropodBackend::infer(const TensorStore &inpu
     // Get outputs
     auto to_return = stdx::make_unique<TensorStore>();
 
-    auto outputs_tuple      = result.toTuple();
-    bool is_tuple_of_tuples = outputs_tuple->elements()[0].isTuple();
-    if (!is_tuple_of_tuples)
+    const auto &outputs_dict = result.toGenericDict()->elements();
+    for (const auto &elem : outputs_dict)
     {
-        // Just a tuple
-        to_return->tensors.emplace_back(get_tensor_from_key_value_pair(outputs_tuple.get()));
-    }
-    else
-    {
-        // A tuple of tuples
-        for (size_t pos = 0; pos < outputs_tuple->elements().size(); ++pos)
-        {
-            auto tuple = outputs_tuple->elements()[pos].toTuple();
-            to_return->tensors.emplace_back(get_tensor_from_key_value_pair(tuple.get()));
-        }
+        // Get the name and torch tensor
+        const std::string &name   = elem.first.toString()->string();
+        auto               tensor = elem.second.toTensor();
+
+        // Get the type and make a TorchNeuropodTensor
+        auto tensor_type = get_neuropod_type_from_torch_type(tensor.scalar_type());
+        auto neuropod_tensor = make_tensor<TorchNeuropodTensor>(tensor_type, name, tensor);
+
+        // Add it to our TensorStore
+        to_return->tensors.emplace_back(std::move(neuropod_tensor));
     }
 
     return to_return;

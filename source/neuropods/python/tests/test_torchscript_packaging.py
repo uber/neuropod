@@ -17,11 +17,9 @@ class AdditionModel(torch.jit.ScriptModule):
     """
     @torch.jit.script_method
     def forward(self, x, y):
-        # dicts are not supported in TorchScript so we can't do this:
-        # return {
-        #     "out": x + y
-        # }
-        return (("out", x + y),)
+        return {
+            "out": x + y
+        }
 
 
 class TestTorchScriptPackaging(unittest.TestCase):

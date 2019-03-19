@@ -51,13 +51,9 @@ class TorchScriptNeuropodExecutor(NeuropodExecutor):
         with torch.no_grad():
             out = self.model(**converted_inputs)
 
-        # Make sure we have a tuple of tuples
-        if out and not isinstance(out[0], tuple):
-            out = (out, )
-
         # Convert the outputs to numpy arrays
         converted_out = {}
-        for key, value in out:
+        for key, value in out.items():
             if isinstance(value, torch.Tensor):
                 converted_out[key] = value.numpy()
             elif isinstance(value, list) and isinstance(value[0], basestring):
