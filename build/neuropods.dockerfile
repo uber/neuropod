@@ -32,6 +32,10 @@ ENV NEUROPODS_PYTORCH_SHA256=$NEUROPODS_PYTORCH_SHA256
 ARG PIP_OVERRIDES
 RUN [ ! -z "${PIP_OVERRIDES}" ] && pip install ${PIP_OVERRIDES} || echo "No pip overrides specified."
 
+# TODO(vip): for some reason, adding to `/etc/ld.so.conf.d/libtorch.conf` does not work for
+# new versions of libtorch. Setting LD_LIBRARY_PATH does work correctly, however
+ENV LD_LIBRARY_PATH="/usr/src/source/bazel-source/external/libtorch_repo/lib"
+
 # Create a source dir and copy the code in
 RUN mkdir -p /usr/src
 COPY . /usr/src
@@ -59,7 +63,6 @@ RUN mkdir -p /tmp/dist_test && \
 
 # Make sure the tests can find all the `.so` files for the backends
 RUN echo "/tmp/dist_test/lib" > /etc/ld.so.conf.d/libneuropods.conf && \
-    echo "/usr/src/source/bazel-source/external/libtorch_repo/lib" > /etc/ld.so.conf.d/libtorch.conf && \
     echo "/usr/src/source/bazel-source/external/tensorflow_repo/lib" > /etc/ld.so.conf.d/tensorflow.conf && \
     ldconfig
 
