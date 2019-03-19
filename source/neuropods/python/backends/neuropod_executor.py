@@ -100,6 +100,26 @@ class NeuropodExecutor(object):
         # Read the neuropod config
         self.neuropod_config = config_utils.read_neuropod_config(neuropod_path)
 
+    @property
+    def inputs(self):
+        """
+        Get the inputs of the loaded neuropod. Returns a list of dicts representing
+        the format of the expected input to the neuropod.
+
+        Ex: [{"name": "x", "dtype": "float32", "shape": [None,]}]
+        """
+        return self.neuropod_config["input_spec"]
+
+    @property
+    def outputs(self):
+        """
+        Get the outputs of the loaded neuropod. Returns a list of dicts representing
+        the format of the output of the neuropod.
+
+        Ex: [{"name": "z", "dtype": "float32", "shape": [None,]}]
+        """
+        return self.neuropod_config["output_spec"]
+
     def infer(self, inputs):
         """
         Run inference using the specifed inputs.

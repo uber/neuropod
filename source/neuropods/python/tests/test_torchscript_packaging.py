@@ -9,7 +9,7 @@ import unittest
 from testpath.tempdir import TemporaryDirectory
 
 from neuropods.backends.torchscript.packager import create_torchscript_neuropod
-
+from neuropods.tests.utils import get_addition_model_spec, check_addition_model
 
 class AdditionModel(torch.jit.ScriptModule):
     """
@@ -36,22 +36,12 @@ class TestTorchScriptPackaging(unittest.TestCase):
                 neuropod_path=neuropod_path,
                 model_name="addition_model",
                 module=AdditionModel(),
-                input_spec=[
-                    {"name": "x", "dtype": "float32", "shape": (None,)},
-                    {"name": "y", "dtype": "float32", "shape": (None,)},
-                    {"name": "optional", "dtype": "string", "shape": (None,)},
-                ],
-                output_spec=[
-                    {"name": "out", "dtype": "float32", "shape": (None,)},
-                ],
-                test_input_data={
-                    "x": np.arange(5, dtype=np.float32),
-                    "y": np.arange(5, dtype=np.float32),
-                },
-                test_expected_out={
-                    "out": np.zeros(5) if do_fail else np.arange(5) + np.arange(5)
-                },
+                # Get the input/output spec along with test data
+                **get_addition_model_spec(do_fail=do_fail)
             )
+
+            # Run some additional checks
+            check_addition_model(neuropod_path)
 
     def test_simple_addition_model(self):
         # Tests a case where packaging works correctly and

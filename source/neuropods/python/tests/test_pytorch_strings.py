@@ -8,6 +8,7 @@ import unittest
 from testpath.tempdir import TemporaryDirectory
 
 from neuropods.backends.pytorch.packager import create_pytorch_neuropod
+from neuropods.tests.utils import get_string_concat_model_spec, check_strings_model
 
 STRINGS_MODEL_SOURCE = """
 import numpy as np
@@ -33,11 +34,6 @@ def package_strings_model(out_dir, do_fail=False):
     with open(os.path.join(model_code_dir, "strings_model.py"), "w") as f:
         f.write(STRINGS_MODEL_SOURCE)
 
-    if do_fail:
-        expected_out = np.array(["a", "b", "c"])
-    else:
-        expected_out = np.array(["apple sauce", "banana pudding", "carrot cake"])
-
     # `create_pytorch_neuropod` runs inference with the test data immediately
     # after creating the neuropod. Raises a ValueError if the model output
     # does not match the expected output.
@@ -53,26 +49,17 @@ def package_strings_model(out_dir, do_fail=False):
         }],
         entrypoint_package="strings_model",
         entrypoint="get_model",
-        input_spec=[
-            {"name": "x", "dtype": "string", "shape": (None,)},
-            {"name": "y", "dtype": "string", "shape": (None,)},
-        ],
-        output_spec=[
-            {"name": "out", "dtype": "string", "shape": (None,)},
-        ],
-        test_input_data={
-            "x": np.array(["apple", "banana", "carrot"]),
-            "y": np.array(["sauce", "pudding", "cake"]),
-        },
-        test_expected_out={
-            "out": expected_out,
-        },
         test_deps=['torch', 'numpy'],
         # This runs the test in the current process instead of in a new virtualenv
         # We are using this to ensure the test will work even if the CI environment
         # is restrictive
         skip_virtualenv=True,
+        # Get the input/output spec along with test data
+        **get_string_concat_model_spec(do_fail=do_fail)
     )
+
+    # Run some additional checks
+    check_strings_model(neuropod_path)
 
 
 class TestPytorchPackaging(unittest.TestCase):

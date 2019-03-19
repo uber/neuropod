@@ -10,7 +10,7 @@ from testpath.tempdir import TemporaryDirectory
 
 from neuropods.backends.tensorflow.packager import create_tensorflow_neuropod
 from neuropods.loader import load_neuropod
-
+from neuropods.tests.utils import get_addition_model_spec, check_addition_model
 
 def create_tf_addition_model():
     """
@@ -63,22 +63,12 @@ class TestTensorflowPackaging(unittest.TestCase):
                     "y": "some_namespace/in_y:0",
                     "out": "some_namespace/out:0",
                 },
-                input_spec=[
-                    {"name": "x", "dtype": "float32", "shape": (None,)},
-                    {"name": "y", "dtype": "float32", "shape": (None,)},
-                    {"name": "optional", "dtype": "string", "shape": (None,)},
-                ],
-                output_spec=[
-                    {"name": "out", "dtype": "float32", "shape": (None,)},
-                ],
-                test_input_data={
-                    "x": np.arange(5, dtype=np.float32),
-                    "y": np.arange(5, dtype=np.float32),
-                },
-                test_expected_out={
-                    "out": np.zeros(5) if do_fail else np.arange(5) + np.arange(5)
-                },
+                # Get the input/output spec along with test data
+                **get_addition_model_spec(do_fail=do_fail)
             )
+
+            # Run some additional checks
+            check_addition_model(neuropod_path)
 
     def package_accumulator_model(self, neuropod_path, init_op_name_as_list):
         graph_def, init_op_name = create_tf_accumulator_model()

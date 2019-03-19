@@ -9,7 +9,7 @@ import unittest
 from testpath.tempdir import TemporaryDirectory
 
 from neuropods.backends.torchscript.packager import create_torchscript_neuropod
-
+from neuropods.tests.utils import get_string_concat_model_spec, check_strings_model
 
 class StringsModel(torch.jit.ScriptModule):
     """
@@ -32,11 +32,6 @@ class StringsModel(torch.jit.ScriptModule):
 def package_strings_model(out_dir, do_fail=False):
     neuropod_path = os.path.join(out_dir, "test_neuropod")
 
-    if do_fail:
-        expected_out = np.array(["a", "b", "c"])
-    else:
-        expected_out = np.array(["apple sauce", "banana pudding", "carrot cake"])
-
     # `create_torchscript_neuropod` runs inference with the test data immediately
     # after creating the neuropod. Raises a ValueError if the model output
     # does not match the expected output.
@@ -44,21 +39,12 @@ def package_strings_model(out_dir, do_fail=False):
         neuropod_path=neuropod_path,
         model_name="strings_model",
         module=StringsModel(),
-        input_spec=[
-            {"name": "x", "dtype": "string", "shape": (None,)},
-            {"name": "y", "dtype": "string", "shape": (None,)},
-        ],
-        output_spec=[
-            {"name": "out", "dtype": "string", "shape": (None,)},
-        ],
-        test_input_data={
-            "x": np.array(["apple", "banana", "carrot"]),
-            "y": np.array(["sauce", "pudding", "cake"]),
-        },
-        test_expected_out={
-            "out": expected_out,
-        },
+        # Get the input/output spec along with test data
+        **get_string_concat_model_spec(do_fail=do_fail)
     )
+
+    # Run some additional checks
+    check_strings_model(neuropod_path)
 
 
 class TestTorchScriptStrings(unittest.TestCase):
