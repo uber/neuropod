@@ -6,7 +6,7 @@ load("//bazel:libtorch.bzl", "libtorch_repository")
 libtorch_repository(
     name = "libtorch_repo",
     build_file = "@//deps:BUILD.libtorch",
-    default_version = "1.0.0",
+    default_version = "1.0.0.dev20190318",
 )
 
 tensorflow_repository(

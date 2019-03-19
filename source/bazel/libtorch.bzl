@@ -6,9 +6,9 @@ def _impl(repository_ctx):
     else:
         version = repository_ctx.os.environ.get("NEUROPODS_PYTORCH_VERSION", "") or repository_ctx.attr.default_version
         if repository_ctx.os.name.startswith("mac"):
-            download_url = "https://download.pytorch.org/libtorch/cpu/libtorch-macos-" + version + ".zip"
+            download_url = "https://download.pytorch.org/libtorch/nightly/cpu/libtorch-macos-" + version + ".zip"
         else:
-            download_url = "https://download.pytorch.org/libtorch/cpu/libtorch-shared-with-deps-" + version + ".zip"
+            download_url = "https://download.pytorch.org/libtorch/nightly/cpu/libtorch-shared-with-deps-" + version + ".zip"
         download_sha = ''
 
     repository_ctx.download_and_extract(download_url, sha256=download_sha, stripPrefix="libtorch")

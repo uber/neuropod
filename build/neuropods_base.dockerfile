@@ -26,10 +26,11 @@ RUN mkdir -p /usr/src
 COPY . /usr/src
 
 # Install deps for the python interface
+# (the -f flag tells pip where to find the torch nightly builds)
 WORKDIR /usr/src/source/python
 RUN pip install -U pip setuptools && \
     python setup.py egg_info && \
-    cat neuropods.egg-info/requires.txt  | sed '/^\[/ d' | paste -sd " " - | xargs pip install
+    cat neuropods.egg-info/requires.txt  | sed '/^\[/ d' | paste -sd " " - | xargs pip install -f https://download.pytorch.org/whl/nightly/cpu/torch_nightly.html
 
 # Delete the source code we copied in
 WORKDIR /usr/src
