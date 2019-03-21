@@ -69,7 +69,8 @@ PythonBridge::PythonBridge(const std::string &             neuropod_path,
     try
     {
         // Utilize the virtualenv if one is present
-        if (auto venv_path = std::getenv("VIRTUAL_ENV")) {
+        if (auto venv_path = std::getenv("VIRTUAL_ENV"))
+        {
             setenv("PYTHONHOME", venv_path, true);
         }
  
