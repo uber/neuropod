@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <cstring>
 #include <functional>
 #include <numeric>
 #include <ostream>
@@ -257,6 +258,27 @@ public:
         out.insert(out.end(), &data_pointer[0], &data_pointer[size]);
 
         return out;
+    }
+
+    void copy_from(const T * input_data, size_t input_data_size)
+    {
+        // Get the number of elements and a pointer to the data
+        size_t numel        = get_num_elements();
+        T *    data_pointer = get_raw_data_ptr();
+
+        if (numel != input_data_size)
+        {
+            throw std::runtime_error("The size of the provided data does not match the number"
+                "of elements in the tensor.");
+        }
+
+        // Copy the data into the tensor
+        std::memcpy(data_pointer, input_data, input_data_size * sizeof(T));
+    }
+
+    void copy_from(const std::vector<T> &input_data)
+    {
+        copy_from(input_data.data(), input_data.size());
     }
 
     friend std::ostream &operator<<(std::ostream &out, const TypedNeuropodTensor<T> &tensor)

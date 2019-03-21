@@ -6,6 +6,7 @@
 
 #include <memory>
 #include <string>
+#include <unordered_set>
 #include <vector>
 
 #include "neuropods/internal/backend_registration.hh"
@@ -44,7 +45,7 @@ public:
         = 0;
 
     // Run inference
-    virtual std::unique_ptr<TensorStore> infer(const TensorStore &inputs) = 0;
+    virtual std::unique_ptr<TensorStore> infer(const std::unordered_set<std::shared_ptr<NeuropodTensor>> &inputs) = 0;
 };
 
 template<template <class> class TensorImpl>

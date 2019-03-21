@@ -108,13 +108,13 @@ PythonBridge::PythonBridge(const std::string &             neuropod_path,
 PythonBridge::~PythonBridge() = default;
 
 // Run inference
-std::unique_ptr<TensorStore> PythonBridge::infer(const TensorStore &inputs)
+std::unique_ptr<TensorStore> PythonBridge::infer(const std::unordered_set<std::shared_ptr<NeuropodTensor>> &inputs)
 {
     try
     {
         // Populate a dict mapping input names to values
         py::dict model_inputs;
-        for (const std::shared_ptr<NeuropodTensor> &tensor : inputs.tensors)
+        for (const std::shared_ptr<NeuropodTensor> &tensor : inputs)
         {
             model_inputs[tensor->get_name()]
                 = std::dynamic_pointer_cast<NativeDataContainer<py::object>>(tensor)->get_native_data();

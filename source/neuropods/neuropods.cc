@@ -41,15 +41,11 @@ Neuropod::Neuropod(const std::string &neuropod_path, std::shared_ptr<NeuropodBac
 
 Neuropod::~Neuropod() = default;
 
-std::unique_ptr<NeuropodInputBuilder> Neuropod::get_input_builder()
+std::unique_ptr<TensorStore> Neuropod::infer(const std::unordered_set<std::shared_ptr<NeuropodTensor>> &inputs)
 {
-    return stdx::make_unique<NeuropodInputBuilder>(backend_);
-}
-
-std::unique_ptr<TensorStore> Neuropod::infer(const std::unique_ptr<TensorStore> &inputs)
-{
+    // TODO(vip): make sure that tensor names in `inputs` are not repeated
     // Run inference
-    return backend_->infer(*inputs);
+    return backend_->infer(inputs);
 }
 
 const std::vector<TensorSpec> &Neuropod::get_inputs() const
@@ -61,5 +57,44 @@ const std::vector<TensorSpec> &Neuropod::get_outputs() const
 {
     return model_config_->outputs;
 }
+
+template <typename T>
+std::shared_ptr<TypedNeuropodTensor<T>> Neuropod::allocate_tensor(
+    const std::string &node_name,
+    const std::vector<int64_t> &input_dims)
+{
+    std::shared_ptr<NeuropodTensor> tensor
+        = backend_->allocate_tensor(node_name, input_dims, get_tensor_type_from_cpp<T>());
+
+    return std::dynamic_pointer_cast<TypedNeuropodTensor<T>>(tensor);
+}
+
+template <typename T>
+std::shared_ptr<TypedNeuropodTensor<T>> Neuropod::tensor_from_memory(
+    const std::string &         node_name,
+    const std::vector<int64_t> &input_dims,
+    T *                         data,
+    const Deleter &             deleter)
+{
+    std::shared_ptr<NeuropodTensor> tensor
+        = backend_->tensor_from_memory(node_name, input_dims, get_tensor_type_from_cpp<T>(), data, deleter);
+
+    return std::dynamic_pointer_cast<TypedNeuropodTensor<T>>(tensor);
+}
+
+// Instantiate the templates
+#define INIT_TEMPLATES_FOR_TYPE(CPP_TYPE, NEUROPOD_TYPE)                                                                          \
+    template std::shared_ptr<TypedNeuropodTensor<CPP_TYPE>> Neuropod::tensor_from_memory(const std::string &         node_name,   \
+                                                                                         const std::vector<int64_t> &input_dims,  \
+                                                                                         CPP_TYPE *                  data,        \
+                                                                                         const Deleter &             deleter);
+
+
+#define INIT_STRING_TEMPLATES_FOR_TYPE(CPP_TYPE, NEUROPOD_TYPE)                             \
+    template std::shared_ptr<TypedNeuropodTensor<CPP_TYPE>> Neuropod::allocate_tensor(      \
+        const std::string &node_name, const std::vector<int64_t> &input_dims);
+
+FOR_EACH_TYPE_MAPPING_EXCEPT_STRING(INIT_TEMPLATES_FOR_TYPE);
+FOR_EACH_TYPE_MAPPING_INCLUDING_STRING(INIT_STRING_TEMPLATES_FOR_TYPE);
 
 } // namespace neuropods

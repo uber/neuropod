@@ -7,7 +7,6 @@ load("@bazel_tools//tools/build_defs/pkg:pkg.bzl", "pkg_tar")
 cc_library(
     name = "neuropods_hdrs",
     hdrs = [
-        "neuropod_input_builder.hh",
         "neuropods.hh",
     ],
     visibility = [
@@ -26,7 +25,6 @@ cc_binary(
     linkshared = True,
     linkstatic = True,
     srcs = [
-        "neuropod_input_builder.cc",
         "neuropods.cc",
     ],
     visibility = [
@@ -43,7 +41,6 @@ pkg_tar(
     package_dir = "include/neuropods/",
     srcs = [
         # Headers
-        ":neuropod_input_builder.hh",
         ":neuropods.hh",
     ],
     deps = [
