@@ -46,7 +46,7 @@ public:
     ~PythonBridge();
 
     // Run inference
-    std::unique_ptr<TensorStore> infer(const TensorStore &inputs);
+    std::unique_ptr<TensorStore> infer(const std::unordered_set<std::shared_ptr<NeuropodTensor>> &inputs);
 };
 
 } // namespace neuropods

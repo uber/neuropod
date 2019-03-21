@@ -7,10 +7,12 @@
 #include <memory>
 #include <string>
 #include <unordered_map>
+#include <unordered_set>
 #include <vector>
 
+#include "neuropods/backends/neuropod_backend.hh"
 #include "neuropods/internal/config_utils.hh"
-#include "neuropods/neuropod_input_builder.hh"
+#include "neuropods/internal/tensor_store.hh"
 
 namespace neuropods
 {
@@ -63,16 +65,32 @@ public:
 
     ~Neuropod();
 
-    // Get a NeuropodInputBuilder
-    std::unique_ptr<NeuropodInputBuilder> get_input_builder();
-
     // Run inference
-    // You should use a `NeuropodInputBuilder` to generate the input
-    std::unique_ptr<TensorStore> infer(const std::unique_ptr<TensorStore> &inputs);
+    std::unique_ptr<TensorStore> infer(const std::unordered_set<std::shared_ptr<NeuropodTensor>> &inputs);
 
     // Get the inputs and outputs of the loaded Neuropod
     const std::vector<TensorSpec> &get_inputs() const;
     const std::vector<TensorSpec> &get_outputs() const;
+
+    // Allocate a tensor of a certain shape and type
+    template <typename T>
+    std::shared_ptr<TypedNeuropodTensor<T>> allocate_tensor(
+        const std::string &node_name,
+        const std::vector<int64_t> &input_dims);
+
+    // Allocate a tensor of a certain shape and type with existing data
+    // The user-provided memory will be wrapped and `deleter`
+    // will be called with a pointer to `data` when the tensor is
+    // deallocated.
+    //
+    // Note: Some backends may have specific alignment requirements (e.g. tensorflow).
+    // To support all the built-in backends, `data` should be aligned to 64 bytes.
+    template <typename T>
+    std::shared_ptr<TypedNeuropodTensor<T>> tensor_from_memory(
+        const std::string &         node_name,
+        const std::vector<int64_t> &input_dims,
+        T *                         data,
+        const Deleter &             deleter);
 };
 
 } // namespace neuropods

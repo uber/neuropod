@@ -58,7 +58,7 @@ TorchNeuropodBackend::TorchNeuropodBackend(const std::string &neuropod_path, std
 TorchNeuropodBackend::~TorchNeuropodBackend() = default;
 
 // Run inference
-std::unique_ptr<TensorStore> TorchNeuropodBackend::infer(const TensorStore &inputs)
+std::unique_ptr<TensorStore> TorchNeuropodBackend::infer(const std::unordered_set<std::shared_ptr<NeuropodTensor>> &inputs)
 {
     torch::NoGradGuard guard;
 
@@ -68,7 +68,7 @@ std::unique_ptr<TensorStore> TorchNeuropodBackend::infer(const TensorStore &inpu
 
     // Define the vector of inputs and add the inputs
     std::vector<torch::jit::IValue> torch_inputs(schema.arguments().size());
-    for (const std::shared_ptr<NeuropodTensor> &tensor : inputs.tensors)
+    for (const std::shared_ptr<NeuropodTensor> &tensor : inputs)
     {
         const auto  input_name = tensor->get_name();
         const auto &input_data

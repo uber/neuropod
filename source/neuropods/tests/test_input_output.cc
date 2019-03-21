@@ -6,7 +6,6 @@
 
 #include "neuropods/backends/test_backend/test_neuropod_backend.hh"
 #include "neuropods/internal/tensor_store.hh"
-#include "neuropods/neuropod_input_builder.hh"
 
 namespace
 {
@@ -55,55 +54,65 @@ void check_vectors_eq(const std::vector<T> &a, const std::vector<T> &b)
 }
 
 // Creates tensors using various input methods
-// and validates the output of the builder
-TEST(test_input_builder, add_tensors_and_build)
+// and validates the output
+TEST(test_allocate_tensor, add_tensors_and_validate)
 {
-    neuropods::NeuropodInputBuilder builder(std::make_shared<neuropods::TestNeuropodBackend>());
+    neuropods::TestNeuropodBackend backend;
 
-    builder.add_tensor("a", a_data, a_shape).add_tensor("b", b_data, b_shape).add_tensor("c", c_data, 4, c_shape);
+    // Allocate tensors
+    std::shared_ptr<neuropods::NeuropodTensor> a_ten = backend.allocate_tensor("a", a_shape, neuropods::INT32_TENSOR);
+    a_ten->as_typed_tensor<int32_t>()->copy_from(a_data);
 
-    // Test using allocate
-    {
-        auto data = builder.allocate_tensor<double>("d", d_shape);
-        memcpy(data->get_raw_data_ptr(), d_data, 4 * sizeof(double));
-    }
+    std::shared_ptr<neuropods::NeuropodTensor> b_ten = backend.allocate_tensor("b", b_shape, neuropods::INT64_TENSOR);
+    b_ten->as_typed_tensor<int64_t>()->copy_from(b_data);
 
+    std::shared_ptr<neuropods::NeuropodTensor> c_ten = backend.allocate_tensor("c", c_shape, neuropods::FLOAT_TENSOR);
+    c_ten->as_typed_tensor<float>()->copy_from(c_data, 4);
 
-    auto tensor_store = builder.build();
+    // Wrap existing data
+    // TODO(vip): Refactor this test. It's bad practice to have an empty deleter
+    // The created tensor should be responsible for deallocating the memory
+    std::shared_ptr<neuropods::NeuropodTensor> d_ten = backend.tensor_from_memory(
+        "d",
+        d_shape,
+        neuropods::DOUBLE_TENSOR,
+        const_cast<double *>(d_data),
+        [](void * unused) {});
 
     // Validate the internal state for a
     {
-        const auto ten = tensor_store->find("a");
+        const auto ten = a_ten;
         check_tensor_eq_ptr(ten, a_data.data(), a_data.size());
         check_vectors_eq(ten->get_dims(), a_shape);
     }
 
     // Validate the internal state for b
     {
-        const auto ten = tensor_store->find("b");
+        const auto ten = b_ten;
         check_tensor_eq_ptr(ten, b_data.data(), b_data.size());
         check_vectors_eq(ten->get_dims(), b_shape);
     }
 
     // Validate the internal state for c
     {
-        const auto ten = tensor_store->find("c");
+        const auto ten = c_ten;
         check_tensor_eq_ptr(ten, c_data, 4);
         check_vectors_eq(ten->get_dims(), c_shape);
     }
 
     // Validate the internal state for d
     {
-        const auto ten = tensor_store->find("d");
+        const auto ten = d_ten;
         check_tensor_eq_ptr(ten, d_data, 4);
         check_vectors_eq(ten->get_dims(), d_shape);
     }
 }
 
-TEST(test_input_builder, adding_tensor_with_the_same_name_should_fail)
-{
-    neuropods::NeuropodInputBuilder builder(std::make_shared<neuropods::TestNeuropodBackend>());
-
-    builder.allocate_tensor<int8_t>("a", {10});
-    EXPECT_THROW(builder.allocate_tensor<int8_t>("a", {10}), std::runtime_error);
-}
+// TODO(vip): reenable once the same validation is added to `Neuropod`
+// TEST(test_input_builder, adding_tensor_with_the_same_name_should_fail)
+// {
+//     neuropods::NeuropodInputBuilder builder(std::make_shared<neuropods::TestNeuropodBackend>());
+//
+//     builder.allocate_tensor<int8_t>("a", {10});
+//     EXPECT_THROW(builder.allocate_tensor<int8_t>("a", {10}), std::runtime_error);
+// }

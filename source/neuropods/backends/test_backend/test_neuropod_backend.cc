@@ -14,7 +14,7 @@ TestNeuropodBackend::TestNeuropodBackend(const std::string &neuropod_path, std::
 TestNeuropodBackend::~TestNeuropodBackend() = default;
 
 // Run inference
-std::unique_ptr<TensorStore> TestNeuropodBackend::infer(const TensorStore &inputs)
+std::unique_ptr<TensorStore> TestNeuropodBackend::infer(const std::unordered_set<std::shared_ptr<NeuropodTensor>> &inputs)
 {
     return stdx::make_unique<TensorStore>();
 }

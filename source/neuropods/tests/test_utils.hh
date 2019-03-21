@@ -35,12 +35,21 @@ void test_addition_model(neuropods::Neuropod &neuropod, bool copy_mem)
         const float y_data[] = {7, 8, 9, 10};
         const float target[] = {8, 10, 12, 14};
 
-        // Get an input builder and add some data
-        auto input_builder = neuropod.get_input_builder();
+        std::unordered_set<std::shared_ptr<neuropods::NeuropodTensor>> input_data;
 
         if (copy_mem)
         {
-            input_builder->add_tensor("x", x_data, 4, shape).add_tensor("y", y_data, 4, shape);
+            // Allocate the tensors
+            auto x_ten = neuropod.allocate_tensor<float>("x", shape);
+            auto y_ten = neuropod.allocate_tensor<float>("y", shape);
+
+            // Copy the input data
+            x_ten->copy_from(x_data, 4);
+            y_ten->copy_from(y_data, 4);
+
+            // Add it to the inputs for inference
+            input_data.insert(x_ten);
+            input_data.insert(y_ten);
         }
         else
         {
@@ -58,11 +67,14 @@ void test_addition_model(neuropods::Neuropod &neuropod, bool copy_mem)
                 free_counter++;
             };
 
-            input_builder->tensor_from_memory<float>("x", shape, const_cast<float *>(x_data_aligned), deleter);
-            input_builder->tensor_from_memory<float>("y", shape, const_cast<float *>(y_data_aligned), deleter);
-        }
+            // Create tensors by wrapping existing data
+            auto x_ten = neuropod.tensor_from_memory("x", shape, const_cast<float *>(x_data_aligned), deleter);
+            auto y_ten = neuropod.tensor_from_memory("y", shape, const_cast<float *>(y_data_aligned), deleter);
 
-        auto input_data = input_builder->build();
+            // Add it to the inputs for inference
+            input_data.insert(x_ten);
+            input_data.insert(y_ten);
+        }
 
         // Run inference
         const auto output_data = neuropod.infer(input_data);
@@ -121,12 +133,16 @@ void test_strings_model(neuropods::Neuropod &neuropod)
     const std::vector<std::string> y_data = {"sauce", "pudding", "cake"};
     std::vector<std::string>       target = {"apple sauce", "banana pudding", "carrot cake"};
 
-    // Get an input builder and add some data
-    auto input_builder = neuropod.get_input_builder();
-    auto input_data    = input_builder->add_tensor("x", x_data, shape).add_tensor("y", y_data, shape).build();
+    // Allocate tensors
+    auto x_ten = neuropod.allocate_tensor<std::string>("x", shape);
+    auto y_ten = neuropod.allocate_tensor<std::string>("y", shape);
+
+    // Set the data
+    x_ten->set(x_data);
+    y_ten->set(y_data);
 
     // Run inference
-    const auto output_data = neuropod.infer(input_data);
+    const auto output_data = neuropod.infer({x_ten, y_ten});
 
     // Get the data in the output tensor
     const std::vector<std::string> out_vector = output_data->find_or_throw("out")
