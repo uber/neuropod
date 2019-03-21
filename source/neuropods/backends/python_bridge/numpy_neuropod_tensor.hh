@@ -12,6 +12,7 @@
 #include <string>
 #include <vector>
 
+#include "neuropods/internal/deleter.hh"
 #include "neuropods/internal/neuropod_tensor.hh"
 
 namespace neuropods
@@ -42,6 +43,13 @@ std::vector<int64_t> get_dims_from_numpy(PyArrayObject *nparray)
     std::vector<int64_t> shape(&dims[0], &dims[ndims]);
 
     return shape;
+}
+
+void deallocator(PyObject * capsule)
+{
+    // The tensor is being deallocated, run the deleter that the user provided
+    auto handle = PyCapsule_GetPointer(capsule, nullptr);
+    run_deleter(handle);
 }
 
 } // namespace
@@ -89,6 +97,38 @@ public:
 
             // numpy typenum
             get_numpy_type_from_neuropod_type(get_tensor_type_from_cpp<T>()));
+
+        py::handle<>       handle(obj);
+        py::numeric::array arr(handle);
+
+        nparray_ = arr;
+    };
+
+    // Wrap existing memory
+    NumpyNeuropodTensor(const std::string &name, const std::vector<int64_t> &dims, void * data, const Deleter &deleter)
+        : TypedNeuropodTensor<T>(name, dims)
+    {
+        setup_numpy_if_needed();
+
+        // Allocate the numpy array
+        PyObject *obj = PyArray_SimpleNewFromData(
+            // num dims
+            dims.size(),
+
+            // The dimensions, on OSX npy_intp is 32 bit, so we need to reinterpret_cast
+            reinterpret_cast<npy_intp *>(const_cast<int64_t *>(dims.data())),
+
+            // numpy typenum
+            get_numpy_type_from_neuropod_type(get_tensor_type_from_cpp<T>()),
+
+            // Data
+            data
+        );
+
+        // Make sure the deleter gets called when deallocating the numpy array
+        auto deleter_handle = register_deleter(deleter, data);
+        PyObject *capsule = PyCapsule_New(deleter_handle, nullptr, deallocator);
+        PyArray_SetBaseObject(reinterpret_cast<PyArrayObject *>(obj), capsule);
 
         py::handle<>       handle(obj);
         py::numeric::array arr(handle);
