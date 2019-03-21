@@ -91,6 +91,19 @@ cc_library(
     linkopts = ["-ldl"],
 )
 
+cc_library(
+    name = "deleter",
+    hdrs = [
+        "deleter.hh",
+    ],
+    srcs = [
+        "deleter.cc",
+    ],
+    visibility = [
+        "//neuropods:__subpackages__",
+    ],
+)
+
 # Package all the header files
 pkg_tar(
     name = "libneuropods_internal_hdrs",

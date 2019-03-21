@@ -20,6 +20,7 @@ cc_binary(
     ],
     deps = [
         "//neuropods/backends:neuropod_backend",
+        "//neuropods/internal:deleter",
         "@libtorch_repo//:libtorch_hdrs",
         "@libtorch_repo//:libtorch",
     ]

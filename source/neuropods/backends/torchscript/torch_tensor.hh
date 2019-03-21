@@ -10,6 +10,7 @@
 #include <torch/script.h>
 #include <torch/torch.h>
 
+#include "neuropods/internal/deleter.hh"
 #include "neuropods/internal/neuropod_tensor.hh"
 
 namespace neuropods
@@ -48,6 +49,14 @@ uint64_t *get_data_from_torch_tensor(const torch::Tensor &tensor)
     throw std::runtime_error("TorchScript doesn't support type uint64_t");
 }
 
+torch::Deleter get_torch_deleter(const Deleter &deleter, void * data)
+{
+    auto handle = register_deleter(deleter, data);
+    return [handle](void * unused) {
+        run_deleter(handle);
+    };
+}
+
 } // namespace
 
 // This class is internal to neuropods and should not be exposed
@@ -57,10 +66,16 @@ class TorchNeuropodTensor : public TypedNeuropodTensor<T>, public NativeDataCont
 {
 public:
     // Allocate a torch tensor
-    // TODO(vip): maybe add a way to wrap existing data using torch::from_blob
     TorchNeuropodTensor(const std::string &name, const std::vector<int64_t> &dims)
         : TypedNeuropodTensor<T>(name, dims),
           tensor(torch::empty(dims, get_torch_type_from_neuropod_type(get_tensor_type_from_cpp<T>())))
+    {
+    }
+
+    // Wrap existing memory
+    TorchNeuropodTensor(const std::string &name, const std::vector<int64_t> &dims, void * data, const Deleter &deleter)
+        : TypedNeuropodTensor<T>(name, dims),
+          tensor(torch::from_blob(data, dims, get_torch_deleter(deleter, data), get_torch_type_from_neuropod_type(get_tensor_type_from_cpp<T>())))
     {
     }
 

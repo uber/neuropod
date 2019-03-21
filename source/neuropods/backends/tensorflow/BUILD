@@ -21,6 +21,7 @@ cc_binary(
     ],
     deps = [
         "//neuropods/backends:neuropod_backend",
+        "//neuropods/internal:deleter",
         "@tensorflow_repo//:tensorflow_c_hdrs",
         "@tensorflow_repo//:libtensorflow",
     ]

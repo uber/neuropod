@@ -23,6 +23,7 @@ cc_binary(
     ],
     deps = [
         "//neuropods/backends:neuropod_backend",
+        "//neuropods/internal:deleter",
         "@boost_repo//:boost",
     ] + select({
         "@bazel_tools//src/conditions:darwin": ["@python_numpy_repo_darwin//:python_numpy"],

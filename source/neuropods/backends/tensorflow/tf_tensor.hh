@@ -9,6 +9,7 @@
 
 #include <tensorflow/c/c_api.h>
 
+#include "neuropods/internal/deleter.hh"
 #include "neuropods/internal/neuropod_tensor.hh"
 #include "neuropods/backends/tensorflow/type_utils.hh"
 
@@ -32,6 +33,12 @@ std::vector<int64_t> get_shape(TF_Tensor *tensor)
     return out;
 }
 
+void deallocator(void * data, size_t len, void * handle)
+{
+    // The tensor is being deallocated, run the deleter that the user provided
+    run_deleter(handle);
+}
+
 } // namespace
 
 
@@ -48,6 +55,20 @@ public:
                                    dims.data(),
                                    dims.size(),
                                    this->get_num_elements() * sizeof(T)))
+    {
+    }
+
+    // Wrap existing memory
+    TensorflowNeuropodTensor(const std::string &name, const std::vector<int64_t> &dims, void * data, const Deleter &deleter)
+        : TypedNeuropodTensor<T>(name, dims),
+          tensor(TF_NewTensor(get_tf_type_from_neuropod_type(this->get_tensor_type()),
+                              dims.data(),
+                              dims.size(),
+                              data,
+                              this->get_num_elements() * sizeof(T),
+                              deallocator,
+                              register_deleter(deleter, data)
+                              ))
     {
     }
 

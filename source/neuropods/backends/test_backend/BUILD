@@ -13,6 +13,7 @@ cc_library(
     ],
     deps = [
         "//neuropods/backends:neuropod_backend",
+        "//neuropods/internal:deleter",
     ],
 )
 
