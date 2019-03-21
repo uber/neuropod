@@ -48,10 +48,24 @@ public:
                                      const std::vector<int64_t> &input_dims);
 
     // Add a tensor of a certain shape
-    // The InputBuilder will allocate the memory and return a
+    // The InputBuilder will allocate the memory and return a pointer to a
     // TypedNeuropodTensor<T> object that can be used to write the data.
     template <typename T>
     TypedNeuropodTensor<T> *allocate_tensor(const std::string &node_name, const std::vector<int64_t> &input_dims);
+
+    // Add a tensor of a certain shape with existing data
+    // The InputBuilder will wrap the provided memory and return a
+    // pointer to a TypedNeuropodTensor<T> object
+    //
+    // Note: Some backends may have specific alignment requirements (e.g. tensorflow).
+    // To support all the built-in backends, `data` should be aligned to 64 bytes.
+    // `deleter` will be called with a pointer to `data` when the tensor is
+    // deallocated
+    template <typename T>
+    TypedNeuropodTensor<T> *tensor_from_memory(const std::string &         node_name,
+                                               const std::vector<int64_t> &input_dims,
+                                               void *                      data,
+                                               const Deleter &             deleter);
 
     // Get the data
     std::unique_ptr<TensorStore> build();

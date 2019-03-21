@@ -337,15 +337,15 @@ public:
 
 
 // Utility to make a tensor of a specific type
-template <template <class> class TensorClass, typename... Params>
-std::unique_ptr<NeuropodTensor> make_tensor(TensorType tensor_type, Params &&... params)
-{
 #define MAKE_TENSOR(CPP_TYPE, NEUROPOD_TYPE)                                              \
     case NEUROPOD_TYPE:                                                                   \
     {                                                                                     \
         return stdx::make_unique<TensorClass<CPP_TYPE>>(std::forward<Params>(params)...); \
     }
 
+template <template <class> class TensorClass, typename... Params>
+std::unique_ptr<NeuropodTensor> make_tensor(TensorType tensor_type, Params &&... params)
+{
     // Make a tensor of the correct type and return it
     switch (tensor_type)
     {
@@ -353,8 +353,21 @@ std::unique_ptr<NeuropodTensor> make_tensor(TensorType tensor_type, Params &&...
     default:
         throw std::runtime_error("Unsupported tensor type!");
     }
-#undef MAKE_TENSOR
 }
+
+template <template <class> class TensorClass, typename... Params>
+std::unique_ptr<NeuropodTensor> make_tensor_no_string(TensorType tensor_type, Params &&... params)
+{
+    // Make a tensor of the correct type and return it
+    switch (tensor_type)
+    {
+        FOR_EACH_TYPE_MAPPING_EXCEPT_STRING(MAKE_TENSOR)
+    default:
+        throw std::runtime_error("Unsupported tensor type!");
+    }
+}
+
+#undef MAKE_TENSOR
 
 // Utility superclass for getting data from a tensor
 // without having to downcast to a specific TypedNeuropodTensor

@@ -89,6 +89,29 @@ TypedNeuropodTensor<T> *NeuropodInputBuilder::allocate_tensor(const std::string 
     return tensor->as_typed_tensor<T>();
 }
 
+template <typename T>
+TypedNeuropodTensor<T> *NeuropodInputBuilder::tensor_from_memory(const std::string &         node_name,
+                                                                 const std::vector<int64_t> &input_dims,
+                                                                 void *                      data,
+                                                                 const Deleter &             deleter)
+{
+    if (data_->find(node_name))
+    {
+        std::stringstream error_message;
+        error_message << "Tensor " << node_name << " was already created.";
+        throw std::runtime_error(error_message.str());
+    }
+
+    std::shared_ptr<NeuropodTensor> tensor
+        = backend_->tensor_from_memory(node_name, input_dims, get_tensor_type_from_cpp<T>(), data, deleter);
+
+    // Add it to the vector of tensors stored in the builder
+    data_->tensors.emplace_back(tensor);
+
+    // Downcast to a TypedNeuropodTensor so we can get the data pointer
+    return tensor->as_typed_tensor<T>();
+}
+
 std::unique_ptr<TensorStore> NeuropodInputBuilder::build()
 {
     return std::move(data_);
@@ -103,7 +126,13 @@ std::unique_ptr<TensorStore> NeuropodInputBuilder::build()
     template NeuropodInputBuilder &         NeuropodInputBuilder::add_tensor<CPP_TYPE>(const std::string &node_name,            \
                                                                               const CPP_TYPE *   input_data,                    \
                                                                               size_t             input_data_size,               \
-                                                                              const std::vector<int64_t> &input_dims);
+                                                                              const std::vector<int64_t> &input_dims);          \
+                                                                                                                                \
+    template TypedNeuropodTensor<CPP_TYPE> *NeuropodInputBuilder::tensor_from_memory(const std::string &         node_name,     \
+                                                                                     const std::vector<int64_t> &input_dims,    \
+                                                                                     void *                      data,          \
+                                                                                     const Deleter &             deleter);
+
 
 #define INIT_STRING_TEMPLATES_FOR_TYPE(CPP_TYPE, NEUROPOD_TYPE)                                                                 \
     template TypedNeuropodTensor<CPP_TYPE> *NeuropodInputBuilder::allocate_tensor(                                              \

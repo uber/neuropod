@@ -9,6 +9,7 @@
 #include <memory>
 #include <vector>
 
+#include "neuropods/internal/deleter.hh"
 #include "neuropods/internal/neuropod_tensor.hh"
 
 namespace neuropods
@@ -23,13 +24,25 @@ private:
     // A pointer to the data contained in the tensor
     void *data_;
 
+    // A deleter to free the underlying memory
+    void *deleter_handle_;
+
 public:
     TestNeuropodTensor(const std::string &name, const std::vector<int64_t> &dims) : TypedNeuropodTensor<T>(name, dims)
     {
         data_ = malloc(this->get_num_elements() * sizeof(T));
+        deleter_handle_ = nullptr;
     }
 
-    ~TestNeuropodTensor() { free(data_); }
+    // Wrap existing memory
+    TestNeuropodTensor(const std::string &name, const std::vector<int64_t> &dims, void * data, const Deleter &deleter)
+        : TypedNeuropodTensor<T>(name, dims)
+    {
+        data_ = data;
+        deleter_handle_ = register_deleter(deleter, data);
+    }
+
+    ~TestNeuropodTensor() { run_deleter(deleter_handle_); }
 
     // Get a pointer to the underlying data
     T *get_raw_data_ptr() { return static_cast<T *>(data_); }
