@@ -24,6 +24,14 @@ class TorchScriptNeuropodExecutor(NeuropodExecutor):
 
         # Load the model
         self.model = torch.jit.load(os.path.join(neuropod_path, "0", "data", "model.pt"))
+        self.model_expects_dictionary = False
+
+        # Check the expected input format of the model
+        model_inputs = list(self.model.graph.inputs())
+
+        # Expects a dictionary mapping from a tensor name to tensor
+        if len(model_inputs) == 1 and model_inputs[0].type().kind() == "DictType":
+            self.model_expects_dictionary = True
 
     def forward(self, inputs):
         """
@@ -49,7 +57,10 @@ class TorchScriptNeuropodExecutor(NeuropodExecutor):
 
         # Run inference
         with torch.no_grad():
-            out = self.model(**converted_inputs)
+            if self.model_expects_dictionary:
+                out = self.model(converted_inputs)
+            else:
+                out = self.model(**converted_inputs)
 
         # Convert the outputs to numpy arrays
         converted_out = {}
