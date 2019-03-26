@@ -99,4 +99,89 @@ public:
     torch::Tensor tensor;
 };
 
+// Specialization for strings
+// Torch does not natively support string tensors. Instead, we will be using a list of strings.
+// Note: this only implements support for 1D string tensors
+// TODO(vip, yevgeni): Design a better approach to multidimensional string tensors
+template<>
+class TorchNeuropodTensor<std::string> : public TypedNeuropodTensor<std::string>,
+                                         public NativeDataContainer<torch::jit::IValue>
+{
+public:
+    // Allocate a torch tensor
+    TorchNeuropodTensor(const std::string &name, const std::vector<int64_t> &dims)
+        : TypedNeuropodTensor<std::string>(name, dims),
+          list(at::ivalue::GenericList::create(std::vector<torch::jit::IValue>(get_num_elements())))
+    {
+        if (dims.size() != 1)
+        {
+            std::stringstream err;
+            err << "Only 1D TorchScript string tensors are supported. "
+                "Tried to create a tensor with " << dims.size() << " dimensions.";
+            throw std::runtime_error(err.str());
+        }
+    }
+
+    // Wrap an existing torch tensor
+    TorchNeuropodTensor(const std::string &name, torch::jit::IValue tensor)
+        : TypedNeuropodTensor<std::string>(name, {tensor.toGenericListRef().size()}),
+          list(tensor.toGenericList())
+    {
+    }
+
+    ~TorchNeuropodTensor() = default;
+
+    void set(const std::vector<std::string> &data)
+    {
+        if (data.size() != get_num_elements())
+        {
+            std::stringstream err;
+            err << "Error setting data for a TorchScript string tensor. "
+                "Make sure that the number of elements in the input vector is correct. "
+                "Expected size " <<  get_num_elements() << " but got " << data.size();
+            throw std::runtime_error(err.str());
+        }
+
+        // Get a reference to the tensor data
+        auto &tensor_data = list->elements();
+        for (size_t i = 0; i < data.size(); i++)
+        {
+            // Wrap all the input strings with IValues and set each item
+            tensor_data[i] = torch::jit::IValue(data[i]);
+        }
+    }
+
+    std::vector<std::string> get_data_as_vector()
+    {
+        std::vector<std::string> out;
+
+        // Reserve space for all the items in the tensor
+        out.reserve(get_num_elements());
+
+        // Get the items in the tensor and sanity check sizes
+        auto &tensor_data = list->elements();
+        if (tensor_data.size() != get_num_elements())
+        {
+            std::stringstream err;
+            err << "Error converting TorchScript list into vector of strings. "
+                "Make sure that the dimensions of the returned list are correct. "
+                "Expected size " <<  get_num_elements() << " but got " << tensor_data.size();
+            throw std::runtime_error(err.str());
+        }
+
+        for (const auto &item : tensor_data)
+        {
+            out.emplace_back(item.toStringRef());
+        }
+
+         // Return the filled vector
+        return out;
+    }
+
+    torch::jit::IValue get_native_data() { return list; }
+
+    // The underlying TorchScript list
+    c10::intrusive_ptr<at::ivalue::GenericList> list;
+};
+
 } // namespace neuropods
