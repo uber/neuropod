@@ -22,17 +22,13 @@ std::shared_ptr<torch::jit::script::Module> load_model_from_path(const std::stri
     std::ifstream stream(graph_path, std::ios_base::binary);
     if (!stream.good())
     {
-        std::stringstream ss;
-        ss << "Failed to load graph from path " << graph_path.c_str();
-        throw std::runtime_error(ss.str());
+        NEUROPOD_ERROR("Failed to load graph from path " << graph_path.c_str());
     }
 
     auto model = torch::jit::load(stream);
     if (!model)
     {
-        std::stringstream ss;
-        ss << "Failed to deserialize graph from path " << graph_path.c_str();
-        throw std::runtime_error(ss.str());
+        NEUROPOD_ERROR("Failed to deserialize graph from path " << graph_path.c_str());
     }
     return model;
 }
@@ -77,9 +73,7 @@ std::unique_ptr<TensorStore> TorchNeuropodBackend::infer(const std::unordered_se
         auto arg_index = schema.argumentIndexWithName(input_name);
         if (!arg_index.has_value())
         {
-            std::stringstream ss;
-            ss << "Input '" << input_name.c_str() << "' does not exist. Model inputs " << schema;
-            throw std::runtime_error(ss.str());
+            NEUROPOD_ERROR("Input '" << input_name.c_str() << "' does not exist. Model inputs " << schema);
         }
 
         // TODO(vip): transfer to the correct device
@@ -110,10 +104,8 @@ std::unique_ptr<TensorStore> TorchNeuropodBackend::infer(const std::unordered_se
             auto &list = tensor.toGenericListRef();
             if (list.size() != 0 && !list[0].isString())
             {
-                std::stringstream err;
-                err << "Neuropod got a list of type '" << list[0].tagKind() << "' for tensor '" << name << "'."
-                    "Only tensors or lists of strings are supported";
-                throw std::runtime_error(err.str());
+                NEUROPOD_ERROR("Neuropod got a list of type '" << list[0].tagKind() << "' for tensor '" << name << "'."
+                    "Only tensors or lists of strings are supported");
             }
 
             // Make a TorchNeuropodTensor
@@ -136,10 +128,8 @@ std::unique_ptr<TensorStore> TorchNeuropodBackend::infer(const std::unordered_se
         }
         else
         {
-            std::stringstream err;
-            err << "Neuropod returned an invalid type! All outputs must be tensors"
-                "or lists of strings. Got type '" << elem.second.tagKind() << "' for tensor '" << name << "'";
-            throw std::runtime_error(err.str());
+            NEUROPOD_ERROR("Neuropod returned an invalid type! All outputs must be tensors"
+                "or lists of strings. Got type '" << elem.second.tagKind() << "' for tensor '" << name << "'");
         }
     }
 

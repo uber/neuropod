@@ -30,9 +30,7 @@ std::shared_ptr<NeuropodTensor> TensorStore::find_or_throw(const std::string &na
     auto tensor = find(name);
     if (!tensor)
     {
-        std::stringstream ss;
-        ss << "Tensor not found for name '" << name << "'!";
-        throw std::runtime_error(ss.str());
+        NEUROPOD_ERROR("Tensor not found for name '" << name << "'!");
     }
     return tensor;
 }

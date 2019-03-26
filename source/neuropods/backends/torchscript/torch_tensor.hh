@@ -28,25 +28,25 @@ T *get_data_from_torch_tensor(const torch::Tensor &tensor)
 template <>
 std::string *get_data_from_torch_tensor(const torch::Tensor &tensor)
 {
-    throw std::runtime_error("String support is not implemented yet");
+    NEUROPOD_ERROR("String support is not implemented yet");
 }
 
 template <>
 uint16_t *get_data_from_torch_tensor(const torch::Tensor &tensor)
 {
-    throw std::runtime_error("TorchScript doesn't support type uint16_t");
+    NEUROPOD_ERROR("TorchScript doesn't support type uint16_t");
 }
 
 template <>
 uint32_t *get_data_from_torch_tensor(const torch::Tensor &tensor)
 {
-    throw std::runtime_error("TorchScript doesn't support type uint32_t");
+    NEUROPOD_ERROR("TorchScript doesn't support type uint32_t");
 }
 
 template <>
 uint64_t *get_data_from_torch_tensor(const torch::Tensor &tensor)
 {
-    throw std::runtime_error("TorchScript doesn't support type uint64_t");
+    NEUROPOD_ERROR("TorchScript doesn't support type uint64_t");
 }
 
 torch::Deleter get_torch_deleter(const Deleter &deleter, void * data)
@@ -115,10 +115,8 @@ public:
     {
         if (dims.size() != 1)
         {
-            std::stringstream err;
-            err << "Only 1D TorchScript string tensors are supported. "
-                "Tried to create a tensor with " << dims.size() << " dimensions.";
-            throw std::runtime_error(err.str());
+            NEUROPOD_ERROR("Only 1D TorchScript string tensors are supported. "
+                "Tried to create a tensor with " << dims.size() << " dimensions.");
         }
     }
 
@@ -135,11 +133,9 @@ public:
     {
         if (data.size() != get_num_elements())
         {
-            std::stringstream err;
-            err << "Error setting data for a TorchScript string tensor. "
+            NEUROPOD_ERROR("Error setting data for a TorchScript string tensor. "
                 "Make sure that the number of elements in the input vector is correct. "
-                "Expected size " <<  get_num_elements() << " but got " << data.size();
-            throw std::runtime_error(err.str());
+                "Expected size " <<  get_num_elements() << " but got " << data.size());
         }
 
         // Get a reference to the tensor data
@@ -162,11 +158,9 @@ public:
         auto &tensor_data = list->elements();
         if (tensor_data.size() != get_num_elements())
         {
-            std::stringstream err;
-            err << "Error converting TorchScript list into vector of strings. "
+            NEUROPOD_ERROR("Error converting TorchScript list into vector of strings. "
                 "Make sure that the dimensions of the returned list are correct. "
-                "Expected size " <<  get_num_elements() << " but got " << tensor_data.size();
-            throw std::runtime_error(err.str());
+                "Expected size " <<  get_num_elements() << " but got " << tensor_data.size());
         }
 
         for (const auto &item : tensor_data)
