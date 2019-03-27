@@ -241,7 +241,7 @@ Neuropod neuropod(ADDITION_MODEL_PATH);
 // Get an input builder and add some data
 std::unordered_set<std::shared_ptr<neuropods::NeuropodTensor>> input_data;
 
-// Add the input data using two different signatures of `add_tensor`
+// Add the input data using two different signatures of `copy_from`
 // (one with a pointer and size, one with a vector)
 auto x_tensor = neuropod->allocate_tensor<float>("x", shape);
 x_tensor->copy_from(x_data, 4);
