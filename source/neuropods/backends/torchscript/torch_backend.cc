@@ -96,16 +96,51 @@ std::unique_ptr<TensorStore> TorchNeuropodBackend::infer(const std::unordered_se
     const auto &outputs_dict = result.toGenericDict()->elements();
     for (const auto &elem : outputs_dict)
     {
-        // Get the name and torch tensor
-        const std::string &name   = elem.first.toString()->string();
-        auto               tensor = elem.second.toTensor();
+        // Get the name of the tensor
+        const std::string &name = elem.first.toString()->string();
 
-        // Get the type and make a TorchNeuropodTensor
-        auto tensor_type = get_neuropod_type_from_torch_type(tensor.scalar_type());
-        auto neuropod_tensor = make_tensor<TorchNeuropodTensor>(tensor_type, name, tensor);
+        if (elem.second.isGenericList())
+        {
+            // A list of strings
+            // This is used in place of string tensors because torch does not
+            // have native support for string tensors
+            auto tensor = elem.second;
 
-        // Add it to our TensorStore
-        to_return->tensors.emplace_back(std::move(neuropod_tensor));
+            // Make sure it's actually a list of strings (or empty)
+            auto &list = tensor.toGenericListRef();
+            if (list.size() != 0 && !list[0].isString())
+            {
+                std::stringstream err;
+                err << "Neuropod got a list of type '" << list[0].tagKind() << "' for tensor '" << name << "'."
+                    "Only tensors or lists of strings are supported";
+                throw std::runtime_error(err.str());
+            }
+
+            // Make a TorchNeuropodTensor
+            auto neuropod_tensor = stdx::make_unique<TorchNeuropodTensor<std::string>>(name, tensor);
+
+            // Add it to our TensorStore
+            to_return->tensors.emplace_back(std::move(neuropod_tensor));
+        }
+        else if (elem.second.isTensor())
+        {
+            // Torch tensor
+            auto tensor = elem.second.toTensor();
+
+            // Get the type and make a TorchNeuropodTensor
+            auto tensor_type = get_neuropod_type_from_torch_type(tensor.scalar_type());
+            auto neuropod_tensor = make_tensor<TorchNeuropodTensor>(tensor_type, name, tensor);
+
+            // Add it to our TensorStore
+            to_return->tensors.emplace_back(std::move(neuropod_tensor));
+        }
+        else
+        {
+            std::stringstream err;
+            err << "Neuropod returned an invalid type! All outputs must be tensors"
+                "or lists of strings. Got type '" << elem.second.tagKind() << "' for tensor '" << name << "'";
+            throw std::runtime_error(err.str());
+        }
     }
 
     return to_return;
