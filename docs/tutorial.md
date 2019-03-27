@@ -239,13 +239,18 @@ const std::vector<float> y_data = {5, 6, 7, 8};
 Neuropod neuropod(ADDITION_MODEL_PATH);
 
 // Get an input builder and add some data
-auto input_builder = neuropod.get_input_builder();
+std::unordered_set<std::shared_ptr<neuropods::NeuropodTensor>> input_data;
 
 // Add the input data using two different signatures of `add_tensor`
 // (one with a pointer and size, one with a vector)
-auto input_data    = input_builder->add_tensor("x", x_data, 4, shape)
-                                   .add_tensor("y", y_data, shape)
-                                   .build();
+auto x_tensor = neuropod->allocate_tensor<float>("x", shape);
+x_tensor->copy_from(x_data, 4);
+
+auto y_tensor = neuropod->allocate_tensor<float>("y", shape);
+y_tensor->copy_from(y_data);
+
+input_data.insert(x_tensor);
+input_data.insert(y_tensor);
 
 // Run inference
 const auto output_data = neuropod.infer(input_data);
