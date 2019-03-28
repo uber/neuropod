@@ -247,7 +247,7 @@ auto y_tensor = neuropod->allocate_tensor<float>("y", shape);
 y_tensor->copy_from(y_data);
 
 // Run inference
-const auto output_data = neuropod.infer({x_tensor, y_tensor})
+const auto output_data = neuropod.infer({x_tensor, y_tensor});
 
 const auto out_tensor = output_data->find_or_throw("out");
 
