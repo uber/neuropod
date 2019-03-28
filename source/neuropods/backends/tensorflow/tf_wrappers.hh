@@ -38,16 +38,12 @@ struct tf_session_deleter
         TF_CloseSession(session, status.get());
         if (TF_GetCode(status.get()) != TF_OK)
         {
-            std::stringstream ss;
-            ss << "Failed to close session: " << TF_Message(status.get());
-            throw std::runtime_error(ss.str());
+            NEUROPOD_ERROR("Failed to close session: " << TF_Message(status.get()));
         }
         TF_DeleteSession(session, status.get());
         if (TF_GetCode(status.get()) != TF_OK)
         {
-            std::stringstream ss;
-            ss << "Failed to delete session: " << TF_Message(status.get());
-            throw std::runtime_error(ss.str());
+            NEUROPOD_ERROR("Failed to delete session: " << TF_Message(status.get()));
         }
     }
 };

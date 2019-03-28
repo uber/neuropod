@@ -16,6 +16,7 @@ cc_library(
         "//neuropods:__subpackages__",
     ],
     deps = [
+        ":error_utils",
         ":memory_utils",
         ":neuropod_tensor",
         "@libjsoncpp_repo//:libjsoncpp",
@@ -43,6 +44,7 @@ cc_library(
         "//neuropods:__subpackages__",
     ],
     deps = [
+        ":error_utils",
         ":memory_utils",
     ],
 )
@@ -72,6 +74,7 @@ cc_library(
         "//neuropods:__subpackages__",
     ],
     deps = [
+        ":error_utils",
         ":memory_utils",
         ":neuropod_config_utils",
     ],
@@ -98,6 +101,16 @@ cc_library(
     ],
     srcs = [
         "deleter.cc",
+    ],
+    visibility = [
+        "//neuropods:__subpackages__",
+    ],
+)
+
+cc_library(
+    name = "error_utils",
+    hdrs = [
+        "error_utils.hh",
     ],
     visibility = [
         "//neuropods:__subpackages__",

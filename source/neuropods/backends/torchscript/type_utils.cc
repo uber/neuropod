@@ -7,6 +7,8 @@
 #include <sstream>
 #include <stdexcept>
 
+#include "neuropods/internal/error_utils.hh"
+
 namespace neuropods
 {
 
@@ -42,9 +44,7 @@ TensorType get_neuropod_type_from_torch_type(torch::Dtype type)
         break;
     }
 
-    std::stringstream ss;
-    ss << "Neuropods does not support type: " << type;
-    throw std::runtime_error(ss.str());
+    NEUROPOD_ERROR("Neuropods does not support type: " << type);
 }
 
 torch::Dtype get_torch_type_from_neuropod_type(TensorType type)
@@ -60,9 +60,7 @@ torch::Dtype get_torch_type_from_neuropod_type(TensorType type)
         break;
     }
 
-    std::stringstream ss;
-    ss << "TorchScript does not support type: " << type;
-    throw std::runtime_error(ss.str());
+    NEUROPOD_ERROR("TorchScript does not support type: " << type);
 }
 
 } // namespace neuropods

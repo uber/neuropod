@@ -13,6 +13,7 @@
 #include <string>
 #include <vector>
 
+#include "neuropods/internal/error_utils.hh"
 #include "neuropods/internal/memory_utils.hh"
 #include "neuropods/internal/type_macros.hh"
 
@@ -125,8 +126,7 @@ public:
         this->assure_rank(1);
         if (this->get_dims()[0] != 1)
         {
-            throw std::runtime_error("Tensor is expected to have shape of {1} to be"
-                                     "casted to a scalar.");
+            NEUROPOD_ERROR("Tensor is expected to have shape of {1} to be casted to a scalar.");
         }
         return (*this->template as_typed_tensor<T>())[0];
     }
@@ -139,8 +139,7 @@ public:
         this->assure_rank(1);
         if (this->get_dims()[0] != 1)
         {
-            throw std::runtime_error("Tensor is expected to have shape of {1} to be"
-                                     "casted to a scalar.");
+            NEUROPOD_ERROR("Tensor is expected to have shape of {1} to be casted to a scalar.");
         }
         return (*this->template as_typed_tensor<T>())[0];
     }
@@ -154,10 +153,8 @@ protected:
 
         if (requested != actual)
         {
-            std::stringstream ss;
-            ss << "Tried to downcast tensor \"" << get_name() << "\" of type " << actual
-               << " to a TypedNeuropodTensor of type " << requested;
-            throw std::runtime_error(ss.str());
+            NEUROPOD_ERROR("Tried to downcast tensor \"" << get_name() << "\" of type " << actual
+               << " to a TypedNeuropodTensor of type " << requested);
         }
     }
     void assure_rank(size_t expected_rank) const
@@ -166,11 +163,8 @@ protected:
         const size_t rank = dims.size();
         if (rank != expected_rank)
         {
-            std::stringstream error_message;
-
-            error_message << "Tensor '" << this->get_name() << " is expected to have rank of " << expected_rank
-                          << " while the actual rank is " << rank;
-            throw std::runtime_error(error_message.str());
+            NEUROPOD_ERROR("Tensor '" << this->get_name() << " is expected to have rank of " << expected_rank
+                          << " while the actual rank is " << rank);
         }
     }
 };
@@ -268,7 +262,7 @@ public:
 
         if (numel != input_data_size)
         {
-            throw std::runtime_error("The size of the provided data does not match the number"
+            NEUROPOD_ERROR("The size of the provided data does not match the number"
                 "of elements in the tensor.");
         }
 
@@ -345,7 +339,7 @@ public:
     // Set the data in the string tensor
     virtual void set(const std::vector<std::string> &data)
     {
-        throw std::runtime_error("Children must implement `set`");
+        NEUROPOD_ERROR("Children must implement `set`");
     }
 
     // TODO(vip): make this pure virtual once all the existing backends have
@@ -353,7 +347,7 @@ public:
     // Get the data in the string tensor
     virtual std::vector<std::string> get_data_as_vector()
     {
-        throw std::runtime_error("Children must implement `get_data_as_vector`");
+        NEUROPOD_ERROR("Children must implement `get_data_as_vector`");
     };
 };
 
@@ -373,7 +367,7 @@ std::unique_ptr<NeuropodTensor> make_tensor(TensorType tensor_type, Params &&...
     {
         FOR_EACH_TYPE_MAPPING_INCLUDING_STRING(MAKE_TENSOR)
     default:
-        throw std::runtime_error("Unsupported tensor type!");
+        NEUROPOD_ERROR("Unsupported tensor type: " << tensor_type);
     }
 }
 
@@ -385,7 +379,7 @@ std::unique_ptr<NeuropodTensor> make_tensor_no_string(TensorType tensor_type, Pa
     {
         FOR_EACH_TYPE_MAPPING_EXCEPT_STRING(MAKE_TENSOR)
     default:
-        throw std::runtime_error("Unsupported tensor type!");
+        NEUROPOD_ERROR("Unsupported tensor type: " << tensor_type);
     }
 }
 

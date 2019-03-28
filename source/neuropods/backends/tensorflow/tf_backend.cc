@@ -55,7 +55,7 @@ void setup_node_mapping(const std::string &neuropod_path, std::unordered_map<std
     // Make sure that node_name_mapping exists and is an object
     if (!obj["node_name_mapping"].isObject())
     {
-        throw std::runtime_error("'node_name_mapping' must be an object in the tf neuropod config");
+        NEUROPOD_ERROR("'node_name_mapping' must be an object in the tf neuropod config");
     }
 
     const auto node_name_mapping = obj["node_name_mapping"];
@@ -65,7 +65,7 @@ void setup_node_mapping(const std::string &neuropod_path, std::unordered_map<std
         const auto val = node_name_mapping[node_name];
         if (!val.isString())
         {
-            throw std::runtime_error("All values in 'node_name_mapping' in the tf neuropod config must be strings");
+            NEUROPOD_ERROR("All values in 'node_name_mapping' in the tf neuropod config must be strings");
         }
 
         mapping[node_name] = val.asString();
@@ -86,9 +86,7 @@ TF_Output get_graph_node_from_name(const std::string &node_name_with_index, cons
     TF_Operation *oper = TF_GraphOperationByName(graph_.get(), node_name.c_str());
     if (!oper)
     {
-        std::stringstream ss;
-        ss << "Operation '" << node_name_with_index << "' is not found";
-        throw std::runtime_error(ss.str());
+        NEUROPOD_ERROR("Operation '" << node_name_with_index << "' is not found");
     }
     // TensorFlow uses TF_Output everywhere, including input placeholders
     // Operations can have several outputs, they are indexed started from 0
@@ -122,9 +120,7 @@ void TensorflowNeuropodBackend::check_status() const
 {
     if (TF_GetCode(status_.get()) != TF_OK)
     {
-        std::stringstream ss;
-        ss << "Tensorflow error: " << TF_Message(status_.get());
-        throw std::runtime_error(ss.str());
+        NEUROPOD_ERROR("Tensorflow error: " << TF_Message(status_.get()));
     }
 }
 
@@ -142,9 +138,7 @@ void TensorflowNeuropodBackend::load_graph(const std::string &graph_path)
         ifs.read(buffer.data(), length);
         if (ifs.fail())
         {
-            std::stringstream ss;
-            ss << "Failed to read graph file: " << graph_path;
-            throw std::runtime_error(ss.str());
+            NEUROPOD_ERROR("Failed to read graph file: " << graph_path);
         }
 
         status_.reset(TF_NewStatus());
@@ -164,9 +158,7 @@ void TensorflowNeuropodBackend::load_graph(const std::string &graph_path)
     }
     else
     {
-        std::stringstream ss;
-        ss << "Failed to load graph: " << graph_path;
-        throw std::runtime_error(ss.str());
+        NEUROPOD_ERROR("Failed to load graph: " << graph_path);
     }
 }
 

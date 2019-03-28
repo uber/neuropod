@@ -62,7 +62,7 @@ PyArrayObject *get_nparray_from_obj(py::object boost_obj)
     PyObject *obj = boost_obj.ptr();
     if (obj == nullptr || !PyArray_Check(obj))
     {
-        throw std::runtime_error("Can't extract data from python object; expected numpy array");
+        NEUROPOD_ERROR("Can't extract data from python object; expected numpy array");
     }
 
     PyArrayObject *arr = reinterpret_cast<PyArrayObject *>(obj);

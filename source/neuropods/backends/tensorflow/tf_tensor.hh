@@ -135,7 +135,7 @@ public:
         // elements in the tensor
         if (data.size() != this->get_num_elements())
         {
-            throw std::runtime_error("Size of provided vector does not match the number "
+            NEUROPOD_ERROR("Size of provided vector does not match the number "
                 "of elements in the tensor");
         }
 
@@ -175,9 +175,7 @@ public:
             // Check status
             if (TF_GetCode(status) != TF_OK)
             {
-                std::stringstream ss;
-                ss << "Tensorflow error: " << TF_Message(status);
-                throw std::runtime_error(ss.str());
+                NEUROPOD_ERROR("Tensorflow error: " << TF_Message(status));
             }
 
             // Move the pointer forward
@@ -215,9 +213,7 @@ public:
             // Check status
             if (TF_GetCode(status) != TF_OK)
             {
-                std::stringstream ss;
-                ss << "Tensorflow error: " << TF_Message(status);
-                throw std::runtime_error(ss.str());
+                NEUROPOD_ERROR("Tensorflow error: " << TF_Message(status));
             }
 
             // Add the string

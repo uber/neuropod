@@ -10,6 +10,8 @@
 #include <stdexcept>
 #include <unordered_map>
 
+#include "neuropods/internal/error_utils.hh"
+
 namespace neuropods
 {
 
@@ -28,13 +30,7 @@ std::string get_config_path(const std::string &neuropod_path)
 }
 
 [[noreturn]] void throw_neuropod_config_error(const std::string &err) {
-    std::stringstream ss;
-    ss << "------------------------------" << std::endl;
-    ss << "Error loading neuropod config!" << std::endl;
-    ss << err << std::endl;
-    ss << "Please check your config file" << std::endl;
-    ss << "------------------------------" << std::endl;
-    throw std::runtime_error(ss.str());
+    NEUROPOD_ERROR("Error loading neuropod config! Please check your config file. " << err);
 }
 
 const std::unordered_map<std::string, TensorType> type_mapping = {
@@ -134,11 +130,7 @@ std::unique_ptr<ModelConfig> load_model_config(const std::string &neuropod_path)
 
     if (!ifs)
     {
-        std::stringstream ss;
-        ss << "Error loading config file '";
-        ss << path;
-        ss << "'!";
-        throw std::runtime_error(ss.str());
+        NEUROPOD_ERROR("Error loading config file with path '" << path << "'!");
     }
 
     return load_model_config(ifs);

@@ -11,6 +11,8 @@
 #include <stdexcept>
 #include <unordered_map>
 
+#include "neuropods/internal/error_utils.hh"
+
 namespace neuropods
 {
 
@@ -26,7 +28,7 @@ void init_registrar_if_needed()
     std::call_once(registrar_initialized, [](){
         registered_backends_by_name = new std::unordered_map<std::string, BackendFactoryFunction>();
         registered_backends_by_type = new std::unordered_map<std::string, BackendFactoryFunction>();
-    });    
+    });
 }
 
 // A map from a backend type (e.g. tensorflow, python, torchscript, etc.) to the name
@@ -51,19 +53,15 @@ void load_default_backend(const std::unordered_map<std::string, std::string> &de
 
     if (backend_it == default_backend_for_type.end())
     {
-        std::stringstream ss;
-        ss << "Default Neuropod backend not found for type '" << type << "'! ";
-        ss << "Make sure that you load a Neuropod backend that can support '" << type << "'";
-        throw std::runtime_error(ss.str());
+        NEUROPOD_ERROR("Default Neuropod backend not found for type '" << type << "'! "
+            "Make sure that you load a Neuropod backend that can support '" << type << "'");
     }
     else
     {
         if (dlopen(backend_it->second.c_str(), RTLD_NOW) == nullptr)
         {
-            std::stringstream ss;
-            ss << "Loading the default backend for type '" << type << "' failed. ";
-            ss << "Error from dlopen: " << dlerror();
-            throw std::runtime_error(ss.str());
+            NEUROPOD_ERROR("Loading the default backend for type '" << type << "' failed. "
+                "Error from dlopen: " << dlerror());
         }
     }
 }
@@ -103,10 +101,8 @@ BackendFactoryFunction get_backend_for_type(const std::unordered_map<std::string
     {
         // If we get here, that means that we tried loading a default backend
         // and it failed
-        std::stringstream ss;
-        ss << "Neuropod backend not found for type '" << type << "'! ";
-        ss << "Loading the default backend for type '" << type << "' failed.";
-        throw std::runtime_error(ss.str());
+        NEUROPOD_ERROR("Neuropod backend not found for type '" << type << "'! "
+            "Loading the default backend for type '" << type << "' failed.");
     }
     else
     {
@@ -121,10 +117,8 @@ BackendFactoryFunction get_backend_by_name(const std::string &name)
     auto backend_it = registered_backends_by_name->find(name);
     if (backend_it == registered_backends_by_name->end())
     {
-        std::stringstream ss;
-        ss << "Neuropod backend not found for name'" << name << "'! ";
-        ss << "Make sure that you have a build dependency on the correct backend";
-        throw std::runtime_error(ss.str());
+        NEUROPOD_ERROR("Neuropod backend not found for name'" << name << "'! "
+            "Make sure that you have a build dependency on the correct backend");
     }
     else
     {

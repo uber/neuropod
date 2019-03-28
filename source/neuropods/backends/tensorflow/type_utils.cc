@@ -7,6 +7,8 @@
 #include <sstream>
 #include <stdexcept>
 
+#include "neuropods/internal/error_utils.hh"
+
 namespace neuropods
 {
 
@@ -39,9 +41,7 @@ TensorType get_neuropod_type_from_tf_type(TF_DataType type)
         break;
     }
 
-    std::stringstream ss;
-    ss << "Neuropods does not support type: " << type;
-    throw std::runtime_error(ss.str());
+    NEUROPOD_ERROR("Neuropods does not support type: " << type);
 }
 
 TF_DataType get_tf_type_from_neuropod_type(TensorType type)
@@ -55,9 +55,7 @@ TF_DataType get_tf_type_from_neuropod_type(TensorType type)
         FOR_TF_NEUROPOD_MAPPING(NEUROPOD_TO_TF)
     }
 
-    std::stringstream ss;
-    ss << "TensorFlow does not support type: " << type;
-    throw std::runtime_error(ss.str());
+    NEUROPOD_ERROR("TensorFlow does not support type: " << type);
 }
 
 } // namespace neuropods

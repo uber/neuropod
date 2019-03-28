@@ -11,6 +11,8 @@
 #include <sstream>
 #include <stdexcept>
 
+#include "neuropods/internal/error_utils.hh"
+
 namespace neuropods
 {
 
@@ -41,9 +43,7 @@ int get_numpy_type_from_neuropod_type(TensorType type)
         FOR_NP_NEUROPOD_MAPPING(NEUROPOD_TO_NUMPY)
     }
 
-    std::stringstream ss;
-    ss << "Unsupported Neuropod type: " << type;
-    throw std::runtime_error(ss.str());
+    NEUROPOD_ERROR("Unsupported Neuropod type: " << type);
 }
 
 
@@ -58,9 +58,7 @@ TensorType get_neuropod_type_from_numpy_type(int type)
         FOR_NP_NEUROPOD_MAPPING(NUMPY_TO_NEUROPOD)
     }
 
-    std::stringstream ss;
-    ss << "Unsupported numpy type: " << type;
-    throw std::runtime_error(ss.str());
+    NEUROPOD_ERROR("Unsupported numpy type: " << type);
 }
 
 } // namespace neuropods
