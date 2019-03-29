@@ -11,6 +11,10 @@ def _impl(repository_ctx):
             download_url = "https://storage.googleapis.com/tensorflow/libtensorflow/libtensorflow-cpu-linux-x86_64-" + version + ".tar.gz"
         download_sha = ''
 
+        if repository_ctx.attr.default_version == version:
+            # If we're using the default version, use the default sha
+            download_sha = repository_ctx.attr.default_sha
+
     repository_ctx.download_and_extract(download_url, sha256=download_sha)
     repository_ctx.symlink(repository_ctx.path(Label(repository_ctx.attr.build_file)), "BUILD.bazel")
 
@@ -18,4 +22,5 @@ tensorflow_repository = repository_rule(
     implementation=_impl,
     local=True,
     attrs={"build_file": attr.string(mandatory=True),
-           "default_version": attr.string(mandatory=True)})
+           "default_version": attr.string(mandatory=True),
+           "default_sha": attr.string()})
