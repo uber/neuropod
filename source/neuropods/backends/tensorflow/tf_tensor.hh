@@ -59,6 +59,8 @@ public:
     }
 
     // Wrap existing memory
+    // This data should be 64 byte aligned
+    // https://github.com/tensorflow/tensorflow/blob/master/tensorflow/core/framework/allocator.h#L84
     TensorflowNeuropodTensor(const std::string &name, const std::vector<int64_t> &dims, void * data, const Deleter &deleter)
         : TypedNeuropodTensor<T>(name, dims),
           tensor(TF_NewTensor(get_tf_type_from_neuropod_type(this->get_tensor_type()),
