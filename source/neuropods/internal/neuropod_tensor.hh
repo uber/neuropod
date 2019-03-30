@@ -43,6 +43,13 @@ FOR_EACH_TYPE_MAPPING_INCLUDING_STRING(GET_TENSOR_TYPE_FN)
 template <typename T>
 class TypedNeuropodTensor;
 
+// Lets us write visitor functions to cleanly interact with `TypedNeuropodTensor`s
+template <typename ReturnType>
+struct NeuropodTensorVisitor
+{
+    typedef ReturnType return_type;
+};
+
 // A type erased version of a TypedNeuropodTensor. See the documentation for
 // TypedNeuropodTensor for more details.
 // Backends should not extend this class directly for their tensor implementations
@@ -142,6 +149,28 @@ public:
             NEUROPOD_ERROR("Tensor is expected to have shape of {1} to be casted to a scalar.");
         }
         return (*this->template as_typed_tensor<T>())[0];
+    }
+
+    template <typename Visitor, typename... Params>
+    typename Visitor::return_type
+    apply_visitor(const Visitor &visitor, Params &&... params)
+    {
+        // Downcast to the appropriate TypedNeuropodTensor and call the visitor
+    #define RUN_VISITOR_FN(CPP_TYPE, NEUROPOD_TYPE)                     \
+        case NEUROPOD_TYPE:                                             \
+        {                                                               \
+            return visitor(as_typed_tensor<CPP_TYPE>(), std::forward<Params>(params)...); \
+        }
+
+        // Switch on the type
+        switch(get_tensor_type())
+        {
+            FOR_EACH_TYPE_MAPPING_INCLUDING_STRING(RUN_VISITOR_FN)
+        default:
+            NEUROPOD_ERROR("Invalid tensor type" << get_tensor_type());
+        }
+
+    #undef RUN_VISITOR_FN
     }
 
 protected:

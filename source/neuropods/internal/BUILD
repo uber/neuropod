@@ -117,6 +117,19 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "tensor_utils",
+    hdrs = [
+        "tensor_utils.hh",
+    ],
+    deps = [
+        "//neuropods:neuropods_hdrs",
+    ],
+    visibility = [
+        "//neuropods:__subpackages__",
+    ],
+)
+
 # Package all the header files
 pkg_tar(
     name = "libneuropods_internal_hdrs",
