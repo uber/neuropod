@@ -123,7 +123,23 @@ cc_library(
         "tensor_utils.hh",
     ],
     deps = [
+        ":serialized_tensor",
         "//neuropods:neuropods_hdrs",
+    ],
+    visibility = [
+        "//neuropods:__subpackages__",
+    ],
+)
+
+
+cc_library(
+    name = "serialized_tensor",
+    hdrs = [
+        "serialized_tensor.hh",
+    ],
+    deps = [
+        ":deleter",
+        ":neuropod_tensor",
     ],
     visibility = [
         "//neuropods:__subpackages__",

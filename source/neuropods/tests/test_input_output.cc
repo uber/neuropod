@@ -6,6 +6,7 @@
 
 #include "neuropods/backends/test_backend/test_neuropod_backend.hh"
 #include "neuropods/internal/tensor_store.hh"
+#include "neuropods/internal/tensor_utils.hh"
 
 namespace
 {
@@ -53,6 +54,18 @@ void check_vectors_eq(const std::vector<T> &a, const std::vector<T> &b)
     EXPECT_EQ(memcmp(&a[0], &b[0], a.size() * sizeof(T)), 0);
 }
 
+std::shared_ptr<neuropods::NeuropodTensor> serialize_deserialize(const std::shared_ptr<neuropods::NeuropodTensor> &tensor)
+{
+    // Serialize the tensor
+    std::shared_ptr<void> data;
+    size_t length;
+    serialize_tensor(tensor, data, length);
+
+    // Deserialize the tensor
+    // Make sure we capture the shared pointer `data` in our deleter
+    return neuropods::deserialize_tensor<neuropods::TestNeuropodTensor>(data.get(), [data](void * unused) {});
+}
+
 // Creates tensors using various input methods
 // and validates the output
 TEST(test_allocate_tensor, add_tensors_and_validate)
@@ -81,28 +94,28 @@ TEST(test_allocate_tensor, add_tensors_and_validate)
 
     // Validate the internal state for a
     {
-        const auto ten = a_ten;
+        const auto ten = serialize_deserialize(a_ten);
         check_tensor_eq_ptr(ten, a_data.data(), a_data.size());
         check_vectors_eq(ten->get_dims(), a_shape);
     }
 
     // Validate the internal state for b
     {
-        const auto ten = b_ten;
+        const auto ten = serialize_deserialize(b_ten);
         check_tensor_eq_ptr(ten, b_data.data(), b_data.size());
         check_vectors_eq(ten->get_dims(), b_shape);
     }
 
     // Validate the internal state for c
     {
-        const auto ten = c_ten;
+        const auto ten = serialize_deserialize(c_ten);
         check_tensor_eq_ptr(ten, c_data, 4);
         check_vectors_eq(ten->get_dims(), c_shape);
     }
 
     // Validate the internal state for d
     {
-        const auto ten = d_ten;
+        const auto ten = serialize_deserialize(d_ten);
         check_tensor_eq_ptr(ten, d_data, 4);
         check_vectors_eq(ten->get_dims(), d_shape);
     }

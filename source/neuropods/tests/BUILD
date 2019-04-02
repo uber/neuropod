@@ -13,6 +13,7 @@ cc_test(
         "@gtest//:main",
         "//neuropods:neuropods_hdrs",
         "//neuropods/backends/test_backend:test_backend_hdrs",
+        "//neuropods/internal:tensor_utils",
     ],
 )
 
