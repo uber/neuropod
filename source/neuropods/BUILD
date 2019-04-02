@@ -58,6 +58,16 @@ pkg_tar(
         "//neuropods/backends/python_bridge:libneuropod_pythonbridge_backend.so",
         "//neuropods/backends/torchscript:libneuropod_torchscript_backend.so",
         "//neuropods/backends/tensorflow:libneuropod_tensorflow_backend.so",
+        "//neuropods/backends/multiprocess_backend:libneuropod_multiprocess_backend.so",
+    ]
+)
+
+pkg_tar(
+    name = "libneuropods_bins",
+    package_dir = "bin/",
+    srcs = [
+        # Binaries
+        "//neuropods/backends/multiprocess_backend:neuropod_multiprocess_worker",
     ]
 )
 
@@ -67,5 +77,6 @@ pkg_tar(
     deps = [
         ":libneuropods_hdrs",
         ":libneuropods_libs",
+        ":libneuropods_bins",
     ]
 )

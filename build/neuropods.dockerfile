@@ -47,6 +47,9 @@ RUN python -m unittest discover --verbose neuropods/tests
 # Build a wheel + install locally
 RUN python setup.py bdist_wheel && pip install dist/*.whl
 
+# Update PATH so the tests can find binaries they need
+ENV PATH="/tmp/dist_test/bin:${PATH}"
+
 # Build the native code
 WORKDIR /usr/src/source
 RUN bazel build //...:all
@@ -58,7 +61,7 @@ RUN mkdir -p /usr/src/dist && \
 # Make sure we only depend on .so files we whitelist (and we depend on all the whitelisted ones)
 RUN mkdir -p /tmp/dist_test && \
     tar -xvf /usr/src/dist/libneuropods.tar.gz -C /tmp/dist_test && \
-    readelf -d /tmp/dist_test/lib/*.so | grep NEEDED | sort | uniq |\
+    readelf -d /tmp/dist_test/lib/* /tmp/dist_test/bin/* | grep NEEDED | sort | uniq |\
     diff -I '^#.*' /usr/src/build/allowed_deps.txt -
 
 # Make sure the tests can find all the `.so` files for the backends

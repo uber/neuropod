@@ -54,6 +54,18 @@ cc_test(
 )
 
 cc_test(
+    name = "test_multiprocess_backend",
+    srcs = [
+        "test_multiprocess_backend.cc",
+        "//neuropods:libneuropods.so",
+        "//neuropods/backends/multiprocess_backend:libneuropod_multiprocess_backend.so",
+    ],
+    deps = [
+        ":neuropods_test_utils",
+    ],
+)
+
+cc_test(
     name = "test_default_backend",
     srcs = [
         "test_default_backend.cc",
