@@ -63,8 +63,9 @@ void maybe_register_python_shutdown()
 } // namespace
 
 PythonBridge::PythonBridge(const std::string &             neuropod_path,
-                           std::unique_ptr<ModelConfig> &  model_config,
+                           std::unique_ptr<ModelConfig>    model_config,
                            const std::vector<std::string> &python_path_additions)
+     : NeuropodBackend(std::move(model_config))
 {
     try
     {
@@ -73,7 +74,7 @@ PythonBridge::PythonBridge(const std::string &             neuropod_path,
         {
             setenv("PYTHONHOME", venv_path, true);
         }
- 
+
         // Register python shutdown
         maybe_register_python_shutdown();
 

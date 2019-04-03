@@ -20,22 +20,23 @@ Neuropod::Neuropod(const std::string &neuropod_path)
 
 // Find the right backend to use and load the neuropod
 Neuropod::Neuropod(const std::string &neuropod_path, const std::unordered_map<std::string, std::string> &default_backend_overrides)
-    : model_config_(load_model_config(neuropod_path)),
-      backend_(get_backend_for_type(default_backend_overrides, model_config_->platform)(neuropod_path, model_config_))
 {
+    // Load the model config and find the correct backend
+    auto model_config = load_model_config(neuropod_path);
+    auto platform = model_config->platform;
+
+    backend_ = get_backend_for_type(default_backend_overrides, platform)(neuropod_path, std::move(model_config));
 }
 
 // Load the neuropod using the specified backend
 Neuropod::Neuropod(const std::string &neuropod_path, const std::string &backend_name)
-    : model_config_(load_model_config(neuropod_path)),
-      backend_(get_backend_by_name(backend_name)(neuropod_path, model_config_))
+    : backend_(get_backend_by_name(backend_name)(neuropod_path, load_model_config(neuropod_path)))
 {
 }
 
-// Load the model config and use the backend that was provided by the user
-Neuropod::Neuropod(const std::string &neuropod_path, std::shared_ptr<NeuropodBackend> backend)
-    : model_config_(load_model_config(neuropod_path)),
-      backend_(backend)
+// Use the backend that was provided by the user
+Neuropod::Neuropod(std::shared_ptr<NeuropodBackend> backend)
+    : backend_(backend)
 {
 }
 
@@ -43,19 +44,37 @@ Neuropod::~Neuropod() = default;
 
 std::unique_ptr<TensorStore> Neuropod::infer(const std::unordered_set<std::shared_ptr<NeuropodTensor>> &inputs)
 {
-    // TODO(vip): make sure that tensor names in `inputs` are not repeated
     // Run inference
+    // TODO(vip): make sure that tensor names in `inputs` are not repeated
+    // TODO(vip): if `has_input_and_output_spec()`, do shape/type checking before calling `infer`
     return backend_->infer(inputs);
+}
+
+bool Neuropod::has_input_and_output_spec() const
+{
+    return backend_->get_neuropod_model_config() != nullptr;
 }
 
 const std::vector<TensorSpec> &Neuropod::get_inputs() const
 {
-    return model_config_->inputs;
+    if (!has_input_and_output_spec())
+    {
+        NEUROPOD_ERROR("This neuropod does not have input and output specs. "
+            "Please check `has_input_and_output_spec()` before calling `get_outputs()`");
+    }
+
+    return backend_->get_neuropod_model_config()->inputs;
 }
 
 const std::vector<TensorSpec> &Neuropod::get_outputs() const
 {
-    return model_config_->outputs;
+    if (!has_input_and_output_spec())
+    {
+        NEUROPOD_ERROR("This neuropod does not have input and output specs. "
+            "Please check `has_input_and_output_spec()` before calling `get_outputs()`");
+    }
+
+    return backend_->get_neuropod_model_config()->outputs;
 }
 
 template <typename T>

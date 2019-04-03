@@ -46,8 +46,9 @@ std::string get_graph_path(const std::string &neuropod_path)
 
 } // namespace
 
-TorchNeuropodBackend::TorchNeuropodBackend(const std::string &neuropod_path, std::unique_ptr<ModelConfig> &model_config)
-    : model_(load_model_from_path(get_graph_path(neuropod_path)))
+TorchNeuropodBackend::TorchNeuropodBackend(const std::string &neuropod_path, std::unique_ptr<ModelConfig> model_config)
+    : NeuropodBackend(std::move(model_config)),
+      model_(load_model_from_path(get_graph_path(neuropod_path)))
 {
 }
 

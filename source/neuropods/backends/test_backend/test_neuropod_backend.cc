@@ -10,7 +10,11 @@ namespace neuropods
 {
 
 TestNeuropodBackend::TestNeuropodBackend() {}
-TestNeuropodBackend::TestNeuropodBackend(const std::string &neuropod_path, std::unique_ptr<ModelConfig> &model_config) {}
+TestNeuropodBackend::TestNeuropodBackend(const std::string &neuropod_path, std::unique_ptr<ModelConfig> model_config)
+     : NeuropodBackend(std::move(model_config))
+{
+}
+
 TestNeuropodBackend::~TestNeuropodBackend() = default;
 
 // Run inference

@@ -18,16 +18,16 @@ namespace neuropods
 class NeuropodBackend;
 
 // A function that takes in a path to a neuropod and returns a pointer to a NeuropodBackend
-typedef std::unique_ptr<NeuropodBackend> (*BackendFactoryFunction)(const std::string &           neuropod_path,
-                                                                   std::unique_ptr<ModelConfig> &config);
+typedef std::unique_ptr<NeuropodBackend> (*BackendFactoryFunction)(const std::string &          neuropod_path,
+                                                                   std::unique_ptr<ModelConfig> config);
 
 // A template to create a factory for any backend
 // This is used in the macro below
 template <typename T>
-std::unique_ptr<NeuropodBackend> createNeuropodBackend(const std::string &           neuropod_path,
-                                                       std::unique_ptr<ModelConfig> &config)
+std::unique_ptr<NeuropodBackend> createNeuropodBackend(const std::string &          neuropod_path,
+                                                       std::unique_ptr<ModelConfig> config)
 {
-    return stdx::make_unique<T>(neuropod_path, config);
+    return stdx::make_unique<T>(neuropod_path, std::move(config));
 }
 
 // Register a backend for a set of specific types

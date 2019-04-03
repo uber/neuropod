@@ -23,7 +23,16 @@ struct TensorStore;
 // The interface that every neuropod backend implements
 class NeuropodBackend
 {
+protected:
+    // The neuropod model config (if any)
+    std::unique_ptr<ModelConfig> model_config_;
+
 public:
+    NeuropodBackend() {}
+
+    // An optional ModelConfig. See `get_neuropod_model_config` below for more details
+    NeuropodBackend(std::unique_ptr<ModelConfig> model_config) : model_config_(std::move(model_config)) {}
+
     virtual ~NeuropodBackend() {}
 
     // Allocate a tensor of a specific type
@@ -46,10 +55,16 @@ public:
 
     // Run inference
     virtual std::unique_ptr<TensorStore> infer(const std::unordered_set<std::shared_ptr<NeuropodTensor>> &inputs) = 0;
+
+    // The backend retains ownership of the model config
+    // This can be a nullptr if there is no associated Neuropod config
+    // (e.g. if a TF or TorchScript model was directly loaded instead of using a
+    // Neuropod package)
+    ModelConfig * get_neuropod_model_config() const { return model_config_.get(); }
 };
 
 template<template <class> class TensorImpl>
-class NeuropodBackendWithDefaultAllocator : public NeuropodBackend
+class NeuropodBackendWithDefaultAllocator : public virtual NeuropodBackend
 {
 public:
     std::unique_ptr<NeuropodTensor> allocate_tensor(const std::string &         node_name,

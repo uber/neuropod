@@ -20,9 +20,6 @@ namespace neuropods
 class Neuropod
 {
 private:
-    // The neuropod model config
-    std::unique_ptr<ModelConfig> model_config_;
-
     // The backend used to load and run the neuropod
     std::shared_ptr<NeuropodBackend> backend_;
 
@@ -61,14 +58,21 @@ public:
     //   auto proxy = std::make_shared<NeuropodGRPCProxy>(neuropod_path, some_remote_config, ...);
     //   Neuropod neuropod(proxy);
     //
-    Neuropod(const std::string &neuropod_path, std::shared_ptr<NeuropodBackend> backend);
+    Neuropod(std::shared_ptr<NeuropodBackend> backend);
 
     ~Neuropod();
 
     // Run inference
     std::unique_ptr<TensorStore> infer(const std::unordered_set<std::shared_ptr<NeuropodTensor>> &inputs);
 
-    // Get the inputs and outputs of the loaded Neuropod
+
+    // Returns true if the neuropod has input and output specs specified
+    bool has_input_and_output_spec() const;
+
+    // Get the inputs and outputs of the loaded Neuropod if any
+    // Throws an error if the if the input and output specs of the model
+    // were not specified
+    // Check `has_input_and_output_spec()` before calling these methods
     const std::vector<TensorSpec> &get_inputs() const;
     const std::vector<TensorSpec> &get_outputs() const;
 

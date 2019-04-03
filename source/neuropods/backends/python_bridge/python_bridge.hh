@@ -33,6 +33,9 @@ std::vector<std::string> get_default_python_path()
 class PythonBridge : public NeuropodBackendWithDefaultAllocator<NumpyNeuropodTensor>
 {
 private:
+    // The neuropod model config
+    std::unique_ptr<ModelConfig> model_config_;
+
     py::object main_module_;
     py::object main_namespace_;
 
@@ -40,7 +43,7 @@ private:
 
 public:
     PythonBridge(const std::string &             neuropod_path,
-                 std::unique_ptr<ModelConfig> &  model_config,
+                 std::unique_ptr<ModelConfig>    model_config,
                  const std::vector<std::string> &python_path_additions = get_default_python_path());
 
     ~PythonBridge();
