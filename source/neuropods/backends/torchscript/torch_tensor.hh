@@ -122,7 +122,7 @@ public:
 
     // Wrap an existing torch tensor
     TorchNeuropodTensor(const std::string &name, torch::jit::IValue tensor)
-        : TypedNeuropodTensor<std::string>(name, {tensor.toGenericListRef().size()}),
+        : TypedNeuropodTensor<std::string>(name, {static_cast<int64_t>(tensor.toGenericListRef().size())}),
           list(tensor.toGenericList())
     {
     }

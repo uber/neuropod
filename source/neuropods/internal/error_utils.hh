@@ -11,7 +11,7 @@ namespace neuropods
 {
 
 // A helper macro that lets us do things like
-// NEUROPOD_ERROR("Expeccted value " << a << ", but got " << b)
+// NEUROPOD_ERROR("Expected value " << a << ", but got " << b)
 #define NEUROPOD_ERROR(MSG)                 \
 {                                           \
     std::stringstream err;                  \
