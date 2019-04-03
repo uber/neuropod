@@ -16,7 +16,7 @@ def _impl(repository_ctx):
             if repository_ctx.os.name.startswith("mac"):
                 download_sha = repository_ctx.attr.mac_sha
             else:
-                download_sha = repository_ctx.attr.default_sha
+                download_sha = repository_ctx.attr.linux_sha
 
 
 
@@ -28,5 +28,5 @@ libtorch_repository = repository_rule(
     local=True,
     attrs={"build_file": attr.string(mandatory=True),
            "default_version": attr.string(mandatory=True),
-           "default_sha": attr.string(),
+           "linux_sha": attr.string(),
            "mac_sha": attr.string()})
