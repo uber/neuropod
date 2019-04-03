@@ -47,7 +47,12 @@ std::string get_graph_path(const std::string &neuropod_path)
 } // namespace
 
 TorchNeuropodBackend::TorchNeuropodBackend(const std::string &neuropod_path, std::unique_ptr<ModelConfig> &model_config)
-    : model_(load_model_from_path(get_graph_path(neuropod_path)))
+    : TorchNeuropodBackend(get_graph_path(neuropod_path))
+{
+}
+
+TorchNeuropodBackend::TorchNeuropodBackend(const std::string &torchscript_model_path)
+    : model_(load_model_from_path(torchscript_model_path))
 {
 }
 
@@ -67,8 +72,7 @@ std::unique_ptr<TensorStore> TorchNeuropodBackend::infer(const std::unordered_se
     for (const std::shared_ptr<NeuropodTensor> &tensor : inputs)
     {
         const auto  input_name = tensor->get_name();
-        const auto &input_data
-            = std::dynamic_pointer_cast<NativeDataContainer<torch::jit::IValue>>(tensor)->get_native_data();
+        const auto &input_data = get_ivalue_from_torch_tensor(tensor);
 
         auto arg_index = schema.argumentIndexWithName(input_name);
         if (!arg_index.has_value())
