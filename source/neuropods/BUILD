@@ -16,7 +16,6 @@ cc_library(
         "//neuropods/backends:neuropod_backend",
         "//neuropods/internal:neuropod_config_utils",
         "//neuropods/internal:neuropod_tensor",
-        "//neuropods/internal:tensor_store",
     ],
 )
 

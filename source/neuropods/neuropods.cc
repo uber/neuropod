@@ -8,7 +8,6 @@
 #include "neuropods/internal/config_utils.hh"
 #include "neuropods/backends/neuropod_backend.hh"
 #include "neuropods/internal/neuropod_tensor.hh"
-#include "neuropods/internal/tensor_store.hh"
 
 namespace neuropods
 {
@@ -41,7 +40,7 @@ Neuropod::Neuropod(const std::string &neuropod_path, std::shared_ptr<NeuropodBac
 
 Neuropod::~Neuropod() = default;
 
-std::unique_ptr<TensorStore> Neuropod::infer(const std::unordered_set<std::shared_ptr<NeuropodTensor>> &inputs)
+std::unique_ptr<TensorMap> Neuropod::infer(const std::unordered_set<std::shared_ptr<NeuropodTensor>> &inputs)
 {
     // TODO(vip): make sure that tensor names in `inputs` are not repeated
     // Run inference

@@ -17,7 +17,6 @@ cc_library(
         "//neuropods/internal:backend_registration",
         "//neuropods/internal:deleter",
         "//neuropods/internal:neuropod_tensor",
-        "//neuropods/internal:tensor_store",
     ],
 )
 

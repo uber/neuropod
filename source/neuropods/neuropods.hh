@@ -12,7 +12,6 @@
 
 #include "neuropods/backends/neuropod_backend.hh"
 #include "neuropods/internal/config_utils.hh"
-#include "neuropods/internal/tensor_store.hh"
 
 namespace neuropods
 {
@@ -66,7 +65,7 @@ public:
     ~Neuropod();
 
     // Run inference
-    std::unique_ptr<TensorStore> infer(const std::unordered_set<std::shared_ptr<NeuropodTensor>> &inputs);
+    std::unique_ptr<TensorMap> infer(const std::unordered_set<std::shared_ptr<NeuropodTensor>> &inputs);
 
     // Get the inputs and outputs of the loaded Neuropod
     const std::vector<TensorSpec> &get_inputs() const;

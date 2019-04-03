@@ -4,8 +4,6 @@
 
 #include "test_neuropod_backend.hh"
 
-#include "neuropods/internal/tensor_store.hh"
-
 namespace neuropods
 {
 
@@ -14,9 +12,9 @@ TestNeuropodBackend::TestNeuropodBackend(const std::string &neuropod_path, std::
 TestNeuropodBackend::~TestNeuropodBackend() = default;
 
 // Run inference
-std::unique_ptr<TensorStore> TestNeuropodBackend::infer(const std::unordered_set<std::shared_ptr<NeuropodTensor>> &inputs)
+std::unique_ptr<TensorMap> TestNeuropodBackend::infer(const std::unordered_set<std::shared_ptr<NeuropodTensor>> &inputs)
 {
-    return stdx::make_unique<TensorStore>();
+    return stdx::make_unique<TensorMap>();
 }
 
 REGISTER_NEUROPOD_BACKEND(TestNeuropodBackend, "noop")
