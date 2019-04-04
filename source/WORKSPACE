@@ -7,14 +7,16 @@ libtorch_repository(
     name = "libtorch_repo",
     build_file = "@//deps:BUILD.libtorch",
     default_version = "1.0.0.dev20190318",
-    default_sha = "6e59041708bf7438f9e5d4e1dbf6fbb4dc53aacae3f198f5d626e0ef0d5b4e19",
+    linux_sha = "6e59041708bf7438f9e5d4e1dbf6fbb4dc53aacae3f198f5d626e0ef0d5b4e19",
+    mac_sha = "d55b535f42c965fa2ccfd6656b7b37010615b9202f8ce80bd36aca682e2aaedd",
 )
 
 tensorflow_repository(
     name = "tensorflow_repo",
     build_file = "@//deps:BUILD.tensorflow",
     default_version = "1.12.0",
-    default_sha = "fd473e2ef72a446421f627aebe90479b92495965c26843034625677a14d8d64f",
+    linux_sha = "fd473e2ef72a446421f627aebe90479b92495965c26843034625677a14d8d64f",
+    mac_sha = "0f77844966cfe8053eaa74f2b6bc5fecfddac070e4be49bd96ad70d5210dd8cc",
 )
 
 http_archive(
