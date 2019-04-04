@@ -1,6 +1,8 @@
 *.pyc
 source/python/.idea
 source/python/neuropods.egg-info/
+source/python/build/
+source/python/dist/
 .idea/
 bazel-bin
 bazel-genfiles
