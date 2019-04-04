@@ -29,8 +29,8 @@ std::string get_config_path(const std::string &neuropod_path)
     return neuropod_path + "/config.json";
 }
 
-[[noreturn]] void throw_neuropod_config_error(const std::string &err) {
-    NEUROPOD_ERROR("Error loading neuropod config! Please check your config file. " << err);
+[[noreturn]] void throw_neuropod_config_error(const std::string &message) {
+    NEUROPOD_ERROR("Error loading neuropod config! Please check your config file. " << message);
 }
 
 const std::unordered_map<std::string, TensorType> type_mapping = {
