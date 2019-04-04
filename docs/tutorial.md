@@ -249,7 +249,7 @@ y_tensor->copy_from(y_data);
 // Run inference
 const auto output_data = neuropod.infer({x_tensor, y_tensor});
 
-const auto out_tensor = output_data->find_or_throw("out");
+const auto out_tensor = output_data->at("out");
 
 // {6, 8, 10, 12}
 const auto out_vector = out_tensor->as_typed_tensor<float>()->get_data_as_vector();
