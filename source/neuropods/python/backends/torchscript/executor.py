@@ -66,7 +66,7 @@ class TorchScriptNeuropodExecutor(NeuropodExecutor):
         converted_out = {}
         for key, value in out.items():
             if isinstance(value, torch.Tensor):
-                converted_out[key] = value.numpy()
+                converted_out[key] = value.cpu().numpy()
             elif isinstance(value, list) and isinstance(value[0], basestring):
                 converted_out[key] = np.array(value, dtype=np.string_)
             else:
