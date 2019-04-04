@@ -5,7 +5,6 @@
 #include "gtest/gtest.h"
 
 #include "neuropods/backends/test_backend/test_neuropod_backend.hh"
-#include "neuropods/internal/tensor_store.hh"
 
 namespace
 {

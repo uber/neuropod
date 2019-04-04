@@ -18,7 +18,10 @@ namespace neuropods
 {
 
 class NeuropodTensor;
-struct TensorStore;
+
+// A map from a tensor name to a pointer to a NeuropodTensor
+// This is the output type of `infer`
+using TensorMap = std::unordered_map<std::string, std::shared_ptr<NeuropodTensor>>;
 
 // The interface that every neuropod backend implements
 class NeuropodBackend
@@ -45,7 +48,7 @@ public:
         = 0;
 
     // Run inference
-    virtual std::unique_ptr<TensorStore> infer(const std::unordered_set<std::shared_ptr<NeuropodTensor>> &inputs) = 0;
+    virtual std::unique_ptr<TensorMap> infer(const std::unordered_set<std::shared_ptr<NeuropodTensor>> &inputs) = 0;
 };
 
 template<template <class> class TensorImpl>

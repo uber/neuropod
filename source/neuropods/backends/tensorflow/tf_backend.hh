@@ -22,12 +22,6 @@ namespace neuropods
 class TensorflowNeuropodBackend : public NeuropodBackendWithDefaultAllocator<TensorflowNeuropodTensor>
 {
 private:
-    // Setup setup inputs given a TensorStore
-    void setup_inputs(const TensorStore &       inputs,
-                      std::vector<TF_Output> &  input_ops,
-                      std::vector<TF_Tensor *> &input_values);
-
-
     // Check the status of the last TF API call and throw an exception if
     // there was an error
     void check_status() const;
@@ -56,7 +50,7 @@ public:
     ~TensorflowNeuropodBackend();
 
     // Run inference
-    std::unique_ptr<TensorStore> infer(const std::unordered_set<std::shared_ptr<NeuropodTensor>> &inputs);
+    std::unique_ptr<TensorMap> infer(const std::unordered_set<std::shared_ptr<NeuropodTensor>> &inputs);
 };
 
 } // namespace neuropods

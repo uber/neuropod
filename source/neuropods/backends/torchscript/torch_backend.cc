@@ -9,7 +9,6 @@
 #include <stdexcept>
 
 #include "neuropods/backends/torchscript/type_utils.hh"
-#include "neuropods/internal/tensor_store.hh"
 
 namespace neuropods
 {
@@ -54,7 +53,7 @@ TorchNeuropodBackend::TorchNeuropodBackend(const std::string &neuropod_path, std
 TorchNeuropodBackend::~TorchNeuropodBackend() = default;
 
 // Run inference
-std::unique_ptr<TensorStore> TorchNeuropodBackend::infer(const std::unordered_set<std::shared_ptr<NeuropodTensor>> &inputs)
+std::unique_ptr<TensorMap> TorchNeuropodBackend::infer(const std::unordered_set<std::shared_ptr<NeuropodTensor>> &inputs)
 {
     torch::NoGradGuard guard;
 
@@ -85,7 +84,7 @@ std::unique_ptr<TensorStore> TorchNeuropodBackend::infer(const std::unordered_se
     c10::IValue result = model_->forward(torch_inputs);
 
     // Get outputs
-    auto to_return = stdx::make_unique<TensorStore>();
+    auto to_return = stdx::make_unique<TensorMap>();
 
     const auto &outputs_dict = result.toGenericDict()->elements();
     for (const auto &elem : outputs_dict)
@@ -111,8 +110,8 @@ std::unique_ptr<TensorStore> TorchNeuropodBackend::infer(const std::unordered_se
             // Make a TorchNeuropodTensor
             auto neuropod_tensor = stdx::make_unique<TorchNeuropodTensor<std::string>>(name, tensor);
 
-            // Add it to our TensorStore
-            to_return->tensors.emplace_back(std::move(neuropod_tensor));
+            // Add it to our output
+            (*to_return)[name] = std::move(neuropod_tensor);
         }
         else if (elem.second.isTensor())
         {
@@ -123,8 +122,8 @@ std::unique_ptr<TensorStore> TorchNeuropodBackend::infer(const std::unordered_se
             auto tensor_type = get_neuropod_type_from_torch_type(tensor.scalar_type());
             auto neuropod_tensor = make_tensor<TorchNeuropodTensor>(tensor_type, name, tensor);
 
-            // Add it to our TensorStore
-            to_return->tensors.emplace_back(std::move(neuropod_tensor));
+            // Add it to our output
+            (*to_return)[name] = std::move(neuropod_tensor);
         }
         else
         {

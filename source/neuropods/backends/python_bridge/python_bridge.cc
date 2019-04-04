@@ -11,7 +11,6 @@
 #include <vector>
 
 #include "neuropods/backends/python_bridge/type_utils.hh"
-#include "neuropods/internal/tensor_store.hh"
 
 namespace neuropods
 {
@@ -73,7 +72,7 @@ PythonBridge::PythonBridge(const std::string &             neuropod_path,
         {
             setenv("PYTHONHOME", venv_path, true);
         }
- 
+
         // Register python shutdown
         maybe_register_python_shutdown();
 
@@ -114,7 +113,7 @@ PythonBridge::PythonBridge(const std::string &             neuropod_path,
 PythonBridge::~PythonBridge() = default;
 
 // Run inference
-std::unique_ptr<TensorStore> PythonBridge::infer(const std::unordered_set<std::shared_ptr<NeuropodTensor>> &inputs)
+std::unique_ptr<TensorMap> PythonBridge::infer(const std::unordered_set<std::shared_ptr<NeuropodTensor>> &inputs)
 {
     try
     {
@@ -139,8 +138,8 @@ std::unique_ptr<TensorStore> PythonBridge::infer(const std::unordered_set<std::s
         py::dict model_outputs = py::extract<py::dict>(locals["model_outputs"]);
 
         // Convert from numpy to `NeuropodTensor`s
-        std::unique_ptr<TensorStore> to_return = stdx::make_unique<TensorStore>();
-        py::list                     out_keys  = model_outputs.keys();
+        auto     to_return = stdx::make_unique<TensorMap>();
+        py::list out_keys  = model_outputs.keys();
         for (int i = 0; i < py::len(out_keys); i++)
         {
             const char *      key_c_str = py::extract<const char *>(out_keys[i]);
@@ -149,7 +148,7 @@ std::unique_ptr<TensorStore> PythonBridge::infer(const std::unordered_set<std::s
 
             PyArrayObject *nparray     = get_nparray_from_obj(model_outputs[key]);
             TensorType     tensor_type = get_neuropod_type_from_numpy_type(PyArray_TYPE(nparray));
-            to_return->tensors.emplace_back(make_tensor<NumpyNeuropodTensor>(tensor_type, key, nparray));
+            (*to_return)[key] = make_tensor<NumpyNeuropodTensor>(tensor_type, key, nparray);
         }
 
         return to_return;

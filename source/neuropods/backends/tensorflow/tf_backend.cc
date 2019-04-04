@@ -11,7 +11,6 @@
 #include <stdexcept>
 
 #include "neuropods/backends/tensorflow/type_utils.hh"
-#include "neuropods/internal/tensor_store.hh"
 
 namespace neuropods
 {
@@ -163,7 +162,7 @@ void TensorflowNeuropodBackend::load_graph(const std::string &graph_path)
 }
 
 // Run inference
-std::unique_ptr<TensorStore> TensorflowNeuropodBackend::infer(const std::unordered_set<std::shared_ptr<NeuropodTensor>> &inputs)
+std::unique_ptr<TensorMap> TensorflowNeuropodBackend::infer(const std::unordered_set<std::shared_ptr<NeuropodTensor>> &inputs)
 {
     std::vector<std::string> output_node_names;
 
@@ -224,13 +223,13 @@ std::unique_ptr<TensorStore> TensorflowNeuropodBackend::infer(const std::unorder
 
 
     // Read the outputs
-    auto to_return = stdx::make_unique<TensorStore>();
+    auto to_return = stdx::make_unique<TensorMap>();
     for (size_t i = 0; i < output_names_.size(); ++i)
     {
         const auto &output_name   = output_names_[i];
         const auto &output_tensor = output_values[i];
         const auto tensor_type    = get_neuropod_type_from_tf_type(TF_TensorType(output_tensor));
-        to_return->tensors.emplace_back(make_tensor<TensorflowNeuropodTensor>(tensor_type, output_name, output_tensor));
+        (*to_return)[output_name] = make_tensor<TensorflowNeuropodTensor>(tensor_type, output_name, output_tensor);
     }
 
     return to_return;
