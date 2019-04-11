@@ -57,15 +57,17 @@ const std::vector<TensorSpec> &Neuropod::get_outputs() const
     return model_config_->outputs;
 }
 
+std::shared_ptr<NeuropodTensorAllocator> Neuropod::get_tensor_allocator()
+{
+    return backend_->get_tensor_allocator();
+}
+
 template <typename T>
 std::shared_ptr<TypedNeuropodTensor<T>> Neuropod::allocate_tensor(
     const std::string &node_name,
     const std::vector<int64_t> &input_dims)
 {
-    std::shared_ptr<NeuropodTensor> tensor
-        = backend_->allocate_tensor(node_name, input_dims, get_tensor_type_from_cpp<T>());
-
-    return std::dynamic_pointer_cast<TypedNeuropodTensor<T>>(tensor);
+    return get_tensor_allocator()->allocate_tensor<T>(node_name, input_dims);
 }
 
 template <typename T>
@@ -75,10 +77,7 @@ std::shared_ptr<TypedNeuropodTensor<T>> Neuropod::tensor_from_memory(
     T *                         data,
     const Deleter &             deleter)
 {
-    std::shared_ptr<NeuropodTensor> tensor
-        = backend_->tensor_from_memory(node_name, input_dims, get_tensor_type_from_cpp<T>(), data, deleter);
-
-    return std::dynamic_pointer_cast<TypedNeuropodTensor<T>>(tensor);
+    return get_tensor_allocator()->tensor_from_memory(node_name, input_dims, data, deleter);
 }
 
 // Instantiate the templates
