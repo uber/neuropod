@@ -7,7 +7,6 @@
 #include <memory>
 #include <string>
 #include <unordered_map>
-#include <unordered_set>
 #include <vector>
 
 #include "neuropods/backends/neuropod_backend.hh"
@@ -65,7 +64,7 @@ public:
     ~Neuropod();
 
     // Run inference
-    std::unique_ptr<TensorMap> infer(const std::unordered_set<std::shared_ptr<NeuropodTensor>> &inputs);
+    std::unique_ptr<TensorMap> infer(const TensorSet &inputs);
 
     // Get the inputs and outputs of the loaded Neuropod
     const std::vector<TensorSpec> &get_inputs() const;
