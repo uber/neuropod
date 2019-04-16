@@ -40,7 +40,7 @@ Neuropod::Neuropod(const std::string &neuropod_path, std::shared_ptr<NeuropodBac
 
 Neuropod::~Neuropod() = default;
 
-std::unique_ptr<TensorMap> Neuropod::infer(const std::unordered_set<std::shared_ptr<NeuropodTensor>> &inputs)
+std::unique_ptr<TensorMap> Neuropod::infer(const TensorSet &inputs)
 {
     // TODO(vip): make sure that tensor names in `inputs` are not repeated
     // Run inference

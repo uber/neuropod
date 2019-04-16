@@ -162,7 +162,7 @@ void TensorflowNeuropodBackend::load_graph(const std::string &graph_path)
 }
 
 // Run inference
-std::unique_ptr<TensorMap> TensorflowNeuropodBackend::infer(const std::unordered_set<std::shared_ptr<NeuropodTensor>> &inputs)
+std::unique_ptr<TensorMap> TensorflowNeuropodBackend::infer(const TensorSet &inputs)
 {
     std::vector<std::string> output_node_names;
 

@@ -113,7 +113,7 @@ PythonBridge::PythonBridge(const std::string &             neuropod_path,
 PythonBridge::~PythonBridge() = default;
 
 // Run inference
-std::unique_ptr<TensorMap> PythonBridge::infer(const std::unordered_set<std::shared_ptr<NeuropodTensor>> &inputs)
+std::unique_ptr<TensorMap> PythonBridge::infer(const TensorSet &inputs)
 {
     try
     {

@@ -58,7 +58,7 @@ TorchNeuropodBackend::TorchNeuropodBackend(const std::string &torchscript_model_
 TorchNeuropodBackend::~TorchNeuropodBackend() = default;
 
 // Run inference
-std::unique_ptr<TensorMap> TorchNeuropodBackend::infer(const std::unordered_set<std::shared_ptr<NeuropodTensor>> &inputs)
+std::unique_ptr<TensorMap> TorchNeuropodBackend::infer(const TensorSet &inputs)
 {
     torch::NoGradGuard guard;
 

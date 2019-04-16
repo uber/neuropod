@@ -12,7 +12,7 @@ TestNeuropodBackend::TestNeuropodBackend(const std::string &neuropod_path, std::
 TestNeuropodBackend::~TestNeuropodBackend() = default;
 
 // Run inference
-std::unique_ptr<TensorMap> TestNeuropodBackend::infer(const std::unordered_set<std::shared_ptr<NeuropodTensor>> &inputs)
+std::unique_ptr<TensorMap> TestNeuropodBackend::infer(const TensorSet &inputs)
 {
     return stdx::make_unique<TensorMap>();
 }
