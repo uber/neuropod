@@ -16,7 +16,7 @@ class uint8_tensor_fixture : public ::testing::Test
 public:
     uint8_tensor_fixture()
     {
-        untyped_tensor       = test_backend_.allocate_tensor("test_tensor", {EXPECTED_SIZE}, neuropods::UINT8_TENSOR);
+        untyped_tensor       = test_backend_.get_tensor_allocator()->allocate_tensor("test_tensor", {EXPECTED_SIZE}, neuropods::UINT8_TENSOR);
         const_untyped_tensor = untyped_tensor.get();
 
         tensor       = untyped_tensor->as_typed_tensor<uint8_t>();
@@ -43,7 +43,7 @@ class uint8_scalar_fixture : public ::testing::Test
 public:
     uint8_scalar_fixture()
     {
-        untyped_tensor = test_backend_.allocate_tensor("test_scalar", {1}, neuropods::UINT8_TENSOR);
+        untyped_tensor = test_backend_.get_tensor_allocator()->allocate_tensor("test_scalar", {1}, neuropods::UINT8_TENSOR);
         untyped_tensor->as_scalar<uint8_t>() = 42;
         const_untyped_tensor                 = untyped_tensor.get();
         tensor                               = untyped_tensor->as_typed_tensor<uint8_t>();
@@ -63,7 +63,7 @@ TEST(test_stream_operator, untyped_tensor)
 {
     std::stringstream              ss;
     neuropods::TestNeuropodBackend test_backend;
-    const auto untyped_tensor = test_backend.allocate_tensor("tensor1", {3}, neuropods::UINT8_TENSOR);
+    const auto untyped_tensor = test_backend.get_tensor_allocator()->allocate_tensor("tensor1", {3}, neuropods::UINT8_TENSOR);
     ss << *untyped_tensor;
 
     EXPECT_THAT(ss.str(), HasSubstr("NeuropodTensor 'tensor1'"));
@@ -73,7 +73,7 @@ TEST(test_stream_operator, typed_tensor)
 {
     std::stringstream              ss;
     neuropods::TestNeuropodBackend test_backend;
-    auto untyped_tensor = test_backend.allocate_tensor("tensor1", {3}, neuropods::UINT8_TENSOR);
+    auto untyped_tensor = test_backend.get_tensor_allocator()->allocate_tensor("tensor1", {3}, neuropods::UINT8_TENSOR);
 
     auto &typed_tensor = *untyped_tensor->as_typed_tensor<uint8_t>();
 
@@ -91,7 +91,7 @@ TEST(test_stream_operator, typed_float_tensor)
     std::stringstream              ss;
     neuropods::TestNeuropodBackend test_backend;
     constexpr int                  TENSOR_SIZE = 8;
-    auto untyped_tensor = test_backend.allocate_tensor("tensor1", {TENSOR_SIZE}, neuropods::FLOAT_TENSOR);
+    auto untyped_tensor = test_backend.get_tensor_allocator()->allocate_tensor("tensor1", {TENSOR_SIZE}, neuropods::FLOAT_TENSOR);
 
     auto &typed_tensor = *untyped_tensor->as_typed_tensor<float>();
 
@@ -109,7 +109,7 @@ TEST(test_typed_neuropod_tensor, downcast_failulre)
 {
     neuropods::TestNeuropodBackend test_backend;
     constexpr int                  TENSOR_SIZE = 8;
-    auto untyped_tensor = test_backend.allocate_tensor("tensor1", {TENSOR_SIZE}, neuropods::FLOAT_TENSOR);
+    auto untyped_tensor = test_backend.get_tensor_allocator()->allocate_tensor("tensor1", {TENSOR_SIZE}, neuropods::FLOAT_TENSOR);
 
     EXPECT_THROW(untyped_tensor->as_typed_tensor<int8_t>(), std::runtime_error);
 }

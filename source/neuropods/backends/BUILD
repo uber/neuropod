@@ -8,6 +8,7 @@ cc_library(
     name = "neuropod_backend",
     srcs = [],
     hdrs = [
+        "tensor_allocator.hh",
         "neuropod_backend.hh",
     ],
     visibility = [

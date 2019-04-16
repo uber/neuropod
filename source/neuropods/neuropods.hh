@@ -71,6 +71,9 @@ public:
     const std::vector<TensorSpec> &get_inputs() const;
     const std::vector<TensorSpec> &get_outputs() const;
 
+    // Returns a tensor allocator that can allocate tensors compatible with this neuropod
+    std::shared_ptr<NeuropodTensorAllocator> get_tensor_allocator();
+
     // Allocate a tensor of a certain shape and type
     template <typename T>
     std::shared_ptr<TypedNeuropodTensor<T>> allocate_tensor(
