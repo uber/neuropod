@@ -34,7 +34,7 @@ public:
     ~TorchNeuropodBackend();
 
     // Run inference
-    std::unique_ptr<ValueMap> infer(const ValueSet &inputs);
+    std::unique_ptr<NeuropodValueMap> infer(const NeuropodValueMap &inputs);
 };
 
 } // namespace neuropods

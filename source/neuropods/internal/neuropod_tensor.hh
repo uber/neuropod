@@ -50,21 +50,13 @@ class TypedNeuropodTensor;
 class NeuropodValue
 {
 private:
-    // The name of this NeuropodValue
-    const std::string name_;
-
     // Whether or not this item is a tensor
     const bool is_tensor_;
 
 public:
-    NeuropodValue(const std::string &name, bool is_tensor) : name_(name), is_tensor_(is_tensor) {}
-
-    NeuropodValue(const std::string &name) : NeuropodValue(name, true) {}
+    NeuropodValue(bool is_tensor) : is_tensor_(is_tensor) {}
 
     virtual ~NeuropodValue() {}
-
-    // Get the name of this NeuropodValue
-    const std::string &get_name() const { return name_; }
 
     // Type-checked downcast to a NeuropodTensor
     NeuropodTensor *as_tensor();
@@ -82,7 +74,7 @@ protected:
     {
         if (!is_tensor_)
         {
-            NEUROPOD_ERROR("NeuropodValue with name " << name_ << " is expected to be a NeuropodTensor.");
+            NEUROPOD_ERROR("This NeuropodValue is expected to be a NeuropodTensor.");
         }
     }
 };
@@ -101,8 +93,8 @@ private:
 
 public:
     // Create a NeuropodTensor with a name and type
-    NeuropodTensor(const std::string &name, TensorType tensor_type, const std::vector<int64_t> dims)
-        : NeuropodValue(name), tensor_type_(tensor_type), dims_(dims)
+    NeuropodTensor(TensorType tensor_type, const std::vector<int64_t> dims)
+        : NeuropodValue(true), tensor_type_(tensor_type), dims_(dims)
     {
     }
 
@@ -112,7 +104,7 @@ public:
 
     friend std::ostream &operator<<(std::ostream &out, const NeuropodTensor &tensor)
     {
-        out << "NeuropodTensor '" << tensor.get_name() << "' with type ";
+        out << "NeuropodTensor with type ";
         out << tensor.get_tensor_type();
         out << " and shape (";
         for (const int64_t dim : tensor.get_dims())
@@ -191,7 +183,7 @@ protected:
 
         if (requested != actual)
         {
-            NEUROPOD_ERROR("Tried to downcast tensor \"" << get_name() << "\" of type " << actual
+            NEUROPOD_ERROR("Tried to downcast tensor of type " << actual
                << " to a TypedNeuropodTensor of type " << requested);
         }
     }
@@ -201,7 +193,7 @@ protected:
         const size_t rank = dims.size();
         if (rank != expected_rank)
         {
-            NEUROPOD_ERROR("Tensor '" << this->get_name() << " is expected to have rank of " << expected_rank
+            NEUROPOD_ERROR("Tensor is expected to have rank of " << expected_rank
                           << " while the actual rank is " << rank);
         }
     }
@@ -213,8 +205,8 @@ template <typename T>
 class TypedNeuropodTensor : public NeuropodTensor
 {
 public:
-    TypedNeuropodTensor(const std::string &name, const std::vector<int64_t> dims)
-        : NeuropodTensor(name, get_tensor_type_from_cpp<T>(), dims)
+    TypedNeuropodTensor(const std::vector<int64_t> dims)
+        : NeuropodTensor(get_tensor_type_from_cpp<T>(), dims)
     {
     }
 
@@ -362,8 +354,8 @@ template <>
 class TypedNeuropodTensor<std::string> : public NeuropodTensor
 {
 public:
-    TypedNeuropodTensor(const std::string &name, const std::vector<int64_t> dims)
-        : NeuropodTensor(name, STRING_TENSOR, dims)
+    TypedNeuropodTensor(const std::vector<int64_t> dims)
+        : NeuropodTensor(STRING_TENSOR, dims)
     {
     }
 

@@ -60,20 +60,19 @@ TEST(test_allocate_tensor, add_tensors_and_validate)
     auto allocator = backend.get_tensor_allocator();
 
     // Allocate tensors
-    std::shared_ptr<neuropods::NeuropodTensor> a_ten = allocator->allocate_tensor("a", a_shape, neuropods::INT32_TENSOR);
+    std::shared_ptr<neuropods::NeuropodTensor> a_ten = allocator->allocate_tensor(a_shape, neuropods::INT32_TENSOR);
     a_ten->as_typed_tensor<int32_t>()->copy_from(a_data);
 
-    std::shared_ptr<neuropods::NeuropodTensor> b_ten = allocator->allocate_tensor("b", b_shape, neuropods::INT64_TENSOR);
+    std::shared_ptr<neuropods::NeuropodTensor> b_ten = allocator->allocate_tensor(b_shape, neuropods::INT64_TENSOR);
     b_ten->as_typed_tensor<int64_t>()->copy_from(b_data);
 
-    std::shared_ptr<neuropods::NeuropodTensor> c_ten = allocator->allocate_tensor("c", c_shape, neuropods::FLOAT_TENSOR);
+    std::shared_ptr<neuropods::NeuropodTensor> c_ten = allocator->allocate_tensor(c_shape, neuropods::FLOAT_TENSOR);
     c_ten->as_typed_tensor<float>()->copy_from(c_data, 4);
 
     // Wrap existing data
     // TODO(vip): Refactor this test. It's bad practice to have an empty deleter
     // The created tensor should be responsible for deallocating the memory
     std::shared_ptr<neuropods::NeuropodTensor> d_ten = allocator->tensor_from_memory(
-        "d",
         d_shape,
         neuropods::DOUBLE_TENSOR,
         const_cast<double *>(d_data),
@@ -113,6 +112,6 @@ TEST(test_allocate_tensor, add_tensors_and_validate)
 // {
 //     neuropods::NeuropodInputBuilder builder(std::make_shared<neuropods::TestNeuropodBackend>());
 //
-//     builder.allocate_tensor<int8_t>("a", {10});
-//     EXPECT_THROW(builder.allocate_tensor<int8_t>("a", {10}), std::runtime_error);
+//     builder.allocate_tensor<int8_t>({10});
+//     EXPECT_THROW(builder.allocate_tensor<int8_t>({10}), std::runtime_error);
 // }

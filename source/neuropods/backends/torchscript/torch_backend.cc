@@ -58,7 +58,7 @@ TorchNeuropodBackend::TorchNeuropodBackend(const std::string &torchscript_model_
 TorchNeuropodBackend::~TorchNeuropodBackend() = default;
 
 // Run inference
-std::unique_ptr<ValueMap> TorchNeuropodBackend::infer(const ValueSet &inputs)
+std::unique_ptr<NeuropodValueMap> TorchNeuropodBackend::infer(const NeuropodValueMap &inputs)
 {
     torch::NoGradGuard guard;
 
@@ -68,10 +68,10 @@ std::unique_ptr<ValueMap> TorchNeuropodBackend::infer(const ValueSet &inputs)
 
     // Define the vector of inputs and add the inputs
     std::vector<torch::jit::IValue> torch_inputs(schema.arguments().size());
-    for (const auto &tensor : inputs)
+    for (const auto &entry : inputs)
     {
-        const auto  input_name = tensor->get_name();
-        const auto &input_data = get_ivalue_from_torch_tensor(tensor);
+        const auto  input_name = entry.first;
+        const auto &input_data = get_ivalue_from_torch_tensor(entry.second);
 
         auto arg_index = schema.argumentIndexWithName(input_name);
         if (!arg_index.has_value())
@@ -88,7 +88,7 @@ std::unique_ptr<ValueMap> TorchNeuropodBackend::infer(const ValueSet &inputs)
     c10::IValue result = model_->forward(torch_inputs);
 
     // Get outputs
-    auto to_return = stdx::make_unique<ValueMap>();
+    auto to_return = stdx::make_unique<NeuropodValueMap>();
 
     const auto &outputs_dict = result.toGenericDict()->elements();
     for (const auto &elem : outputs_dict)
@@ -112,7 +112,7 @@ std::unique_ptr<ValueMap> TorchNeuropodBackend::infer(const ValueSet &inputs)
             }
 
             // Make a TorchNeuropodTensor
-            auto neuropod_tensor = stdx::make_unique<TorchNeuropodTensor<std::string>>(name, tensor);
+            auto neuropod_tensor = stdx::make_unique<TorchNeuropodTensor<std::string>>(tensor);
 
             // Add it to our output
             (*to_return)[name] = std::move(neuropod_tensor);
@@ -124,7 +124,7 @@ std::unique_ptr<ValueMap> TorchNeuropodBackend::infer(const ValueSet &inputs)
 
             // Get the type and make a TorchNeuropodTensor
             auto tensor_type = get_neuropod_type_from_torch_type(tensor.scalar_type());
-            auto neuropod_tensor = make_tensor<TorchNeuropodTensor>(tensor_type, name, tensor);
+            auto neuropod_tensor = make_tensor<TorchNeuropodTensor>(tensor_type, tensor);
 
             // Add it to our output
             (*to_return)[name] = std::move(neuropod_tensor);

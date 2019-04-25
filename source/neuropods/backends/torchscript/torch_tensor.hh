@@ -66,22 +66,22 @@ class TorchNeuropodTensor : public TypedNeuropodTensor<T>, public NativeDataCont
 {
 public:
     // Allocate a torch tensor
-    TorchNeuropodTensor(const std::string &name, const std::vector<int64_t> &dims)
-        : TypedNeuropodTensor<T>(name, dims),
+    TorchNeuropodTensor(const std::vector<int64_t> &dims)
+        : TypedNeuropodTensor<T>(dims),
           tensor(torch::empty(dims, get_torch_type_from_neuropod_type(get_tensor_type_from_cpp<T>())))
     {
     }
 
     // Wrap existing memory
-    TorchNeuropodTensor(const std::string &name, const std::vector<int64_t> &dims, void * data, const Deleter &deleter)
-        : TypedNeuropodTensor<T>(name, dims),
+    TorchNeuropodTensor(const std::vector<int64_t> &dims, void * data, const Deleter &deleter)
+        : TypedNeuropodTensor<T>(dims),
           tensor(torch::from_blob(data, dims, get_torch_deleter(deleter, data), get_torch_type_from_neuropod_type(get_tensor_type_from_cpp<T>())))
     {
     }
 
     // Wrap an existing torch tensor
-    TorchNeuropodTensor(const std::string &name, torch::Tensor tensor)
-        : TypedNeuropodTensor<T>(name, tensor.sizes().vec()), tensor(tensor)
+    TorchNeuropodTensor(torch::Tensor tensor)
+        : TypedNeuropodTensor<T>(tensor.sizes().vec()), tensor(tensor)
     {
     }
 
@@ -109,8 +109,8 @@ class TorchNeuropodTensor<std::string> : public TypedNeuropodTensor<std::string>
 {
 public:
     // Allocate a torch tensor
-    TorchNeuropodTensor(const std::string &name, const std::vector<int64_t> &dims)
-        : TypedNeuropodTensor<std::string>(name, dims),
+    TorchNeuropodTensor(const std::vector<int64_t> &dims)
+        : TypedNeuropodTensor<std::string>(dims),
           list(at::ivalue::GenericList::create(std::vector<torch::jit::IValue>(get_num_elements())))
     {
         if (dims.size() != 1)
@@ -121,8 +121,8 @@ public:
     }
 
     // Wrap an existing torch tensor
-    TorchNeuropodTensor(const std::string &name, torch::jit::IValue tensor)
-        : TypedNeuropodTensor<std::string>(name, {static_cast<int64_t>(tensor.toGenericListRef().size())}),
+    TorchNeuropodTensor(torch::jit::IValue tensor)
+        : TypedNeuropodTensor<std::string>({static_cast<int64_t>(tensor.toGenericListRef().size())}),
           list(tensor.toGenericList())
     {
     }

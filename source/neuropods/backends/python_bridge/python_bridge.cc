@@ -113,16 +113,16 @@ PythonBridge::PythonBridge(const std::string &             neuropod_path,
 PythonBridge::~PythonBridge() = default;
 
 // Run inference
-std::unique_ptr<ValueMap> PythonBridge::infer(const ValueSet &inputs)
+std::unique_ptr<NeuropodValueMap> PythonBridge::infer(const NeuropodValueMap &inputs)
 {
     try
     {
         // Populate a dict mapping input names to values
         py::dict model_inputs;
-        for (const auto &tensor : inputs)
+        for (const auto &entry : inputs)
         {
-            model_inputs[tensor->get_name()]
-                = std::dynamic_pointer_cast<NativeDataContainer<py::object>>(tensor)->get_native_data();
+            model_inputs[entry.first]
+                = std::dynamic_pointer_cast<NativeDataContainer<py::object>>(entry.second)->get_native_data();
         }
 
         // Create local python variables with the loaded neuropod and the input dict
@@ -138,7 +138,7 @@ std::unique_ptr<ValueMap> PythonBridge::infer(const ValueSet &inputs)
         py::dict model_outputs = py::extract<py::dict>(locals["model_outputs"]);
 
         // Convert from numpy to `NeuropodTensor`s
-        auto     to_return = stdx::make_unique<ValueMap>();
+        auto     to_return = stdx::make_unique<NeuropodValueMap>();
         py::list out_keys  = model_outputs.keys();
         for (int i = 0; i < py::len(out_keys); i++)
         {
@@ -148,7 +148,7 @@ std::unique_ptr<ValueMap> PythonBridge::infer(const ValueSet &inputs)
 
             PyArrayObject *nparray     = get_nparray_from_obj(model_outputs[key]);
             TensorType     tensor_type = get_neuropod_type_from_numpy_type(PyArray_TYPE(nparray));
-            (*to_return)[key] = make_tensor<NumpyNeuropodTensor>(tensor_type, key, nparray);
+            (*to_return)[key] = make_tensor<NumpyNeuropodTensor>(tensor_type, nparray);
         }
 
         return to_return;
