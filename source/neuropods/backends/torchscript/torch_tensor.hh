@@ -179,7 +179,7 @@ public:
 };
 
 // Utility function to get an IValue from a torch tensor
-torch::jit::IValue get_ivalue_from_torch_tensor(const std::shared_ptr<NeuropodTensor> &tensor)
+torch::jit::IValue get_ivalue_from_torch_tensor(const std::shared_ptr<NeuropodValue> &tensor)
 {
     return std::dynamic_pointer_cast<NativeDataContainer<torch::jit::IValue>>(tensor)->get_native_data();
 }

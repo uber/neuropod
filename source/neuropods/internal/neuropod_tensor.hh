@@ -39,19 +39,60 @@ FOR_EACH_TYPE_MAPPING_INCLUDING_STRING(GET_TENSOR_TYPE_FN)
 
 } // namespace
 
+// Forward declare NeuropodTensor
+class NeuropodTensor;
+
 // Forward declare TypedNeuropodTensor
 template <typename T>
 class TypedNeuropodTensor;
 
+// Base value type for Neuropod
+class NeuropodValue
+{
+private:
+    // The name of this NeuropodValue
+    const std::string name_;
+
+    // Whether or not this item is a tensor
+    const bool is_tensor_;
+
+public:
+    NeuropodValue(const std::string &name, bool is_tensor) : name_(name), is_tensor_(is_tensor) {}
+
+    NeuropodValue(const std::string &name) : NeuropodValue(name, true) {}
+
+    virtual ~NeuropodValue() {}
+
+    // Get the name of this NeuropodValue
+    const std::string &get_name() const { return name_; }
+
+    // Type-checked downcast to a NeuropodTensor
+    NeuropodTensor *as_tensor();
+    const NeuropodTensor *as_tensor() const;
+
+    // Type-checked downcast to a TypedNeuropodTensor
+    template <typename T>
+    TypedNeuropodTensor<T> *as_typed_tensor();
+
+    template <typename T>
+    const TypedNeuropodTensor<T> *as_typed_tensor() const;
+
+protected:
+    void assure_tensor() const
+    {
+        if (!is_tensor_)
+        {
+            NEUROPOD_ERROR("NeuropodValue with name " << name_ << " is expected to be a NeuropodTensor.");
+        }
+    }
+};
+
 // A type erased version of a TypedNeuropodTensor. See the documentation for
 // TypedNeuropodTensor for more details.
 // Backends should not extend this class directly for their tensor implementations
-class NeuropodTensor
+class NeuropodTensor : public NeuropodValue
 {
 private:
-    // The name of the tensor
-    const std::string name_;
-
     // The type of the tensor
     const TensorType tensor_type_;
 
@@ -61,7 +102,7 @@ private:
 public:
     // Create a NeuropodTensor with a name and type
     NeuropodTensor(const std::string &name, TensorType tensor_type, const std::vector<int64_t> dims)
-        : name_(name), tensor_type_(tensor_type), dims_(dims)
+        : NeuropodValue(name), tensor_type_(tensor_type), dims_(dims)
     {
     }
 
@@ -85,9 +126,6 @@ public:
 
     // Get the dimensions of the tensor
     const std::vector<int64_t> &get_dims() const { return dims_; }
-
-    // Get the name of the tensor
-    const std::string &get_name() const { return name_; }
 
     // Get the number of elements in the tensor
     // by multiplying all the dims together
