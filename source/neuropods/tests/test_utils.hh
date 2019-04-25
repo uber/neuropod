@@ -35,7 +35,7 @@ void test_addition_model(neuropods::Neuropod &neuropod, bool copy_mem)
         const float y_data[] = {7, 8, 9, 10};
         const float target[] = {8, 10, 12, 14};
 
-        std::unordered_set<std::shared_ptr<neuropods::NeuropodTensor>> input_data;
+        neuropods::ValueSet input_data;
 
         if (copy_mem)
         {
@@ -84,7 +84,7 @@ void test_addition_model(neuropods::Neuropod &neuropod, bool copy_mem)
                                                            ->as_typed_tensor<float>()
                                                            ->get_data_as_vector();
 
-        const std::vector<int64_t> out_shape  = output_data->at("out")->get_dims();
+        const std::vector<int64_t> out_shape  = output_data->at("out")->as_tensor()->get_dims();
 
         // Check that the output data matches
         EXPECT_EQ(out_vector.size(), 4);
@@ -149,7 +149,7 @@ void test_strings_model(neuropods::Neuropod &neuropod)
                                                            ->as_typed_tensor<std::string>()
                                                            ->get_data_as_vector();
 
-    const std::vector<int64_t>     out_shape  = output_data->at("out")->get_dims();
+    const std::vector<int64_t>     out_shape  = output_data->at("out")->as_tensor()->get_dims();
 
     // Check that the output data matches
     EXPECT_EQ(out_vector.size(), 3);

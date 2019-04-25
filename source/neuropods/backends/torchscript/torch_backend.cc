@@ -58,7 +58,7 @@ TorchNeuropodBackend::TorchNeuropodBackend(const std::string &torchscript_model_
 TorchNeuropodBackend::~TorchNeuropodBackend() = default;
 
 // Run inference
-std::unique_ptr<TensorMap> TorchNeuropodBackend::infer(const TensorSet &inputs)
+std::unique_ptr<ValueMap> TorchNeuropodBackend::infer(const ValueSet &inputs)
 {
     torch::NoGradGuard guard;
 
@@ -68,7 +68,7 @@ std::unique_ptr<TensorMap> TorchNeuropodBackend::infer(const TensorSet &inputs)
 
     // Define the vector of inputs and add the inputs
     std::vector<torch::jit::IValue> torch_inputs(schema.arguments().size());
-    for (const std::shared_ptr<NeuropodTensor> &tensor : inputs)
+    for (const auto &tensor : inputs)
     {
         const auto  input_name = tensor->get_name();
         const auto &input_data = get_ivalue_from_torch_tensor(tensor);
@@ -88,7 +88,7 @@ std::unique_ptr<TensorMap> TorchNeuropodBackend::infer(const TensorSet &inputs)
     c10::IValue result = model_->forward(torch_inputs);
 
     // Get outputs
-    auto to_return = stdx::make_unique<TensorMap>();
+    auto to_return = stdx::make_unique<ValueMap>();
 
     const auto &outputs_dict = result.toGenericDict()->elements();
     for (const auto &elem : outputs_dict)

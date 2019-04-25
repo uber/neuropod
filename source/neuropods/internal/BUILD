@@ -35,6 +35,9 @@ cc_library(
 
 cc_library(
     name = "neuropod_tensor",
+    srcs = [
+        "neuropod_tensor.cc",
+    ],
     hdrs = [
         "neuropod_tensor.hh",
         "tensor_types.hh",

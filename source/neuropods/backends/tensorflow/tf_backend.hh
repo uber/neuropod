@@ -50,7 +50,7 @@ public:
     ~TensorflowNeuropodBackend();
 
     // Run inference
-    std::unique_ptr<TensorMap> infer(const TensorSet &inputs);
+    std::unique_ptr<ValueMap> infer(const ValueSet &inputs);
 };
 
 } // namespace neuropods

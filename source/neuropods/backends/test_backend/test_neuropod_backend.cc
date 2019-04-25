@@ -12,9 +12,9 @@ TestNeuropodBackend::TestNeuropodBackend(const std::string &neuropod_path, std::
 TestNeuropodBackend::~TestNeuropodBackend() = default;
 
 // Run inference
-std::unique_ptr<TensorMap> TestNeuropodBackend::infer(const TensorSet &inputs)
+std::unique_ptr<ValueMap> TestNeuropodBackend::infer(const ValueSet &inputs)
 {
-    return stdx::make_unique<TensorMap>();
+    return stdx::make_unique<ValueMap>();
 }
 
 REGISTER_NEUROPOD_BACKEND(TestNeuropodBackend, "noop")

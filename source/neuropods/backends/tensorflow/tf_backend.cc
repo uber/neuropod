@@ -162,7 +162,7 @@ void TensorflowNeuropodBackend::load_graph(const std::string &graph_path)
 }
 
 // Run inference
-std::unique_ptr<TensorMap> TensorflowNeuropodBackend::infer(const TensorSet &inputs)
+std::unique_ptr<ValueMap> TensorflowNeuropodBackend::infer(const ValueSet &inputs)
 {
     std::vector<std::string> output_node_names;
 
@@ -179,7 +179,7 @@ std::unique_ptr<TensorMap> TensorflowNeuropodBackend::infer(const TensorSet &inp
     std::vector<TF_Tensor *> input_values;
 
     // Loop through all the input tensors and setup the inputs
-    for (const std::shared_ptr<NeuropodTensor> &tensor : inputs)
+    for (const auto &tensor : inputs)
     {
         const auto  input_name = node_name_mapping_.at(tensor->get_name());
         const auto &input_data
@@ -223,7 +223,7 @@ std::unique_ptr<TensorMap> TensorflowNeuropodBackend::infer(const TensorSet &inp
 
 
     // Read the outputs
-    auto to_return = stdx::make_unique<TensorMap>();
+    auto to_return = stdx::make_unique<ValueMap>();
     for (size_t i = 0; i < output_names_.size(); ++i)
     {
         const auto &output_name   = output_names_[i];
