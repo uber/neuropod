@@ -64,7 +64,7 @@ public:
     ~Neuropod();
 
     // Run inference
-    std::unique_ptr<ValueMap> infer(const ValueSet &inputs);
+    std::unique_ptr<NeuropodValueMap> infer(const NeuropodValueMap &inputs);
 
     // Get the inputs and outputs of the loaded Neuropod
     const std::vector<TensorSpec> &get_inputs() const;
@@ -76,7 +76,6 @@ public:
     // Allocate a tensor of a certain shape and type
     template <typename T>
     std::shared_ptr<TypedNeuropodTensor<T>> allocate_tensor(
-        const std::string &node_name,
         const std::vector<int64_t> &input_dims);
 
     // Allocate a tensor of a certain shape and type with existing data
@@ -88,7 +87,6 @@ public:
     // To support all the built-in backends, `data` should be aligned to 64 bytes.
     template <typename T>
     std::shared_ptr<TypedNeuropodTensor<T>> tensor_from_memory(
-        const std::string &         node_name,
         const std::vector<int64_t> &input_dims,
         T *                         data,
         const Deleter &             deleter);

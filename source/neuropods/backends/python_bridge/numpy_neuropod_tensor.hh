@@ -83,7 +83,7 @@ class NumpyNeuropodTensor : public TypedNeuropodTensor<T>, public NativeDataCont
 {
 public:
     // Allocate a numpy array
-    NumpyNeuropodTensor(const std::string &name, const std::vector<int64_t> &dims) : TypedNeuropodTensor<T>(name, dims)
+    NumpyNeuropodTensor(const std::vector<int64_t> &dims) : TypedNeuropodTensor<T>(dims)
     {
         setup_numpy_if_needed();
 
@@ -105,8 +105,8 @@ public:
     };
 
     // Wrap existing memory
-    NumpyNeuropodTensor(const std::string &name, const std::vector<int64_t> &dims, void * data, const Deleter &deleter)
-        : TypedNeuropodTensor<T>(name, dims)
+    NumpyNeuropodTensor(const std::vector<int64_t> &dims, void * data, const Deleter &deleter)
+        : TypedNeuropodTensor<T>(dims)
     {
         setup_numpy_if_needed();
 
@@ -137,8 +137,8 @@ public:
     };
 
     // Wrap an existing array
-    NumpyNeuropodTensor(const std::string &name, PyArrayObject *nparray)
-        : TypedNeuropodTensor<T>(name, get_dims_from_numpy(nparray))
+    NumpyNeuropodTensor(PyArrayObject *nparray)
+        : TypedNeuropodTensor<T>(get_dims_from_numpy(nparray))
     {
         py::handle<>       handle(reinterpret_cast<PyObject *>(nparray));
         py::numeric::array arr(handle);
@@ -183,15 +183,15 @@ class NumpyNeuropodTensor<std::string> : public TypedNeuropodTensor<std::string>
 {
 public:
     // Allocate a numpy array
-    NumpyNeuropodTensor(const std::string &name, const std::vector<int64_t> &dims)
-        : TypedNeuropodTensor<std::string>(name, dims)
+    NumpyNeuropodTensor(const std::vector<int64_t> &dims)
+        : TypedNeuropodTensor<std::string>(dims)
     {
         setup_numpy_if_needed();
     };
 
     // Wrap an existing array
-    NumpyNeuropodTensor(const std::string &name, PyArrayObject *nparray)
-        : TypedNeuropodTensor<std::string>(name, get_dims_from_numpy(nparray))
+    NumpyNeuropodTensor(PyArrayObject *nparray)
+        : TypedNeuropodTensor<std::string>(get_dims_from_numpy(nparray))
     {
         py::handle<>       handle(reinterpret_cast<PyObject *>(nparray));
         py::numeric::array arr(handle);

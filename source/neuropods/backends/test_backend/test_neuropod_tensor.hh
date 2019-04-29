@@ -28,15 +28,15 @@ private:
     void *deleter_handle_;
 
 public:
-    TestNeuropodTensor(const std::string &name, const std::vector<int64_t> &dims) : TypedNeuropodTensor<T>(name, dims)
+    TestNeuropodTensor(const std::vector<int64_t> &dims) : TypedNeuropodTensor<T>(dims)
     {
         data_ = malloc(this->get_num_elements() * sizeof(T));
         deleter_handle_ = nullptr;
     }
 
     // Wrap existing memory
-    TestNeuropodTensor(const std::string &name, const std::vector<int64_t> &dims, void * data, const Deleter &deleter)
-        : TypedNeuropodTensor<T>(name, dims)
+    TestNeuropodTensor(const std::vector<int64_t> &dims, void * data, const Deleter &deleter)
+        : TypedNeuropodTensor<T>(dims)
     {
         data_ = data;
         deleter_handle_ = register_deleter(deleter, data);
@@ -59,7 +59,7 @@ private:
     std::vector<std::string> data_;
 
 public:
-    TestNeuropodTensor(const std::string &name, const std::vector<int64_t> &dims) : TypedNeuropodTensor<std::string>(name, dims)
+    TestNeuropodTensor(const std::vector<int64_t> &dims) : TypedNeuropodTensor<std::string>(dims)
     {
     }
 

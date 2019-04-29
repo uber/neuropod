@@ -49,8 +49,8 @@ class TensorflowNeuropodTensor : public TypedNeuropodTensor<T>, public NativeDat
 {
 public:
     // Allocate a TF tensor
-    TensorflowNeuropodTensor(const std::string &name, const std::vector<int64_t> &dims)
-        : TypedNeuropodTensor<T>(name, dims),
+    TensorflowNeuropodTensor(const std::vector<int64_t> &dims)
+        : TypedNeuropodTensor<T>(dims),
           tensor(TF_AllocateTensor(get_tf_type_from_neuropod_type(this->get_tensor_type()),
                                    dims.data(),
                                    dims.size(),
@@ -61,8 +61,8 @@ public:
     // Wrap existing memory
     // This data should be 64 byte aligned
     // https://github.com/tensorflow/tensorflow/blob/master/tensorflow/core/framework/allocator.h#L84
-    TensorflowNeuropodTensor(const std::string &name, const std::vector<int64_t> &dims, void * data, const Deleter &deleter)
-        : TypedNeuropodTensor<T>(name, dims),
+    TensorflowNeuropodTensor(const std::vector<int64_t> &dims, void * data, const Deleter &deleter)
+        : TypedNeuropodTensor<T>(dims),
           tensor(TF_NewTensor(get_tf_type_from_neuropod_type(this->get_tensor_type()),
                               dims.data(),
                               dims.size(),
@@ -75,8 +75,8 @@ public:
     }
 
     // Wrap an existing TF tensor
-    TensorflowNeuropodTensor(const std::string &name, TF_Tensor *tensor)
-        : TypedNeuropodTensor<T>(name, get_shape(tensor)),
+    TensorflowNeuropodTensor(TF_Tensor *tensor)
+        : TypedNeuropodTensor<T>(get_shape(tensor)),
           tensor(tensor)
     {
     }
@@ -109,14 +109,14 @@ class TensorflowNeuropodTensor<std::string> : public TypedNeuropodTensor<std::st
 {
 public:
     // Allocate a TF tensor
-    TensorflowNeuropodTensor(const std::string &name, const std::vector<int64_t> &dims)
-        : TypedNeuropodTensor<std::string>(name, dims)
+    TensorflowNeuropodTensor(const std::vector<int64_t> &dims)
+        : TypedNeuropodTensor<std::string>(dims)
     {
     }
 
     // Wrap an existing TF tensor
-    TensorflowNeuropodTensor(const std::string &name, TF_Tensor *tensor)
-        : TypedNeuropodTensor<std::string>(name, get_shape(tensor)), tensor(tensor)
+    TensorflowNeuropodTensor(TF_Tensor *tensor)
+        : TypedNeuropodTensor<std::string>(get_shape(tensor)), tensor(tensor)
     {
     }
 
