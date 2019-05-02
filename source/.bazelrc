@@ -1,0 +1,2 @@
+# Pass python virtual envs through to the test runner
+build --test_env=VIRTUAL_ENV

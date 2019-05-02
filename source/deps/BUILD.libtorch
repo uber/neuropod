@@ -23,11 +23,14 @@ cc_library(
     ],
 )
 
-cc_import(
+cc_library(
     name = "libtorch",
-    interface_library = select({
-        "@bazel_tools//src/conditions:darwin": "lib/libtorch.dylib",
-        "//conditions:default": "lib/libtorch.so",
+    srcs = select({
+        "@bazel_tools//src/conditions:darwin": ["lib/libtorch.1.dylib", "lib/libcaffe2.dylib", "lib/libc10.dylib"],
+        "//conditions:default": ["lib/libtorch.so"],
     }),
-    system_provided = True,
+    deps = select({
+        "@bazel_tools//src/conditions:darwin": ["@mklml_repo_darwin//:mklml"],
+        "//conditions:default": [],
+    }),
 )

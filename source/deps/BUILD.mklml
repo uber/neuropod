@@ -1,0 +1,12 @@
+#
+# Uber, Inc. (c) 2019
+#
+
+package(
+    default_visibility = ["//visibility:public"],
+)
+
+cc_library(
+    name = "mklml",
+    srcs = ["lib/libmklml.dylib"],
+)

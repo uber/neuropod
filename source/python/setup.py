@@ -8,7 +8,7 @@ REQUIRED_PACKAGES = [
 ]
 
 EXTRA_REQUIRE = {
-    "tensorflow": ["tensorflow"],
+    "tensorflow": ["tensorflow==1.12.0"],
     "torch": ["torch_nightly==1.0.0.dev20190318"],
 }
 

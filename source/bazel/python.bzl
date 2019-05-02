@@ -1,6 +1,6 @@
 # https://docs.bazel.build/versions/master/skylark/repository_rules.html
 def _impl(repository_ctx):
-    res = repository_ctx.execute(["python", "-c", "import sys; print(sys.exec_prefix)"])
+    res = repository_ctx.execute(["python", "-c", "import os; from distutils import sysconfig; print os.path.dirname(sysconfig.get_config_var('LIBDIR'))"])
     if res.return_code != 0:
         fail("Python interpreter not found: " + res.stderr)
     python_path = repository_ctx.path(res.stdout.strip('\n'))

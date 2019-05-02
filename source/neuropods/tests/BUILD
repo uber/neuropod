@@ -61,6 +61,25 @@ cc_test(
     deps = [
         ":neuropods_test_utils",
     ],
+    data = [
+        "//neuropods/backends/python_bridge:libneuropod_pythonbridge_backend.so",
+        "//neuropods/backends/torchscript:libneuropod_torchscript_backend.so",
+        "//neuropods/backends/tensorflow:libneuropod_tensorflow_backend.so",
+    ],
+    linkopts = select({
+        "@bazel_tools//src/conditions:darwin": [
+            "-Wl,-rpath,@loader_path/../backends/python_bridge",
+            "-Wl,-rpath,@loader_path/../backends/tensorflow",
+            "-Wl,-rpath,@loader_path/../backends/torchscript",
+        ],
+        "//conditions:default": [
+            # This doesn't work for some reason
+            # TODO(vip): debug
+            "-Wl,-rpath,$$ORIGIN/../backends/python_bridge",
+            "-Wl,-rpath,$$ORIGIN/../backends/tensorflow",
+            "-Wl,-rpath,$$ORIGIN/../backends/torchscript",
+        ],
+    }),
 )
 
 cc_library(
@@ -96,6 +115,7 @@ cc_test(
     name = "test_internal_neuropod_tensor",
     srcs = [
         "test_internal_neuropod_tensor.cc",
+        "//neuropods:libneuropods.so",
         "//neuropods/backends/test_backend:libneuropod_test_backend.so",
     ],
     deps = [
