@@ -8,6 +8,7 @@
 #include <atomic>
 #include <string>
 #include <vector>
+#include <stdlib.h>
 
 #include "gtest/gtest.h"
 
@@ -54,8 +55,9 @@ void test_addition_model(neuropods::Neuropod &neuropod, bool copy_mem)
         else
         {
             // 64 byte aligned input data
-            float * x_data_aligned = static_cast<float *>(aligned_alloc(64, 64));
-            float * y_data_aligned = static_cast<float *>(aligned_alloc(64, 64));
+            float *x_data_aligned, *y_data_aligned;
+            EXPECT_EQ(0, posix_memalign((void **)&x_data_aligned, 64, 64));
+            EXPECT_EQ(0, posix_memalign((void **)&y_data_aligned, 64, 64));
 
             // Set the data
             std::copy(x_data, x_data + 4, x_data_aligned);
