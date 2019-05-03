@@ -48,13 +48,13 @@ def create_keras_neuropod(
 
                                 Can be auto-generated using `infer_keras_output_spec()`.
 
-    :param  node_name_mapping:  Optional mapping from a neuropod input/output name to a name of Keras layers
+    :param  node_name_mapping:  Optional mapping from a neuropod input/output name to a name of Keras input/output
                                 Ex: {
                                     "x": "input_1",
                                     "out": "fc1000",
                                 }
 
-                                Defaults to using Keras input/output layer names as Neuropod input/output names.
+                                Defaults to using Keras input/output names as neuropod input/output names.
 
     :param  test_input_data:    Optional sample input data. This is a dict mapping input names to
                                 values. If this is provided, inference will be run in an isolated environment
@@ -75,13 +75,14 @@ def create_keras_neuropod(
     """
     tf_node_mapping = dict()
     if node_name_mapping is not None:
-        for name, layer_name in node_name_mapping.items():
-            matched_layers = [l for l in model.layers if l.name == layer_name]
-            if not matched_layers:
-                raise ValueError('No layer named {name} is found in the model.'.format(name=layer_name))
-            # layer.output works for input, output and intermediate layers.
-            # For input layers it returns the input tensor.
-            tf_node_mapping[name] = matched_layers[0].output
+        for name, keras_name in node_name_mapping.items():
+            if keras_name in model.input_names:
+                tf_node_mapping[name] = model.inputs[model.input_names.index(keras_name)]
+            elif keras_name in model.output_names:
+                tf_node_mapping[name] = model.outputs[model.output_names.index(keras_name)]
+            else:
+                raise ValueError('{keras_name} is neither an input name nor an output name.'
+                                 ''.format(keras_name=keras_name))
     else:
         for name, tensor in zip(model.input_names, model.inputs):
             tf_node_mapping[name] = tensor
@@ -126,14 +127,14 @@ def infer_keras_input_spec(model, node_name_mapping=None):
 
     :returns:                   An input spec suitable to be passed to `create_tensorflow_keras_neuropod()`.
     """
-    reverse_node_name_mapping = {layer_name: name for name, layer_name in (node_name_mapping or dict()).items()}
+    reverse_node_name_mapping = {keras_name: name for name, keras_name in (node_name_mapping or dict()).items()}
 
     input_spec = []
-    for name, tensor in zip(model.input_names, model.inputs):
+    for keras_name, tensor in zip(model.input_names, model.inputs):
         dims = tuple(d.value for d in tensor.shape.dims[1:])
         # TODO: verify that node_name_mapping provides covers all inputs
         input_spec.append({
-            'name': reverse_node_name_mapping[name] if reverse_node_name_mapping else name,
+            'name': reverse_node_name_mapping[keras_name] if reverse_node_name_mapping else keras_name,
             'dtype': tensor.dtype.name,
             'shape': ('num_inputs',) + dims
         })
@@ -157,14 +158,14 @@ def infer_keras_output_spec(model, node_name_mapping=None):
 
     :returns:                   An output spec suitable to be passed to `create_tensorflow_keras_neuropod()`.
     """
-    reverse_node_name_mapping = {layer_name: name for name, layer_name in (node_name_mapping or dict()).items()}
+    reverse_node_name_mapping = {keras_name: name for name, keras_name in (node_name_mapping or dict()).items()}
 
     output_spec = []
-    for name, tensor in zip(model.output_names, model.outputs):
+    for keras_name, tensor in zip(model.output_names, model.outputs):
         dims = tuple(d.value for d in tensor.shape.dims[1:])
         # TODO: verify that node_name_mapping provides covers all outputs
         output_spec.append({
-            'name': reverse_node_name_mapping[name] if reverse_node_name_mapping else name,
+            'name': reverse_node_name_mapping[keras_name] if reverse_node_name_mapping else keras_name,
             'dtype': tensor.dtype.name,
             'shape': ('num_inputs',) + dims
         })
