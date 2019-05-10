@@ -10,8 +10,9 @@ import numpy as np
 from testpath.tempdir import TemporaryDirectory
 
 from neuropods.loader import load_neuropod
-from neuropods.utils.env_utils import create_virtualenv, eval_in_virtualenv
+from neuropods.utils.env_utils import create_virtualenv, eval_in_virtualenv, eval_in_new_process
 
+RUN_NATIVE_TESTS   = os.getenv("NEUROPODS_RUN_NATIVE_TESTS") is not None
 TEST_DATA_FILENAME = "test_data.pkl"
 
 logger = logging.getLogger(__name__)
@@ -47,6 +48,19 @@ def eval_in_process(neuropod_path, test_input_data):
         # Run inference and return the output
         return model.infer(test_input_data)
 
+def load_and_test_native(neuropod_path, test_input_data, test_expected_out=None):
+    """
+    Loads a neuropod using the python bindings and runs inference.
+    If expected output is specified, the output of the model is checked against
+    the expected values.
+
+    Raises a ValueError if the outputs don't match the expected values
+    """
+    out = eval_in_new_process(neuropod_path, test_input_data, extra_args=["--use-native"])
+    # Check the output
+    if test_expected_out is not None:
+        # Throws a ValueError if the output doesn't match the expected value
+        check_output_matches_expected(out, test_expected_out)
 
 def load_and_test_neuropod(neuropod_path, test_input_data, test_expected_out=None,
                            use_virtualenv=False, test_deps=[], test_virtualenv=None):
@@ -57,6 +71,8 @@ def load_and_test_neuropod(neuropod_path, test_input_data, test_expected_out=Non
 
     Raises a ValueError if the outputs don't match the expected values
     """
+    if RUN_NATIVE_TESTS:
+        return load_and_test_native(neuropod_path, test_input_data, test_expected_out)
 
     if use_virtualenv:
         # Run the model in a virtualenv

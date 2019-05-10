@@ -68,6 +68,15 @@ http_archive(
     strip_prefix = "boost_1_54_0",
 )
 
+http_archive(
+    name = "pybind11_repo",
+    build_file = "@//deps:BUILD.pybind11",
+    sha256 = "c62073cd8d4f9209ad64092279e757f5fd83327a5b17a72c04fd0fea27d0d593",
+    type = "zip",
+    url = "https://github.com/pybind/pybind11/archive/v2.2.4.zip",
+    strip_prefix = "pybind11-2.2.4",
+)
+
 python_repository(
     name = "python_repo",
     build_file = "@//deps:BUILD.python",

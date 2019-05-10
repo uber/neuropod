@@ -20,8 +20,14 @@ source ../build/set_build_env.sh
 pushd python
 python -m unittest discover --verbose neuropods/tests
 
+# Test the native bindings
+NEUROPODS_RUN_NATIVE_TESTS=true python -m unittest discover --verbose neuropods/tests
+
 # Run GPU only python tests
 python -m unittest discover --verbose neuropods/tests -p gpu_test*.py
+
+# Run GPU only python tests with native bindings
+NEUROPODS_RUN_NATIVE_TESTS=true python -m unittest discover --verbose neuropods/tests -p gpu_test*.py
 popd
 
 # Run native tests
