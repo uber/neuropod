@@ -12,9 +12,9 @@ def create_keras_neuropod(
         model_name,
         sess,
         model,
-        input_spec,
-        output_spec,
         node_name_mapping=None,
+        input_spec=None,
+        output_spec=None,
         test_input_data=None,
         test_expected_out=None):
     """
@@ -28,7 +28,15 @@ def create_keras_neuropod(
 
     :param  model:              A Keras model object.
 
-    :param  input_spec:         A list of dicts specifying the input to the model. For each input, if shape
+    :param  node_name_mapping:  Optional mapping from a neuropod input/output name to a name of Keras input/output
+                                Ex: {
+                                    "x": "input_1",
+                                    "out": "fc1000",
+                                }
+
+                                Defaults to using Keras input/output names as neuropod input/output names.
+
+    :param  input_spec:         An optional list of dicts specifying the input to the model. For each input, if shape
                                 is set to `None`, no validation is done on the shape. If shape is a tuple, the
                                 dimensions of the input are validated against that tuple.  A value of
                                 `None` for any of the dimensions means that dimension will not be checked.
@@ -38,23 +46,15 @@ def create_keras_neuropod(
                                     {"name": "y", "dtype": "float32", "shape": (None,)},
                                 ]
 
-                                Can be auto-generated using `infer_keras_input_spec()`.
+                                Defaults to a spec auto-generated using `infer_keras_input_spec()`.
 
-    :param  output_spec:        A list of dicts specifying the output of the model. See the documentation for
+    :param  output_spec:        An optional list of dicts specifying the output of the model. See the documentation for
                                 the `input_spec` parameter for more details.
                                 Ex: [
                                     {"name": "out", "dtype": "float32", "shape": (None,)},
                                 ]
 
-                                Can be auto-generated using `infer_keras_output_spec()`.
-
-    :param  node_name_mapping:  Optional mapping from a neuropod input/output name to a name of Keras input/output
-                                Ex: {
-                                    "x": "input_1",
-                                    "out": "fc1000",
-                                }
-
-                                Defaults to using Keras input/output names as neuropod input/output names.
+                                Defaults to a spec auto-generated using `infer_keras_input_spec()`.
 
     :param  test_input_data:    Optional sample input data. This is a dict mapping input names to
                                 values. If this is provided, inference will be run in an isolated environment
@@ -73,6 +73,11 @@ def create_keras_neuropod(
                                     "out": np.arange(5) + np.arange(5)
                                 }
     """
+    if input_spec is None:
+        input_spec = infer_keras_input_spec(model, node_name_mapping)
+    if output_spec is None:
+        output_spec = infer_keras_output_spec(model, node_name_mapping)
+
     tf_node_mapping = dict()
     if node_name_mapping is not None:
         for name, keras_name in node_name_mapping.items():
