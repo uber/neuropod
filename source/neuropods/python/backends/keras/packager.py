@@ -132,19 +132,7 @@ def infer_keras_input_spec(model, node_name_mapping=None):
 
     :returns:                   An input spec suitable to be passed to `create_tensorflow_keras_neuropod()`.
     """
-    reverse_node_name_mapping = {keras_name: name for name, keras_name in (node_name_mapping or dict()).items()}
-
-    input_spec = []
-    for keras_name, tensor in zip(model.input_names, model.inputs):
-        dims = tuple(d.value for d in tensor.shape.dims[1:])
-        # TODO: verify that node_name_mapping provides covers all inputs
-        input_spec.append({
-            'name': reverse_node_name_mapping[keras_name] if reverse_node_name_mapping else keras_name,
-            'dtype': tensor.dtype.name,
-            'shape': ('num_inputs',) + dims
-        })
-
-    return input_spec
+    return _infer_keras_spec(model.input_names, model.inputs)
 
 
 def infer_keras_output_spec(model, node_name_mapping=None):
@@ -163,16 +151,23 @@ def infer_keras_output_spec(model, node_name_mapping=None):
 
     :returns:                   An output spec suitable to be passed to `create_tensorflow_keras_neuropod()`.
     """
+    return _infer_keras_spec(model.output_names, model.outputs)
+
+
+def _infer_keras_spec(names, tensors, node_name_mapping):
+    """
+    Function implementing the spec inference for either input or output.
+    """
     reverse_node_name_mapping = {keras_name: name for name, keras_name in (node_name_mapping or dict()).items()}
 
-    output_spec = []
-    for keras_name, tensor in zip(model.output_names, model.outputs):
+    spec = []
+    for keras_name, tensor in zip(names, tensors):
         dims = tuple(d.value for d in tensor.shape.dims[1:])
-        # TODO: verify that node_name_mapping provides covers all outputs
-        output_spec.append({
+        # TODO: verify that node_name_mapping provides covers all inputs
+        spec.append({
             'name': reverse_node_name_mapping[keras_name] if reverse_node_name_mapping else keras_name,
             'dtype': tensor.dtype.name,
             'shape': ('num_inputs',) + dims
         })
 
-    return output_spec
+    return spec
