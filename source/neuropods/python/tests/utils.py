@@ -16,12 +16,12 @@ def get_addition_model_spec(do_fail=False):
 
     return dict(
         input_spec=[
-            {"name": "x", "dtype": "float32", "shape": (None,)},
-            {"name": "y", "dtype": "float32", "shape": (None,)},
-            {"name": "optional", "dtype": "string", "shape": (None,)},
+            {"name": "x", "dtype": "float32", "shape": ("batch_size",)},
+            {"name": "y", "dtype": "float32", "shape": ("batch_size",)},
+            {"name": "optional", "dtype": "string", "shape": ("batch_size",)},
         ],
         output_spec=[
-            {"name": "out", "dtype": "float32", "shape": (None,)},
+            {"name": "out", "dtype": "float32", "shape": ("batch_size",)},
         ],
         test_input_data={
             "x": np.arange(5, dtype=np.float32),
@@ -46,11 +46,11 @@ def get_string_concat_model_spec(do_fail=False):
 
     return dict(
         input_spec=[
-            {"name": "x", "dtype": "string", "shape": (None,)},
-            {"name": "y", "dtype": "string", "shape": (None,)},
+            {"name": "x", "dtype": "string", "shape": ("batch_size",)},
+            {"name": "y", "dtype": "string", "shape": ("batch_size",)},
         ],
         output_spec=[
-            {"name": "out", "dtype": "string", "shape": (None,)},
+            {"name": "out", "dtype": "string", "shape": ("batch_size",)},
         ],
         test_input_data={
             "x": np.array(["apple", "banana", "carrot"]),

@@ -132,7 +132,7 @@ def infer_keras_input_spec(model, node_name_mapping=None):
 
     :returns:                   An input spec suitable to be passed to `create_tensorflow_keras_neuropod()`.
     """
-    return _infer_keras_spec(model.input_names, model.inputs)
+    return _infer_keras_spec(model.input_names, model.inputs, node_name_mapping)
 
 
 def infer_keras_output_spec(model, node_name_mapping=None):
@@ -151,7 +151,7 @@ def infer_keras_output_spec(model, node_name_mapping=None):
 
     :returns:                   An output spec suitable to be passed to `create_tensorflow_keras_neuropod()`.
     """
-    return _infer_keras_spec(model.output_names, model.outputs)
+    return _infer_keras_spec(model.output_names, model.outputs, node_name_mapping)
 
 
 def _infer_keras_spec(names, tensors, node_name_mapping):
@@ -167,7 +167,7 @@ def _infer_keras_spec(names, tensors, node_name_mapping):
         spec.append({
             'name': reverse_node_name_mapping[keras_name] if reverse_node_name_mapping else keras_name,
             'dtype': tensor.dtype.name,
-            'shape': ('num_inputs',) + dims
+            'shape': ('batch_size',) + dims
         })
 
     return spec
