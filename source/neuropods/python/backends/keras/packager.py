@@ -86,7 +86,7 @@ def create_keras_neuropod(
             elif keras_name in model.output_names:
                 tf_node_mapping[name] = model.outputs[model.output_names.index(keras_name)]
             else:
-                raise ValueError('{keras_name} is neither an input name nor an output name.'
+                raise ValueError('{keras_name} is neither a Keras input name nor a Keras output name.'
                                  ''.format(keras_name=keras_name))
     else:
         for name, tensor in zip(model.input_names, model.inputs):
@@ -162,10 +162,20 @@ def _infer_keras_spec(names, tensors, node_name_mapping):
 
     spec = []
     for keras_name, tensor in zip(names, tensors):
+        # Skip the first dimension - batch size.
         dims = tuple(d.value for d in tensor.shape.dims[1:])
-        # TODO: verify that node_name_mapping provides covers all inputs
+
+        if reverse_node_name_mapping:
+            # If the node_name_mapping is defined, it must cover all inputs and outputs.
+            name = reverse_node_name_mapping.get(keras_name)
+            if name is None:
+                raise ValueError('Keras input/output layer {name} is not covered by node_name_mapping.'
+                                ''.format(name=keras_name))
+        else:
+            name = keras_name
+
         spec.append({
-            'name': reverse_node_name_mapping[keras_name] if reverse_node_name_mapping else keras_name,
+            'name': name,
             'dtype': tensor.dtype.name,
             'shape': ('batch_size',) + dims
         })

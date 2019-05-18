@@ -15,22 +15,34 @@ from neuropods.backends.keras.packager import create_keras_neuropod, \
 from neuropods.loader import load_neuropod
 from neuropods.tests.utils import get_addition_model_spec, check_addition_model
 
-def create_keras_addition_model():
+def create_keras_addition_model(node_name_mapping=None):
     """
     A simple addition model
     """
-    x = Input(batch_shape=(None,), name='x')
-    y = Input(batch_shape=(None,), name='y')
-    optional = Input(batch_shape=(None,), name='optional', dtype=tf.string)
-    out = Add(name='out')([x, y])
+    if node_name_mapping is None:
+        class id_dict(dict):
+            def __missing__(self, key):
+                return key
+
+        node_name_mapping = id_dict()
+
+    x = Input(batch_shape=(None,), name=node_name_mapping['x'])
+    y = Input(batch_shape=(None,), name=node_name_mapping['y'])
+    optional = Input(batch_shape=(None,), name=node_name_mapping['optional'], dtype=tf.string)
+    out = Add(name=node_name_mapping['out'])([x, y])
     model = Model(inputs=[x, y, optional], outputs=[out])
     return model
 
 
 class TestKerasPackaging(unittest.TestCase):
-    def package_simple_addition_model(self, do_fail=False):
+    def package_simple_addition_model(self, alias_names=False, do_fail=False):
         with TemporaryDirectory() as test_dir:
             neuropod_path = os.path.join(test_dir, "test_neuropod")
+
+            if alias_names:
+                node_name_mapping = {'x': 'x_', 'y': 'y_', 'optional': 'optional_', 'out': 'out_'}
+            else:
+                node_name_mapping = None
 
             # `create_keras_neuropod` runs inference with the test data immediately
             # after creating the neuropod. Raises a ValueError if the model output
@@ -39,7 +51,8 @@ class TestKerasPackaging(unittest.TestCase):
                 neuropod_path=neuropod_path,
                 model_name="addition_model",
                 sess=tf.keras.backend.get_session(),
-                model=create_keras_addition_model(),
+                model=create_keras_addition_model(node_name_mapping),
+                node_name_mapping=node_name_mapping,
                 # Get the input/output spec along with test data
                 **get_addition_model_spec(do_fail=do_fail)
             )
@@ -51,6 +64,11 @@ class TestKerasPackaging(unittest.TestCase):
         # Tests a case where packaging works correctly and
         # the model output matches the expected output
         self.package_simple_addition_model()
+
+    def test_simple_addition_model_with_alias(self):
+        # Tests a case where packaging works correctly and
+        # the model output matches the expected output
+        self.package_simple_addition_model(alias_names=True)
 
     def test_simple_addition_model_failure(self):
         # Tests a case where the output does not match the expected output
