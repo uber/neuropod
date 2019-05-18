@@ -75,8 +75,13 @@ def create_keras_neuropod(
     """
     if input_spec is None:
         input_spec = infer_keras_input_spec(model, node_name_mapping)
+    else:
+        _check_spec(input_spec, 'input', model.input_names, node_name_mapping)
+
     if output_spec is None:
         output_spec = infer_keras_output_spec(model, node_name_mapping)
+    else:
+        _check_spec(output_spec, 'output', model.output_names, node_name_mapping)
 
     tf_node_mapping = dict()
     if node_name_mapping is not None:
@@ -95,8 +100,7 @@ def create_keras_neuropod(
             tf_node_mapping[name] = tensor
 
     graph_def = model.outputs[0].graph.as_graph_def()
-    # TODO: validate that output spec only mentions valid nodes
-    tf_output_op_names = [tf_node_mapping[t['name']].op.name for t in output_spec]
+    tf_output_op_names = [tf_node_mapping[spec_el['name']].op.name for spec_el in output_spec]
     frozen_graph_def = tf.graph_util.convert_variables_to_constants(
         sess=sess,
         input_graph_def=graph_def,
@@ -114,6 +118,26 @@ def create_keras_neuropod(
         test_input_data=test_input_data,
         test_expected_out=test_expected_out
     )
+
+
+def _check_spec(spec, spec_type, names, node_name_mapping):
+    """
+    Function checking whether specification only references allowed set of names.
+    """
+    for spec_el in spec:
+        name = spec_el['name']
+        if node_name_mapping:
+            keras_name = node_name_mapping.get(name)
+            if keras_name is None:
+                raise ValueError('{spec_type} {name} is not mapped in node_name_mapping.'
+                                 ''.format(spec_type=spec_type, name=name).capitalize())
+            if keras_name not in names:
+                raise ValueError('{spec_type} {name} mapped to {keras_name} is not in model {spec_type}s.'
+                                 ''.format(spec_type=spec_type, name=name, keras_name=keras_name).capitalize())
+        else:
+            if name not in names:
+                raise ValueError('{spec_type} {name} is not in model {spec_type}s.'
+                                 ''.format(spec_type=spec_type, name=name).capitalize())
 
 
 def infer_keras_input_spec(model, node_name_mapping=None):
