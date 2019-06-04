@@ -1,0 +1,24 @@
+--- toolchain/cc_toolchain_config.bzl.tpl	2019-06-05 00:58:14.681677976 +0000
++++ toolchain/cc_toolchain_config.bzl.tpl	2019-06-05 01:00:20.133676223 +0000
+@@ -136,9 +136,9 @@
+             "-fuse-ld=lld",
+             # The linker has no way of knowing if there are C++ objects; so we always link C++ libraries.
+             "-L%{toolchain_path_prefix}/lib",
+-            "-l:libc++.a",
+-            "-l:libc++abi.a",
+-            "-l:libunwind.a",
++            # Build with libstdc++ on linux
++            "-lstdc++",
++            "-lgcc_s",
+             # Compiler runtime features.
+             "-rtlib=compiler-rt",
+             # To support libunwind.
+@@ -262,7 +261,7 @@
+             ),
+             flag_set(
+                 actions = all_cpp_compile_actions,
+-                flag_groups = [flag_group(flags = ["-std=c++17", "-stdlib=libc++"])],
++                flag_groups = [flag_group(flags = ["-std=c++11", "-stdlib=libstdc++" if ctx.attr.cpu == "k8" else "-stdlib=libc++"])],
+             ),
+         ],
+     )

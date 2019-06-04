@@ -2,15 +2,6 @@
 set -e
 pushd source
 
-if [[ $(uname -s) == 'Linux' ]]; then
-    # We need to build with gcc 4.9 to work with the default libtorch
-    GCC_VERSION=4.9
-    echo "Building with CC ${CC:=/usr/bin/gcc-${GCC_VERSION}}"
-    echo "Building with CXX ${CXX:=/usr/bin/g++-${GCC_VERSION}}"
-    export CC
-    export CXX
-fi
-
 # Run python tests
 pushd python
 python -m unittest discover --verbose neuropods/tests

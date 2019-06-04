@@ -2,10 +2,6 @@
 
 FROM ubuntu:16.04
 
-# Set the GCC version used for this build
-ARG GCC_VERSION=4.9
-ENV CC=/usr/bin/gcc-${GCC_VERSION} CXX=/usr/bin/g++-${GCC_VERSION}
-
 # Optional overrides used by the bazel build
 ARG NEUROPODS_TENSORFLOW_VERSION
 ARG NEUROPODS_TENSORFLOW_URL
@@ -45,4 +41,4 @@ RUN /usr/src/build/install_python_deps.sh
 COPY . /usr/src
 
 # Build and test
-RUN /usr/src/build/build.sh
+# See build/docker_build.sh
