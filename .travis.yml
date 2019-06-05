@@ -1,19 +1,22 @@
-dist: trusty
+# Run on 16.04 for linux builds
+dist: xenial
 language: minimal
-services:
-  - docker
+os:
+  - linux
+  - osx
 
 before_install:
-  - curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-  - sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
-  - sudo apt-get update
-  - sudo apt-get -y -o Dpkg::Options::="--force-confnew" install docker-ce
+  # Do everything in a virtualenv
+  - sudo pip install -U pip
+  - sudo pip install virtualenv
+  - virtualenv /tmp/neuropod_venv
+  - source /tmp/neuropod_venv/bin/activate
 
 install:
-  # TODO(vip): update this image to be Neuropods specific once we open source
-  - docker pull vpanyam/dl_base:latest
+  # Install dependencies
+  - ./build/install_system_deps.sh
+  - ./build/install_python_deps.sh
 
 script:
   # This builds both the C++ and python versions and runs tests
-  - docker build -f build/neuropods.dockerfile -t neuropods .
-
+  - ./build/build.sh

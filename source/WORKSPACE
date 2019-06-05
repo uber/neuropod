@@ -73,3 +73,11 @@ http_archive(
     url = "https://github.com/eigenteam/eigen-git-mirror/archive/3.2.10.zip",
     strip_prefix = "eigen-git-mirror-3.2.10",
 )
+
+http_archive(
+    name = "mklml_repo_darwin",
+    build_file = "@//deps:BUILD.mklml",
+    sha256 = "2fbb71a0365d42a39ea7906568d69b1db3bfc9914fee75eedb06c5f32bf5fa68",
+    url = "https://github.com/intel/mkl-dnn/releases/download/v0.19/mklml_mac_2019.0.5.20190502.tgz",
+    strip_prefix = "mklml_mac_2019.0.5.20190502",
+)
