@@ -6,7 +6,7 @@ import numpy as np
 import tensorflow as tf
 from collections import defaultdict
 
-from neuropods.backends.tensorflow.packager import create_tensorflow_neuropod
+from neuropods.packagers import create_tensorflow_neuropod
 
 
 def _placeholdes_from_input_spec(input_spec, input_prefix='INPUT_API'):
