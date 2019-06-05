@@ -9,7 +9,7 @@ import unittest
 from tempfile import mkdtemp
 from testpath.tempdir import TemporaryDirectory
 
-from neuropods.backends.pytorch.packager import create_pytorch_neuropod
+from neuropods.packagers import create_pytorch_neuropod
 from neuropods.tests.utils import get_addition_model_spec, check_addition_model
 
 ADDITION_MODEL_SOURCE = """

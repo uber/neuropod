@@ -8,7 +8,7 @@ import torch
 import unittest
 from testpath.tempdir import TemporaryDirectory
 
-from neuropods.backends.torchscript.packager import create_torchscript_neuropod
+from neuropods.packagers import create_torchscript_neuropod
 from neuropods.tests.utils import get_addition_model_spec, check_addition_model
 
 class AdditionModel(torch.jit.ScriptModule):

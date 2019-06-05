@@ -7,7 +7,7 @@ import os
 import unittest
 from testpath.tempdir import TemporaryDirectory
 
-from neuropods.backends.pytorch.packager import create_pytorch_neuropod
+from neuropods.packagers import create_pytorch_neuropod
 from neuropods.tests.utils import get_string_concat_model_spec, check_strings_model
 
 STRINGS_MODEL_SOURCE = """

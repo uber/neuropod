@@ -8,7 +8,7 @@ import torch
 import unittest
 from testpath.tempdir import TemporaryDirectory
 
-from neuropods.backends.torchscript.packager import create_torchscript_neuropod
+from neuropods.packagers import create_torchscript_neuropod
 from neuropods.tests.utils import get_string_concat_model_spec, check_strings_model
 
 class StringsModel(torch.jit.ScriptModule):
