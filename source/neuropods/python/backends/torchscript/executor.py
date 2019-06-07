@@ -27,10 +27,10 @@ class TorchScriptNeuropodExecutor(NeuropodExecutor):
         self.model_expects_dictionary = False
 
         # Check the expected input format of the model
-        model_inputs = list(self.model.graph.inputs())
+        model_inputs = self.model._get_method("forward").schema().arguments
 
         # Expects a dictionary mapping from a tensor name to tensor
-        if len(model_inputs) == 1 and model_inputs[0].type().kind() == "DictType":
+        if len(model_inputs) == 1 and model_inputs[0].type.kind() == "DictType":
             self.model_expects_dictionary = True
 
     def forward(self, inputs):
