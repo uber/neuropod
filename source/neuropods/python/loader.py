@@ -30,7 +30,7 @@ def load_neuropod(neuropod_path):
 
 if __name__ == '__main__':
     import argparse
-    import cPickle as pickle
+    from six.moves import cPickle as pickle
 
     parser = argparse.ArgumentParser(description='Load a model and run inference with provided sample data.')
     parser.add_argument('--neuropod-path', help='The path to a neuropod to load', required=True)
