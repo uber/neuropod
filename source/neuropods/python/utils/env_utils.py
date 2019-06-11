@@ -5,7 +5,7 @@
 """
 Utilities for dealing with virtualenvs and pip
 """
-import cPickle as pickle
+from six.moves import cPickle as pickle
 import os
 import shutil
 import subprocess
