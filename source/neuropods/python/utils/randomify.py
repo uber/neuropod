@@ -79,7 +79,7 @@ def _random_from_output_spec(output_spec, output_prefix='OUTPUT_API'):
     return node_name_mapping
 
 
-def randomify_neuropod(output_path, input_spec, output_spec):
+def randomify_neuropod(output_path, input_spec, output_spec, **kwargs):
     """Uses neuropod input and output specs to automatically generate a neuropod package that complies to the spec and
     produces random outputs.
 
@@ -107,6 +107,7 @@ def randomify_neuropod(output_path, input_spec, output_spec):
         node_name_mapping=node_name_mapping,
         input_spec=input_spec,
         output_spec=output_spec,
+        **kwargs
     )
 
     return output_path

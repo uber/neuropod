@@ -21,7 +21,8 @@ def create_tensorflow_neuropod(
         graph_def=None,
         init_op_names=None,
         test_input_data=None,
-        test_expected_out=None):
+        test_expected_out=None,
+        default_input_device="GPU"):
     """
     Packages a TensorFlow model as a neuropod package.
 
@@ -40,9 +41,11 @@ def create_tensorflow_neuropod(
                                 is set to `None`, no validation is done on the shape. If shape is a tuple, the
                                 dimensions of the input are validated against that tuple.  A value of
                                 `None` for any of the dimensions means that dimension will not be checked.
-                                `dtype` can be any valid numpy datatype string.
+                                `dtype` can be any valid numpy datatype string. These can optionally specify
+                                a device (either "CPU" or "GPU"). If not specified, the `default_input_device`
+                                will be used.
                                 Ex: [
-                                    {"name": "x", "dtype": "float32", "shape": (None,)},
+                                    {"name": "x", "dtype": "float32", "shape": (None,), "device": "GPU"},
                                     {"name": "y", "dtype": "float32", "shape": (None,)},
                                 ]
 
@@ -79,6 +82,7 @@ def create_tensorflow_neuropod(
                                 Ex: {
                                     "out": np.arange(5) + np.arange(5)
                                 }
+    :param  default_input_device:   The default device that input tensors should be moved to before inference.
     """
     try:
         # Create the neuropod folder
@@ -97,6 +101,7 @@ def create_tensorflow_neuropod(
         platform="tensorflow",
         input_spec=input_spec,
         output_spec=output_spec,
+        default_input_device=default_input_device
     )
 
     # Create a folder to store the model

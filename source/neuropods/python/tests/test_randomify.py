@@ -33,7 +33,7 @@ class TestSpecValidation(unittest.TestCase):
         cls.tmpdir = mkdtemp()
 
         neuropod_path = os.path.join(cls.tmpdir, 'test_stub_neuropod')
-        randomify_neuropod(neuropod_path, input_spec, output_spec)
+        randomify_neuropod(neuropod_path, input_spec, output_spec, default_input_device="GPU")
         neuropod = load_neuropod(neuropod_path)
         cls.neuropod = neuropod
 

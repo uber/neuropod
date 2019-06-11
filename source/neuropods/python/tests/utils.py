@@ -16,9 +16,9 @@ def get_addition_model_spec(do_fail=False):
 
     return dict(
         input_spec=[
-            {"name": "x", "dtype": "float32", "shape": ("batch_size",)},
-            {"name": "y", "dtype": "float32", "shape": ("batch_size",)},
-            {"name": "optional", "dtype": "string", "shape": ("batch_size",)},
+            {"name": "x", "dtype": "float32", "shape": ("batch_size",), "device": "GPU"},
+            {"name": "y", "dtype": "float32", "shape": ("batch_size",), "device": "GPU"},
+            {"name": "optional", "dtype": "string", "shape": ("batch_size",), "device": "GPU"},
         ],
         output_spec=[
             {"name": "out", "dtype": "float32", "shape": ("batch_size",)},
@@ -46,9 +46,10 @@ def get_string_concat_model_spec(do_fail=False):
 
     return dict(
         input_spec=[
-            {"name": "x", "dtype": "string", "shape": ("batch_size",)},
-            {"name": "y", "dtype": "string", "shape": ("batch_size",)},
+            {"name": "x", "dtype": "string", "shape": ("batch_size",), "device": "CPU"},
+            {"name": "y", "dtype": "string", "shape": ("batch_size",), "device": "CPU"},
         ],
+        default_input_device="CPU",
         output_spec=[
             {"name": "out", "dtype": "string", "shape": ("batch_size",)},
         ],

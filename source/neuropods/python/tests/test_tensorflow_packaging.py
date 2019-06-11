@@ -87,6 +87,7 @@ class TestTensorflowPackaging(unittest.TestCase):
             input_spec=[
                 {"name": "x", "dtype": "float32", "shape": ()},
             ],
+            default_input_device="GPU",
             output_spec=[
                 {"name": "out", "dtype": "float32", "shape": ()},
             ],

@@ -10,6 +10,7 @@ from tensorflow.keras.models import Model
 import unittest
 from testpath.tempdir import TemporaryDirectory
 
+from neuropods.backends.config_utils import canonicalize_tensor_spec
 from neuropods.backends.keras.packager import create_keras_neuropod, \
     infer_keras_input_spec, infer_keras_output_spec
 from neuropods.loader import load_neuropod
@@ -78,11 +79,19 @@ class TestKerasPackaging(unittest.TestCase):
     def test_input_spec_inference(self):
         # Test whether addition model's input spec is inferred correctly
         inferred_spec = infer_keras_input_spec(create_keras_addition_model())
+
+        # Canonicalize the spec before comparing
+        inferred_spec = canonicalize_tensor_spec(inferred_spec, default_device="GPU")
+
         self.assertEquals(get_addition_model_spec()['input_spec'], inferred_spec)
 
     def test_output_spec_inference(self):
         # Test whether addition model's output spec is inferred correctly
         inferred_spec = infer_keras_output_spec(create_keras_addition_model())
+
+        # Canonicalize the spec before comparing
+        inferred_spec = canonicalize_tensor_spec(inferred_spec, default_device=None)
+
         self.assertEquals(get_addition_model_spec()['output_spec'], inferred_spec)
 
 

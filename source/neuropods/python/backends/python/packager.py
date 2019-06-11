@@ -23,7 +23,8 @@ def create_python_neuropod(
         test_expected_out=None,
         test_deps=[],
         test_virtualenv=None,
-        skip_virtualenv=False):
+        skip_virtualenv=False,
+        default_input_device="GPU"):
     """
     Packages arbitrary python code as a neuropod package.
 
@@ -72,9 +73,11 @@ def create_python_neuropod(
                                 is set to `None`, no validation is done on the shape. If shape is a tuple, the
                                 dimensions of the input are validated against that tuple.  A value of
                                 `None` for any of the dimensions means that dimension will not be checked.
-                                `dtype` can be any valid numpy datatype string.
+                                `dtype` can be any valid numpy datatype string. These can optionally specify
+                                a device (either "CPU" or "GPU"). If not specified, the `default_input_device`
+                                will be used.
                                 Ex: [
-                                    {"name": "x", "dtype": "float32", "shape": (None,)},
+                                    {"name": "x", "dtype": "float32", "shape": (None,), "device": "GPU"},
                                     {"name": "y", "dtype": "float32", "shape": (None,)},
                                 ]
 
@@ -108,6 +111,7 @@ def create_python_neuropod(
                                 If not specified, a new temporary virtualenv is created.
 
     :param  skip_virtualenv:    If set to true, runs the test locally instead of in a virtualenv
+    :param  default_input_device:   The default device that input tensors should be moved to before inference.
     """
     try:
         # Create the neuropod folder
@@ -122,6 +126,7 @@ def create_python_neuropod(
         platform="python",
         input_spec=input_spec,
         output_spec=output_spec,
+        default_input_device=default_input_device
     )
 
     neuropod_data_path = os.path.join(neuropod_path, "0", "data")

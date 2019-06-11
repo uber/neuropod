@@ -16,7 +16,8 @@ def create_keras_neuropod(
         input_spec=None,
         output_spec=None,
         test_input_data=None,
-        test_expected_out=None):
+        test_expected_out=None,
+        default_input_device="GPU"):
     """
     Packages a Keras model as a neuropod package. Currently, only the TensorFlow backend is supported.
 
@@ -40,9 +41,11 @@ def create_keras_neuropod(
                                 is set to `None`, no validation is done on the shape. If shape is a tuple, the
                                 dimensions of the input are validated against that tuple.  A value of
                                 `None` for any of the dimensions means that dimension will not be checked.
-                                `dtype` can be any valid numpy datatype string.
+                                `dtype` can be any valid numpy datatype string. These can optionally specify
+                                a device (either "CPU" or "GPU"). If not specified, the `default_input_device`
+                                will be used.
                                 Ex: [
-                                    {"name": "x", "dtype": "float32", "shape": (None,)},
+                                    {"name": "x", "dtype": "float32", "shape": (None,), "device": "GPU"},
                                     {"name": "y", "dtype": "float32", "shape": (None,)},
                                 ]
 
@@ -72,6 +75,9 @@ def create_keras_neuropod(
                                 Ex: {
                                     "out": np.arange(5) + np.arange(5)
                                 }
+
+    :param  default_input_device:   The default device that input tensors should be moved to before inference. If
+                                    `input_spec` is not provided, all input tensors are moved to this device.
     """
     if input_spec is None:
         input_spec = infer_keras_input_spec(model, node_name_mapping)
@@ -116,7 +122,8 @@ def create_keras_neuropod(
         input_spec=input_spec,
         output_spec=output_spec,
         test_input_data=test_input_data,
-        test_expected_out=test_expected_out
+        test_expected_out=test_expected_out,
+        default_input_device=default_input_device
     )
 
 
