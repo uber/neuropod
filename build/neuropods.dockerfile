@@ -32,7 +32,6 @@ RUN /usr/src/build/install_system_deps.sh
 RUN mkdir -p /usr/src/source/python /usr/src/source/neuropods/python
 COPY build/install_python_deps.sh /usr/src/build/install_python_deps.sh
 COPY source/python /usr/src/source/python
-COPY source/neuropods/python /usr/src/source/neuropods/python
 
 # Install python dependencies
 RUN /usr/src/build/install_python_deps.sh
