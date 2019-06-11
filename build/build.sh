@@ -36,5 +36,5 @@ if [[ $(uname -s) == 'Linux' ]]; then
 fi
 
 # Run native tests
-bazel test --test_output=errors //...
+bazel test --cache_test_results=no --test_output=errors //...
 popd
