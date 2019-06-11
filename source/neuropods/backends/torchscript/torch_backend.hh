@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "neuropods/neuropods.hh"
 #include "neuropods/backends/neuropod_backend.hh"
 #include "neuropods/backends/torchscript/torch_tensor.hh"
 #include "neuropods/internal/tensor_types.hh"
@@ -28,8 +29,20 @@ private:
     // The model output specification from ModelConfig
     std::vector<TensorSpec> output_specs_;
 
+    // The options this model was loaded with
+    RuntimeOptions options_;
+
+    // The device mapping for the input tensors
+    std::unordered_map<std::string, DeviceType> input_device_mapping_;
+
+    // Get a torch device given a target neuropod device
+    // (this also depends on the visible device in the options above)
+    torch::Device get_torch_device(neuropods::DeviceType target_device);
+
 public:
-    TorchNeuropodBackend(const std::string &neuropod_path, std::unique_ptr<ModelConfig> &model_config);
+    TorchNeuropodBackend(const std::string &           neuropod_path,
+                         std::unique_ptr<ModelConfig> &model_config,
+                         const RuntimeOptions &        options);
 
     // Create a TorchNeuropodBackend using the path to a TorchScript model exported using `torch.jit.save`
     TorchNeuropodBackend(const std::string &torchscript_model_path);

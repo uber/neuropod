@@ -15,6 +15,30 @@
 namespace neuropods
 {
 
+typedef int NeuropodDevice;
+namespace Device
+{
+    constexpr int CPU  = -1;
+    constexpr int GPU0 = 0;
+    constexpr int GPU1 = 1;
+    constexpr int GPU2 = 2;
+    constexpr int GPU3 = 3;
+    constexpr int GPU4 = 4;
+    constexpr int GPU5 = 5;
+    constexpr int GPU6 = 6;
+    constexpr int GPU7 = 7;
+}
+
+struct RuntimeOptions
+{
+    // The device to run this Neuropod on.
+    // Some devices are defined in the namespace above. For machines with more
+    // than 8 GPUs, passing in an index will also work (e.g. `9` for `GPU9`).
+    //
+    // To attempt to run the model on CPU, set this to `Device::CPU`
+    NeuropodDevice visible_device = Device::GPU0;
+};
+
 class Neuropod
 {
 private:
@@ -26,7 +50,7 @@ private:
 
 public:
     // Load a neuropod.
-    explicit Neuropod(const std::string &neuropod_path);
+    Neuropod(const std::string &neuropod_path, const RuntimeOptions &options = {});
 
     // Load a neuropod with custom default backends.
     // `default_backend_overrides` allows users to override the default backend for a given type.
@@ -35,10 +59,13 @@ public:
     // Note: Libraries in this map will only be loaded if a backend for the requested type hasn't
     // already been loaded
     Neuropod(const std::string &                                 neuropod_path,
-             const std::unordered_map<std::string, std::string> &default_backend_overrides);
+             const std::unordered_map<std::string, std::string> &default_backend_overrides,
+             const RuntimeOptions &options = {});
 
     // Use a specific backend to execute the neuropod
-    Neuropod(const std::string &neuropod_path, const std::string &backend_name);
+    Neuropod(const std::string &neuropod_path,
+             const std::string &backend_name,
+             const RuntimeOptions &options = {});
 
     // Allows an already-initialized backend to be passed in. This enables backends that need
     // non-standard arguments. For example, this can be used to build a proxy that runs a

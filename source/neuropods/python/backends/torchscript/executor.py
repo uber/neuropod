@@ -17,21 +17,26 @@ class TorchScriptNeuropodExecutor(NeuropodExecutor):
     Executes a TorchScript neuropod
     """
 
-    def __init__(self, neuropod_path, load_custom_ops=True):
+    def __init__(self, neuropod_path, visible_gpu=0, load_custom_ops=True):
         """
         Load a TorchScript neuropod
 
-        :param  neuropod_path:  The path to a python neuropod package
+        :param  neuropod_path:      The path to a TorchScript neuropod package
+        :param  visible_gpu:        The index of the GPU that this Neuropod should run on (if any).
+                                    This is either `None` or a nonnegative integer. Setting this
+                                    to `None` will attempt to run this model on CPU.
+        :param  load_custom_ops:    Whether or not to load custom ops included in the model.
         """
         super(TorchScriptNeuropodExecutor, self).__init__(neuropod_path)
+        self.visible_gpu = visible_gpu
 
         # Load custom ops (if any)
         if load_custom_ops and "custom_ops" in self.neuropod_config:
             for op in self.neuropod_config["custom_ops"]:
                 torch.ops.load_library(os.path.join(neuropod_path, "0", "ops", op))
 
-        # Load the model
-        self.model = torch.jit.load(os.path.join(neuropod_path, "0", "data", "model.pt"))
+        # Load the model onto the appropriate device (ideally a GPU if we have one available)
+        self.model = torch.jit.load(os.path.join(neuropod_path, "0", "data", "model.pt"), map_location=self._get_torch_device("GPU"))
         self.model_expects_dictionary = False
 
         # Check the expected input format of the model
@@ -43,6 +48,23 @@ class TorchScriptNeuropodExecutor(NeuropodExecutor):
         # Expects a dictionary mapping from a tensor name to tensor
         if len(model_inputs) == 1 and model_inputs[0].type.kind() == "DictType":
             self.model_expects_dictionary = True
+
+    def _get_torch_device(self, target_device):
+        """
+        Get a concrete device (e.g. `cuda:0` or `cpu`) given a target (e.g. `CPU` or `GPU`)
+        """
+        if self.visible_gpu is None or not torch.cuda.is_available():
+            # No matter what the target device is, we don't have a choice other
+            # than running on CPU
+            # TODO(vip): warn if visible_gpu is set but CUDA isn't available
+            return "cpu"
+
+        if target_device == "CPU":
+            return "cpu"
+        elif target_device == "GPU":
+            return "cuda:" + str(self.visible_gpu)
+
+        raise ValueError("Invalid device '{}'!".format(target_device))
 
     def forward(self, inputs):
         """
@@ -58,13 +80,23 @@ class TorchScriptNeuropodExecutor(NeuropodExecutor):
                     in this dict are strings and all the values are numpy arrays.
         """
 
-        # Convert the inputs to torch tensors
+        # Convert the inputs to torch tensors and move to the appropriate device
         converted_inputs = {}
         for k, v in inputs.items():
+            # Get the target device for this tensor
+            target_device = self._get_torch_device(self.input_device_mapping[k])
+
             if v.dtype.type == np.str_:
                 converted_inputs[k] = v.tolist()
+
+                # We don't handle devices for string "tensors" because lists cannot
+                # be moved to GPU
+                # TODO(vip): warn if target_device.startswith("cuda")
             else:
                 converted_inputs[k] = torch.from_numpy(v)
+
+                # Move to the correct device
+                converted_inputs[k] = converted_inputs[k].to(target_device)
 
         # Run inference
         with torch.no_grad():

@@ -12,23 +12,24 @@
 namespace neuropods
 {
 
-Neuropod::Neuropod(const std::string &neuropod_path)
-    : Neuropod(neuropod_path, std::unordered_map<std::string, std::string>())
+Neuropod::Neuropod(const std::string &neuropod_path, const RuntimeOptions &options)
+    : Neuropod(neuropod_path, std::unordered_map<std::string, std::string>(), options)
 {
 }
 
 // Find the right backend to use and load the neuropod
 Neuropod::Neuropod(const std::string &                                 neuropod_path,
-                   const std::unordered_map<std::string, std::string> &default_backend_overrides)
+                   const std::unordered_map<std::string, std::string> &default_backend_overrides,
+                   const RuntimeOptions &options)
     : model_config_(load_model_config(neuropod_path)),
-      backend_(get_backend_for_type(default_backend_overrides, model_config_->platform)(neuropod_path, model_config_))
+      backend_(get_backend_for_type(default_backend_overrides, model_config_->platform)(neuropod_path, model_config_, options))
 {
 }
 
 // Load the neuropod using the specified backend
-Neuropod::Neuropod(const std::string &neuropod_path, const std::string &backend_name)
+Neuropod::Neuropod(const std::string &neuropod_path, const std::string &backend_name, const RuntimeOptions &options)
     : model_config_(load_model_config(neuropod_path)),
-      backend_(get_backend_by_name(backend_name)(neuropod_path, model_config_))
+      backend_(get_backend_by_name(backend_name)(neuropod_path, model_config_, options))
 {
 }
 
