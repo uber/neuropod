@@ -1,0 +1,26 @@
+steps:
+    # Build and push the image
+  - label: ":docker: Build"
+    agents:
+      queue: private-builders
+    plugins:
+      - docker-compose:
+          build: test-base
+          config: docker-compose.test.yml
+          image-repository: 027047743804.dkr.ecr.us-east-2.amazonaws.com/uber
+          push-retries: 5
+    retry:
+      automatic: true
+
+    # Wait until the build is complete
+  - wait
+
+    # Run the tests
+  - label: ":docker: Test"
+    agents:
+      queue: private-default
+    command: build/test.sh
+    plugins:
+      - docker-compose:
+          run: test-base
+          config: docker-compose.test.yml
