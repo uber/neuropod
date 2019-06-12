@@ -20,3 +20,4 @@ install:
 script:
   # This builds both the C++ and python versions and runs tests
   - ./build/build.sh
+  - ./build/test.sh

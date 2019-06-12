@@ -8,12 +8,12 @@ set -e
 mkdir -p /tmp/neuropod_docker_cache
 
 # Build the image
-docker build -f build/neuropods.dockerfile -t neuropods .
+docker build --target neuropod-base -f build/neuropods.dockerfile -t neuropods .
 
 if [[ "$1" == "-i" ]]; then
     # Run interactively
     docker run --rm -it -v /tmp/neuropod_docker_cache:/root/.cache neuropods /bin/bash
 else
     # Build and test Neuropods
-    docker run --rm -v /tmp/neuropod_docker_cache:/root/.cache neuropods build/build.sh
+    docker run --rm -v /tmp/neuropod_docker_cache:/root/.cache neuropods /bin/bash -c "build/build.sh;build/test.sh"
 fi
