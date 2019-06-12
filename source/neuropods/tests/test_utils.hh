@@ -113,6 +113,13 @@ void test_addition_model(const std::string &neuropod_path, const std::string &ba
     test_addition_model(neuropod);
 }
 
+void test_addition_model(const std::string &neuropod_path, const std::unordered_map<std::string, std::string> &default_backend_overrides)
+{
+    // Load the neuropod
+    neuropods::Neuropod neuropod(neuropod_path, default_backend_overrides);
+    test_addition_model(neuropod);
+}
+
 void test_addition_model(const std::string &neuropod_path)
 {
     // Load the neuropod
@@ -164,6 +171,13 @@ void test_strings_model(const std::string &neuropod_path, const std::string &bac
 {
     // Load the neuropod
     neuropods::Neuropod neuropod(neuropod_path, backend);
+    test_strings_model(neuropod);
+}
+
+void test_strings_model(const std::string &neuropod_path, const std::unordered_map<std::string, std::string> &default_backend_overrides)
+{
+    // Load the neuropod
+    neuropods::Neuropod neuropod(neuropod_path, default_backend_overrides);
     test_strings_model(neuropod);
 }
 
