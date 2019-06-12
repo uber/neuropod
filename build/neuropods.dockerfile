@@ -1,6 +1,7 @@
-# This image builds Neuropods and runs the python and C++ tests
+# This image builds Neuropods and runs the Python and C++ tests
 
-FROM ubuntu:16.04
+# To only install deps (and skip build and tests), pass `--target neuropod-base` to docker build
+FROM ubuntu:16.04 as neuropod-base
 
 # Optional overrides used by the bazel build
 ARG NEUROPODS_TENSORFLOW_VERSION
@@ -39,5 +40,11 @@ RUN /usr/src/build/install_python_deps.sh
 # Copy the rest of the code in
 COPY . /usr/src
 
-# Build and test
-# See build/docker_build.sh
+# Build
+# To only build (and skip tests), pass `--target neuropod-build` to docker build
+FROM neuropod-base as neuropod-build
+RUN /usr/src/build/build.sh
+
+# Test
+FROM neuropod-build
+RUN /usr/src/build/test.sh
