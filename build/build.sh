@@ -16,10 +16,6 @@ popd
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:`pwd`/bazel-source/external/libtorch_repo/lib
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:`pwd`/bazel-source/external/tensorflow_repo/lib
 
-# Make sure the tests can find all the `.so` files for the backends
-# TODO(vip): get rpaths to work correctly in bazel on linux
-export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/tmp/dist_test/lib
-
 # Build the native code
 bazel build //...:all
 
