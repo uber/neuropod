@@ -1,0 +1,13 @@
+# A separate docker-compose file for GPU because the buildkite agents
+# for CPU builds use an older version of docker-compose.
+# This file will be merged into `docker-compose.test.yml` once the build
+# agents are updated.
+version: '2.3'
+services:
+  test-gpu:
+    build:
+      context: .
+      dockerfile: build/neuropods.dockerfile
+      target: neuropod-build
+    privileged: true
+    runtime: nvidia
