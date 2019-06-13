@@ -2,19 +2,13 @@
 set -e
 pushd source
 
-# Run python tests
-pushd python
-python -m unittest discover --verbose neuropods/tests
+# Set LD_LIBRARY_PATH
+source ../build/set_build_env.sh
 
 # Build a wheel + install locally
+pushd python
 python setup.py bdist_wheel && pip install dist/*.whl
 popd
-
-# Add TF and torch to the LD_LIBRARY_PATH
-# This is so the tests can find the shared objects at runtime
-# TODO(vip): find a better way to do this
-export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:`pwd`/bazel-source/external/libtorch_repo/lib
-export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:`pwd`/bazel-source/external/tensorflow_repo/lib
 
 # Build the native code
 bazel build //...:all
@@ -31,6 +25,4 @@ if [[ $(uname -s) == 'Linux' ]]; then
         diff -I '^#.*' ../build/allowed_deps.txt -
 fi
 
-# Run native tests
-bazel test --cache_test_results=no --test_output=errors //...
 popd

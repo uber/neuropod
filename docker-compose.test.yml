@@ -1,0 +1,8 @@
+version: '2.3'
+services:
+  test-base:
+    build:
+      context: .
+      dockerfile: build/neuropods.dockerfile
+      target: neuropod-build
+    privileged: true
