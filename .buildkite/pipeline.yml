@@ -1,22 +1,24 @@
 steps:
-  # Build and push the image
-  - label: ":docker: Build"
-    agents:
-      queue: private-builders
-    plugins:
-      - docker-compose:
-          build: test-base
-          config: docker-compose.test.yml
-          image-repository: 027047743804.dkr.ecr.us-east-2.amazonaws.com/uber
-          push-retries: 5
-    retry:
-      automatic: true
+  # For now, it's much faster to build and test on the same machine
+  # (since the docker image is pretty large)
+  # # Build and push the image
+  # - label: ":docker: Build"
+  #   agents:
+  #     queue: private-builders
+  #   plugins:
+  #     - docker-compose:
+  #         build: test-base
+  #         config: docker-compose.test.yml
+  #         image-repository: 027047743804.dkr.ecr.us-east-2.amazonaws.com/uber
+  #         push-retries: 5
+  #   retry:
+  #     automatic: true
+  #
+  # # Wait until the build is complete
+  # - wait
 
-  # Wait until the build is complete
-  - wait
-
-  # Run the tests
-  - label: ":docker: Test"
+  # Run the tests on CPU
+  - label: ":docker: CPU Tests"
     agents:
       queue: private-default
     command: build/test.sh
@@ -24,3 +26,13 @@ steps:
       - docker-compose:
           run: test-base
           config: docker-compose.test.yml
+
+  # Run the tests on GPU
+  - label: ":docker: GPU Tests"
+    agents:
+      queue: private-gpu
+    command: build/test_gpu.sh
+    plugins:
+      - docker-compose:
+          run: test-gpu
+          config: docker-compose.test-gpu.yml
