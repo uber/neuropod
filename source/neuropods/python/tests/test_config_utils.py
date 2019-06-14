@@ -16,7 +16,10 @@ def get_valid_config():
         ],
         "output_spec": [
             {"name": "y", "dtype": "float32", "shape": (None, 2, "some_symbol")},
-        ]
+        ],
+        "input_tensor_device": {
+            "x": "GPU"
+        }
     }
 
 
@@ -54,6 +57,27 @@ class TestSpecValidation(unittest.TestCase):
     def test_validate_neuropod_config_invalid_platform(self):
         config = get_valid_config()
         config["platform"] = 5
+
+        with self.assertRaises(ValueError):
+            validate_neuropod_config(config)
+
+    def test_validate_neuropod_config_invalid_device(self):
+        config = get_valid_config()
+        config["input_tensor_device"]["x"] = "TPU"
+
+        with self.assertRaises(ValueError):
+            validate_neuropod_config(config)
+
+    def test_validate_neuropod_config_device_without_input(self):
+        config = get_valid_config()
+        config["input_tensor_device"]["y"] = "CPU"
+
+        with self.assertRaises(ValueError):
+            validate_neuropod_config(config)
+
+    def test_validate_neuropod_config_input_without_device(self):
+        config = get_valid_config()
+        config["input_tensor_device"] = {}
 
         with self.assertRaises(ValueError):
             validate_neuropod_config(config)

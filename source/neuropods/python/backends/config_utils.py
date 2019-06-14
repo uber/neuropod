@@ -58,6 +58,7 @@ def validate_neuropod_config(config):
     """
     name = config["name"]
     platform = config["platform"]
+    device_mapping = config["input_tensor_device"]
 
     if not isinstance(name, basestring):
         raise ValueError("Field 'name' in config must be a string! Got value {} of type {}.".format(name, type(name)))
@@ -81,6 +82,21 @@ def validate_neuropod_config(config):
             if not isinstance(op, basestring):
                 raise ValueError("All items in 'custom_ops' must be strings! Got value {} of type {}.".format(op, type(op)))
 
+    # Ensure all inputs have a device specified
+    input_tensor_names = {item["name"] for item in config["input_spec"]}
+    device_tensor_names = set(device_mapping.keys())
+    inputs_without_device = input_tensor_names - device_tensor_names
+    devices_without_input = device_tensor_names - input_tensor_names
+
+    if len(inputs_without_device) != 0:
+        raise ValueError("Some input tensors do not have devices specified: {}".format(inputs_without_device))
+
+    if len(devices_without_input) != 0:
+        raise ValueError("Devices were specified for some tensors not in the `input_spec`: {}".format(devices_without_input))
+
+    for tensor_name, device in device_mapping.items():
+        if not device in ["GPU", "CPU"]:
+            raise ValueError("Device must either be 'GPU' or 'CPU'! Got value '{}' for tensor named '{}'.".format(device, tensor_name))
 
 
 def canonicalize_tensor_spec(spec):
@@ -98,7 +114,7 @@ def canonicalize_tensor_spec(spec):
     return transformed
 
 
-def write_neuropod_config(neuropod_path, model_name, platform, input_spec, output_spec, custom_ops=None):
+def write_neuropod_config(neuropod_path, model_name, platform, input_spec, output_spec, custom_ops=None, input_tensor_device=None, default_input_tensor_device="GPU"):
     """
     Creates the neuropod config file
 
@@ -111,18 +127,57 @@ def write_neuropod_config(neuropod_path, model_name, platform, input_spec, outpu
 
     :param  output_spec:    A list of dicts specifying the output of the model.
                             Ex: [{"name": "y", "dtype": "float32", "shape": (None, )}]
+
+    :param  input_tensor_device:    A dict mapping input tensor names to the device
+                                    that the model expects them to be on. This can
+                                    either be `GPU` or `CPU`. Any tensors in `input_spec`
+                                    not specified in this mapping will use the
+                                    `default_input_tensor_device` specified below.
+
+                                    If a GPU is selected at inference time, Neuropods
+                                    will move tensors to the appropriate devices before
+                                    running the model. Otherwise, it will attempt to run
+                                    the model on CPU and move all tensors (and the model)
+                                    to CPU.
+
+                                    See the docstring for `load_neuropod` for more info.
+
+                                    Ex: `{"x": "GPU"}`
+
+    :param  default_input_tensor_device:    The default device that input tensors are expected
+                                            to be on. This can either be `GPU` or `CPU`.
+
     """
     if custom_ops is None:
         custom_ops = []
+
+    if input_tensor_device is None:
+        input_tensor_device = {}
+
+    # Canonicalize the specs
+    input_spec  = canonicalize_tensor_spec(input_spec)
+    output_spec = canonicalize_tensor_spec(output_spec)
+
+    # Set up the device mapping
+    device_mapping = {}
+    for item in input_spec:
+        name = item["name"]
+        if name in input_tensor_device:
+            # Use the device specified by the user
+            device_mapping[name] = input_tensor_device[name]
+        else:
+            # Use the default device
+            device_mapping[name] = default_input_tensor_device
 
     # TODO: Switch to prototext
     with open(os.path.join(neuropod_path, "config.json"), "w") as config_file:
         config = {
             "name": model_name,
             "platform": platform,
-            "input_spec": canonicalize_tensor_spec(input_spec),
-            "output_spec": canonicalize_tensor_spec(output_spec),
+            "input_spec": input_spec,
+            "output_spec": output_spec,
             "custom_ops": custom_ops,
+            "input_tensor_device": device_mapping
         }
 
         # Verify that the config is correct
@@ -140,6 +195,13 @@ def read_neuropod_config(neuropod_path):
     """
     with open(os.path.join(neuropod_path, "config.json"), "r") as config_file:
         config = json.load(config_file)
+
+        # For backwards compatibility
+        # TODO(vip): Remove this on version increase
+        if "input_tensor_device" not in config:
+            # If there is no mapping in the configuration, move all tensors to
+            # GPU by default
+            config["input_tensor_device"] = {item["name"]: "GPU" for item in config["input_spec"]}
 
         # Verify that the config is correct
         validate_neuropod_config(config)
