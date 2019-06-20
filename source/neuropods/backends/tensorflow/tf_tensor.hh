@@ -188,7 +188,7 @@ public:
         TF_DeleteStatus(status);
     }
 
-    std::vector<std::string> get_data_as_vector()
+    std::vector<std::string> get_data_as_vector() const
     {
         // The format of TF string tensors is described here:
         // https://github.com/tensorflow/tensorflow/blob/master/tensorflow/c/c_api.h#L214

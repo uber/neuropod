@@ -70,7 +70,7 @@ public:
         data_ = data;
     }
 
-    std::vector<std::string> get_data_as_vector()
+    std::vector<std::string> get_data_as_vector() const
     {
         return data_;
     }

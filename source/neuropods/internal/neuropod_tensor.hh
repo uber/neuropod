@@ -270,7 +270,7 @@ public:
 
     const T &as_scalar() const { return NeuropodTensor::as_scalar<T>(); }
 
-    std::vector<T> get_data_as_vector()
+    std::vector<T> get_data_as_vector() const
     {
         std::vector<T> out;
 
@@ -375,7 +375,7 @@ public:
     // TODO(vip): make this pure virtual once all the existing backends have
     // implementations.
     // Get the data in the string tensor
-    virtual std::vector<std::string> get_data_as_vector()
+    virtual std::vector<std::string> get_data_as_vector() const
     {
         NEUROPOD_ERROR("Children must implement `get_data_as_vector`");
     };
