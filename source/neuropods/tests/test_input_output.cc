@@ -1,10 +1,14 @@
 //
-// Uber, Inc. (c) 2018
+// Uber, In (c) 2018
 //
 
+#include "gmock/gmock.h"
 #include "gtest/gtest.h"
 
 #include "neuropods/backends/test_backend/test_neuropod_backend.hh"
+
+using ::testing::ElementsAreArray;
+using ::testing::ElementsAre;
 
 namespace
 {

@@ -17,6 +17,21 @@ cc_test(
 )
 
 cc_test(
+    name = "test_serializatoin",
+    srcs = [
+        "test_serialization_stream.cc",
+        "//neuropods:libneuropods.so",
+        "//neuropods/backends/test_backend:libneuropod_test_backend.so",
+    ],
+    deps = [
+        "@gtest//:main",
+        "//neuropods:neuropods_hdrs",
+        "//neuropods/backends/test_backend:test_backend_hdrs",
+        "//neuropods/serialization:stream",
+    ],
+)
+
+cc_test(
     name = "test_python_bridge",
     srcs = [
         "test_python_bridge.cc",
