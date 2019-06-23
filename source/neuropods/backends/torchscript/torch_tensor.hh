@@ -94,6 +94,7 @@ public:
     const T *get_raw_data_ptr() const { return get_data_from_torch_tensor<T>(tensor); }
 
     torch::jit::IValue get_native_data() { return tensor; }
+    torch::jit::IValue get_native_data() const { return tensor; }
 
     // The underlying torch tensor
     torch::Tensor tensor;
@@ -172,6 +173,7 @@ public:
         return out;
     }
 
+    torch::jit::IValue get_native_data() const { return list; }
     torch::jit::IValue get_native_data() { return list; }
 
     // The underlying TorchScript list

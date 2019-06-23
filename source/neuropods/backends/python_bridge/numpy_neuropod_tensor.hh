@@ -12,6 +12,7 @@
 #include <string>
 #include <vector>
 
+#include "neuropods/backends/python_bridge/type_utils.hh"
 #include "neuropods/internal/deleter.hh"
 #include "neuropods/internal/neuropod_tensor.hh"
 
@@ -170,6 +171,7 @@ public:
         return static_cast<const T *>(data);
     }
 
+    py::object get_native_data() const { return nparray_; }
     py::object get_native_data() { return nparray_; }
 
     // The underlying numpy array
@@ -289,6 +291,7 @@ public:
         return out;
     }
 
+    py::object get_native_data() const { return nparray_; }
     py::object get_native_data() { return nparray_; }
 
     // The underlying numpy array

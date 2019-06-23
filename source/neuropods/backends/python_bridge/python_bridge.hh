@@ -27,6 +27,8 @@ std::vector<std::string> get_default_python_path()
 
 } // namespace
 
+void initialize_python_bridge_backend();
+
 // This backend starts an embedded python interpreter and is used
 // to execute neuropods that contain python code. This includes
 // models from PyTorch < 1.0 and PyTorch models that don't use TorchScript

@@ -59,7 +59,35 @@ void maybe_register_python_shutdown()
     }
 }
 
+
+void initialize_python_bridge_backend(const std::vector<std::string> &python_path_additions)
+{
+    // Utilize the virtualenv if one is present
+    if (auto venv_path = std::getenv("VIRTUAL_ENV"))
+    {
+        setenv("PYTHONHOME", venv_path, true);
+    }
+
+    // Register python shutdown
+    maybe_register_python_shutdown();
+
+    // Modify PYTHONPATH
+    set_python_path(python_path_additions);
+
+    // Workaround for this issue:
+    // https://stackoverflow.com/questions/11842920/undefined-symbol-pyexc-importerror-when-embedding-python-in-c
+    dlopen("libpython2.7.so", RTLD_LAZY | RTLD_GLOBAL);
+
+    // Initialize the embedded python interpreter
+    Py_Initialize();
+}
+
 } // namespace
+
+void initialize_python_bridge_backend()
+{
+    initialize_python_bridge_backend({});
+}
 
 PythonBridge::PythonBridge(const std::string &             neuropod_path,
                            std::unique_ptr<ModelConfig> &  model_config,
@@ -67,24 +95,7 @@ PythonBridge::PythonBridge(const std::string &             neuropod_path,
 {
     try
     {
-        // Utilize the virtualenv if one is present
-        if (auto venv_path = std::getenv("VIRTUAL_ENV"))
-        {
-            setenv("PYTHONHOME", venv_path, true);
-        }
-
-        // Register python shutdown
-        maybe_register_python_shutdown();
-
-        // Modify PYTHONPATH
-        set_python_path(python_path_additions);
-
-        // Workaround for this issue:
-        // https://stackoverflow.com/questions/11842920/undefined-symbol-pyexc-importerror-when-embedding-python-in-c
-        dlopen("libpython2.7.so", RTLD_LAZY | RTLD_GLOBAL);
-
-        // Initialize the embedded python interpreter
-        Py_Initialize();
+        initialize_python_bridge_backend(python_path_additions);
 
         // Initial setup
         main_module_    = py::import("__main__");
