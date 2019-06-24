@@ -9,3 +9,6 @@ build --cxxopt='-std=c++11'
 
 # We need this to be compatible with libtorch
 build --cxxopt='-D_GLIBCXX_USE_CXX11_ABI=0'
+
+# Disable strict python version checking added in Bazel 0.27
+build --extra_toolchains=@bazel_tools//tools/python:autodetecting_toolchain_nonstrict
