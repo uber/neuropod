@@ -17,11 +17,15 @@ steps:
   # # Wait until the build is complete
   # - wait
 
+  # In order to avoid wasting resources, all builds are built with AddressSanitizer
+  # (instead of having builds with and without)
+  # Once we begin releasing artifacts, we can add a release build without ASAN
+
   # Run the tests on CPU
   - label: ":docker: CPU Tests"
     agents:
       queue: private-default
-    command: build/test.sh
+    command: build/test.sh --config=asan
     plugins:
       - docker-compose:
           run: test-base
@@ -31,7 +35,7 @@ steps:
   - label: ":docker: GPU Tests"
     agents:
       queue: private-gpu
-    command: build/test_gpu.sh
+    command: build/test_gpu.sh --config=asan
     plugins:
       - docker-compose:
           run: test-gpu

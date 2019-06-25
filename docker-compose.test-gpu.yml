@@ -9,5 +9,7 @@ services:
       context: .
       dockerfile: build/neuropods.dockerfile
       target: neuropod-build
+      args:
+        BAZEL_ARGS: --config=asan
     privileged: true
     runtime: nvidia

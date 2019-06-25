@@ -1,0 +1,6 @@
+# Suppress a leak in TF
+leak:tensorflow::Env::RegisterFileSystem
+
+# Suppress all python leaks for now
+# TODO(vip): revisit once we switch from Boost python to pybind11
+leak:libpython2.7.so

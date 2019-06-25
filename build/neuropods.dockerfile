@@ -5,6 +5,7 @@
 FROM nvidia/cuda:10.0-runtime-ubuntu16.04 as neuropod-base
 
 # Optional overrides used by the bazel build
+ARG BAZEL_ARGS
 ARG NEUROPODS_TENSORFLOW_VERSION
 ARG NEUROPODS_TENSORFLOW_URL
 ARG NEUROPODS_TENSORFLOW_SHA256
@@ -44,8 +45,8 @@ COPY . /usr/src
 # Build
 # To only build (and skip tests), pass `--target neuropod-build` to docker build
 FROM neuropod-base as neuropod-build
-RUN /usr/src/build/build.sh
+RUN /usr/src/build/build.sh $BAZEL_ARGS
 
 # Test
 FROM neuropod-build
-RUN /usr/src/build/test.sh
+RUN /usr/src/build/test.sh $BAZEL_ARGS

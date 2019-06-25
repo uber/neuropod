@@ -9,7 +9,10 @@ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:`pwd`/bazel-source/external/tensorflow_r
 
 # Ignore ODR errors from ASAN
 # See https://github.com/google/sanitizers/wiki/AddressSanitizerOneDefinitionRuleViolation
-export ASAN_OPTIONS=detect_odr_violation=0
+export ASAN_OPTIONS=fast_unwind_on_malloc=0:detect_odr_violation=0
+
+# Suppress some detections from lsan
+export LSAN_OPTIONS=suppressions=`pwd`/../build/lsan_suppressions.txt
 
 # Set the ASAN symbolizer path
 # See https://clang.llvm.org/docs/AddressSanitizer.html

@@ -14,4 +14,4 @@ build --cxxopt='-D_GLIBCXX_USE_CXX11_ABI=0'
 build --extra_toolchains=@bazel_tools//tools/python:autodetecting_toolchain_nonstrict
 
 # Use ASAN
-build:asan -c dbg --copt='-fsanitize=address' --copt='-fno-omit-frame-pointer' --linkopt='-fsanitize=address' --test_env=ASAN_OPTIONS --test_env=ASAN_SYMBOLIZER_PATH
+build:asan -c dbg --copt='-fsanitize=address' --copt='-fno-omit-frame-pointer' --linkopt='-fsanitize=address' --test_env=ASAN_OPTIONS --test_env=LSAN_OPTIONS --test_env=ASAN_SYMBOLIZER_PATH --copt='-U_FORTIFY_SOURCE'

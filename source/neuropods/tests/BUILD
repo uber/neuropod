@@ -82,7 +82,6 @@ cc_test(
         "//neuropods/backends/torchscript:libneuropod_torchscript_backend.so",
         "//neuropods/backends/tensorflow:libneuropod_tensorflow_backend.so",
     ],
-    linkstatic = True,
 )
 
 cc_library(
