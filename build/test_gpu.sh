@@ -25,5 +25,5 @@ python -m unittest discover --verbose neuropods/tests -p gpu_test*.py
 popd
 
 # Run native tests
-bazel test --cache_test_results=no --test_output=errors //...
+bazel test --cache_test_results=no --test_output=errors "$@" //...
 popd

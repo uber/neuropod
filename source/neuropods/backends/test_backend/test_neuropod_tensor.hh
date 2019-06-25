@@ -31,7 +31,7 @@ public:
     TestNeuropodTensor(const std::vector<int64_t> &dims) : TypedNeuropodTensor<T>(dims)
     {
         data_ = malloc(this->get_num_elements() * sizeof(T));
-        deleter_handle_ = nullptr;
+        deleter_handle_ = register_deleter([](void * data) { free(data); }, data_);
     }
 
     // Wrap existing memory
