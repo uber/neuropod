@@ -5,19 +5,11 @@ os:
   - linux
   - osx
 
-before_install:
-  # Do everything in a virtualenv
-  - sudo pip install -U pip
-  - sudo pip install virtualenv
-  - virtualenv /tmp/neuropod_venv
-  - source /tmp/neuropod_venv/bin/activate
-
-install:
-  # Install dependencies
-  - ./build/install_system_deps.sh
-  - ./build/install_python_deps.sh
-
 script:
-  # This builds both the C++ and python versions and runs tests
-  - ./build/build.sh
-  - ./build/test.sh
+  # Travis changes whether the shell is a TTY or not depending on if there are secret env variables set.
+  # Travis also does not set these variables for PRs from outside the repo (e.g. from forks) for security
+  # reasons (https://docs.travis-ci.com/user/pull-requests/#pull-requests-and-security-restrictions).
+  # This leads to different behavior depending on where the PR came from.
+  # To get around this, we always run in a non-interactive shell.
+  - set -o pipefail
+  - ./build/travis_build.sh < /dev/null | cat
