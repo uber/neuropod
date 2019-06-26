@@ -6,7 +6,7 @@ import os
 import torch
 
 from neuropods.backends import config_utils
-from neuropods.utils.eval_utils import load_and_test_neuropod
+from neuropods.utils.eval_utils import save_test_data, load_and_test_neuropod
 
 
 def create_torchscript_neuropod(
@@ -16,7 +16,8 @@ def create_torchscript_neuropod(
         input_spec,
         output_spec,
         test_input_data=None,
-        test_expected_out=None):
+        test_expected_out=None,
+        persist_test_data=True):
     """
     Packages a TorchScript model as a neuropod package.
 
@@ -63,6 +64,8 @@ def create_torchscript_neuropod(
                                 Ex: {
                                     "out": np.arange(5) + np.arange(5)
                                 }
+
+    :param  persist_test_data:  Optionally saves the test data within the packaged neuropod. default True.
     """
     try:
         # Create the neuropod folder
@@ -88,6 +91,8 @@ def create_torchscript_neuropod(
     torch.jit.save(module, model_path)
 
     if test_input_data is not None:
+        if persist_test_data:
+            save_test_data(neuropod_path, test_input_data, test_expected_out)
         # Load and run the neuropod to make sure that packaging worked correctly
         # Throws a ValueError if the output doesn't match the expected output (if specified)
         load_and_test_neuropod(
