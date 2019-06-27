@@ -137,6 +137,10 @@ def create_python_neuropod(
     # Copy the specified source code while preserving package paths
     for copy_spec in code_path_spec:
         python_root = copy_spec["python_root"]
+
+        if os.path.realpath(neuropod_path).startswith(os.path.realpath(python_root) + os.sep):
+            raise ValueError("`neuropod_path` cannot be a subdirectory of `python_root`")
+
         for dir_to_package in copy_spec["dirs_to_package"]:
             shutil.copytree(
                 os.path.join(python_root, dir_to_package),
