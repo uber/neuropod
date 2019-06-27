@@ -21,11 +21,13 @@ def create_virtualenv(venv_path, packages_to_install=[], verbose=False):
         stdout = None if verbose else FNULL
 
         # Create the virtualenv
-        subprocess.call(['/usr/bin/env', 'virtualenv', venv_path], env={}, stdout=stdout)
+        retcode = subprocess.call(['/usr/bin/env', 'virtualenv', venv_path], env={}, stdout=stdout)
+        if retcode != 0:
+            raise ValueError("Error creating virtual environment for testing! Please make sure `virtualenv` is installed")
 
         # Install the specified pip packages
         for package in ['pip', 'six'] + packages_to_install:
-            subprocess.call([os.path.join(venv_path, 'bin', 'pip'), 'install', '-U', package], env={}, stdout=stdout)
+            subprocess.check_call([os.path.join(venv_path, 'bin', 'pip'), 'install', '-U', package], env={}, stdout=stdout)
 
         # Copy the neuropods library into the virtualenv
         # This dir is added to the pythonpath in `eval_in_virtualenv`
