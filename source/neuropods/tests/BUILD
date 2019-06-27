@@ -13,6 +13,22 @@ cc_test(
         "@gtest//:main",
         "//neuropods:neuropods_hdrs",
         "//neuropods/backends/test_backend:test_backend_hdrs",
+        "//neuropods/serialization:serialization_hdrs",
+    ],
+)
+
+cc_test(
+    name = "test_serialization",
+    srcs = [
+        "test_serialization.cc",
+        "//neuropods:libneuropods.so",
+        "//neuropods/backends/test_backend:libneuropod_test_backend.so",
+    ],
+    deps = [
+        "@gtest//:main",
+        "//neuropods:neuropods_hdrs",
+        "//neuropods/backends/test_backend:test_backend_hdrs",
+        "//neuropods/serialization:serialization_hdrs",
     ],
 )
 

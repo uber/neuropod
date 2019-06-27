@@ -53,6 +53,21 @@ cc_library(
 )
 
 cc_library(
+    name = "tensor_serialization_impl",
+    srcs = [
+        "neuropod_tensor_serialization.cc",
+    ],
+    visibility = [
+        "//neuropods:__subpackages__",
+    ],
+    deps = [
+        "@boost_repo//:boost",
+        "//neuropods/backends:neuropod_backend",
+        "//neuropods/serialization:serialization_hdrs",
+    ],
+)
+
+cc_library(
     name = "backend_registration",
     hdrs = [
         "backend_registration.hh",

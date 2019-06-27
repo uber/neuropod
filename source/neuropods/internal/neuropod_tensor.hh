@@ -37,6 +37,14 @@ TensorType get_tensor_type_from_cpp() = delete;
 
 FOR_EACH_TYPE_MAPPING_INCLUDING_STRING(GET_TENSOR_TYPE_FN)
 
+// Utility to set the serialization tag for a class
+// Note that the MAKE_SERIALIZABLE macro must be used
+// in order to actually make a class serializable.
+#define SET_SERIALIZE_TAG(tag) \
+    /* Used by the MAKE_SERIALIZABLE macro */ \
+    static std::string get_static_serialize_tag() { return tag; } \
+    std::string get_serialize_tag() const { return tag; }
+
 } // namespace
 
 // Forward declare NeuropodTensor
@@ -69,6 +77,10 @@ public:
     template <typename T>
     const TypedNeuropodTensor<T> *as_typed_tensor() const;
 
+    // Don't override this manually
+    // Use the SET_SERIALIZE_TAG macro instead
+    virtual std::string get_serialize_tag() const = 0;
+
 protected:
     void assure_tensor() const
     {
@@ -78,6 +90,15 @@ protected:
         }
     }
 };
+
+
+// Lets us write visitor functions to cleanly interact with `TypedNeuropodTensor`s
+template <typename ReturnType>
+struct NeuropodTensorVisitor
+{
+    typedef ReturnType return_type;
+};
+
 
 // A type erased version of a TypedNeuropodTensor. See the documentation for
 // TypedNeuropodTensor for more details.
@@ -173,6 +194,52 @@ public:
         }
         return (*this->template as_typed_tensor<T>())[0];
     }
+
+    template <typename Visitor, typename... Params>
+    typename Visitor::return_type
+    apply_visitor(const Visitor &visitor, Params &&... params)
+    {
+        // Downcast to the appropriate TypedNeuropodTensor and call the visitor
+    #define RUN_VISITOR_FN(CPP_TYPE, NEUROPOD_TYPE)                                       \
+        case NEUROPOD_TYPE:                                                               \
+        {                                                                                 \
+            return visitor(as_typed_tensor<CPP_TYPE>(), std::forward<Params>(params)...); \
+        }
+
+        // Switch on the type
+        switch(get_tensor_type())
+        {
+            FOR_EACH_TYPE_MAPPING_INCLUDING_STRING(RUN_VISITOR_FN)
+        default:
+            NEUROPOD_ERROR("Invalid tensor type" << get_tensor_type());
+        }
+
+    #undef RUN_VISITOR_FN
+    }
+
+    template <typename Visitor, typename... Params>
+    typename Visitor::return_type
+    apply_visitor(const Visitor &visitor, Params &&... params) const
+    {
+        // Downcast to the appropriate TypedNeuropodTensor and call the visitor
+    #define RUN_VISITOR_FN(CPP_TYPE, NEUROPOD_TYPE)                                       \
+        case NEUROPOD_TYPE:                                                               \
+        {                                                                                 \
+            return visitor(as_typed_tensor<CPP_TYPE>(), std::forward<Params>(params)...); \
+        }
+
+        // Switch on the type
+        switch(get_tensor_type())
+        {
+            FOR_EACH_TYPE_MAPPING_INCLUDING_STRING(RUN_VISITOR_FN)
+        default:
+            NEUROPOD_ERROR("Invalid tensor type" << get_tensor_type());
+        }
+
+    #undef RUN_VISITOR_FN
+    }
+
+    SET_SERIALIZE_TAG("neuropodtensor")
 
 protected:
     template <typename T>
@@ -270,7 +337,7 @@ public:
 
     const T &as_scalar() const { return NeuropodTensor::as_scalar<T>(); }
 
-    std::vector<T> get_data_as_vector()
+    std::vector<T> get_data_as_vector() const
     {
         std::vector<T> out;
 
@@ -375,7 +442,7 @@ public:
     // TODO(vip): make this pure virtual once all the existing backends have
     // implementations.
     // Get the data in the string tensor
-    virtual std::vector<std::string> get_data_as_vector()
+    virtual std::vector<std::string> get_data_as_vector() const
     {
         NEUROPOD_ERROR("Children must implement `get_data_as_vector`");
     };

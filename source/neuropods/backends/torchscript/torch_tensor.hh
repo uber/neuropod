@@ -147,7 +147,7 @@ public:
         }
     }
 
-    std::vector<std::string> get_data_as_vector()
+    std::vector<std::string> get_data_as_vector() const
     {
         std::vector<std::string> out;
 
