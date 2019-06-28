@@ -4,6 +4,8 @@
 
 #include "test_utils.hh"
 
+LOAD_BACKEND("torchscript")
+
 TEST(test_models, test_torchscript_addition_model)
 {
     // Test the TorchScript addition model using the native torchscript backend

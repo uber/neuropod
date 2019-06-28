@@ -4,6 +4,8 @@
 
 #include "neuropods/tests/test_utils.hh"
 
+LOAD_BACKEND("tensorflow")
+
 TEST(test_models, test_tensorflow_addition_model)
 {
     // Test the TensorFlow addition model using the native TensorFlow backend

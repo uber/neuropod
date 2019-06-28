@@ -10,9 +10,28 @@
 #include <vector>
 #include <stdlib.h>
 
+#include "dlfcn.h"
 #include "gtest/gtest.h"
 
 #include "neuropods/neuropods.hh"
+
+// We need to override the default backend lookup paths
+// Modifying the RPATH doesn't work on Linux because Bazel symlinks all the objects
+// into the test directory
+const std::unordered_map<std::string, std::string> default_backend_overrides = {
+    {"tensorflow", "./neuropods/backends/tensorflow/libneuropod_tensorflow_backend.so"},
+    {"python", "./neuropods/backends/python_bridge/libneuropod_pythonbridge_backend.so"},
+    {"pytorch", "./neuropods/backends/python_bridge/libneuropod_pythonbridge_backend.so"},
+    {"torchscript", "./neuropods/backends/torchscript/libneuropod_torchscript_backend.so"},
+};
+
+void* load_backend(const std::string &type)
+{
+    return dlopen(default_backend_overrides.at(type).c_str(), RTLD_NOW);
+}
+
+#define LOAD_BACKEND(type) \
+    void* unused = load_backend(type);
 
 void test_addition_model(neuropods::Neuropod &neuropod, bool copy_mem)
 {

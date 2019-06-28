@@ -18,3 +18,11 @@ cc_import(
     interface_library = "lib/libtensorflow.so",
     system_provided = True,
 )
+
+filegroup(
+    name = "libtensorflow_libs",
+    srcs = [
+        "lib/libtensorflow.so",
+        "lib/libtensorflow_framework.so",
+    ]
+)

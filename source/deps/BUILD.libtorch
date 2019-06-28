@@ -34,3 +34,21 @@ cc_library(
         "//conditions:default": [],
     }),
 )
+
+filegroup(
+    name = "libtorch_libs",
+    srcs = select({
+        "@bazel_tools//src/conditions:darwin": [
+            "lib/libtorch.1.dylib",
+            "lib/libcaffe2.dylib",
+            "lib/libc10.dylib",
+        ],
+        "//conditions:default": [
+            "lib/libtorch.so.1",
+            "lib/libtorch.so",
+            "lib/libcaffe2.so",
+            "lib/libc10.so",
+            "lib/libgomp-8bba0e50.so.1",
+        ],
+    })
+)

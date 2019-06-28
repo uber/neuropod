@@ -13,7 +13,7 @@ else
     nvidia-smi -L
 fi
 
-# Set LD_LIBRARY_PATH
+# Set the build environment
 source ../build/set_build_env.sh
 
 # Run python tests

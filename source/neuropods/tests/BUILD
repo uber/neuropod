@@ -49,10 +49,10 @@ cc_test(
     srcs = [
         "test_torchscript_backend.cc",
         "//neuropods:libneuropods.so",
-        "//neuropods/backends/torchscript:libneuropod_torchscript_backend.so",
     ],
     deps = [
         ":neuropods_test_utils",
+        "//neuropods/backends/torchscript:libneuropod_torchscript_backend.so",
     ],
 )
 
@@ -61,10 +61,10 @@ cc_test(
     srcs = [
         "test_tensorflow_backend.cc",
         "//neuropods:libneuropods.so",
-        "//neuropods/backends/tensorflow:libneuropod_tensorflow_backend.so",
     ],
     deps = [
         ":neuropods_test_utils",
+        "//neuropods/backends/tensorflow:libneuropod_tensorflow_backend.so",
     ],
 )
 

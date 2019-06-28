@@ -2,6 +2,8 @@
 # Uber, Inc. (c) 2018
 #
 
+load("//bazel:copy_libs.bzl", "copy_libs")
+
 cc_binary(
     name = "libneuropod_tensorflow_backend.so",
     srcs = [
@@ -15,7 +17,7 @@ cc_binary(
     ],
     linkshared = True,
     linkstatic = True,
-    linkopts = ["-Wl,-rpath ."],
+    linkopts = ["-Wl,-rpath,$$ORIGIN"],
     visibility = [
         "//neuropods:__subpackages__",
     ],
@@ -24,5 +26,13 @@ cc_binary(
         "//neuropods/internal:deleter",
         "@tensorflow_repo//:tensorflow_c_hdrs",
         "@tensorflow_repo//:libtensorflow",
+    ],
+    data = [
+        ":copy_libtensorflow",
     ]
+)
+
+copy_libs(
+    name = "copy_libtensorflow",
+    libs = "@tensorflow_repo//:libtensorflow_libs"
 )

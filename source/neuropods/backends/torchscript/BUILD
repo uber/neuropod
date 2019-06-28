@@ -2,6 +2,8 @@
 # Uber, Inc. (c) 2018
 #
 
+load("//bazel:copy_libs.bzl", "copy_libs")
+
 cc_binary(
     name = "libneuropod_torchscript_backend.so",
     srcs = [
@@ -14,7 +16,7 @@ cc_binary(
     ],
     linkshared = True,
     linkstatic = True,
-    linkopts = ["-Wl,-rpath ."],
+    linkopts = ["-Wl,-rpath,$$ORIGIN"],
     visibility = [
         "//neuropods:__subpackages__",
     ],
@@ -23,5 +25,13 @@ cc_binary(
         "//neuropods/internal:deleter",
         "@libtorch_repo//:libtorch_hdrs",
         "@libtorch_repo//:libtorch",
+    ],
+    data = [
+        ":copy_libtorch",
     ]
+)
+
+copy_libs(
+    name = "copy_libtorch",
+    libs = "@libtorch_repo//:libtorch_libs"
 )
