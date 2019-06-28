@@ -22,9 +22,9 @@ llvm_toolchain(
 libtorch_repository(
     name = "libtorch_repo",
     build_file = "@//deps:BUILD.libtorch",
-    default_version = "1.0.0.dev20190318",
-    linux_sha = "6e59041708bf7438f9e5d4e1dbf6fbb4dc53aacae3f198f5d626e0ef0d5b4e19",
-    mac_sha = "d55b535f42c965fa2ccfd6656b7b37010615b9202f8ce80bd36aca682e2aaedd",
+    default_version = "1.1.0",
+    linux_sha = "c863a0073ff4c7b6feb958799c7dc3202b3449e86ff1cec9c85c7da9d1fe0218",
+    mac_sha = "2db31f6c7e69ea9142396d8ed0a7ad70dde2a9993cc8c23cc48c03ffeea13f0f",
 )
 
 tensorflow_repository(

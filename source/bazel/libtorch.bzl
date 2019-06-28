@@ -1,14 +1,18 @@
 # https://docs.bazel.build/versions/master/skylark/repository_rules.html
 def _impl(repository_ctx):
-    if repository_ctx.os.environ.get("NEUROPODS_PYTORCH_URL"):
-        download_url = repository_ctx.os.environ["NEUROPODS_PYTORCH_URL"]
-        download_sha = repository_ctx.os.environ.get("NEUROPODS_PYTORCH_SHA256", '')
+    if repository_ctx.os.environ.get("NEUROPODS_LIBTORCH_URL"):
+        download_url = repository_ctx.os.environ["NEUROPODS_LIBTORCH_URL"]
+        download_sha = repository_ctx.os.environ.get("NEUROPODS_LIBTORCH_SHA256", '')
     else:
-        version = repository_ctx.os.environ.get("NEUROPODS_PYTORCH_VERSION", "") or repository_ctx.attr.default_version
+        version = repository_ctx.os.environ.get("NEUROPODS_LIBTORCH_VERSION", "") or repository_ctx.attr.default_version
+        download_base = "https://download.pytorch.org/libtorch"
+        if "dev" in version:
+            download_base += "/nightly"
+
         if repository_ctx.os.name.startswith("mac"):
-            download_url = "https://download.pytorch.org/libtorch/nightly/cpu/libtorch-macos-" + version + ".zip"
+            download_url = download_base + "/cpu/libtorch-macos-" + version + ".zip"
         else:
-            download_url = "https://download.pytorch.org/libtorch/nightly/cpu/libtorch-shared-with-deps-" + version + ".zip"
+            download_url = download_base + "/cpu/libtorch-shared-with-deps-" + version + ".zip"
         download_sha = ''
 
         if repository_ctx.attr.default_version == version:
