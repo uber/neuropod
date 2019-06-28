@@ -12,6 +12,7 @@
 #include <string>
 #include <vector>
 
+#include "neuropods/backends/python_bridge/type_utils.hh"
 #include "neuropods/internal/deleter.hh"
 #include "neuropods/internal/neuropod_tensor.hh"
 
