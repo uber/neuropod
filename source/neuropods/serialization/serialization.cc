@@ -16,14 +16,14 @@ namespace
 {
 
 std::once_flag registrar_initialized;
-std::unordered_map<std::string, serialize_fn_t>*     registered_serializers   = nullptr;
-std::unordered_map<std::string, deserialize_fn_t>*   registered_deserializers = nullptr;
+std::unique_ptr<std::unordered_map<std::string, serialize_fn_t>>     registered_serializers;
+std::unique_ptr<std::unordered_map<std::string, deserialize_fn_t>>   registered_deserializers;
 
 void init_registrar_if_needed()
 {
     std::call_once(registrar_initialized, [](){
-        registered_serializers   = new std::unordered_map<std::string, serialize_fn_t>();
-        registered_deserializers = new std::unordered_map<std::string, deserialize_fn_t>();
+        registered_serializers   = stdx::make_unique<std::unordered_map<std::string, serialize_fn_t>>();
+        registered_deserializers = stdx::make_unique<std::unordered_map<std::string, deserialize_fn_t>>();
     });
 }
 

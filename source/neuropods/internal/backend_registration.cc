@@ -20,14 +20,14 @@ namespace
 {
 
 std::once_flag registrar_initialized;
-std::unordered_map<std::string, BackendFactoryFunction>* registered_backends_by_type = nullptr;
-std::unordered_map<std::string, BackendFactoryFunction>* registered_backends_by_name = nullptr;
+std::unique_ptr<std::unordered_map<std::string, BackendFactoryFunction>> registered_backends_by_type;
+std::unique_ptr<std::unordered_map<std::string, BackendFactoryFunction>> registered_backends_by_name;
 
 void init_registrar_if_needed()
 {
     std::call_once(registrar_initialized, [](){
-        registered_backends_by_name = new std::unordered_map<std::string, BackendFactoryFunction>();
-        registered_backends_by_type = new std::unordered_map<std::string, BackendFactoryFunction>();
+        registered_backends_by_name = stdx::make_unique<std::unordered_map<std::string, BackendFactoryFunction>>();
+        registered_backends_by_type = stdx::make_unique<std::unordered_map<std::string, BackendFactoryFunction>>();
     });
 }
 
