@@ -9,11 +9,14 @@ package(
 cc_library(
     name = "boost",
     srcs = glob([
-        # Boost.Python is not header-only
+        # Some Boost libraries are not header-only
         "libs/python/src/**/*.cpp",
+        "libs/serialization/src/**/*.cpp",
+        "libs/serialization/src/**/*.ipp",
     ]),
     hdrs = glob([
         "boost/**/*.hpp",
+        "boost/**/*.ipp",
     ]),
     includes = [
         "."

@@ -32,6 +32,8 @@ cc_binary(
     deps = [
         ":neuropods_hdrs",
         "//neuropods/internal:backend_registration_impl",
+        "//neuropods/internal:tensor_serialization_impl",
+        "//neuropods/serialization:serialization_impl",
     ]
 )
 
@@ -45,6 +47,7 @@ pkg_tar(
     deps = [
         "//neuropods/internal:libneuropods_internal_hdrs",
         "//neuropods/backends:libneuropods_backends_hdrs",
+        "//neuropods/serialization:libneuropods_serialization_hdrs",
     ],
 )
 

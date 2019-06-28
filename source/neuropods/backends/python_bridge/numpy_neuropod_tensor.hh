@@ -264,7 +264,7 @@ public:
         nparray_ = arr;
     }
 
-    std::vector<std::string> get_data_as_vector()
+    std::vector<std::string> get_data_as_vector() const
     {
         auto arr = reinterpret_cast<PyArrayObject *>(nparray_.ptr());
 
