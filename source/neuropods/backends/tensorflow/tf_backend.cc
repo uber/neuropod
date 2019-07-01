@@ -47,9 +47,16 @@ void setup_node_mapping(const std::string &neuropod_path, std::unordered_map<std
     std::ifstream ifs(get_tf_config_path(neuropod_path));
 
     // Parse it
-    Json::Reader reader;
+    Json::CharReaderBuilder rbuilder;
     Json::Value  obj;
-    reader.parse(ifs, obj);
+
+    std::string parse_err;
+    bool parsingSuccessful = Json::parseFromStream(rbuilder, ifs, &obj, &parse_err);
+
+    if (!parsingSuccessful)
+    {
+        NEUROPOD_ERROR("Error parsing TF Neuropod Config JSON: " + parse_err);
+    }
 
     // Make sure that node_name_mapping exists and is an object
     if (!obj["node_name_mapping"].isObject())
