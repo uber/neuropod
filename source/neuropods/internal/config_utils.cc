@@ -139,9 +139,16 @@ std::unique_ptr<ModelConfig> load_model_config(const std::string &neuropod_path)
 std::unique_ptr<ModelConfig> load_model_config(std::istream &input_stream)
 {
     // Parse it
-    Json::Reader reader;
+    Json::CharReaderBuilder rbuilder;
     Json::Value  obj;
-    reader.parse(input_stream, obj);
+
+    std::string parse_err;
+    bool parsingSuccessful = Json::parseFromStream(rbuilder, input_stream, &obj, &parse_err);
+
+    if (!parsingSuccessful)
+    {
+        throw_neuropod_config_error("Error parsing JSON: " + parse_err);
+    }
 
     // Make sure that name and platform are strings
     if (!obj["name"].isString() || !obj["platform"].isString())
