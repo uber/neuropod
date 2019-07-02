@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 REQUIRED_PACKAGES = [
-    "numpy",
+    "numpy<1.17.0",
     "testpath",
     "future",
     "six"
