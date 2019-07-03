@@ -1,0 +1,2 @@
+fixes:
+  - "source/bazel-source/*/coverage.dat::source/"

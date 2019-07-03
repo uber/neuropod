@@ -16,3 +16,10 @@ source /tmp/neuropod_venv/bin/activate
 
 # Run tests
 ./build/test.sh
+
+# Upload code coverage reports
+pushd source
+bazel coverage --cache_test_results=no --test_output=errors "$@" //...
+popd
+
+bash <(curl -s https://codecov.io/bash) -s source/bazel-testlogs/
