@@ -27,6 +27,11 @@ def check_output_matches_expected(out, expected_out):
             success_condition = np.allclose(value, out[key])
 
         if not success_condition:
+            logger.info("Output for key '{}' does not match expected\nExpected:\n{}\nActual\n{}\n".format(
+                key,
+                value,
+                out[key],
+            ))
             raise ValueError("{} does not match expected value!".format(key))
 
 
