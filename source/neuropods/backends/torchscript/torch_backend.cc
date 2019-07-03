@@ -63,25 +63,43 @@ std::unique_ptr<NeuropodValueMap> TorchNeuropodBackend::infer(const NeuropodValu
     torch::NoGradGuard guard;
 
     // Get inference schema
-    auto &      method = model_->get_method("forward");
-    const auto &schema = method.getSchema();
+    auto &      method    = model_->get_method("forward");
+    const auto &schema    = method.getSchema();
+    const auto &arguments = schema.arguments();
 
     // Define the vector of inputs and add the inputs
-    std::vector<torch::jit::IValue> torch_inputs(schema.arguments().size());
-    for (const auto &entry : inputs)
+    std::vector<torch::jit::IValue> torch_inputs(arguments.size());
+    if (arguments.size() == 1 && arguments.at(0).type()->isSubclass(c10::TypeKind::DictType))
     {
-        const auto  input_name = entry.first;
-        const auto &input_data = get_ivalue_from_torch_tensor(entry.second);
-
-        auto arg_index = schema.argumentIndexWithName(input_name);
-        if (!arg_index.has_value())
+        // This model expects a dict as input
+        torch::ivalue::UnorderedMap input_dict;
+        for (const auto &entry : inputs)
         {
-            NEUROPOD_ERROR("Input '" << input_name.c_str() << "' does not exist. Model inputs " << schema);
+            // TODO(vip): transfer to the correct device
+            // .to(device) is a no-op if the tensor is already transferred
+            input_dict[entry.first] = get_ivalue_from_torch_tensor(entry.second);
         }
 
-        // TODO(vip): transfer to the correct device
-        // .to(device) is a no-op if the tensor is already transferred
-        torch_inputs.at(arg_index.value()) = input_data;
+        torch_inputs.at(0) = input_dict;
+    }
+    else
+    {
+        // Pass inputs normally
+        for (const auto &entry : inputs)
+        {
+            const auto  input_name = entry.first;
+            const auto &input_data = get_ivalue_from_torch_tensor(entry.second);
+
+            const auto arg_index = schema.argumentIndexWithName(input_name);
+            if (!arg_index.has_value())
+            {
+                NEUROPOD_ERROR("Input '" << input_name.c_str() << "' does not exist. Model inputs " << schema);
+            }
+
+            // TODO(vip): transfer to the correct device
+            // .to(device) is a no-op if the tensor is already transferred
+            torch_inputs.at(arg_index.value()) = input_data;
+        }
     }
 
     // Run inference
