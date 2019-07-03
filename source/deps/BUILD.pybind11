@@ -1,0 +1,21 @@
+#
+# Uber, Inc. (c) 2019
+#
+
+package(
+    default_visibility = ["//visibility:public"],
+)
+
+cc_library(
+    name = "pybind11",
+    hdrs = glob([
+        "include/pybind11/**",
+    ]),
+    includes = [
+        "include"
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "@python_repo//:python",
+    ],
+)

@@ -14,3 +14,6 @@ export ASAN_OPTIONS=detect_odr_violation=0
 # Set the ASAN symbolizer path
 # See https://clang.llvm.org/docs/AddressSanitizer.html
 export ASAN_SYMBOLIZER_PATH=`pwd`/bazel-source/external/llvm_toolchain/bin/llvm-symbolizer
+
+# So the python tests can find the native bindings
+export PYTHONPATH=`pwd`/bazel-bin/neuropods/bindings
