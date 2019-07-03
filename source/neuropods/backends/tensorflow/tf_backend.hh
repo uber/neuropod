@@ -29,6 +29,9 @@ private:
     // Loads a frozen graph from a protobuf file
     void load_graph(const std::string &graph_path);
 
+    // Run target ops in the graph
+    void run_target_ops(const std::vector<std::string> &target_op_names);
+
     // Pointer to the status of a TF call
     TF_StatusPtr status_;
     // Pointer to the TF graph
