@@ -57,6 +57,14 @@ TorchNeuropodBackend::TorchNeuropodBackend(const std::string &torchscript_model_
 
 TorchNeuropodBackend::~TorchNeuropodBackend() = default;
 
+#ifdef ATG_BUILD
+ #define KEY(elem) (elem.key())
+ #define VALUE(elem) (elem.value())
+#else
+ #define KEY(elem) (elem.first)
+ #define VALUE(elem) (elem.second)
+#endif
+
 // Run inference
 std::unique_ptr<NeuropodValueMap> TorchNeuropodBackend::infer(const NeuropodValueMap &inputs)
 {
@@ -94,14 +102,14 @@ std::unique_ptr<NeuropodValueMap> TorchNeuropodBackend::infer(const NeuropodValu
     for (const auto &elem : outputs_dict)
     {
         // Get the name of the tensor
-        const std::string &name = elem.first.toString()->string();
+        const std::string &name = KEY(elem).toString()->string();
 
-        if (elem.second.isGenericList())
+        if (VALUE(elem).isGenericList())
         {
             // A list of strings
             // This is used in place of string tensors because torch does not
             // have native support for string tensors
-            auto tensor = elem.second;
+            auto tensor = VALUE(elem);
 
             // Make sure it's actually a list of strings (or empty)
             auto &list = tensor.toGenericListRef();
@@ -117,10 +125,10 @@ std::unique_ptr<NeuropodValueMap> TorchNeuropodBackend::infer(const NeuropodValu
             // Add it to our output
             (*to_return)[name] = std::move(neuropod_tensor);
         }
-        else if (elem.second.isTensor())
+        else if (VALUE(elem).isTensor())
         {
             // Torch tensor
-            auto tensor = elem.second.toTensor();
+            auto tensor = VALUE(elem).toTensor();
 
             // Get the type and make a TorchNeuropodTensor
             auto tensor_type = get_neuropod_type_from_torch_type(tensor.scalar_type());
@@ -132,7 +140,7 @@ std::unique_ptr<NeuropodValueMap> TorchNeuropodBackend::infer(const NeuropodValu
         else
         {
             NEUROPOD_ERROR("Neuropod returned an invalid type! All outputs must be tensors"
-                "or lists of strings. Got type '" << elem.second.tagKind() << "' for tensor '" << name << "'");
+                "or lists of strings. Got type '" << VALUE(elem).tagKind() << "' for tensor '" << name << "'");
         }
     }
 

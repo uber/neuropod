@@ -5,7 +5,13 @@
 #include "config_utils.hh"
 
 #include <fstream>
-#include <json/json.h>
+
+#ifdef ATG_BUILD
+ #include <jsoncpp/json/json.h>
+#else
+ #include <json/json.h>
+#endif
+
 #include <sstream>
 #include <stdexcept>
 #include <unordered_map>
@@ -138,10 +144,15 @@ std::unique_ptr<ModelConfig> load_model_config(const std::string &neuropod_path)
 
 std::unique_ptr<ModelConfig> load_model_config(std::istream &input_stream)
 {
-    // Parse it
-    Json::CharReaderBuilder rbuilder;
     Json::Value  obj;
 
+    // Parse it
+
+#if ATG_BUILD
+    Json::Reader reader;
+    reader.parse(input_stream, obj);
+#else
+    Json::CharReaderBuilder rbuilder;
     std::string parse_err;
     bool parsingSuccessful = Json::parseFromStream(rbuilder, input_stream, &obj, &parse_err);
 
@@ -149,6 +160,7 @@ std::unique_ptr<ModelConfig> load_model_config(std::istream &input_stream)
     {
         throw_neuropod_config_error("Error parsing JSON: " + parse_err);
     }
+#endif
 
     // Make sure that name and platform are strings
     if (!obj["name"].isString() || !obj["platform"].isString())
