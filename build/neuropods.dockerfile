@@ -4,21 +4,6 @@
 # FROM ubuntu:16.04 as neuropod-base
 FROM nvidia/cuda:10.0-runtime-ubuntu16.04 as neuropod-base
 
-# Optional overrides used by the bazel build
-ARG NEUROPODS_TENSORFLOW_VERSION
-ARG NEUROPODS_TENSORFLOW_URL
-ARG NEUROPODS_TENSORFLOW_SHA256
-ARG NEUROPODS_LIBTORCH_VERSION
-ARG NEUROPODS_LIBTORCH_URL
-ARG NEUROPODS_LIBTORCH_SHA256
-
-ENV NEUROPODS_TENSORFLOW_VERSION=$NEUROPODS_TENSORFLOW_VERSION
-ENV NEUROPODS_TENSORFLOW_URL=$NEUROPODS_TENSORFLOW_URL
-ENV NEUROPODS_TENSORFLOW_SHA256=$NEUROPODS_TENSORFLOW_SHA256
-ENV NEUROPODS_LIBTORCH_VERSION=$NEUROPODS_LIBTORCH_VERSION
-ENV NEUROPODS_LIBTORCH_URL=$NEUROPODS_LIBTORCH_URL
-ENV NEUROPODS_LIBTORCH_SHA256=$NEUROPODS_LIBTORCH_SHA256
-
 # We use sudo in the build scripts
 RUN apt-get update && apt-get install -y sudo
 
@@ -33,7 +18,17 @@ RUN /usr/src/build/install_system_deps.sh
 # Copy the python code into the image
 RUN mkdir -p /usr/src/source/python /usr/src/source/neuropods/python
 COPY build/install_python_deps.sh /usr/src/build/install_python_deps.sh
+COPY build/install_frameworks.py /usr/src/build/install_frameworks.py
 COPY source/python /usr/src/source/python
+
+# Optional overrides
+ARG NEUROPODS_TENSORFLOW_VERSION
+ARG NEUROPODS_TORCH_VERSION
+ARG NEUROPODS_IS_GPU
+
+ENV NEUROPODS_TENSORFLOW_VERSION=$NEUROPODS_TENSORFLOW_VERSION
+ENV NEUROPODS_TORCH_VERSION=$NEUROPODS_TORCH_VERSION
+ENV NEUROPODS_IS_GPU=$NEUROPODS_IS_GPU
 
 # Install python dependencies
 RUN /usr/src/build/install_python_deps.sh
