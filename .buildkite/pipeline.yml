@@ -38,6 +38,15 @@ steps:
           run: test-variant-2
           config: docker-compose.test.yml
 
+  - label: ":docker: CPU Tests (Variant 3)"
+    agents:
+      queue: private-default
+    command: build/test.sh
+    plugins:
+      - docker-compose:
+          run: test-variant-3
+          config: docker-compose.test.yml
+
   # Run the tests on GPU
   - label: ":docker: GPU Tests"
     agents:
