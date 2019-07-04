@@ -3,6 +3,7 @@
 #
 
 import os
+import shutil
 import torch
 
 from neuropods.backends import config_utils
@@ -15,6 +16,7 @@ def create_torchscript_neuropod(
         module,
         input_spec,
         output_spec,
+        custom_ops=[],
         test_input_data=None,
         test_expected_out=None,
         persist_test_data=True):
@@ -73,6 +75,12 @@ def create_torchscript_neuropod(
     except OSError:
         raise ValueError("The specified neuropod path ({}) already exists! Aborting...".format(neuropod_path))
 
+    # Store the custom ops (if any)
+    neuropod_custom_op_path = os.path.join(neuropod_path, "0", "ops")
+    os.makedirs(neuropod_custom_op_path)
+    for op in custom_ops:
+        shutil.copy(op, neuropod_custom_op_path)
+
     # Write the neuropod config file
     config_utils.write_neuropod_config(
         neuropod_path=neuropod_path,
@@ -80,6 +88,7 @@ def create_torchscript_neuropod(
         platform="torchscript",
         input_spec=input_spec,
         output_spec=output_spec,
+        custom_ops=[os.path.basename(op) for op in custom_ops]
     )
 
     # Create a folder to store the model

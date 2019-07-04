@@ -90,8 +90,9 @@ def load_and_test_neuropod(neuropod_path, test_input_data, test_expected_out=Non
             # Otherwise run in the specified virtualenv
             out = eval_in_virtualenv(neuropod_path, test_input_data, test_virtualenv)
     else:
-        # Run the evaluation in the current process
-        out = eval_in_process(neuropod_path, test_input_data)
+        # Run the evaluation in a new process. This is important to make sure
+        # custom ops are being tested correctly
+        out = eval_in_new_process(neuropod_path, test_input_data)
 
     # Check the output
     if test_expected_out is not None:

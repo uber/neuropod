@@ -15,7 +15,7 @@ class TensorflowNeuropodExecutor(NeuropodExecutor):
     Executes a Tensorflow neuropod
     """
 
-    def __init__(self, neuropod_path):
+    def __init__(self, neuropod_path, load_custom_ops=True):
         """
         Load a Tensorflow neuropod
 

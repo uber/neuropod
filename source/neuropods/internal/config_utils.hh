@@ -33,6 +33,8 @@ struct ModelConfig
 
     const std::vector<TensorSpec> inputs;
     const std::vector<TensorSpec> outputs;
+
+    const std::vector<std::string> custom_ops;
 };
 
 std::unique_ptr<ModelConfig> load_model_config(const std::string &neuropod_path);

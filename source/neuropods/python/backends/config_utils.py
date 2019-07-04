@@ -70,6 +70,18 @@ def validate_neuropod_config(config):
     validate_tensor_spec(config["input_spec"])
     validate_tensor_spec(config["output_spec"])
 
+    # Optional custom ops
+    if "custom_ops" in config:
+        custom_ops = config["custom_ops"]
+
+        if not isinstance(custom_ops, list):
+            raise ValueError("Optional field 'custom_ops' must be a list! Got value {} of type {}".format(custom_ops, type(custom_ops)))
+
+        for op in custom_ops:
+            if not isinstance(op, basestring):
+                raise ValueError("All items in 'custom_ops' must be strings! Got value {} of type {}.".format(op, type(op)))
+
+
 
 def canonicalize_tensor_spec(spec):
     """
@@ -86,7 +98,7 @@ def canonicalize_tensor_spec(spec):
     return transformed
 
 
-def write_neuropod_config(neuropod_path, model_name, platform, input_spec, output_spec):
+def write_neuropod_config(neuropod_path, model_name, platform, input_spec, output_spec, custom_ops=None):
     """
     Creates the neuropod config file
 
@@ -100,6 +112,9 @@ def write_neuropod_config(neuropod_path, model_name, platform, input_spec, outpu
     :param  output_spec:    A list of dicts specifying the output of the model.
                             Ex: [{"name": "y", "dtype": "float32", "shape": (None, )}]
     """
+    if custom_ops is None:
+        custom_ops = []
+
     # TODO: Switch to prototext
     with open(os.path.join(neuropod_path, "config.json"), "w") as config_file:
         config = {
@@ -107,6 +122,7 @@ def write_neuropod_config(neuropod_path, model_name, platform, input_spec, outpu
             "platform": platform,
             "input_spec": canonicalize_tensor_spec(input_spec),
             "output_spec": canonicalize_tensor_spec(output_spec),
+            "custom_ops": custom_ops,
         }
 
         # Verify that the config is correct

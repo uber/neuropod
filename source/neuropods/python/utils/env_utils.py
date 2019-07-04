@@ -9,6 +9,7 @@ from six.moves import cPickle as pickle
 import os
 import shutil
 import subprocess
+import sys
 
 from tempfile import mkstemp
 from testpath.tempdir import TemporaryDirectory
@@ -53,7 +54,7 @@ def eval_in_virtualenv(neuropod_path, input_data, venv_path):
         env={"PYTHONPATH": os.path.join(venv_path, "neuropod_test_libs")}
     )
 
-def eval_in_new_process(neuropod_path, input_data, binary_path="python", extra_args=[], **kwargs):
+def eval_in_new_process(neuropod_path, input_data, binary_path=sys.executable, extra_args=[], **kwargs):
     """
     Loads and runs a neuropod model in a separate process with specified input data.
 
