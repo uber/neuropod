@@ -2,6 +2,8 @@
 // Uber, Inc. (c) 2019
 //
 
+#include "neuropods/bindings/python_bindings.hh"
+
 #include <pybind11/pybind11.h>
 #include <pybind11/numpy.h>
 #include <pybind11/stl.h>
@@ -113,38 +115,30 @@ std::shared_ptr<NeuropodTensor> tensor_from_numpy(NeuropodTensorAllocator &alloc
     }
 }
 
-py::dict infer(Neuropod &neuropod, py::dict &inputs_dict)
+} // namespace
+
+NeuropodValueMap from_numpy_dict(NeuropodTensorAllocator &allocator, py::dict &items)
 {
     // Convert from a py::dict of numpy arrays to an unordered_map of `NeuropodTensor`s
-    auto allocator = neuropod.get_tensor_allocator();
-    NeuropodValueMap inputs;
-    for (auto item : inputs_dict)
+    NeuropodValueMap out;
+    for (auto item : items)
     {
-        inputs[item.first.cast<std::string>()] = tensor_from_numpy(*allocator, item.second.cast<py::array>());
-    }
-
-    // Run inference
-    auto outputs = neuropod.infer(inputs);
-
-    // Convert the outputs to a python dict of numpy arrays
-    py::dict out;
-    for (auto &item : *outputs)
-    {
-        out[item.first.c_str()] = tensor_to_numpy(item.second);
+        out[item.first.cast<std::string>()] = tensor_from_numpy(allocator, item.second.cast<py::array>());
     }
 
     return out;
 }
 
-} // namespace
+py::dict to_numpy_dict(NeuropodValueMap &items)
+{
+    // Convert the items to a python dict of numpy arrays
+    py::dict out;
+    for (auto &item : items)
+    {
+        out[item.first.c_str()] = tensor_to_numpy(item.second);
+    }
 
-PYBIND11_MODULE(neuropods_native, m) {
-    py::class_<Neuropod>(m, "Neuropod")
-        .def(py::init<const std::string &>())
-        .def(py::init<const std::string &, const std::unordered_map<std::string, std::string> &>())
-        .def(py::init<const std::string &, const std::string &>())
-        .def("infer", &infer);
-
+    return out;
 }
 
 } // namespace neuropods

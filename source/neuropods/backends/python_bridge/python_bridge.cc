@@ -10,7 +10,7 @@
 #include <stdlib.h>
 #include <vector>
 
-#include "neuropods/backends/python_bridge/type_utils.hh"
+#include "neuropods/bindings/python_bindings.hh"
 
 namespace neuropods
 {
@@ -37,27 +37,29 @@ void set_python_path(const std::vector<std::string> &paths_to_add)
     setenv("PYTHONPATH", python_path.str().c_str(), 1);
 }
 
-// We can't shutdown python in the destructor of `PythonBridge`
-// because there still might be NumpyNeuropodTensors floating around
-// Instead, we shutdown at process termination
-void shutdown_python()
+bool maybe_initialize()
 {
-    // Boost Python requires us not to call Py_Finalize
-    // https://www.boost.org/doc/libs/1_62_0/libs/python/doc/html/tutorial/tutorial/embedding.html
-    // Py_Finalize();
-}
-
-// Make sure we only shutdown python once
-static bool did_register_shutdown = false;
-
-void maybe_register_python_shutdown()
-{
-    if (!did_register_shutdown)
+    if (Py_IsInitialized())
     {
-        atexit(shutdown_python);
-        did_register_shutdown = true;
+        return false;
     }
+
+    // If we have a virtualenv, use it
+    if (auto venv_path = std::getenv("VIRTUAL_ENV"))
+    {
+        setenv("PYTHONHOME", venv_path, true);
+    }
+
+    // Start the interpreter
+    py::initialize_interpreter();
+
+    // TODO: shutdown the interpreter once we know that there are no more python objects left
+    // atexit(py::finalize_interpreter);
+    return true;
 }
+
+// Handle interpreter startup and shutdown
+static auto did_initialize = maybe_initialize();
 
 } // namespace
 
@@ -65,49 +67,14 @@ PythonBridge::PythonBridge(const std::string &             neuropod_path,
                            std::unique_ptr<ModelConfig> &  model_config,
                            const std::vector<std::string> &python_path_additions)
 {
-    try
-    {
-        // Utilize the virtualenv if one is present
-        if (auto venv_path = std::getenv("VIRTUAL_ENV"))
-        {
-            setenv("PYTHONHOME", venv_path, true);
-        }
+    // Modify PYTHONPATH
+    set_python_path(python_path_additions);
 
-        // Register python shutdown
-        maybe_register_python_shutdown();
+    // Get the neuropod loader
+    py::object load_neuropod = py::module::import("neuropods.loader").attr("load_neuropod");
 
-        // Modify PYTHONPATH
-        set_python_path(python_path_additions);
-
-        // Workaround for this issue:
-        // https://stackoverflow.com/questions/11842920/undefined-symbol-pyexc-importerror-when-embedding-python-in-c
-        dlopen("libpython2.7.so", RTLD_LAZY | RTLD_GLOBAL);
-
-        // Initialize the embedded python interpreter
-        Py_Initialize();
-
-        // Initial setup
-        main_module_    = py::import("__main__");
-        main_namespace_ = main_module_.attr("__dict__");
-
-        // Create a local python variable with the neuropod model path
-        py::dict locals;
-        locals["neuropod_path"] = neuropod_path;
-
-        // Load the neuropod
-        py::exec("from neuropods.loader import load_neuropod\n"
-                 "neuropod = load_neuropod(neuropod_path)\n",
-                 main_namespace_,
-                 locals);
-
-        // Save a reference to the loaded neuropod
-        neuropod_ = locals["neuropod"];
-    }
-    catch (py::error_already_set)
-    {
-        PyErr_Print();
-        throw;
-    }
+    // Load the neuropod and save a reference to it
+    neuropod_ = load_neuropod(neuropod_path);
 }
 
 PythonBridge::~PythonBridge() = default;
@@ -115,49 +82,17 @@ PythonBridge::~PythonBridge() = default;
 // Run inference
 std::unique_ptr<NeuropodValueMap> PythonBridge::infer(const NeuropodValueMap &inputs)
 {
-    try
-    {
-        // Populate a dict mapping input names to values
-        py::dict model_inputs;
-        for (const auto &entry : inputs)
-        {
-            model_inputs[entry.first]
-                = std::dynamic_pointer_cast<NativeDataContainer<py::object>>(entry.second)->get_native_data();
-        }
+    // Convert to a py::dict
+    py::dict model_inputs = to_numpy_dict(const_cast<NeuropodValueMap &>(inputs));
 
-        // Create local python variables with the loaded neuropod and the input dict
-        // we just created
-        py::dict locals;
-        locals["neuropod"]     = neuropod_;
-        locals["model_inputs"] = model_inputs;
+    // Run inference
+    py::dict model_outputs = neuropod_.attr("infer")(model_inputs).cast<py::dict>();
 
-        // Run inference
-        py::exec("model_outputs = neuropod.infer(model_inputs)\n", main_namespace_, locals);
+    // Get the outputs
+    auto outputs = from_numpy_dict(*get_tensor_allocator(), model_outputs);
 
-        // Get the output
-        py::dict model_outputs = py::extract<py::dict>(locals["model_outputs"]);
-
-        // Convert from numpy to `NeuropodTensor`s
-        auto     to_return = stdx::make_unique<NeuropodValueMap>();
-        py::list out_keys  = model_outputs.keys();
-        for (int i = 0; i < py::len(out_keys); i++)
-        {
-            const char *      key_c_str = py::extract<const char *>(out_keys[i]);
-            const int         key_len   = py::extract<int>(out_keys[i].attr("__len__")());
-            const std::string key       = std::string(key_c_str, key_len);
-
-            PyArrayObject *nparray     = get_nparray_from_obj(model_outputs[key]);
-            TensorType     tensor_type = get_neuropod_type_from_numpy_type(PyArray_TYPE(nparray));
-            (*to_return)[key] = make_tensor<NumpyNeuropodTensor>(tensor_type, nparray);
-        }
-
-        return to_return;
-    }
-    catch (py::error_already_set)
-    {
-        PyErr_Print();
-        throw;
-    }
+    // We need a unique pointer
+    return stdx::make_unique<NeuropodValueMap>(std::move(outputs));
 }
 
 REGISTER_NEUROPOD_BACKEND(PythonBridge, "python", "pytorch")
