@@ -6,3 +6,15 @@ services:
       dockerfile: build/neuropods.dockerfile
       target: neuropod-build
     privileged: true
+
+  test-variant-1:
+    extends: test-base
+    build:
+      args:
+        NEUROPODS_TORCH_VERSION: 1.1.0
+
+  test-variant-2:
+    extends: test-base
+    build:
+      args:
+        NEUROPODS_TORCH_VERSION: 1.2.0.dev20190601
