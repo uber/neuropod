@@ -8,6 +8,8 @@
 #include <sstream>
 #include <stdexcept>
 
+#include <caffe2/core/macros.h>
+
 #include "neuropods/backends/torchscript/type_utils.hh"
 
 namespace neuropods
@@ -57,6 +59,14 @@ TorchNeuropodBackend::TorchNeuropodBackend(const std::string &torchscript_model_
 
 TorchNeuropodBackend::~TorchNeuropodBackend() = default;
 
+#if CAFFE2_VERSION > 10100
+ #define KEY(elem) (elem.key())
+ #define VALUE(elem) (elem.value())
+#else
+ #define KEY(elem) (elem.first)
+ #define VALUE(elem) (elem.second)
+#endif
+
 // Run inference
 std::unique_ptr<NeuropodValueMap> TorchNeuropodBackend::infer(const NeuropodValueMap &inputs)
 {
@@ -71,6 +81,18 @@ std::unique_ptr<NeuropodValueMap> TorchNeuropodBackend::infer(const NeuropodValu
     std::vector<torch::jit::IValue> torch_inputs(arguments.size());
     if (arguments.size() == 1 && arguments.at(0).type()->isSubclass(c10::TypeKind::DictType))
     {
+    #if CAFFE2_VERSION > 10100
+        // This model expects a dict as input
+        auto input_dict = c10::make_dict<torch::jit::IValue, torch::jit::IValue>();
+        for (const auto &entry : inputs)
+        {
+            // TODO(vip): transfer to the correct device
+            // .to(device) is a no-op if the tensor is already transferred
+            input_dict.insert(entry.first, get_ivalue_from_torch_tensor(entry.second));
+        }
+
+        torch_inputs.at(0) = input_dict;
+    #else
         // This model expects a dict as input
         torch::ivalue::UnorderedMap input_dict;
         for (const auto &entry : inputs)
@@ -81,6 +103,7 @@ std::unique_ptr<NeuropodValueMap> TorchNeuropodBackend::infer(const NeuropodValu
         }
 
         torch_inputs.at(0) = input_dict;
+    #endif
     }
     else
     {
@@ -112,14 +135,14 @@ std::unique_ptr<NeuropodValueMap> TorchNeuropodBackend::infer(const NeuropodValu
     for (const auto &elem : outputs_dict)
     {
         // Get the name of the tensor
-        const std::string &name = elem.first.toString()->string();
+        const std::string &name = KEY(elem).toString()->string();
 
-        if (elem.second.isGenericList())
+        if (VALUE(elem).isGenericList())
         {
             // A list of strings
             // This is used in place of string tensors because torch does not
             // have native support for string tensors
-            auto tensor = elem.second;
+            auto tensor = VALUE(elem);
 
             // Make sure it's actually a list of strings (or empty)
             auto &list = tensor.toGenericListRef();
@@ -135,10 +158,10 @@ std::unique_ptr<NeuropodValueMap> TorchNeuropodBackend::infer(const NeuropodValu
             // Add it to our output
             (*to_return)[name] = std::move(neuropod_tensor);
         }
-        else if (elem.second.isTensor())
+        else if (VALUE(elem).isTensor())
         {
             // Torch tensor
-            auto tensor = elem.second.toTensor();
+            auto tensor = VALUE(elem).toTensor();
 
             // Get the type and make a TorchNeuropodTensor
             auto tensor_type = get_neuropod_type_from_torch_type(tensor.scalar_type());
@@ -150,7 +173,7 @@ std::unique_ptr<NeuropodValueMap> TorchNeuropodBackend::infer(const NeuropodValu
         else
         {
             NEUROPOD_ERROR("Neuropod returned an invalid type! All outputs must be tensors"
-                "or lists of strings. Got type '" << elem.second.tagKind() << "' for tensor '" << name << "'");
+                "or lists of strings. Got type '" << VALUE(elem).tagKind() << "' for tensor '" << name << "'");
         }
     }
 

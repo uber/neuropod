@@ -18,13 +18,24 @@ steps:
   # - wait
 
   # Run the tests on CPU
-  - label: ":docker: CPU Tests"
+  # TODO(vip): Use a script to generate the variants instead of a
+  # static pipeline.yml
+  - label: ":docker: CPU Tests (Variant 1)"
     agents:
       queue: private-default
     command: build/test.sh
     plugins:
       - docker-compose:
-          run: test-base
+          run: test-variant-1
+          config: docker-compose.test.yml
+
+  - label: ":docker: CPU Tests (Variant 2)"
+    agents:
+      queue: private-default
+    command: build/test.sh
+    plugins:
+      - docker-compose:
+          run: test-variant-2
           config: docker-compose.test.yml
 
   # Run the tests on GPU
