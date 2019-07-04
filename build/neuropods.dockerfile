@@ -2,7 +2,8 @@
 
 # To only install deps (and skip build and tests), pass `--target neuropod-base` to docker build
 # FROM ubuntu:16.04 as neuropod-base
-FROM nvidia/cuda:10.0-runtime-ubuntu16.04 as neuropod-base
+ARG NEUROPODS_CUDA_VERSION=10.0
+FROM nvidia/cuda:${NEUROPODS_CUDA_VERSION}-cudnn7-runtime-ubuntu16.04 as neuropod-base
 
 # We use sudo in the build scripts
 RUN apt-get update && apt-get install -y sudo
@@ -25,10 +26,12 @@ COPY source/python /usr/src/source/python
 ARG NEUROPODS_TENSORFLOW_VERSION
 ARG NEUROPODS_TORCH_VERSION
 ARG NEUROPODS_IS_GPU
+ARG NEUROPODS_CUDA_VERSION
 
 ENV NEUROPODS_TENSORFLOW_VERSION=$NEUROPODS_TENSORFLOW_VERSION
 ENV NEUROPODS_TORCH_VERSION=$NEUROPODS_TORCH_VERSION
 ENV NEUROPODS_IS_GPU=$NEUROPODS_IS_GPU
+ENV NEUROPODS_CUDA_VERSION=$NEUROPODS_CUDA_VERSION
 
 # Install python dependencies
 RUN /usr/src/build/install_python_deps.sh
