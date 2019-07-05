@@ -4,17 +4,17 @@
 
 #pragma once
 
-#include <boost/python.hpp>
+#include <pybind11/embed.h>
 #include <string>
 #include <vector>
 
 #include "neuropods/backends/neuropod_backend.hh"
-#include "neuropods/backends/python_bridge/numpy_neuropod_tensor.hh"
+#include "neuropods/backends/test_backend/test_neuropod_tensor.hh"
 
 namespace neuropods
 {
 
-namespace py = boost::python;
+namespace py = pybind11;
 
 namespace
 {
@@ -30,12 +30,9 @@ std::vector<std::string> get_default_python_path()
 // This backend starts an embedded python interpreter and is used
 // to execute neuropods that contain python code. This includes
 // models from PyTorch < 1.0 and PyTorch models that don't use TorchScript
-class PythonBridge : public NeuropodBackendWithDefaultAllocator<NumpyNeuropodTensor>
+class PythonBridge : public NeuropodBackendWithDefaultAllocator<TestNeuropodTensor>
 {
 private:
-    py::object main_module_;
-    py::object main_namespace_;
-
     py::object neuropod_;
 
 public:

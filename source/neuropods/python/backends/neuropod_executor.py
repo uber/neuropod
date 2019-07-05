@@ -134,6 +134,11 @@ class NeuropodExecutor(object):
                     matches the spec in the neuropod config for the loaded model. All the keys
                     in this dict are strings and all the values are numpy arrays.
         """
+        # Convert unicode to string
+        for k, v in inputs.items():
+            if v.dtype.type == np.unicode_:
+                inputs[k] = v.astype("string")
+
         # Validate inputs
         validate_tensors_against_specs(inputs, self.neuropod_config["input_spec"])
 

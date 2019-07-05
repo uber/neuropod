@@ -10,7 +10,6 @@ cc_library(
     name = "boost",
     srcs = glob([
         # Some Boost libraries are not header-only
-        "libs/python/src/**/*.cpp",
         "libs/serialization/src/**/*.cpp",
         "libs/serialization/src/**/*.ipp",
     ]),
