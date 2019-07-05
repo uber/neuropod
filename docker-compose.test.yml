@@ -11,10 +11,19 @@ services:
     extends: test-base
     build:
       args:
+        NEUROPODS_TENSORFLOW_VERSION: 1.11.0
         NEUROPODS_TORCH_VERSION: 1.1.0
 
   test-variant-2:
     extends: test-base
     build:
       args:
+        NEUROPODS_TENSORFLOW_VERSION: 1.12.0
+        NEUROPODS_TORCH_VERSION: 1.1.0
+
+  test-variant-3:
+    extends: test-base
+    build:
+      args:
+        NEUROPODS_TENSORFLOW_VERSION: 1.13.1
         NEUROPODS_TORCH_VERSION: 1.2.0.dev20190601

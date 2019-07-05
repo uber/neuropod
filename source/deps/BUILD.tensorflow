@@ -9,7 +9,7 @@ package(
 cc_library(
     name = "tensorflow_c_hdrs",
     srcs = [],
-    hdrs = ["include/tensorflow/c/c_api.h"],
+    hdrs = glob(["include/tensorflow/c/*.h"]),
     strip_include_prefix = "include",
 )
 
