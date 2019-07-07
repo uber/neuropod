@@ -12,6 +12,7 @@
 
 #include "neuropods/backends/neuropod_backend.hh"
 #include "neuropods/backends/torchscript/torch_tensor.hh"
+#include "neuropods/internal/tensor_types.hh"
 
 namespace neuropods
 {
@@ -24,6 +25,9 @@ class TorchNeuropodBackend : public NeuropodBackendWithDefaultAllocator<TorchNeu
 private:
     // The loaded TorchScript Module
     std::shared_ptr<torch::jit::script::Module> model_;
+
+    // The model output specification from ModelConfig
+    std::vector<TensorSpec> output_specs_;
 
 public:
     TorchNeuropodBackend(const std::string &neuropod_path, std::unique_ptr<ModelConfig> &model_config);

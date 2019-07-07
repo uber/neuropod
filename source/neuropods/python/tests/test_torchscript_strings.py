@@ -54,6 +54,24 @@ class StringsModelDictInput(torch.jit.ScriptModule):
             "out": out[1:]
         }
 
+class StringsModelListOutput(torch.jit.ScriptModule):
+    """
+    A model that concatenates two input strings
+    """
+    @torch.jit.script_method
+    def forward(self, x, y):
+        # type: (List[str], List[str])
+
+        # To force it to be a list of strings
+        out = [""]
+        for i in range(len(x)):
+            f = x[i]
+            s = y[i]
+            out.append(f + " " + s)
+
+        return out[1:]
+
+
 def package_strings_model(out_dir, model=StringsModel, do_fail=False):
     neuropod_path = os.path.join(out_dir, "test_neuropod")
 
@@ -76,7 +94,7 @@ class TestTorchScriptStrings(unittest.TestCase):
     def test_strings_model(self):
         # Tests a case where packaging works correctly and
         # the model output matches the expected output
-        for model in [StringsModel, StringsModelDictInput]:
+        for model in [StringsModel, StringsModelDictInput, StringsModelListOutput]:
             with TemporaryDirectory() as test_dir:
                 package_strings_model(test_dir, model=model)
 

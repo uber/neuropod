@@ -1,0 +1,36 @@
+{
+    "output_spec": [
+        {
+            "dtype": "float32", 
+            "shape": [
+                "batch_size"
+            ], 
+            "name": "out"
+        }
+    ], 
+    "platform": "torchscript", 
+    "input_spec": [
+        {
+            "dtype": "float32", 
+            "shape": [
+                "batch_size"
+            ], 
+            "name": "x"
+        }, 
+        {
+            "dtype": "float32", 
+            "shape": [
+                "batch_size"
+            ], 
+            "name": "y"
+        }, 
+        {
+            "dtype": "string", 
+            "shape": [
+                "batch_size"
+            ], 
+            "name": "optional"
+        }
+    ], 
+    "name": "addition_model"
+}
