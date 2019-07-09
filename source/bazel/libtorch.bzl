@@ -5,14 +5,14 @@ def _impl(repository_ctx):
     version = repository_ctx.os.environ.get("NEUROPODS_TORCH_VERSION") or "1.1.0"
     IS_MAC  = repository_ctx.os.name.startswith("mac")
     IS_GPU  = (repository_ctx.os.environ.get("NEUROPODS_IS_GPU") or None) != None
+    CUDA_VERSION = repository_ctx.os.environ.get("NEUROPODS_CUDA_VERSION") or "10.0"
 
     download_url = "https://download.pytorch.org/libtorch"
     if "dev" in version:
         download_url += "/nightly"
 
     if IS_GPU:
-        # Cuda 10
-        download_url += "/cu100"
+        download_url += "/cu" + CUDA_VERSION.replace(".", "")
     else:
         download_url += "/cpu"
 

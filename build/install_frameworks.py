@@ -16,6 +16,7 @@ import sys
 REQUESTED_TF_VERSION = os.getenv("NEUROPODS_TENSORFLOW_VERSION") or "1.12.0"
 REQUESTED_TORCH_VERSION = os.getenv("NEUROPODS_TORCH_VERSION") or "1.1.0"
 IS_GPU = (os.getenv("NEUROPODS_IS_GPU") or None) is not None
+CUDA_VERSION = os.getenv("NEUROPODS_CUDA_VERSION") or "10.0"
 IS_MAC = platform.system() == "Darwin"
 
 def pip_install(args):
@@ -25,15 +26,20 @@ def pip_install(args):
 
 def install_pytorch(version):
     pip_args = []
+    torch_cuda_string = "cu{}".format(CUDA_VERSION.replace(".", ""))
+
     if "dev" in version:
         if IS_GPU:
-            pip_args += ["-f", "https://download.pytorch.org/whl/nightly/cu100/torch_nightly.html"]
+            pip_args += ["-f", "https://download.pytorch.org/whl/nightly/" + torch_cuda_string + "/torch_nightly.html"]
         else:
             pip_args += ["-f", "https://download.pytorch.org/whl/nightly/cpu/torch_nightly.html"]
 
         pip_args += ["torch_nightly==" + version]
     else:
-        pip_args += ["torch==" + version]
+        if IS_GPU:
+            pip_args += ["https://download.pytorch.org/whl/" + torch_cuda_string + "/torch-" + version + "-cp27-cp27mu-linux_x86_64.whl"]
+        else:
+            pip_args += ["torch==" + version]
 
     pip_install(pip_args)
 
