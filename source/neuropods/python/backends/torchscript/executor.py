@@ -14,13 +14,18 @@ class TorchScriptNeuropodExecutor(NeuropodExecutor):
     Executes a TorchScript neuropod
     """
 
-    def __init__(self, neuropod_path):
+    def __init__(self, neuropod_path, load_custom_ops=True):
         """
         Load a TorchScript neuropod
 
         :param  neuropod_path:  The path to a python neuropod package
         """
         super(TorchScriptNeuropodExecutor, self).__init__(neuropod_path)
+
+        # Load custom ops (if any)
+        if load_custom_ops and "custom_ops" in self.neuropod_config:
+            for op in self.neuropod_config["custom_ops"]:
+                torch.ops.load_library(os.path.join(neuropod_path, "0", "ops", op))
 
         # Load the model
         self.model = torch.jit.load(os.path.join(neuropod_path, "0", "data", "model.pt"))

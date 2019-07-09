@@ -4,6 +4,7 @@
 
 #include "torch_backend.hh"
 
+#include <dlfcn.h>
 #include <iostream>
 #include <sstream>
 #include <stdexcept>
@@ -18,8 +19,35 @@ namespace neuropods
 namespace
 {
 
-std::shared_ptr<torch::jit::script::Module> load_model_from_path(const std::string &graph_path)
+std::shared_ptr<torch::jit::script::Module> load_model_from_path(const std::string &graph_path, const std::vector<std::string> &custom_op_paths)
 {
+    // Load custom ops
+    // TODO(vip): Add a flag allowing users to opt out of loading custom ops
+
+    #ifndef __APPLE__
+        // We need to do this so the custom ops can see the symbols from torch
+        // This binary is already linked against `libtorch.so`; the dlopen just
+        // promotes it to RTLD_GLOBAL.
+        #if CAFFE2_VERSION > 10100
+            void * libtorch = dlopen("libtorch.so", RTLD_NOW | RTLD_GLOBAL | RTLD_NOLOAD);
+        #else
+            void * libtorch = dlopen("libtorch.so.1", RTLD_NOW | RTLD_GLOBAL | RTLD_NOLOAD);
+        #endif
+
+        if (libtorch == nullptr)
+        {
+            NEUROPOD_ERROR("Failed to promote libtorch to RTLD_GLOBAL. Error from dlopen: " << dlerror());
+        }
+    #endif
+
+    for (const auto &path : custom_op_paths)
+    {
+        if (dlopen(path.c_str(), RTLD_NOW) == nullptr)
+        {
+            NEUROPOD_ERROR("Failed to load custom op. Error from dlopen: " << dlerror());
+        }
+    }
+
     std::ifstream stream(graph_path, std::ios_base::binary);
     if (!stream.good())
     {
@@ -45,15 +73,42 @@ std::string get_graph_path(const std::string &neuropod_path)
     return neuropod_path + "/0/data/model.pt";
 }
 
+// Get a custom op path
+std::string get_custom_op_path(const std::string &neuropod_path, const std::string &op_basename)
+{
+    if (neuropod_path.back() == '/')
+    {
+        return neuropod_path + "0/ops/" + op_basename;
+    }
+
+    return neuropod_path + "/0/ops/" + op_basename;
+}
+
+std::vector<std::string> get_custom_ops_from_model_config(const std::string &neuropod_path, const ModelConfig &model_config)
+{
+    std::vector<std::string> out;
+    for (const auto &item : model_config.custom_ops)
+    {
+        out.emplace_back(get_custom_op_path(neuropod_path, item));
+    }
+
+    return out;
+}
+
 } // namespace
 
 TorchNeuropodBackend::TorchNeuropodBackend(const std::string &neuropod_path, std::unique_ptr<ModelConfig> &model_config)
-    : TorchNeuropodBackend(get_graph_path(neuropod_path))
+    : TorchNeuropodBackend(get_graph_path(neuropod_path), get_custom_ops_from_model_config(neuropod_path, *model_config))
 {
 }
 
 TorchNeuropodBackend::TorchNeuropodBackend(const std::string &torchscript_model_path)
-    : model_(load_model_from_path(torchscript_model_path))
+    : TorchNeuropodBackend(torchscript_model_path, {})
+{
+}
+
+TorchNeuropodBackend::TorchNeuropodBackend(const std::string &torchscript_model_path, const std::vector<std::string> &custom_op_paths)
+    : model_(load_model_from_path(torchscript_model_path, custom_op_paths))
 {
 }
 

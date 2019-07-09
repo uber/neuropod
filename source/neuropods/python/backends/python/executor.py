@@ -41,7 +41,7 @@ class PythonNeuropodExecutor(NeuropodExecutor):
     Executes a python neuropod
     """
 
-    def __init__(self, neuropod_path):
+    def __init__(self, neuropod_path, load_custom_ops=True):
         """
         Load a python neuropod
 

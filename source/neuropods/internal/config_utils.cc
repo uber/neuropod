@@ -189,8 +189,19 @@ std::unique_ptr<ModelConfig> load_model_config(std::istream &input_stream)
             spec["name"].asString(), get_dims_from_json(spec["shape"]), convert_to_tensor_type(spec["dtype"]));
     }
 
+    // Get the list of custom ops if any
+    std::vector<std::string> custom_ops;
+    if (obj.isMember("custom_ops"))
+    {
+        const Json::Value &items = obj["custom_ops"];
+        for (const auto &item : items)
+        {
+            custom_ops.emplace_back(item.asString());
+        }
+    }
+
     // Not directly using make_unique because of brace initialization
-    return stdx::make_unique<ModelConfig>(ModelConfig{name, platform, inputs, outputs});
+    return stdx::make_unique<ModelConfig>(ModelConfig{name, platform, inputs, outputs, custom_ops});
 }
 
 } // namespace neuropods

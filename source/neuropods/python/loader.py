@@ -5,7 +5,7 @@
 from neuropods.backends import config_utils
 
 
-def load_neuropod(neuropod_path):
+def load_neuropod(neuropod_path, **kwargs):
     """
     Load a neuropod package. Returns a NeuropodExecutor
 
@@ -17,13 +17,13 @@ def load_neuropod(neuropod_path):
 
     if platform == "python":
         from neuropods.backends.python.executor import PythonNeuropodExecutor
-        return PythonNeuropodExecutor(neuropod_path)
+        return PythonNeuropodExecutor(neuropod_path, **kwargs)
     elif platform == "torchscript":
         from neuropods.backends.torchscript.executor import TorchScriptNeuropodExecutor
-        return TorchScriptNeuropodExecutor(neuropod_path)
+        return TorchScriptNeuropodExecutor(neuropod_path, **kwargs)
     elif platform == "tensorflow":
         from neuropods.backends.tensorflow.executor import TensorflowNeuropodExecutor
-        return TensorflowNeuropodExecutor(neuropod_path)
+        return TensorflowNeuropodExecutor(neuropod_path, **kwargs)
     else:
         raise ValueError("Invalid platform found in neuropod config: {}".format(platform))
 
