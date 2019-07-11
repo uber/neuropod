@@ -20,6 +20,7 @@ def create_tensorflow_neuropod(
         frozen_graph_path=None,
         graph_def=None,
         init_op_names=None,
+        custom_ops=[],
         test_input_data=None,
         test_expected_out=None,
         persist_test_data=True):
@@ -93,6 +94,12 @@ def create_tensorflow_neuropod(
     if (frozen_graph_path is not None and graph_def is not None) or (frozen_graph_path is None and graph_def is None):
         raise ValueError("Exactly one of 'frozen_graph_path' and 'graph_def' must be provided.")
 
+    # Store the custom ops (if any)
+    neuropod_custom_op_path = os.path.join(neuropod_path, "0", "ops")
+    os.makedirs(neuropod_custom_op_path)
+    for op in custom_ops:
+        shutil.copy(op, neuropod_custom_op_path)
+
     # Write the neuropod config file
     config_utils.write_neuropod_config(
         neuropod_path=neuropod_path,
@@ -100,6 +107,7 @@ def create_tensorflow_neuropod(
         platform="tensorflow",
         input_spec=input_spec,
         output_spec=output_spec,
+        custom_ops=[os.path.basename(op) for op in custom_ops]
     )
 
     # Create a folder to store the model
