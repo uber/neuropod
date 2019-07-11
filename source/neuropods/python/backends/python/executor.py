@@ -62,7 +62,9 @@ class PythonNeuropodExecutor(NeuropodExecutor):
         # Verify that loading this neuropod won't clash with anything in our existing path
         _validate_not_importable(entrypoint_package_path)
 
-        # Add the neuropod code path to the beginning of the python path
+        # Add the neuropod code and custom op paths to the beginning of the python path
+        if load_custom_ops:
+            sys.path.insert(0, os.path.join(neuropod_path, "0", "ops"))
         sys.path.insert(0, os.path.join(neuropod_path, "0", "code"))
 
         # Import the entrypoint package
