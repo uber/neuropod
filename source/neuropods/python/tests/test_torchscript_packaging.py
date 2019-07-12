@@ -34,9 +34,17 @@ class AdditionModelDictInput(torch.jit.ScriptModule):
             "out": data["x"] + data["y"]
         }
 
+class AdditionModelTensorOutput(torch.jit.ScriptModule):
+    """
+    A simple addition model
+    """
+    @torch.jit.script_method
+    def forward(self, x, y):
+        return x + y
+
 class TestTorchScriptPackaging(unittest.TestCase):
     def package_simple_addition_model(self, do_fail=False):
-        for model in [AdditionModel, AdditionModelDictInput]:
+        for model in [AdditionModel, AdditionModelDictInput, AdditionModelTensorOutput]:
             with TemporaryDirectory() as test_dir:
                 neuropod_path = os.path.join(test_dir, "test_neuropod")
 

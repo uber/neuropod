@@ -8,6 +8,8 @@ import torch
 
 from neuropods.backends.neuropod_executor import NeuropodExecutor
 
+SINGLE_OUTPUT_ERROR_MSG = "Please either return a dictionary from your model or provide an `output_spec` " \
+                          "of size 1"
 
 class TorchScriptNeuropodExecutor(NeuropodExecutor):
     """
@@ -67,17 +69,38 @@ class TorchScriptNeuropodExecutor(NeuropodExecutor):
             else:
                 out = self.model(**converted_inputs)
 
-        # Convert the outputs to numpy arrays
-        converted_out = {}
-        for key, value in out.items():
-            if isinstance(value, torch.Tensor):
-                converted_out[key] = value.cpu().numpy()
-            elif isinstance(value, list) and isinstance(value[0], basestring):
-                converted_out[key] = np.array(value, dtype=np.string_)
-            else:
-                raise RuntimeError(
-                    "All outputs must be torch tensors! Output `{}` was of type `{}`".format(
-                        key,
-                        type(value)))
+        neuropod_out = {}
+        if isinstance(out, dict):
+            # Convert the outputs to numpy arrays
+            # acceptable values must be torch.Tensor or lists of strings
+            for key, value in out.items():
+                neuropod_out = self._insert_value_to_output(neuropod_out, key, value)
 
-        return converted_out
+        # single output torch.Tensor or list<string>
+        else:
+            output_spec = self.neuropod_config["output_spec"]
+            if not output_spec:
+                raise RuntimeError("Output spec missing." + SINGLE_OUTPUT_ERROR_MSG)
+
+            if len(output_spec) != 1:
+                raise RuntimeError("Output spec has has more than one entry." + SINGLE_OUTPUT_ERROR_MSG)
+
+            name = output_spec[0]["name"]
+            dtype = output_spec[0]["dtype"]
+            self._insert_value_to_output(neuropod_out, name, out, dtype=dtype)
+
+        return neuropod_out
+
+    def _insert_value_to_output(self, neuropod_out, key, value, dtype=None):
+        if isinstance(value, torch.Tensor):
+            neuropod_out[key] = value.cpu().numpy()
+        elif isinstance(value, list) and (dtype == "string" or  isinstance(value[0], basestring)):
+            neuropod_out[key] = np.array(value, dtype=np.string_)
+        else:
+            raise RuntimeError(
+                "All outputs must be torch tensors or list of strings! Output `{}` was of type `{}`".format(
+                    key,
+                    type(value)))
+
+        return neuropod_out
+

@@ -12,6 +12,7 @@
 #include <caffe2/core/macros.h>
 
 #include "neuropods/backends/torchscript/type_utils.hh"
+#include "neuropods/internal/tensor_types.hh"
 
 namespace neuropods
 {
@@ -95,11 +96,60 @@ std::vector<std::string> get_custom_ops_from_model_config(const std::string &neu
     return out;
 }
 
+// insert IValue to the output map at key with some type validation
+void insert_value_in_output(NeuropodValueMap& output, const std::string name, const c10::IValue &value, const bool has_type=false, const TensorType tensor_type=FLOAT_TENSOR) {
+    if (value.isTensor())
+    {
+        // Torch tensor
+        auto tensor = value.toTensor();
+
+        // Get the type and make a TorchNeuropodTensor
+        auto tensor_type = get_neuropod_type_from_torch_type(tensor.scalar_type());
+        auto neuropod_tensor = make_tensor<TorchNeuropodTensor>(tensor_type, tensor);
+
+        // Add it to our output
+        output[name] = std::move(neuropod_tensor);
+    }
+    else if (value.isGenericList())
+    {
+        // A list of strings
+        // This is used in place of string tensors because torch does not
+        // have native support for string tensors
+        auto& tensor = value;
+
+        auto &list = tensor.toGenericListRef();
+
+        // if tensor_type string or no tensor_type and empty list or list containing actual string
+        if ((has_type && tensor_type == TensorType::STRING_TENSOR) || (!has_type && list.size() == 0) || (!has_type && list[0].isString())) {
+            // Make a TorchNeuropodTensor
+            auto neuropod_tensor = stdx::make_unique<TorchNeuropodTensor<std::string>>(tensor);
+
+            // Add it to our output
+            output[name] = std::move(neuropod_tensor);
+        }
+        // it was bad spec or contained non-string type
+        else
+        {
+            NEUROPOD_ERROR("Neuropod got a list of type '" << list[0].tagKind() << "' for tensor '" << name << "'."
+                "Only tensors or lists of strings are supported");
+        }
+    }
+    else
+    {
+        NEUROPOD_ERROR("Neuropod returned an invalid type! All outputs must be tensors"
+            "or lists of strings. Got type '" << value.tagKind() << "' for tensor '" << name << "'");
+    }
+}
+
 } // namespace
 
 TorchNeuropodBackend::TorchNeuropodBackend(const std::string &neuropod_path, std::unique_ptr<ModelConfig> &model_config)
     : TorchNeuropodBackend(get_graph_path(neuropod_path), get_custom_ops_from_model_config(neuropod_path, *model_config))
 {
+
+    for (const auto &tensor_spec: model_config->outputs) {
+        output_specs_.emplace_back(tensor_spec);
+    }
 }
 
 TorchNeuropodBackend::TorchNeuropodBackend(const std::string &torchscript_model_path)
@@ -186,50 +236,32 @@ std::unique_ptr<NeuropodValueMap> TorchNeuropodBackend::infer(const NeuropodValu
     // Get outputs
     auto to_return = stdx::make_unique<NeuropodValueMap>();
 
-    const auto &outputs_dict = result.toGenericDict()->elements();
-    for (const auto &elem : outputs_dict)
+    if (result.isGenericDict()) {
+        const auto &outputs_dict = result.toGenericDict()->elements();
+        for (const auto &elem : outputs_dict)
+        {
+            // Get the name of the tensor
+            const std::string &name = KEY(elem).toString()->string();
+            // Todo include tensor_type if available
+            insert_value_in_output(*to_return, name, VALUE(elem));
+        }
+    }
+    else if (result.isTensor() || result.isGenericList())
     {
-        // Get the name of the tensor
-        const std::string &name = KEY(elem).toString()->string();
-
-        if (VALUE(elem).isGenericList())
-        {
-            // A list of strings
-            // This is used in place of string tensors because torch does not
-            // have native support for string tensors
-            auto tensor = VALUE(elem);
-
-            // Make sure it's actually a list of strings (or empty)
-            auto &list = tensor.toGenericListRef();
-            if (list.size() != 0 && !list[0].isString())
-            {
-                NEUROPOD_ERROR("Neuropod got a list of type '" << list[0].tagKind() << "' for tensor '" << name << "'."
-                    "Only tensors or lists of strings are supported");
-            }
-
-            // Make a TorchNeuropodTensor
-            auto neuropod_tensor = stdx::make_unique<TorchNeuropodTensor<std::string>>(tensor);
-
-            // Add it to our output
-            (*to_return)[name] = std::move(neuropod_tensor);
+        if (output_specs_.empty()) {
+            NEUROPOD_ERROR("Model did not return dict and output spec is empty");
         }
-        else if (VALUE(elem).isTensor())
-        {
-            // Torch tensor
-            auto tensor = VALUE(elem).toTensor();
-
-            // Get the type and make a TorchNeuropodTensor
-            auto tensor_type = get_neuropod_type_from_torch_type(tensor.scalar_type());
-            auto neuropod_tensor = make_tensor<TorchNeuropodTensor>(tensor_type, tensor);
-
-            // Add it to our output
-            (*to_return)[name] = std::move(neuropod_tensor);
+        if (output_specs_.size() != 1) {
+            NEUROPOD_ERROR("Model did not return dict and output spec is not size 1");
         }
-        else
-        {
-            NEUROPOD_ERROR("Neuropod returned an invalid type! All outputs must be tensors"
-                "or lists of strings. Got type '" << VALUE(elem).tagKind() << "' for tensor '" << name << "'");
-        }
+
+        auto& name = output_specs_[0].name;
+        auto& tensor_type = output_specs_[0].type;
+        insert_value_in_output(*to_return, name, result, true, tensor_type);
+    }
+    else
+    {
+      NEUROPOD_ERROR("Torchscript model output type not supported in neuropod");
     }
 
     return to_return;
