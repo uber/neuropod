@@ -19,6 +19,7 @@ def create_python_neuropod(
         entrypoint,
         input_spec,
         output_spec,
+        custom_ops=[],
         test_input_data=None,
         test_expected_out=None,
         test_deps=[],
@@ -118,6 +119,12 @@ def create_python_neuropod(
     except OSError:
         raise ValueError("The specified neuropod path ({}) already exists! Aborting...".format(neuropod_path))
 
+    # Store the custom ops (if any)
+    neuropod_custom_op_path = os.path.join(neuropod_path, "0", "ops")
+    os.makedirs(neuropod_custom_op_path)
+    for op in custom_ops:
+        shutil.copy(op, neuropod_custom_op_path)
+
     # Write the neuropod config file
     config_utils.write_neuropod_config(
         neuropod_path=neuropod_path,
@@ -125,6 +132,7 @@ def create_python_neuropod(
         platform="python",
         input_spec=input_spec,
         output_spec=output_spec,
+        custom_ops=[os.path.basename(op) for op in custom_ops]
     )
 
     neuropod_data_path = os.path.join(neuropod_path, "0", "data")
