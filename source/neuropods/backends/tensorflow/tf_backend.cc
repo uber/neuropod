@@ -40,6 +40,17 @@ std::string get_tf_config_path(const std::string &neuropod_path)
     return neuropod_path + "/0/config.json";
 }
 
+// Get a custom op path
+std::string get_custom_op_path(const std::string &neuropod_path, const std::string &op_basename)
+{
+    if (neuropod_path.back() == '/')
+    {
+        return neuropod_path + "0/ops/" + op_basename;
+    }
+
+     return neuropod_path + "/0/ops/" + op_basename;
+}
+
 // Load a mapping from neuropod node names to node names in the TF graph
 void setup_node_mapping_and_init_ops(const std::string &neuropod_path,
                                      std::unordered_map<std::string, std::string> &mapping,
@@ -116,6 +127,14 @@ TF_Output get_graph_node_from_name(const std::string &node_name_with_index, cons
 TensorflowNeuropodBackend::TensorflowNeuropodBackend(const std::string &           neuropod_path,
                                                      std::unique_ptr<ModelConfig> &model_config)
 {
+    // Load custom ops (if any)
+    status_.reset(TF_NewStatus());
+    for (const auto &item : model_config->custom_ops)
+    {
+        TF_DeleteLibraryHandle(TF_LoadLibrary(get_custom_op_path(neuropod_path, item).c_str(), status_.get()));
+        check_status();
+    }
+
     // Get the graph path and load the graph
     load_graph(get_graph_path(neuropod_path));
 

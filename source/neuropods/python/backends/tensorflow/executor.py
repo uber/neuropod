@@ -23,6 +23,11 @@ class TensorflowNeuropodExecutor(NeuropodExecutor):
         """
         super(TensorflowNeuropodExecutor, self).__init__(neuropod_path)
 
+        # Load custom ops (if any)
+        if load_custom_ops and "custom_ops" in self.neuropod_config:
+            for op in self.neuropod_config["custom_ops"]:
+                tf.load_op_library(os.path.join(neuropod_path, "0", "ops", op).encode('utf-8'))
+
         # Load the model
         with tf.gfile.GFile(os.path.join(neuropod_path, "0", "data", "model.pb"), "rb") as f:
             graph_def = tf.GraphDef()
