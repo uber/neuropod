@@ -4,6 +4,7 @@
 
 import numpy as np
 import os
+from six import string_types
 import torch
 
 from neuropods.backends.neuropod_executor import NeuropodExecutor
@@ -57,7 +58,7 @@ class TorchScriptNeuropodExecutor(NeuropodExecutor):
         # Convert the inputs to torch tensors
         converted_inputs = {}
         for k, v in inputs.items():
-            if v.dtype.type == np.string_:
+            if v.dtype.type == np.str_:
                 converted_inputs[k] = v.tolist()
             else:
                 converted_inputs[k] = torch.from_numpy(v)
@@ -94,8 +95,8 @@ class TorchScriptNeuropodExecutor(NeuropodExecutor):
     def _insert_value_to_output(self, neuropod_out, key, value, dtype=None):
         if isinstance(value, torch.Tensor):
             neuropod_out[key] = value.cpu().numpy()
-        elif isinstance(value, list) and (dtype == "string" or  isinstance(value[0], basestring)):
-            neuropod_out[key] = np.array(value, dtype=np.string_)
+        elif isinstance(value, list) and (dtype == "string" or  isinstance(value[0], string_types)):
+            neuropod_out[key] = np.array(value, dtype=np.str_)
         else:
             raise RuntimeError(
                 "All outputs must be torch tensors or list of strings! Output `{}` was of type `{}`".format(
@@ -103,4 +104,3 @@ class TorchScriptNeuropodExecutor(NeuropodExecutor):
                     type(value)))
 
         return neuropod_out
-

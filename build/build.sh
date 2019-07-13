@@ -27,6 +27,7 @@ if [[ $(uname -s) == 'Linux' ]]; then
         readelf -d /tmp/dist_test/lib/*.so | grep NEEDED | sort | uniq |\
         grep -v libtorch.so |\
         grep -v libtensorflow.so |\
+        grep -v libpython |\
         diff -I '^#.*' ../build/allowed_deps.txt -
 fi
 

@@ -5,9 +5,10 @@
 import numpy as np
 import tensorflow as tf
 from collections import defaultdict
+from six import string_types
 
 from neuropods.packagers import create_tensorflow_neuropod
-
+from neuropods.utils.dtype_utils import get_dtype
 
 def _placeholdes_from_input_spec(input_spec, input_prefix='INPUT_API'):
     """Creates tf.placeholder for each of the entries in the input_spec. Returns a dictionary with the
@@ -19,11 +20,11 @@ def _placeholdes_from_input_spec(input_spec, input_prefix='INPUT_API'):
 
             symbolic_shape = tensor_spec['shape']
             # When a shape is defined by a string symbol, it means it's a variable intput.
-            shape = tuple((None if isinstance(d, basestring) else d for d in symbolic_shape))
+            shape = tuple((None if isinstance(d, string_types) else d for d in symbolic_shape))
 
             # Translate string name to numpy type and the to TF dtype
             numpy_dtype = tensor_spec['dtype']
-            tf_dtype = tf.as_dtype(np.dtype(numpy_dtype))
+            tf_dtype = tf.as_dtype(get_dtype(numpy_dtype))
 
             placeholder = tf.placeholder(tf_dtype, name=name, shape=shape)
 
@@ -52,7 +53,7 @@ def _random_from_output_spec(output_spec, output_prefix='OUTPUT_API'):
             # Randomize variable sized dimensions.
             resolved_shape = tuple()
             for d in symbolic_shape:
-                if isinstance(d, basestring):
+                if isinstance(d, string_types):
                     resolved_shape += (symbol_value[d],)
                 elif d is None:
                     resolved_shape += (toss_random_dim(),)
@@ -60,7 +61,7 @@ def _random_from_output_spec(output_spec, output_prefix='OUTPUT_API'):
                     resolved_shape += (d,)
 
             numpy_dtype = tensor_spec['dtype']
-            tf_dtype = tf.as_dtype(np.dtype(numpy_dtype))
+            tf_dtype = tf.as_dtype(get_dtype(numpy_dtype))
 
             if numpy_dtype != 'string':
                 # Integers need `maxval=` to be specified explicitly. Also, random_uniform does not support all

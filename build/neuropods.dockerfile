@@ -13,8 +13,18 @@ RUN mkdir -p /usr/src/build
 WORKDIR /usr/src
 COPY build/install_system_deps.sh /usr/src/build/install_system_deps.sh
 
+# Should be set to `python` or `python3`
+ARG NEUROPODS_PYTHON_BINARY
+ENV NEUROPODS_PYTHON_BINARY=$NEUROPODS_PYTHON_BINARY
+
 # Install system dependencies
 RUN /usr/src/build/install_system_deps.sh
+
+# Do everything in a virtualenv
+ENV VIRTUAL_ENV=/tmp/neuropod_venv
+RUN ${NEUROPODS_PYTHON_BINARY} -m pip install virtualenv && \
+    ${NEUROPODS_PYTHON_BINARY} -m virtualenv $VIRTUAL_ENV
+ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
 # Copy the python code into the image
 RUN mkdir -p /usr/src/source/python /usr/src/source/neuropods/python

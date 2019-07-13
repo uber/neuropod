@@ -84,6 +84,10 @@ Our build matrix is defined as all combinations of the following:
  - Ubuntu 16.04 CPU (in Docker) - Buildkite
  - Mac CPU (native) - Travis CI
 
+**Python:**
+ - 2.7
+ - 3
+
 **Framework versions (each row of the table):**
 
 | TF | Torch |
@@ -92,10 +96,10 @@ Our build matrix is defined as all combinations of the following:
 | 1.12.0 | 1.2.0.dev20190601 |
 | 1.13.1 | 1.1.0 |
 
-We also have a single build that builds natively on an Ubuntu 16.04 machine (outside of docker)
+We also have an additional build that runs natively on an Ubuntu 16.04 machine (outside of docker)
 to make sure that we don't accidentally break workflows of users not using docker.
 
-This is a total of 10 builds (3 * 3 + 1) running in CI
+This is a total of 19 builds (3 * 2 * 3 + 1) running in CI
 
 ## Future additions
 
@@ -104,9 +108,3 @@ We're also planning on adding the following configurations to the build matrix:
 **Configs:**
  - ASAN + Code Coverage
  - Release
-
-
- **Python:**
-  - 2.7
-  - 3
-

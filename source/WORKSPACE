@@ -57,7 +57,7 @@ http_archive(
 
 python_repository(
     name = "python_repo",
-    build_file = "@//deps:BUILD.python",
+    build_file_template = "@//deps:BUILD.python",
 )
 
 http_archive(

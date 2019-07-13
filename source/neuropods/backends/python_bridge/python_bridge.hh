@@ -34,6 +34,7 @@ class PythonBridge : public NeuropodBackendWithDefaultAllocator<TestNeuropodTens
 {
 private:
     py::object neuropod_;
+    py::object maybe_convert_bindings_types_;
 
 public:
     PythonBridge(const std::string &             neuropod_path,

@@ -4,6 +4,7 @@
 
 import logging
 import os
+import six
 import pickle
 
 import numpy as np
@@ -11,6 +12,7 @@ from testpath.tempdir import TemporaryDirectory
 
 from neuropods.loader import load_neuropod
 from neuropods.utils.env_utils import create_virtualenv, eval_in_virtualenv, eval_in_new_process
+from neuropods.utils.dtype_utils import maybe_convert_bindings_types
 
 RUN_NATIVE_TESTS   = os.getenv("NEUROPODS_RUN_NATIVE_TESTS") is not None
 TEST_DATA_FILENAME = "test_data.pkl"
@@ -20,7 +22,7 @@ logger = logging.getLogger(__name__)
 
 def check_output_matches_expected(out, expected_out):
     for key, value in expected_out.items():
-        if value.dtype.type == np.string_:
+        if value.dtype.type == np.str_:
             # All strings are equal
             success_condition = (value == out[key]).all()
         else:
@@ -61,6 +63,9 @@ def load_and_test_native(neuropod_path, test_input_data, test_expected_out=None)
 
     Raises a ValueError if the outputs don't match the expected values
     """
+    # Converts unicode to ascii for Python 3
+    test_input_data = maybe_convert_bindings_types(test_input_data)
+
     out = eval_in_new_process(neuropod_path, test_input_data, extra_args=["--use-native"])
     # Check the output
     if test_expected_out is not None:
