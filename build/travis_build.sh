@@ -11,6 +11,11 @@ source /tmp/neuropod_venv/bin/activate
 ./build/install_system_deps.sh
 ./build/install_python_deps.sh
 
+# Make sure that the CI matrix is correct
+# This command will fail if the matrix defined in the script
+# does not match the config files
+python ./build/ci_matrix.py
+
 # Build
 ./build/build.sh
 
