@@ -5,6 +5,9 @@
 import json
 import numpy as np
 import os
+from six import string_types, integer_types
+
+from neuropods.utils.dtype_utils import get_dtype_name
 
 ALLOWED_DTYPES = [
     "float32",
@@ -35,7 +38,7 @@ def validate_tensor_spec(spec):
         if dtype not in ALLOWED_DTYPES:
             raise ValueError("{} is not an allowed data type!".format(dtype))
 
-        if not isinstance(name, basestring):
+        if not isinstance(name, string_types):
             raise ValueError("Field 'name' must be a string! Got value {} of type {}.".format(name, type(name)))
 
         if not isinstance(shape, (list, tuple)):
@@ -43,9 +46,9 @@ def validate_tensor_spec(spec):
 
         for dim in shape:
             # A bool is an instance of an int so we have to do that check first
-            is_uint = (not isinstance(dim, bool)) and isinstance(dim, (int, long)) and dim > 0
+            is_uint = (not isinstance(dim, bool)) and isinstance(dim, integer_types) and dim > 0
 
-            if dim is None or is_uint or isinstance(dim, basestring):
+            if dim is None or is_uint or isinstance(dim, string_types):
                 continue
             else:
                 raise ValueError(
@@ -60,10 +63,10 @@ def validate_neuropod_config(config):
     platform = config["platform"]
     device_mapping = config["input_tensor_device"]
 
-    if not isinstance(name, basestring):
+    if not isinstance(name, string_types):
         raise ValueError("Field 'name' in config must be a string! Got value {} of type {}.".format(name, type(name)))
 
-    if not isinstance(platform, basestring):
+    if not isinstance(platform, string_types):
         raise ValueError(
             "Field 'platform' in config must be a string! Got value {} of type {}.".format(
                 platform, type(platform)))
@@ -79,7 +82,7 @@ def validate_neuropod_config(config):
             raise ValueError("Optional field 'custom_ops' must be a list! Got value {} of type {}".format(custom_ops, type(custom_ops)))
 
         for op in custom_ops:
-            if not isinstance(op, basestring):
+            if not isinstance(op, string_types):
                 raise ValueError("All items in 'custom_ops' must be strings! Got value {} of type {}.".format(op, type(op)))
 
     # Ensure all inputs have a device specified
@@ -108,7 +111,7 @@ def canonicalize_tensor_spec(spec):
     for item in spec:
         transformed.append({
             "name": item["name"],
-            "dtype": np.dtype(item["dtype"]).name,
+            "dtype": get_dtype_name(item["dtype"]),
             "shape": item["shape"]
         })
     return transformed

@@ -80,6 +80,7 @@ PLATFORMS = [
 # Versions of python to use
 PY_VERSIONS = [
     "2.7",
+    "3",
 ]
 
 # Versions of frameworks to test with

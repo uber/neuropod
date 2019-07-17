@@ -8,7 +8,7 @@ import six
 import numpy as np
 
 from neuropods.backends import config_utils
-
+from neuropods.utils.dtype_utils import get_dtype
 
 def validate_tensors_against_specs(tensors, tensor_specs):
     # All instances of a symbol in a specification must
@@ -28,7 +28,7 @@ def validate_tensors_against_specs(tensors, tensor_specs):
     # the matching tensor
     for spec in tensor_specs:
         name = spec["name"]
-        dtype = np.dtype(spec["dtype"])
+        dtype = get_dtype(spec["dtype"])
         shape = spec["shape"]
 
         # TODO(yevgeni): treat all tensors as optional. If a particular model requires the input, it will fail therein.
@@ -56,13 +56,13 @@ def validate_tensors_against_specs(tensors, tensor_specs):
             if expected is None:
                 # Any value of dim is okay
                 continue
-            elif isinstance(expected, (int, long)):
+            elif isinstance(expected, six.integer_types):
                 # Check that we have the expected number of items
                 if dim != expected:
                     raise ValueError(
                         "Dim {} of tensor '{}' is expected to be of size {}, but was of size {}".format(
                             i, name, expected, dim))
-            elif isinstance(expected, basestring):
+            elif isinstance(expected, six.string_types):
                 # `expected` is a symbol
                 # Every instance of `expected` should have the same value
                 # For example, if a symbol of "num_classes" is used multiple times in the spec,
@@ -137,7 +137,7 @@ class NeuropodExecutor(object):
         # Convert unicode to string
         for k, v in inputs.items():
             if v.dtype.type == np.unicode_:
-                inputs[k] = v.astype("string")
+                inputs[k] = v.astype("str")
 
         # Validate inputs
         validate_tensors_against_specs(inputs, self.neuropod_config["input_spec"])
@@ -146,7 +146,7 @@ class NeuropodExecutor(object):
         out = self.forward(inputs)
 
         # Make sure the key is ascii
-        out = {key.encode("ascii"): value for key, value in out.items()}
+        out = {key: value for key, value in out.items()}
 
         # Validate outputs
         validate_tensors_against_specs(out, self.neuropod_config["output_spec"])

@@ -73,6 +73,9 @@ PythonBridge::PythonBridge(const std::string &             neuropod_path,
     // Get the neuropod loader
     py::object load_neuropod = py::module::import("neuropods.loader").attr("load_neuropod");
 
+    // Converts from unicode to ascii for python 3 string arrays
+    maybe_convert_bindings_types_ = py::module::import("neuropods.utils.dtype_utils").attr("maybe_convert_bindings_types");
+
     // Load the neuropod and save a reference to it
     neuropod_ = load_neuropod(neuropod_path);
 }
@@ -86,7 +89,10 @@ std::unique_ptr<NeuropodValueMap> PythonBridge::infer(const NeuropodValueMap &in
     py::dict model_inputs = to_numpy_dict(const_cast<NeuropodValueMap &>(inputs));
 
     // Run inference
-    py::dict model_outputs = neuropod_.attr("infer")(model_inputs).cast<py::dict>();
+    py::dict model_outputs_raw = neuropod_.attr("infer")(model_inputs).cast<py::dict>();
+
+    // Postprocess for python 3
+    py::dict model_outputs = maybe_convert_bindings_types_(model_outputs_raw).cast<py::dict>();
 
     // Get the outputs
     auto outputs = from_numpy_dict(*get_tensor_allocator(), model_outputs);

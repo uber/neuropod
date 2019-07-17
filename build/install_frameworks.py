@@ -21,7 +21,7 @@ IS_MAC = platform.system() == "Darwin"
 
 def pip_install(args):
     cmd = [sys.executable, "-m", "pip", "install"] + args
-    print "Running pip command: {}".format(cmd)
+    print("Running pip command: {}".format(cmd))
     subprocess.check_call(cmd)
 
 def install_pytorch(version):
@@ -37,7 +37,16 @@ def install_pytorch(version):
         pip_args += ["torch_nightly==" + version]
     else:
         if IS_GPU:
-            pip_args += ["https://download.pytorch.org/whl/" + torch_cuda_string + "/torch-" + version + "-cp27-cp27mu-linux_x86_64.whl"]
+            # Figure out the correct platform to use
+            package_version_map = {
+                (2,7): "cp27-cp27mu",
+                (3,5): "cp35-cp35m",
+                (3,6): "cp36-cp36m",
+                (3,7): "cp37-cp37m",
+            }
+            platform_version = package_version_map[(sys.version_info.major, sys.version_info.minor)]
+
+            pip_args += ["https://download.pytorch.org/whl/" + torch_cuda_string + "/torch-" + version + "-" + platform_version + "-linux_x86_64.whl"]
         else:
             pip_args += ["torch==" + version]
 
@@ -56,6 +65,6 @@ def install_tensorflow(version):
     pip_install([package + "==" + version])
 
 if __name__ == '__main__':
-    print "Installing tensorflow", REQUESTED_TF_VERSION, "and torch", REQUESTED_TORCH_VERSION
+    print("Installing tensorflow", REQUESTED_TF_VERSION, "and torch", REQUESTED_TORCH_VERSION)
     install_tensorflow(REQUESTED_TF_VERSION)
     install_pytorch(REQUESTED_TORCH_VERSION)

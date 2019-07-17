@@ -9,14 +9,14 @@ package(
 cc_library(
     name = "python",
     srcs = select({
-        "@bazel_tools//src/conditions:darwin": ["lib/libpython2.7.dylib"],
-        "//conditions:default": ["lib/x86_64-linux-gnu/libpython2.7.so"],
+        "@bazel_tools//src/conditions:darwin": ["lib/libpython{PYTHON_VERSION}.dylib"],
+        "//conditions:default": ["lib/x86_64-linux-gnu/libpython{PYTHON_VERSION}.so"],
     }),
     hdrs = glob([
-        "include/python2.7/*.h"
+        "include/python{PYTHON_VERSION}/*.h"
     ]),
     includes = [
-        "include/python2.7"
+        "include/python{PYTHON_VERSION}"
     ],
     visibility = ["//visibility:public"],
 )
