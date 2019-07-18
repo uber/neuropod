@@ -10,6 +10,8 @@ cc_binary(
     ],
     deps = [
         ":bindings",
+        "//neuropods/serialization:serialization_hdrs",
+        "//neuropods/backends/test_backend:test_backend_hdrs",
     ],
     linkshared = True,
 )
