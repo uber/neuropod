@@ -14,7 +14,7 @@ WORKDIR /usr/src
 COPY build/install_system_deps.sh /usr/src/build/install_system_deps.sh
 
 # Should be set to `python` or `python3`
-ARG NEUROPODS_PYTHON_BINARY
+ARG NEUROPODS_PYTHON_BINARY=python
 ENV NEUROPODS_PYTHON_BINARY=$NEUROPODS_PYTHON_BINARY
 
 # Install system dependencies
