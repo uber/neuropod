@@ -22,7 +22,7 @@ namespace
 struct create_array_visitor : public NeuropodTensorVisitor<py::array>
 {
     template <typename T>
-    py::array operator()(TypedNeuropodTensor<T> *tensor, std::shared_ptr<NeuropodValue> &value) const
+    py::array operator()(TypedNeuropodTensor<T> *tensor, std::shared_ptr<NeuropodTensor> &value) const
     {
         auto dims = tensor->get_dims();
         auto data = tensor->get_raw_data_ptr();
@@ -34,16 +34,13 @@ struct create_array_visitor : public NeuropodTensorVisitor<py::array>
         return py::array_t<T>(dims, data, capsule);
     }
 
-    py::array operator()(TypedNeuropodTensor<std::string> *tensor, std::shared_ptr<NeuropodValue> &value) const
+    py::array operator()(TypedNeuropodTensor<std::string> *tensor, std::shared_ptr<NeuropodTensor> &value) const
     {
-        return py::array(py::cast(tensor->get_data_as_vector()));
+        auto arr = py::array(py::cast(tensor->get_data_as_vector()));
+        arr.resize(tensor->get_dims());
+        return arr;
     }
 };
-
-py::array tensor_to_numpy(std::shared_ptr<NeuropodValue> value)
-{
-    return value->as_tensor()->apply_visitor(create_array_visitor{}, value);
-}
 
 TensorType get_array_type(py::array &array)
 {
@@ -89,6 +86,8 @@ std::shared_ptr<NeuropodTensor> tensor_from_string_numpy(NeuropodTensorAllocator
     return tensor;
 }
 
+} // namespace
+
 std::shared_ptr<NeuropodTensor> tensor_from_numpy(NeuropodTensorAllocator &allocator, py::array array)
 {
     // TODO(vip): Make sure it's contiguous and aligned
@@ -115,7 +114,10 @@ std::shared_ptr<NeuropodTensor> tensor_from_numpy(NeuropodTensorAllocator &alloc
     }
 }
 
-} // namespace
+py::array tensor_to_numpy(std::shared_ptr<NeuropodTensor> value)
+{
+    return value->apply_visitor(create_array_visitor{}, value);
+}
 
 NeuropodValueMap from_numpy_dict(NeuropodTensorAllocator &allocator, py::dict &items)
 {
@@ -135,7 +137,7 @@ py::dict to_numpy_dict(NeuropodValueMap &items)
     py::dict out;
     for (auto &item : items)
     {
-        out[item.first.c_str()] = tensor_to_numpy(item.second);
+        out[item.first.c_str()] = tensor_to_numpy(std::dynamic_pointer_cast<NeuropodTensor>(item.second));
     }
 
     return out;
