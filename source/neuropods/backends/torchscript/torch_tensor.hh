@@ -26,12 +26,6 @@ T *get_data_from_torch_tensor(const torch::Tensor &tensor)
 }
 
 template <>
-std::string *get_data_from_torch_tensor(const torch::Tensor &tensor)
-{
-    NEUROPOD_ERROR("String support is not implemented yet");
-}
-
-template <>
 uint16_t *get_data_from_torch_tensor(const torch::Tensor &tensor)
 {
     NEUROPOD_ERROR("TorchScript doesn't support type uint16_t");
@@ -99,6 +93,14 @@ public:
     torch::Tensor tensor;
 };
 
+#if CAFFE2_NIGHTLY_VERSION >= 20190717
+    #define ELEMENTS(collection) collection
+    #define GET_STRING_FROM_LIST(item) item
+#else
+    #define ELEMENTS(collectionptr) collectionptr->elements();
+    #define GET_STRING_FROM_LIST(item) item.toStringRef()
+#endif
+
 // Specialization for strings
 // Torch does not natively support string tensors. Instead, we will be using a list of strings.
 // Note: this only implements support for 1D string tensors
@@ -111,7 +113,11 @@ public:
     // Allocate a torch tensor
     TorchNeuropodTensor(const std::vector<int64_t> &dims)
         : TypedNeuropodTensor<std::string>(dims),
+          #if CAFFE2_NIGHTLY_VERSION >= 20190717
+          list(std::vector<std::string>(get_num_elements()))
+          #else
           list(at::ivalue::GenericList::create(std::vector<torch::jit::IValue>(get_num_elements())))
+          #endif
     {
         if (dims.size() != 1)
         {
@@ -123,7 +129,11 @@ public:
     // Wrap an existing torch tensor
     TorchNeuropodTensor(torch::jit::IValue tensor)
         : TypedNeuropodTensor<std::string>({static_cast<int64_t>(tensor.toGenericListRef().size())}),
+          #if CAFFE2_NIGHTLY_VERSION >= 20190717
+          list(c10::impl::toTypedList<std::string>(tensor.toGenericList()))
+          #else
           list(tensor.toGenericList())
+          #endif
     {
     }
 
@@ -139,11 +149,11 @@ public:
         }
 
         // Get a reference to the tensor data
-        auto &tensor_data = list->elements();
+        auto &tensor_data = ELEMENTS(list);
         for (size_t i = 0; i < data.size(); i++)
         {
-            // Wrap all the input strings with IValues and set each item
-            tensor_data[i] = torch::jit::IValue(data[i]);
+            // Set each item
+            tensor_data[i] = data[i];
         }
     }
 
@@ -154,8 +164,8 @@ public:
         // Reserve space for all the items in the tensor
         out.reserve(get_num_elements());
 
-        // Get the items in the tensor and sanity check sizes
-        auto &tensor_data = list->elements();
+        // Sanity check sizes
+        auto &tensor_data = ELEMENTS(list);
         if (tensor_data.size() != get_num_elements())
         {
             NEUROPOD_ERROR("Error converting TorchScript list into vector of strings. "
@@ -165,17 +175,22 @@ public:
 
         for (const auto &item : tensor_data)
         {
-            out.emplace_back(item.toStringRef());
+            out.emplace_back(GET_STRING_FROM_LIST(item));
         }
 
          // Return the filled vector
         return out;
     }
 
-    torch::jit::IValue get_native_data() { return list; }
-
-    // The underlying TorchScript list
-    c10::intrusive_ptr<at::ivalue::GenericList> list;
+    #if CAFFE2_NIGHTLY_VERSION >= 20190717
+        // Store a typed list
+        torch::jit::IValue get_native_data() { return c10::impl::toGenericList(list); }
+        c10::List<std::string> list;
+    #else
+        // Store a generic list
+        torch::jit::IValue get_native_data() { return list; }
+        c10::intrusive_ptr<at::ivalue::GenericList> list;
+    #endif
 };
 
 // Utility function to get an IValue from a torch tensor

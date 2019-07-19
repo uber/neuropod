@@ -29,7 +29,7 @@ std::shared_ptr<torch::jit::script::Module> load_model_from_path(const std::stri
         // We need to do this so the custom ops can see the symbols from torch
         // This binary is already linked against `libtorch.so`; the dlopen just
         // promotes it to RTLD_GLOBAL.
-        #if CAFFE2_VERSION > 10100
+        #if CAFFE2_NIGHTLY_VERSION >= 20190601
             void * libtorch = dlopen("libtorch.so", RTLD_NOW | RTLD_GLOBAL | RTLD_NOLOAD);
         #else
             void * libtorch = dlopen("libtorch.so.1", RTLD_NOW | RTLD_GLOBAL | RTLD_NOLOAD);
@@ -55,7 +55,12 @@ std::shared_ptr<torch::jit::script::Module> load_model_from_path(const std::stri
         NEUROPOD_ERROR("Failed to load graph from path " << graph_path.c_str());
     }
 
-    auto model = torch::jit::load(stream);
+    #if CAFFE2_NIGHTLY_VERSION >= 20190717
+        auto model = std::make_shared<torch::jit::script::Module>(torch::jit::load(stream));
+    #else
+        auto model = torch::jit::load(stream);
+    #endif
+
     if (!model)
     {
         NEUROPOD_ERROR("Failed to deserialize graph from path " << graph_path.c_str());
@@ -117,7 +122,7 @@ void insert_value_in_output(NeuropodValueMap& output, const std::string name, co
         // have native support for string tensors
         auto& tensor = value;
 
-        auto &list = tensor.toGenericListRef();
+        const auto &list = tensor.toGenericListRef();
 
         // if tensor_type string or no tensor_type and empty list or list containing actual string
         if ((has_type && tensor_type == TensorType::STRING_TENSOR) || (!has_type && list.size() == 0) || (!has_type && list[0].isString())) {
@@ -164,12 +169,28 @@ TorchNeuropodBackend::TorchNeuropodBackend(const std::string &torchscript_model_
 
 TorchNeuropodBackend::~TorchNeuropodBackend() = default;
 
-#if CAFFE2_VERSION > 10100
- #define KEY(elem) (elem.key())
- #define VALUE(elem) (elem.value())
+#if CAFFE2_NIGHTLY_VERSION >= 20190717
+    #define MAKE_DICT(name) c10::impl::GenericDict name((c10::impl::deprecatedUntypedDict()));
+#elif CAFFE2_NIGHTLY_VERSION >= 20190601
+    #define MAKE_DICT(name) auto name = c10::make_dict<torch::jit::IValue, torch::jit::IValue>();
 #else
- #define KEY(elem) (elem.first)
- #define VALUE(elem) (elem.second)
+    #define MAKE_DICT(name) torch::ivalue::UnorderedMap name;
+#endif
+
+#if CAFFE2_NIGHTLY_VERSION >= 20190717
+    #define SCHEMA(method) method.function().getSchema()
+#else
+    #define SCHEMA(method) method.getSchema()
+#endif
+
+#if CAFFE2_NIGHTLY_VERSION >= 20190601
+    #define KEY(elem) (elem.key())
+    #define VALUE(elem) (elem.value())
+    #define DICT_INSERT(dict, key, value) dict.insert(key, value);
+#else
+    #define KEY(elem) (elem.first)
+    #define VALUE(elem) (elem.second)
+    #define DICT_INSERT(dict, key, value) dict[key] = value;
 #endif
 
 // Run inference
@@ -178,37 +199,47 @@ std::unique_ptr<NeuropodValueMap> TorchNeuropodBackend::infer(const NeuropodValu
     torch::NoGradGuard guard;
 
     // Get inference schema
-    auto &      method    = model_->get_method("forward");
-    const auto &schema    = method.getSchema();
+    const auto &method    = model_->get_method("forward");
+    const auto &schema    = SCHEMA(method);
     const auto &arguments = schema.arguments();
 
-    // Define the vector of inputs and add the inputs
-    std::vector<torch::jit::IValue> torch_inputs(arguments.size());
+    // Whether or not this model expects a dictionary as an input
+    bool is_dict_input = false;
+
+    // Torch 1.2.0 adds a ClassType argument to every model
+    bool has_class_type = false;
+
+    #if CAFFE2_NIGHTLY_VERSION >= 20190717
+    if (arguments.size() > 0 && arguments.at(0).type()->isSubclass(c10::TypeKind::ClassType))
+    {
+        has_class_type = true;
+    }
+    #endif
+
+    if (arguments.size() == 2 && has_class_type && arguments.at(1).type()->isSubclass(c10::TypeKind::DictType))
+    {
+        is_dict_input  = true;
+    }
+
     if (arguments.size() == 1 && arguments.at(0).type()->isSubclass(c10::TypeKind::DictType))
     {
-    #if CAFFE2_VERSION > 10100
+        is_dict_input = true;
+    }
+
+    // Define the vector of inputs and add the inputs
+    std::vector<torch::jit::IValue> torch_inputs(arguments.size() - (has_class_type ? 1 : 0));
+    if (is_dict_input)
+    {
         // This model expects a dict as input
-        auto input_dict = c10::make_dict<torch::jit::IValue, torch::jit::IValue>();
+        MAKE_DICT(input_dict);
         for (const auto &entry : inputs)
         {
             // TODO(vip): transfer to the correct device
             // .to(device) is a no-op if the tensor is already transferred
-            input_dict.insert(entry.first, get_ivalue_from_torch_tensor(entry.second));
+            DICT_INSERT(input_dict, entry.first, get_ivalue_from_torch_tensor(entry.second));
         }
 
         torch_inputs.at(0) = input_dict;
-    #else
-        // This model expects a dict as input
-        torch::ivalue::UnorderedMap input_dict;
-        for (const auto &entry : inputs)
-        {
-            // TODO(vip): transfer to the correct device
-            // .to(device) is a no-op if the tensor is already transferred
-            input_dict[entry.first] = get_ivalue_from_torch_tensor(entry.second);
-        }
-
-        torch_inputs.at(0) = input_dict;
-    #endif
     }
     else
     {
@@ -226,7 +257,7 @@ std::unique_ptr<NeuropodValueMap> TorchNeuropodBackend::infer(const NeuropodValu
 
             // TODO(vip): transfer to the correct device
             // .to(device) is a no-op if the tensor is already transferred
-            torch_inputs.at(arg_index.value()) = input_data;
+            torch_inputs.at(arg_index.value() - (has_class_type ? 1 : 0)) = input_data;
         }
     }
 
@@ -237,7 +268,7 @@ std::unique_ptr<NeuropodValueMap> TorchNeuropodBackend::infer(const NeuropodValu
     auto to_return = stdx::make_unique<NeuropodValueMap>();
 
     if (result.isGenericDict()) {
-        const auto &outputs_dict = result.toGenericDict()->elements();
+        const auto &outputs_dict = ELEMENTS(result.toGenericDict());
         for (const auto &elem : outputs_dict)
         {
             // Get the name of the tensor

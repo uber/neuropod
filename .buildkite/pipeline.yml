@@ -5,22 +5,22 @@
 #
 
 steps:
-  - label: ":docker: CPU Tests (test-cpu-variant-tf-1.11.0-torch-1.1.0-py2.7)"
+  - label: ":docker: CPU Tests (test-cpu-variant-tf-1.11.0-torch-1.2.0.dev20190601-py2.7)"
     agents:
       queue: private-default
     command: build/test.sh
     plugins:
       - docker-compose:
-          run: test-cpu-variant-tf-1.11.0-torch-1.1.0-py2.7
+          run: test-cpu-variant-tf-1.11.0-torch-1.2.0.dev20190601-py2.7
           config: docker-compose.test.yml
 
-  - label: ":docker: CPU Tests (test-cpu-variant-tf-1.12.0-torch-1.2.0.dev20190601-py2.7)"
+  - label: ":docker: CPU Tests (test-cpu-variant-tf-1.12.0-torch-1.2.0.dev20190717-py2.7)"
     agents:
       queue: private-default
     command: build/test.sh
     plugins:
       - docker-compose:
-          run: test-cpu-variant-tf-1.12.0-torch-1.2.0.dev20190601-py2.7
+          run: test-cpu-variant-tf-1.12.0-torch-1.2.0.dev20190717-py2.7
           config: docker-compose.test.yml
 
   - label: ":docker: CPU Tests (test-cpu-variant-tf-1.13.1-torch-1.1.0-py2.7)"
@@ -32,22 +32,22 @@ steps:
           run: test-cpu-variant-tf-1.13.1-torch-1.1.0-py2.7
           config: docker-compose.test.yml
 
-  - label: ":docker: CPU Tests (test-cpu-variant-tf-1.11.0-torch-1.1.0-py3)"
+  - label: ":docker: CPU Tests (test-cpu-variant-tf-1.11.0-torch-1.2.0.dev20190601-py3)"
     agents:
       queue: private-default
     command: build/test.sh
     plugins:
       - docker-compose:
-          run: test-cpu-variant-tf-1.11.0-torch-1.1.0-py3
+          run: test-cpu-variant-tf-1.11.0-torch-1.2.0.dev20190601-py3
           config: docker-compose.test.yml
 
-  - label: ":docker: CPU Tests (test-cpu-variant-tf-1.12.0-torch-1.2.0.dev20190601-py3)"
+  - label: ":docker: CPU Tests (test-cpu-variant-tf-1.12.0-torch-1.2.0.dev20190717-py3)"
     agents:
       queue: private-default
     command: build/test.sh
     plugins:
       - docker-compose:
-          run: test-cpu-variant-tf-1.12.0-torch-1.2.0.dev20190601-py3
+          run: test-cpu-variant-tf-1.12.0-torch-1.2.0.dev20190717-py3
           config: docker-compose.test.yml
 
   - label: ":docker: CPU Tests (test-cpu-variant-tf-1.13.1-torch-1.1.0-py3)"
@@ -59,22 +59,22 @@ steps:
           run: test-cpu-variant-tf-1.13.1-torch-1.1.0-py3
           config: docker-compose.test.yml
 
-  - label: ":docker: GPU Tests (test-gpu-variant-tf-1.11.0-torch-1.1.0-py2.7)"
+  - label: ":docker: GPU Tests (test-gpu-variant-tf-1.11.0-torch-1.2.0.dev20190601-py2.7)"
     agents:
       queue: private-gpu
     command: build/test_gpu.sh
     plugins:
       - docker-compose:
-          run: test-gpu-variant-tf-1.11.0-torch-1.1.0-py2.7
+          run: test-gpu-variant-tf-1.11.0-torch-1.2.0.dev20190601-py2.7
           config: docker-compose.test.yml
 
-  - label: ":docker: GPU Tests (test-gpu-variant-tf-1.12.0-torch-1.2.0.dev20190601-py2.7)"
+  - label: ":docker: GPU Tests (test-gpu-variant-tf-1.12.0-torch-1.2.0.dev20190717-py2.7)"
     agents:
       queue: private-gpu
     command: build/test_gpu.sh
     plugins:
       - docker-compose:
-          run: test-gpu-variant-tf-1.12.0-torch-1.2.0.dev20190601-py2.7
+          run: test-gpu-variant-tf-1.12.0-torch-1.2.0.dev20190717-py2.7
           config: docker-compose.test.yml
 
   - label: ":docker: GPU Tests (test-gpu-variant-tf-1.13.1-torch-1.1.0-py2.7)"
@@ -86,22 +86,22 @@ steps:
           run: test-gpu-variant-tf-1.13.1-torch-1.1.0-py2.7
           config: docker-compose.test.yml
 
-  - label: ":docker: GPU Tests (test-gpu-variant-tf-1.11.0-torch-1.1.0-py3)"
+  - label: ":docker: GPU Tests (test-gpu-variant-tf-1.11.0-torch-1.2.0.dev20190601-py3)"
     agents:
       queue: private-gpu
     command: build/test_gpu.sh
     plugins:
       - docker-compose:
-          run: test-gpu-variant-tf-1.11.0-torch-1.1.0-py3
+          run: test-gpu-variant-tf-1.11.0-torch-1.2.0.dev20190601-py3
           config: docker-compose.test.yml
 
-  - label: ":docker: GPU Tests (test-gpu-variant-tf-1.12.0-torch-1.2.0.dev20190601-py3)"
+  - label: ":docker: GPU Tests (test-gpu-variant-tf-1.12.0-torch-1.2.0.dev20190717-py3)"
     agents:
       queue: private-gpu
     command: build/test_gpu.sh
     plugins:
       - docker-compose:
-          run: test-gpu-variant-tf-1.12.0-torch-1.2.0.dev20190601-py3
+          run: test-gpu-variant-tf-1.12.0-torch-1.2.0.dev20190717-py3
           config: docker-compose.test.yml
 
   - label: ":docker: GPU Tests (test-gpu-variant-tf-1.13.1-torch-1.1.0-py3)"

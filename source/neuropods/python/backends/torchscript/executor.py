@@ -37,6 +37,9 @@ class TorchScriptNeuropodExecutor(NeuropodExecutor):
         # Check the expected input format of the model
         model_inputs = self.model.forward.schema.arguments
 
+        if len(model_inputs) > 0 and model_inputs[0].type.kind() == "ClassType":
+            model_inputs = model_inputs[1:]
+
         # Expects a dictionary mapping from a tensor name to tensor
         if len(model_inputs) == 1 and model_inputs[0].type.kind() == "DictType":
             self.model_expects_dictionary = True

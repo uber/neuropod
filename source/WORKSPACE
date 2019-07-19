@@ -21,7 +21,7 @@ llvm_toolchain(
 
 libtorch_repository(
     name = "libtorch_repo",
-    build_file = "@//deps:BUILD.libtorch",
+    build_file_template = "@//deps:BUILD.libtorch",
 )
 
 tensorflow_repository(
