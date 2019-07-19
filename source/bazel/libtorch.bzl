@@ -8,8 +8,10 @@ def _impl(repository_ctx):
     CUDA_VERSION = repository_ctx.os.environ.get("NEUROPODS_CUDA_VERSION") or "10.0"
 
     download_url = "https://download.pytorch.org/libtorch"
+    defines = []
     if "dev" in version:
         download_url += "/nightly"
+        defines.append("CAFFE2_NIGHTLY_VERSION=" + version.split("dev")[1])
 
     if IS_GPU:
         download_url += "/cu" + CUDA_VERSION.replace(".", "")
@@ -22,9 +24,17 @@ def _impl(repository_ctx):
         download_url += "/libtorch-shared-with-deps-" + version + ".zip"
 
     repository_ctx.download_and_extract(download_url, stripPrefix="libtorch")
-    repository_ctx.symlink(repository_ctx.path(Label(repository_ctx.attr.build_file)), "BUILD.bazel")
+
+    # Generate a build file based on the template
+    repository_ctx.template(
+        "BUILD.bazel",
+        repository_ctx.path(Label(repository_ctx.attr.build_file_template)),
+        substitutions = {
+            "{TORCH_DEFINES}": "{}".format(defines),
+        },
+    )
 
 libtorch_repository = repository_rule(
     implementation=_impl,
     local=True,
-    attrs={"build_file": attr.string(mandatory=True)})
+    attrs={"build_file_template": attr.string(mandatory=True)})

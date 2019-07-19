@@ -21,12 +21,13 @@ cc_library(
         "include",
         "include/torch/csrc/api/include",
     ],
+    defines = {TORCH_DEFINES}
 )
 
 cc_library(
     name = "libtorch",
     srcs = select({
-        "@bazel_tools//src/conditions:darwin": ["lib/libcaffe2.dylib", "lib/libc10.dylib"] + glob(["lib/libtorch.dylib", "lib/libtorch.1.dylib"]),
+        "@bazel_tools//src/conditions:darwin": glob(["lib/libcaffe2.dylib", "lib/libc10.dylib", "lib/libtorch.dylib", "lib/libtorch.1.dylib"]),
         "//conditions:default": ["lib/libtorch.so"],
     }),
     deps = select({
