@@ -56,20 +56,8 @@ if __name__ == '__main__':
     if args.use_native:
         import os
         from neuropods_native import Neuropod as NeuropodNative
-        # We need to override the default backend lookup paths to point to the shared objects in
-        # the bazel bin directory
-        # TODO(vip): Do this in a place that only affects the tests
-        DEFAULT_BACKEND_OVERRIDES = {
-            "tensorflow": "../bazel-bin/neuropods/backends/tensorflow/libneuropod_tensorflow_backend.so",
-            "python": "../bazel-bin/neuropods/backends/python_bridge/libneuropod_pythonbridge_backend.so",
-            "pytorch": "../bazel-bin/neuropods/backends/python_bridge/libneuropod_pythonbridge_backend.so",
-            "torchscript": "../bazel-bin/neuropods/backends/torchscript/libneuropod_torchscript_backend.so",
-        }
 
-        if not os.path.isdir("../bazel-bin"):
-            raise ValueError("The `--use-native` option can currently only be used when running from the `source/python` directory within the Neuropods source tree. "
-                             "Please also ensure that the native libraries have been built before using this flag.")
-        model = NeuropodNative(args.neuropod_path, DEFAULT_BACKEND_OVERRIDES)
+        model = NeuropodNative(args.neuropod_path)
         run_model(model)
     else:
         with load_neuropod(args.neuropod_path) as model:

@@ -7,6 +7,11 @@ set -e
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:`pwd`/bazel-source/external/libtorch_repo/lib
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:`pwd`/bazel-source/external/tensorflow_repo/lib
 
+# The backends need to be on the library path for the tests to dynamically load them
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:`pwd`/bazel-bin/neuropods/backends/python_bridge/
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:`pwd`/bazel-bin/neuropods/backends/torchscript/
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:`pwd`/bazel-bin/neuropods/backends/tensorflow/
+
 # Ignore ODR errors from ASAN
 # See https://github.com/google/sanitizers/wiki/AddressSanitizerOneDefinitionRuleViolation
 export ASAN_OPTIONS=detect_odr_violation=0

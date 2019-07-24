@@ -14,5 +14,5 @@ NEUROPODS_RUN_NATIVE_TESTS=true python -m unittest discover --verbose neuropods/
 popd
 
 # Run native tests
-bazel test --cache_test_results=no --test_output=errors "$@" //...
+python ../build/run_cpp_tests.py
 popd
