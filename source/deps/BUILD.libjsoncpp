@@ -10,7 +10,6 @@ cc_library(
     name = "libjsoncpp",
     srcs = [
         "include/json/assertions.h",
-        "src/lib_json/json_batchallocator.h",
         "src/lib_json/json_reader.cpp",
         "src/lib_json/json_tool.h",
         "src/lib_json/json_value.cpp",
