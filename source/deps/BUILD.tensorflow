@@ -15,6 +15,6 @@ cc_library(
 
 cc_import(
     name = "libtensorflow",
-    interface_library = "lib/libtensorflow.so",
+    interface_library = glob(["lib/libtensorflow.so", "lib/libtensorflow.so.1"]),
     system_provided = True,
 )
