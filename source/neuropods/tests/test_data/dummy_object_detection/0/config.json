@@ -1,0 +1,1 @@
+{"node_name_mapping": {"image": "INPUT_API/image:0", "object_class_probability": "OUTPUT_API/object_class_probability:0", "boxes": "OUTPUT_API/boxes:0"}, "init_op_names": []}
