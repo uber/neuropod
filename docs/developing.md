@@ -94,7 +94,7 @@ Our build matrix is defined as all combinations of the following:
 | --- | --- |
 | 1.11.0 | 1.2.0.dev20190601 |
 | 1.12.0 | 1.2.0.dev20190717 |
-| 1.13.1 | 1.1.0 |
+| 1.14.0 | 1.1.0 |
 
 We also have an additional build that runs natively on an Ubuntu 16.04 machine (outside of docker)
 to make sure that we don't accidentally break workflows of users not using docker.

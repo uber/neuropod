@@ -36,11 +36,11 @@ services:
         NEUROPODS_TORCH_VERSION: 1.2.0.dev20190717
         NEUROPODS_PYTHON_BINARY: python
 
-  test-cpu-variant-tf-1.13.1-torch-1.1.0-py2.7:
+  test-cpu-variant-tf-1.14.0-torch-1.1.0-py2.7:
     extends: test-base
     build:
       args:
-        NEUROPODS_TENSORFLOW_VERSION: 1.13.1
+        NEUROPODS_TENSORFLOW_VERSION: 1.14.0
         NEUROPODS_TORCH_VERSION: 1.1.0
         NEUROPODS_PYTHON_BINARY: python
 
@@ -60,11 +60,11 @@ services:
         NEUROPODS_TORCH_VERSION: 1.2.0.dev20190717
         NEUROPODS_PYTHON_BINARY: python3
 
-  test-cpu-variant-tf-1.13.1-torch-1.1.0-py3:
+  test-cpu-variant-tf-1.14.0-torch-1.1.0-py3:
     extends: test-base
     build:
       args:
-        NEUROPODS_TENSORFLOW_VERSION: 1.13.1
+        NEUROPODS_TENSORFLOW_VERSION: 1.14.0
         NEUROPODS_TORCH_VERSION: 1.1.0
         NEUROPODS_PYTHON_BINARY: python3
 
@@ -86,12 +86,12 @@ services:
         NEUROPODS_TORCH_VERSION: 1.2.0.dev20190717
         NEUROPODS_PYTHON_BINARY: python
 
-  test-gpu-variant-tf-1.13.1-torch-1.1.0-py2.7:
+  test-gpu-variant-tf-1.14.0-torch-1.1.0-py2.7:
     extends: test-gpu
     build:
       args:
         NEUROPODS_CUDA_VERSION: 10.0
-        NEUROPODS_TENSORFLOW_VERSION: 1.13.1
+        NEUROPODS_TENSORFLOW_VERSION: 1.14.0
         NEUROPODS_TORCH_VERSION: 1.1.0
         NEUROPODS_PYTHON_BINARY: python
 
@@ -113,12 +113,12 @@ services:
         NEUROPODS_TORCH_VERSION: 1.2.0.dev20190717
         NEUROPODS_PYTHON_BINARY: python3
 
-  test-gpu-variant-tf-1.13.1-torch-1.1.0-py3:
+  test-gpu-variant-tf-1.14.0-torch-1.1.0-py3:
     extends: test-gpu
     build:
       args:
         NEUROPODS_CUDA_VERSION: 10.0
-        NEUROPODS_TENSORFLOW_VERSION: 1.13.1
+        NEUROPODS_TENSORFLOW_VERSION: 1.14.0
         NEUROPODS_TORCH_VERSION: 1.1.0
         NEUROPODS_PYTHON_BINARY: python3
 
