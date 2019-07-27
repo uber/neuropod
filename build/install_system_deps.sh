@@ -22,6 +22,13 @@ else
     # Install bazel and python dev
     sudo apt-get update
     sudo apt-get install -y bazel ${NEUROPODS_PYTHON_BINARY}-dev ${NEUROPODS_PYTHON_BINARY}-pip
+
+    # Install g++-4.9 and make it default to support PyTorch and TensorFlow custom ops
+    sudo apt-get install -y software-properties-common g++-4.9
+    sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-4.9 100
+    sudo update-alternatives --install /usr/bin/x86_64-linux-gnu-gcc x86_64-linux-gnu-gcc /usr/bin/gcc-4.9 100
+    sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-4.9 100
+    sudo update-alternatives --install /usr/bin/x86_64-linux-gnu-g++ x86_64-linux-gnu-g++ /usr/bin/g++-4.9 100
 fi
 
 # Run a bazel command to extract the bazel installation
