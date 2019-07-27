@@ -5,6 +5,7 @@
 import numpy as np
 import os
 import subprocess
+import sys
 import tensorflow as tf
 import unittest
 from testpath.tempdir import TemporaryDirectory
@@ -29,7 +30,7 @@ def create_tf_addition_model(custom_op_path):
 
     return g.as_graph_def()
 
-@unittest.skipIf(tf.__version__ == '1.14.0',
+@unittest.skipIf(tf.__version__ == '1.14.0' and sys.platform == 'darwin',
                  'See https://github.com/tensorflow/tensorflow/issues/30633')
 class TestTensorflowCustomOps(unittest.TestCase):
     @classmethod
