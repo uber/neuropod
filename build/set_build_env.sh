@@ -22,3 +22,7 @@ export ASAN_SYMBOLIZER_PATH=`pwd`/bazel-source/external/llvm_toolchain/bin/llvm-
 
 # So the python tests can find the native bindings
 export PYTHONPATH=`pwd`/bazel-bin/neuropods/bindings
+
+if [[ $(uname -s) == 'Linux' ]]; then
+    export TF_CXX=g++-4.8
+fi
