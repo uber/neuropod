@@ -1,7 +1,13 @@
---- toolchain/cc_toolchain_config.bzl.tpl	2019-06-05 00:58:14.681677976 +0000
-+++ toolchain/cc_toolchain_config.bzl.tpl	2019-06-05 01:00:20.133676223 +0000
-@@ -136,9 +136,9 @@
-             "-fuse-ld=lld",
+--- toolchain/cc_toolchain_config.bzl.tpl	2019-05-16 03:44:32.000000000 +0000
++++ toolchain/cc_toolchain_config.bzl.tpl	2019-07-27 05:32:42.953936974 +0000
+@@ -132,13 +132,13 @@
+
+     if ctx.attr.cpu == "k8":
+         linker_flags = [
+-            # Use the lld linker.
+-            "-fuse-ld=lld",
++            # Use the gold linker.
++            "-fuse-ld=gold",
              # The linker has no way of knowing if there are C++ objects; so we always link C++ libraries.
              "-L%{toolchain_path_prefix}/lib",
 -            "-l:libc++.a",
@@ -13,7 +19,7 @@
              # Compiler runtime features.
              "-rtlib=compiler-rt",
              # To support libunwind.
-@@ -262,7 +261,7 @@
+@@ -262,7 +262,7 @@
              ),
              flag_set(
                  actions = all_cpp_compile_actions,
