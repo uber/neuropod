@@ -4,14 +4,14 @@
 
 #pragma once
 
-#include <string>
-#include <vector>
+#include "neuropods/backends/tensorflow/type_utils.hh"
+#include "neuropods/internal/deleter.hh"
+#include "neuropods/internal/neuropod_tensor.hh"
 
 #include <tensorflow/c/c_api.h>
 
-#include "neuropods/internal/deleter.hh"
-#include "neuropods/internal/neuropod_tensor.hh"
-#include "neuropods/backends/tensorflow/type_utils.hh"
+#include <string>
+#include <vector>
 
 namespace neuropods
 {
@@ -33,7 +33,7 @@ std::vector<int64_t> get_shape(TF_Tensor *tensor)
     return out;
 }
 
-void deallocator(void * data, size_t len, void * handle)
+void deallocator(void *data, size_t len, void *handle)
 {
     // The tensor is being deallocated, run the deleter that the user provided
     run_deleter(handle);
@@ -41,10 +41,9 @@ void deallocator(void * data, size_t len, void * handle)
 
 } // namespace
 
-
 // This class is internal to neuropods and should not be exposed
 // to users
-template<typename T>
+template <typename T>
 class TensorflowNeuropodTensor : public TypedNeuropodTensor<T>, public NativeDataContainer<TF_Tensor *>
 {
 public:
@@ -61,7 +60,7 @@ public:
     // Wrap existing memory
     // This data should be 64 byte aligned
     // https://github.com/tensorflow/tensorflow/blob/master/tensorflow/core/framework/allocator.h#L84
-    TensorflowNeuropodTensor(const std::vector<int64_t> &dims, void * data, const Deleter &deleter)
+    TensorflowNeuropodTensor(const std::vector<int64_t> &dims, void *data, const Deleter &deleter)
         : TypedNeuropodTensor<T>(dims),
           tensor(TF_NewTensor(get_tf_type_from_neuropod_type(this->get_tensor_type()),
                               dims.data(),
@@ -69,17 +68,12 @@ public:
                               data,
                               this->get_num_elements() * sizeof(T),
                               deallocator,
-                              register_deleter(deleter, data)
-                              ))
+                              register_deleter(deleter, data)))
     {
     }
 
     // Wrap an existing TF tensor
-    TensorflowNeuropodTensor(TF_Tensor *tensor)
-        : TypedNeuropodTensor<T>(get_shape(tensor)),
-          tensor(tensor)
-    {
-    }
+    TensorflowNeuropodTensor(TF_Tensor *tensor) : TypedNeuropodTensor<T>(get_shape(tensor)), tensor(tensor) {}
 
     ~TensorflowNeuropodTensor()
     {
@@ -101,7 +95,6 @@ public:
     TF_Tensor *tensor;
 };
 
-
 // Specialization for strings
 template <>
 class TensorflowNeuropodTensor<std::string> : public TypedNeuropodTensor<std::string>,
@@ -109,16 +102,10 @@ class TensorflowNeuropodTensor<std::string> : public TypedNeuropodTensor<std::st
 {
 public:
     // Allocate a TF tensor
-    TensorflowNeuropodTensor(const std::vector<int64_t> &dims)
-        : TypedNeuropodTensor<std::string>(dims)
-    {
-    }
+    TensorflowNeuropodTensor(const std::vector<int64_t> &dims) : TypedNeuropodTensor<std::string>(dims) {}
 
     // Wrap an existing TF tensor
-    TensorflowNeuropodTensor(TF_Tensor *tensor)
-        : TypedNeuropodTensor<std::string>(get_shape(tensor)), tensor(tensor)
-    {
-    }
+    TensorflowNeuropodTensor(TF_Tensor *tensor) : TypedNeuropodTensor<std::string>(get_shape(tensor)), tensor(tensor) {}
 
     ~TensorflowNeuropodTensor()
     {
@@ -138,7 +125,7 @@ public:
         if (data.size() != this->get_num_elements())
         {
             NEUROPOD_ERROR("Size of provided vector does not match the number "
-                "of elements in the tensor");
+                           "of elements in the tensor");
         }
 
         // Get the size of the index
@@ -195,12 +182,12 @@ public:
         std::vector<std::string> out;
 
         // Get pointers to the data and sizes
-        const size_t     tensor_size     = TF_TensorByteSize(tensor);
-        const size_t     numel           = get_num_elements();
-        void * const     tensor_data_ptr = TF_TensorData(tensor);
-        uint64_t * const index_ptr       = static_cast<uint64_t *>(tensor_data_ptr);
-        const size_t     index_size      = sizeof(uint64_t) * numel;
-        char * const     data_ptr        = static_cast<char *>(tensor_data_ptr) + index_size;
+        const size_t    tensor_size     = TF_TensorByteSize(tensor);
+        const size_t    numel           = get_num_elements();
+        void *const     tensor_data_ptr = TF_TensorData(tensor);
+        uint64_t *const index_ptr       = static_cast<uint64_t *>(tensor_data_ptr);
+        const size_t    index_size      = sizeof(uint64_t) * numel;
+        char *const     data_ptr        = static_cast<char *>(tensor_data_ptr) + index_size;
 
         TF_Status *status = TF_NewStatus();
         for (size_t i = 0; i < numel; i++)

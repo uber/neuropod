@@ -4,10 +4,10 @@
 
 #include "type_utils.hh"
 
+#include "neuropods/internal/error_utils.hh"
+
 #include <sstream>
 #include <stdexcept>
-
-#include "neuropods/internal/error_utils.hh"
 
 namespace neuropods
 {
@@ -26,7 +26,6 @@ namespace neuropods
     FN(UINT16_TENSOR, TF_UINT16)    \
     FN(UINT32_TENSOR, TF_UINT32)    \
     FN(UINT64_TENSOR, TF_UINT64)
-
 
 TensorType get_neuropod_type_from_tf_type(TF_DataType type)
 {

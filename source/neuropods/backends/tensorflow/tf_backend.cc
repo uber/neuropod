@@ -4,13 +4,14 @@
 
 #include "tf_backend.hh"
 
+#include "neuropods/backends/tensorflow/type_utils.hh"
+
+#include <json/json.h>
+
 #include <fstream>
 #include <iostream>
-#include <json/json.h>
 #include <sstream>
 #include <stdexcept>
-
-#include "neuropods/backends/tensorflow/type_utils.hh"
 
 namespace neuropods
 {
@@ -48,23 +49,23 @@ std::string get_custom_op_path(const std::string &neuropod_path, const std::stri
         return neuropod_path + "0/ops/" + op_basename;
     }
 
-     return neuropod_path + "/0/ops/" + op_basename;
+    return neuropod_path + "/0/ops/" + op_basename;
 }
 
 // Load a mapping from neuropod node names to node names in the TF graph
-void setup_node_mapping_and_init_ops(const std::string &neuropod_path,
+void setup_node_mapping_and_init_ops(const std::string &                           neuropod_path,
                                      std::unordered_map<std::string, std::string> &mapping,
-                                     std::vector<std::string> &init_ops)
+                                     std::vector<std::string> &                    init_ops)
 {
     // Load the config file
     std::ifstream ifs(get_tf_config_path(neuropod_path));
 
     // Parse it
     Json::CharReaderBuilder rbuilder;
-    Json::Value  obj;
+    Json::Value             obj;
 
     std::string parse_err;
-    bool parsingSuccessful = Json::parseFromStream(rbuilder, ifs, &obj, &parse_err);
+    bool        parsingSuccessful = Json::parseFromStream(rbuilder, ifs, &obj, &parse_err);
 
     if (!parsingSuccessful)
     {
@@ -156,7 +157,6 @@ TensorflowNeuropodBackend::TensorflowNeuropodBackend(const std::string &        
 
 TensorflowNeuropodBackend::~TensorflowNeuropodBackend() = default;
 
-
 // Check the status of the last TF API call and throw an exception if
 // there was an error
 void TensorflowNeuropodBackend::check_status() const
@@ -223,15 +223,15 @@ void TensorflowNeuropodBackend::run_target_ops(const std::vector<std::string> &t
 
     // Run the operation
     TF_SessionRun(session_.get(),
-                  nullptr,    // ignore run options
+                  nullptr, // ignore run options
                   // Input tensors
-                  nullptr,    // list of handlers on input tensors
-                  nullptr,    // list of pointers on input tensors
-                  0,          // number of inputs
+                  nullptr, // list of handlers on input tensors
+                  nullptr, // list of pointers on input tensors
+                  0,       // number of inputs
                   // Output tensors
-                  nullptr,    // list of handlers on output tensors
-                  nullptr,    // list of pointers on output tensors
-                  0,          // number of outputs
+                  nullptr, // list of handlers on output tensors
+                  nullptr, // list of pointers on output tensors
+                  0,       // number of outputs
                   // Default target operations and run meta-data
                   &target_ops[0],    // target operations are outputs
                   target_ops.size(), // no target operations are provided
@@ -261,8 +261,8 @@ std::unique_ptr<NeuropodValueMap> TensorflowNeuropodBackend::infer(const Neuropo
     for (const auto &entry : inputs)
     {
         const auto  input_name = node_name_mapping_.at(entry.first);
-        const auto &input_data
-            = std::dynamic_pointer_cast<NativeDataContainer<TF_Tensor *>>(entry.second)->get_native_data();
+        const auto &input_data =
+            std::dynamic_pointer_cast<NativeDataContainer<TF_Tensor *>>(entry.second)->get_native_data();
 
         input_ops.emplace_back(get_graph_node_from_name(input_name, graph_));
         input_values.emplace_back(input_data);
@@ -300,14 +300,13 @@ std::unique_ptr<NeuropodValueMap> TensorflowNeuropodBackend::infer(const Neuropo
                   status_.get());
     check_status();
 
-
     // Read the outputs
     auto to_return = stdx::make_unique<NeuropodValueMap>();
     for (size_t i = 0; i < output_names_.size(); ++i)
     {
         const auto &output_name   = output_names_[i];
         const auto &output_tensor = output_values[i];
-        const auto tensor_type    = get_neuropod_type_from_tf_type(TF_TensorType(output_tensor));
+        const auto  tensor_type   = get_neuropod_type_from_tf_type(TF_TensorType(output_tensor));
         (*to_return)[output_name] = make_tensor<TensorflowNeuropodTensor>(tensor_type, output_tensor);
     }
 

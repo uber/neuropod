@@ -4,13 +4,14 @@
 
 #include "config_utils.hh"
 
-#include <fstream>
+#include "neuropods/internal/error_utils.hh"
+
 #include <json/json.h>
+
+#include <fstream>
 #include <sstream>
 #include <stdexcept>
 #include <unordered_map>
-
-#include "neuropods/internal/error_utils.hh"
 
 namespace neuropods
 {
@@ -118,7 +119,6 @@ TensorSpec::TensorSpec(const std::string &name, const std::vector<int64_t> dims,
 {
 }
 
-
 TensorSpec::~TensorSpec() = default;
 
 std::unique_ptr<ModelConfig> load_model_config(const std::string &neuropod_path)
@@ -140,10 +140,10 @@ std::unique_ptr<ModelConfig> load_model_config(std::istream &input_stream)
 {
     // Parse it
     Json::CharReaderBuilder rbuilder;
-    Json::Value  obj;
+    Json::Value             obj;
 
     std::string parse_err;
-    bool parsingSuccessful = Json::parseFromStream(rbuilder, input_stream, &obj, &parse_err);
+    bool        parsingSuccessful = Json::parseFromStream(rbuilder, input_stream, &obj, &parse_err);
 
     if (!parsingSuccessful)
     {

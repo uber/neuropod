@@ -4,13 +4,14 @@
 
 #include "python_bridge.hh"
 
-#include <dlfcn.h>
+#include "neuropods/bindings/python_bindings.hh"
+
 #include <exception>
 #include <sstream>
-#include <stdlib.h>
 #include <vector>
 
-#include "neuropods/bindings/python_bindings.hh"
+#include <dlfcn.h>
+#include <stdlib.h>
 
 namespace neuropods
 {
@@ -31,7 +32,6 @@ void set_python_path(const std::vector<std::string> &paths_to_add)
     {
         python_path << existing;
     }
-
 
     // Overwrite the existing PYTHONPATH with the new one
     setenv("PYTHONPATH", python_path.str().c_str(), 1);
@@ -74,7 +74,8 @@ PythonBridge::PythonBridge(const std::string &             neuropod_path,
     py::object load_neuropod = py::module::import("neuropods.loader").attr("load_neuropod");
 
     // Converts from unicode to ascii for python 3 string arrays
-    maybe_convert_bindings_types_ = py::module::import("neuropods.utils.dtype_utils").attr("maybe_convert_bindings_types");
+    maybe_convert_bindings_types_ =
+        py::module::import("neuropods.utils.dtype_utils").attr("maybe_convert_bindings_types");
 
     // Load the neuropod and save a reference to it
     neuropod_ = load_neuropod(neuropod_path);

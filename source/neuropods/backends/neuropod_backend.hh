@@ -4,17 +4,17 @@
 
 #pragma once
 
-#include <memory>
-#include <mutex>
-#include <string>
-#include <unordered_set>
-#include <vector>
-
 #include "neuropods/backends/tensor_allocator.hh"
 #include "neuropods/internal/backend_registration.hh"
 #include "neuropods/internal/deleter.hh"
 #include "neuropods/internal/neuropod_tensor.hh"
 #include "neuropods/internal/tensor_types.hh"
+
+#include <memory>
+#include <mutex>
+#include <string>
+#include <unordered_set>
+#include <vector>
 
 namespace neuropods
 {
@@ -36,12 +36,12 @@ public:
     virtual std::unique_ptr<NeuropodValueMap> infer(const NeuropodValueMap &inputs) = 0;
 };
 
-template<template <class> class TensorImpl>
+template <template <class> class TensorImpl>
 class NeuropodBackendWithDefaultAllocator : public NeuropodBackend
 {
 private:
     std::shared_ptr<NeuropodTensorAllocator> allocator_;
-    std::mutex allocator_lock_;
+    std::mutex                               allocator_lock_;
 
 public:
     std::shared_ptr<NeuropodTensorAllocator> get_tensor_allocator()

@@ -3,10 +3,9 @@
 //
 
 #include "gtest/gtest.h"
-
 #include "neuropods/backends/test_backend/test_neuropod_backend.hh"
-#include "neuropods/internal/neuropod_tensor.hh"
 #include "neuropods/conversions/eigen.hh"
+#include "neuropods/internal/neuropod_tensor.hh"
 
 #include <gmock/gmock.h>
 
@@ -43,7 +42,7 @@ class int32_matrix_fixture : public ::testing::Test
 public:
     int32_matrix_fixture()
     {
-        untyped_tensor       = test_backend_.get_tensor_allocator()->allocate_tensor({ROWS, COLS}, neuropods::INT32_TENSOR);
+        untyped_tensor = test_backend_.get_tensor_allocator()->allocate_tensor({ROWS, COLS}, neuropods::INT32_TENSOR);
         const_untyped_tensor = untyped_tensor.get();
 
         tensor       = untyped_tensor->as_typed_tensor<int32_t>();

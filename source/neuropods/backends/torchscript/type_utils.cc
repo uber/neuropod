@@ -4,10 +4,10 @@
 
 #include "type_utils.hh"
 
+#include "neuropods/internal/error_utils.hh"
+
 #include <sstream>
 #include <stdexcept>
-
-#include "neuropods/internal/error_utils.hh"
 
 namespace neuropods
 {
@@ -29,7 +29,6 @@ namespace neuropods
     // FN(UINT16_TENSOR, ...)
     // FN(UINT32_TENSOR, ...)
     // FN(UINT64_TENSOR, ...)
-
 
 TensorType get_neuropod_type_from_torch_type(torch::Dtype type)
 {

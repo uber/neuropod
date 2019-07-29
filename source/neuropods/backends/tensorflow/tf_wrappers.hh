@@ -4,11 +4,11 @@
 
 #pragma once
 
+#include <tensorflow/c/c_api.h>
+
 #include <memory>
 #include <sstream>
 #include <stdexcept>
-
-#include <tensorflow/c/c_api.h>
 
 namespace neuropods
 {

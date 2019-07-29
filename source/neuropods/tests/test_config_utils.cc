@@ -3,28 +3,26 @@
 //
 
 #include "gtest/gtest.h"
-
 #include "neuropods/internal/config_utils.hh"
 
 namespace
 {
 
 // UATG(clang-format/format) intentionally formatted
-const std::string VALID_SPEC = \
-"{"
-"  \"name\": \"addition_model\","
-"  \"platform\": \"tensorflow\","
-"  \"input_spec\": [{"
-"    \"dtype\": \"float32\","
-"    \"shape\": [null, 2, \"some_symbol\"],"
-"    \"name\": \"x\""
-"  }],"
-"  \"output_spec\": [{"
-"    \"dtype\": \"float32\","
-"    \"shape\": [null, 2, \"some_symbol\"],"
-"    \"name\": \"y\""
-"  }]"
-"}";
+const std::string VALID_SPEC = "{"
+                               "  \"name\": \"addition_model\","
+                               "  \"platform\": \"tensorflow\","
+                               "  \"input_spec\": [{"
+                               "    \"dtype\": \"float32\","
+                               "    \"shape\": [null, 2, \"some_symbol\"],"
+                               "    \"name\": \"x\""
+                               "  }],"
+                               "  \"output_spec\": [{"
+                               "    \"dtype\": \"float32\","
+                               "    \"shape\": [null, 2, \"some_symbol\"],"
+                               "    \"name\": \"y\""
+                               "  }]"
+                               "}";
 
 std::string replace(const std::string &search, const std::string &replace)
 {
@@ -35,14 +33,12 @@ std::string replace(const std::string &search, const std::string &replace)
 
 } // namespace
 
-
 TEST(test_config_utils, valid_config)
 {
     // Test that the config is valid
     std::istringstream config(VALID_SPEC);
     neuropods::load_model_config(config);
 }
-
 
 TEST(test_config_utils, invalid_name)
 {
@@ -57,7 +53,6 @@ TEST(test_config_utils, invalid_platform)
     std::istringstream config(replace("\"tensorflow\"", "5"));
     EXPECT_THROW(neuropods::load_model_config(config), std::runtime_error);
 }
-
 
 TEST(test_config_utils, invalid_spec_dtype)
 {

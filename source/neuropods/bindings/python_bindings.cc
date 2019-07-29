@@ -4,12 +4,12 @@
 
 #include "neuropods/bindings/python_bindings.hh"
 
-#include <pybind11/pybind11.h>
-#include <pybind11/numpy.h>
-#include <pybind11/stl.h>
-
 #include "neuropods/internal/neuropod_tensor.hh"
 #include "neuropods/neuropods.hh"
+
+#include <pybind11/numpy.h>
+#include <pybind11/pybind11.h>
+#include <pybind11/stl.h>
 
 namespace neuropods
 {
@@ -28,9 +28,9 @@ struct create_array_visitor : public NeuropodTensorVisitor<py::array>
         auto data = tensor->get_raw_data_ptr();
 
         // Make sure we don't deallocate the tensor until the numpy array is deallocated
-        auto deleter = [value](void * unused) {};
+        auto deleter        = [value](void *unused) {};
         auto deleter_handle = register_deleter(deleter, nullptr);
-        auto capsule = py::capsule(deleter_handle, [](void * handle) { run_deleter(handle); });
+        auto capsule        = py::capsule(deleter_handle, [](void *handle) { run_deleter(handle); });
         return py::array_t<T>(dims, data, capsule);
     }
 
@@ -44,8 +44,9 @@ struct create_array_visitor : public NeuropodTensorVisitor<py::array>
 
 TensorType get_array_type(py::array &array)
 {
-#define IS_INSTANCE_CHECK(cpp_type, neuropod_type) \
-    if (py::isinstance<py::array_t<cpp_type>>(array)) return neuropod_type;
+#define IS_INSTANCE_CHECK(cpp_type, neuropod_type)    \
+    if (py::isinstance<py::array_t<cpp_type>>(array)) \
+        return neuropod_type;
 
     FOR_EACH_TYPE_MAPPING_EXCEPT_STRING(IS_INSTANCE_CHECK)
 
@@ -59,12 +60,14 @@ TensorType get_array_type(py::array &array)
     NEUROPOD_ERROR("Unsupported array type in python bindings: " << array.dtype().kind())
 }
 
-std::shared_ptr<NeuropodTensor> tensor_from_string_numpy(NeuropodTensorAllocator &allocator, py::array &array, std::vector<int64_t> &shape)
+std::shared_ptr<NeuropodTensor> tensor_from_string_numpy(NeuropodTensorAllocator &allocator,
+                                                         py::array &              array,
+                                                         std::vector<int64_t> &   shape)
 {
     // Unfortunately, for strings, we need to copy all the data in the tensor
-    auto tensor = allocator.allocate_tensor<std::string>(shape);
-    int max_len = array.itemsize();
-    int numel   = tensor->get_num_elements();
+    auto tensor  = allocator.allocate_tensor<std::string>(shape);
+    int  max_len = array.itemsize();
+    int  numel   = tensor->get_num_elements();
 
     // Get a pointer to the underlying data
     char *data = static_cast<char *>(array.mutable_data());

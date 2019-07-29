@@ -2,11 +2,11 @@
 // Uber, Inc. (c) 2019
 //
 
-#include <pybind11/pybind11.h>
-#include <pybind11/numpy.h>
-
 #include "neuropods/internal/neuropod_tensor.hh"
 #include "neuropods/neuropods.hh"
+
+#include <pybind11/numpy.h>
+#include <pybind11/pybind11.h>
 
 namespace neuropods
 {

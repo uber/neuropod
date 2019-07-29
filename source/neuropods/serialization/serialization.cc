@@ -15,13 +15,13 @@ namespace neuropods
 namespace
 {
 
-std::once_flag registrar_initialized;
-std::unique_ptr<std::unordered_map<std::string, serialize_fn_t>>     registered_serializers;
-std::unique_ptr<std::unordered_map<std::string, deserialize_fn_t>>   registered_deserializers;
+std::once_flag                                                     registrar_initialized;
+std::unique_ptr<std::unordered_map<std::string, serialize_fn_t>>   registered_serializers;
+std::unique_ptr<std::unordered_map<std::string, deserialize_fn_t>> registered_deserializers;
 
 void init_registrar_if_needed()
 {
-    std::call_once(registrar_initialized, [](){
+    std::call_once(registrar_initialized, []() {
         registered_serializers   = stdx::make_unique<std::unordered_map<std::string, serialize_fn_t>>();
         registered_deserializers = stdx::make_unique<std::unordered_map<std::string, deserialize_fn_t>>();
     });
@@ -36,7 +36,7 @@ void register_serializer_internal(const std::string &tag, serialize_fn_t seriali
 {
     init_registrar_if_needed();
     (*registered_deserializers)[tag] = deserialize_fn;
-    (*registered_serializers)[tag] = serialize_fn;
+    (*registered_serializers)[tag]   = serialize_fn;
 }
 
 void serialize(boost::archive::binary_oarchive &out, const NeuropodValue &item)
@@ -56,7 +56,7 @@ void serialize(boost::archive::binary_oarchive &out, const NeuropodValue &item)
     registered_serializers->at(tag)(item, out);
 }
 
-std::shared_ptr<NeuropodValue> deserialize(boost::archive::binary_iarchive & ar, NeuropodTensorAllocator &allocator)
+std::shared_ptr<NeuropodValue> deserialize(boost::archive::binary_iarchive &ar, NeuropodTensorAllocator &allocator)
 {
     // Read the tag
     std::string tag;

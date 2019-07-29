@@ -24,7 +24,6 @@
     FN(uint32_t, UINT32_TENSOR)                 \
     FN(uint64_t, UINT64_TENSOR)
 
-
 #define FOR_EACH_TYPE_MAPPING_INCLUDING_STRING(FN) \
     FOR_EACH_TYPE_MAPPING_EXCEPT_STRING(FN)        \
     FN(std::string, STRING_TENSOR)
