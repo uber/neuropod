@@ -3,9 +3,7 @@
 //
 
 #include "gtest/gtest.h"
-
 #include "neuropods/backends/test_backend/test_neuropod_backend.hh"
-
 #include "neuropods/serialization/serialization.hh"
 
 namespace
@@ -31,7 +29,6 @@ void check_ptrs_eq(const T *data, size_t size, const T *target_data, size_t targ
     EXPECT_EQ(memcmp(data, target_data, size * sizeof(T)), 0);
 }
 
-
 template <typename T>
 void check_tensor_eq_ptr(const std::shared_ptr<neuropods::NeuropodTensor> &tensor, const T *target_data, size_t size)
 {
@@ -54,7 +51,8 @@ void check_vectors_eq(const std::vector<T> &a, const std::vector<T> &b)
     EXPECT_EQ(memcmp(&a[0], &b[0], a.size() * sizeof(T)), 0);
 }
 
-std::shared_ptr<neuropods::NeuropodTensor> serialize_deserialize(neuropods::NeuropodTensorAllocator &allocator, const std::shared_ptr<neuropods::NeuropodTensor> &tensor)
+std::shared_ptr<neuropods::NeuropodTensor> serialize_deserialize(
+    neuropods::NeuropodTensorAllocator &allocator, const std::shared_ptr<neuropods::NeuropodTensor> &tensor)
 {
     // Serialize the tensor
     std::stringstream ss;
@@ -70,7 +68,7 @@ std::shared_ptr<neuropods::NeuropodTensor> serialize_deserialize(neuropods::Neur
 TEST(test_allocate_tensor, add_tensors_and_validate)
 {
     neuropods::TestNeuropodBackend backend;
-    auto allocator = backend.get_tensor_allocator();
+    auto                           allocator = backend.get_tensor_allocator();
 
     // Allocate tensors
     std::shared_ptr<neuropods::NeuropodTensor> a_ten = allocator->allocate_tensor(a_shape, neuropods::INT32_TENSOR);
@@ -86,10 +84,7 @@ TEST(test_allocate_tensor, add_tensors_and_validate)
     // TODO(vip): Refactor this test. It's bad practice to have an empty deleter
     // The created tensor should be responsible for deallocating the memory
     std::shared_ptr<neuropods::NeuropodTensor> d_ten = allocator->tensor_from_memory(
-        d_shape,
-        neuropods::DOUBLE_TENSOR,
-        const_cast<double *>(d_data),
-        [](void * unused) {});
+        d_shape, neuropods::DOUBLE_TENSOR, const_cast<double *>(d_data), [](void *unused) {});
 
     // Validate the internal state for a
     {

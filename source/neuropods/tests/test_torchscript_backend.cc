@@ -16,7 +16,6 @@ TEST(test_models, test_torchscript_addition_tensor_output_model)
     test_addition_model("neuropods/tests/test_data/torchscript_addition_model_single_output/", "TorchNeuropodBackend");
 }
 
-
 TEST(test_models, test_torchscript_strings_model)
 {
     // Test the TorchScript strings model using the native torchscript backend

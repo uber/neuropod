@@ -4,14 +4,15 @@
 
 #include "backend_registration.hh"
 
-#include <dlfcn.h>
+#include "neuropods/internal/error_utils.hh"
+
 #include <iostream>
 #include <mutex>
 #include <sstream>
 #include <stdexcept>
 #include <unordered_map>
 
-#include "neuropods/internal/error_utils.hh"
+#include <dlfcn.h>
 
 namespace neuropods
 {
@@ -19,13 +20,13 @@ namespace neuropods
 namespace
 {
 
-std::once_flag registrar_initialized;
+std::once_flag                                                           registrar_initialized;
 std::unique_ptr<std::unordered_map<std::string, BackendFactoryFunction>> registered_backends_by_type;
 std::unique_ptr<std::unordered_map<std::string, BackendFactoryFunction>> registered_backends_by_name;
 
 void init_registrar_if_needed()
 {
-    std::call_once(registrar_initialized, [](){
+    std::call_once(registrar_initialized, []() {
         registered_backends_by_name = stdx::make_unique<std::unordered_map<std::string, BackendFactoryFunction>>();
         registered_backends_by_type = stdx::make_unique<std::unordered_map<std::string, BackendFactoryFunction>>();
     });
@@ -53,15 +54,20 @@ void load_default_backend(const std::unordered_map<std::string, std::string> &de
 
     if (backend_it == default_backend_for_type.end())
     {
-        NEUROPOD_ERROR("Default Neuropod backend not found for type '" << type << "'! "
-            "Make sure that you load a Neuropod backend that can support '" << type << "'");
+        NEUROPOD_ERROR("Default Neuropod backend not found for type '"
+                       << type
+                       << "'! "
+                          "Make sure that you load a Neuropod backend that can support '"
+                       << type << "'");
     }
     else
     {
         if (dlopen(backend_it->second.c_str(), RTLD_NOW) == nullptr)
         {
-            NEUROPOD_ERROR("Loading the default backend for type '" << type << "' failed. "
-                "Error from dlopen: " << dlerror());
+            NEUROPOD_ERROR("Loading the default backend for type '" << type
+                                                                    << "' failed. "
+                                                                       "Error from dlopen: "
+                                                                    << dlerror());
         }
     }
 }
@@ -84,8 +90,8 @@ bool register_backend(const std::string &             name,
     return true;
 }
 
-BackendFactoryFunction get_backend_for_type(const std::unordered_map<std::string, std::string> &default_backend_overrides,
-                                            const std::string &                                 type)
+BackendFactoryFunction get_backend_for_type(
+    const std::unordered_map<std::string, std::string> &default_backend_overrides, const std::string &type)
 {
     init_registrar_if_needed();
 
@@ -101,8 +107,10 @@ BackendFactoryFunction get_backend_for_type(const std::unordered_map<std::string
     {
         // If we get here, that means that we tried loading a default backend
         // and it failed
-        NEUROPOD_ERROR("Neuropod backend not found for type '" << type << "'! "
-            "Loading the default backend for type '" << type << "' failed.");
+        NEUROPOD_ERROR("Neuropod backend not found for type '" << type
+                                                               << "'! "
+                                                                  "Loading the default backend for type '"
+                                                               << type << "' failed.");
     }
     else
     {
@@ -117,8 +125,10 @@ BackendFactoryFunction get_backend_by_name(const std::string &name)
     auto backend_it = registered_backends_by_name->find(name);
     if (backend_it == registered_backends_by_name->end())
     {
-        NEUROPOD_ERROR("Neuropod backend not found for name'" << name << "'! "
-            "Make sure that you have a build dependency on the correct backend");
+        NEUROPOD_ERROR("Neuropod backend not found for name'"
+                       << name
+                       << "'! "
+                          "Make sure that you have a build dependency on the correct backend");
     }
     else
     {

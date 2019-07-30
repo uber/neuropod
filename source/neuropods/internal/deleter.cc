@@ -15,12 +15,12 @@ struct deleter_wrapper
     Deleter deleter;
 
     // The data pointer to pass to the deleter
-    void * data;
+    void *data;
 };
 
 } // namespace
 
-void run_deleter(void * handle)
+void run_deleter(void *handle)
 {
     if (handle == nullptr)
     {
@@ -33,7 +33,7 @@ void run_deleter(void * handle)
     delete wrapper;
 }
 
-void * register_deleter(const Deleter &deleter, void * data)
+void *register_deleter(const Deleter &deleter, void *data)
 {
     // Create a new wrapper and return a handle
     // This is deleted in `run_deleter`

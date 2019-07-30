@@ -4,19 +4,18 @@
 
 #pragma once
 
-#include <string>
-#include <vector>
-
-#include <torch/script.h>
-#include <torch/torch.h>
-
 #include "neuropods/backends/neuropod_backend.hh"
 #include "neuropods/backends/torchscript/torch_tensor.hh"
 #include "neuropods/internal/tensor_types.hh"
 
+#include <torch/script.h>
+#include <torch/torch.h>
+
+#include <string>
+#include <vector>
+
 namespace neuropods
 {
-
 
 // This backend can execute TorchScript models using the
 // native C++ torch API

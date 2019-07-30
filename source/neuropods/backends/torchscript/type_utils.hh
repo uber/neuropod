@@ -4,9 +4,9 @@
 
 #pragma once
 
-#include <torch/torch.h>
-
 #include "neuropods/internal/tensor_types.hh"
+
+#include <torch/torch.h>
 
 namespace neuropods
 {

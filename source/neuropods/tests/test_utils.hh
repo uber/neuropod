@@ -4,15 +4,15 @@
 
 #pragma once
 
+#include "gtest/gtest.h"
+#include "neuropods/neuropods.hh"
+
 #include <algorithm>
 #include <atomic>
 #include <string>
 #include <vector>
+
 #include <stdlib.h>
-
-#include "gtest/gtest.h"
-
-#include "neuropods/neuropods.hh"
 
 void test_addition_model(neuropods::Neuropod &neuropod, bool copy_mem)
 {
@@ -31,10 +31,10 @@ void test_addition_model(neuropods::Neuropod &neuropod, bool copy_mem)
         EXPECT_EQ(output_specs.at(0).type, neuropods::FLOAT_TENSOR);
 
         // Some sample input data
-        std::vector<int64_t> shape = {2, 2};
-        const float x_data[] = {1, 2, 3, 4};
-        const float y_data[] = {7, 8, 9, 10};
-        const float target[] = {8, 10, 12, 14};
+        std::vector<int64_t> shape    = {2, 2};
+        const float          x_data[] = {1, 2, 3, 4};
+        const float          y_data[] = {7, 8, 9, 10};
+        const float          target[] = {8, 10, 12, 14};
 
         neuropods::NeuropodValueMap input_data;
 
@@ -56,15 +56,15 @@ void test_addition_model(neuropods::Neuropod &neuropod, bool copy_mem)
         {
             // 64 byte aligned input data
             float *x_data_aligned, *y_data_aligned;
-            EXPECT_EQ(0, posix_memalign((void **)&x_data_aligned, 64, 64));
-            EXPECT_EQ(0, posix_memalign((void **)&y_data_aligned, 64, 64));
+            EXPECT_EQ(0, posix_memalign((void **) &x_data_aligned, 64, 64));
+            EXPECT_EQ(0, posix_memalign((void **) &y_data_aligned, 64, 64));
 
             // Set the data
             std::copy(x_data, x_data + 4, x_data_aligned);
             std::copy(y_data, y_data + 4, y_data_aligned);
 
             // Set up a deleter to free the memory
-            auto deleter = [&](void * data) {
+            auto deleter = [&](void *data) {
                 free(data);
                 free_counter++;
             };
@@ -78,11 +78,9 @@ void test_addition_model(neuropods::Neuropod &neuropod, bool copy_mem)
         const auto output_data = neuropod.infer(input_data);
 
         // Get the data in the output tensor
-        const std::vector<float>   out_vector = output_data->at("out")
-                                                           ->as_typed_tensor<float>()
-                                                           ->get_data_as_vector();
+        const std::vector<float> out_vector = output_data->at("out")->as_typed_tensor<float>()->get_data_as_vector();
 
-        const std::vector<int64_t> out_shape  = output_data->at("out")->as_tensor()->get_dims();
+        const std::vector<int64_t> out_shape = output_data->at("out")->as_tensor()->get_dims();
 
         // Check that the output data matches
         EXPECT_EQ(out_vector.size(), 4);
@@ -113,7 +111,8 @@ void test_addition_model(const std::string &neuropod_path, const std::string &ba
     test_addition_model(neuropod);
 }
 
-void test_addition_model(const std::string &neuropod_path, const std::unordered_map<std::string, std::string> &default_backend_overrides)
+void test_addition_model(const std::string &                                 neuropod_path,
+                         const std::unordered_map<std::string, std::string> &default_backend_overrides)
 {
     // Load the neuropod
     neuropods::Neuropod neuropod(neuropod_path, default_backend_overrides);
@@ -126,7 +125,6 @@ void test_addition_model(const std::string &neuropod_path)
     neuropods::Neuropod neuropod(neuropod_path);
     test_addition_model(neuropod);
 }
-
 
 void test_strings_model(neuropods::Neuropod &neuropod)
 {
@@ -147,17 +145,13 @@ void test_strings_model(neuropods::Neuropod &neuropod)
     y_ten->set(y_data);
 
     // Run inference
-    const auto output_data = neuropod.infer({
-        {"x", x_ten},
-        {"y", y_ten}
-    });
+    const auto output_data = neuropod.infer({{"x", x_ten}, {"y", y_ten}});
 
     // Get the data in the output tensor
-    const std::vector<std::string> out_vector = output_data->at("out")
-                                                           ->as_typed_tensor<std::string>()
-                                                           ->get_data_as_vector();
+    const std::vector<std::string> out_vector =
+        output_data->at("out")->as_typed_tensor<std::string>()->get_data_as_vector();
 
-    const std::vector<int64_t>     out_shape  = output_data->at("out")->as_tensor()->get_dims();
+    const std::vector<int64_t> out_shape = output_data->at("out")->as_tensor()->get_dims();
 
     // Check that the output data matches
     EXPECT_EQ(out_vector.size(), 3);
@@ -174,7 +168,8 @@ void test_strings_model(const std::string &neuropod_path, const std::string &bac
     test_strings_model(neuropod);
 }
 
-void test_strings_model(const std::string &neuropod_path, const std::unordered_map<std::string, std::string> &default_backend_overrides)
+void test_strings_model(const std::string &                                 neuropod_path,
+                        const std::unordered_map<std::string, std::string> &default_backend_overrides)
 {
     // Load the neuropod
     neuropods::Neuropod neuropod(neuropod_path, default_backend_overrides);

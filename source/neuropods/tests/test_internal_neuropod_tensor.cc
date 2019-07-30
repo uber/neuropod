@@ -3,7 +3,6 @@
 //
 
 #include "gtest/gtest.h"
-
 #include "neuropods/backends/test_backend/test_neuropod_backend.hh"
 #include "neuropods/internal/neuropod_tensor.hh"
 
@@ -16,7 +15,8 @@ class uint8_tensor_fixture : public ::testing::Test
 public:
     uint8_tensor_fixture()
     {
-        untyped_tensor       = test_backend_.get_tensor_allocator()->allocate_tensor({EXPECTED_SIZE}, neuropods::UINT8_TENSOR);
+        untyped_tensor =
+            test_backend_.get_tensor_allocator()->allocate_tensor({EXPECTED_SIZE}, neuropods::UINT8_TENSOR);
         const_untyped_tensor = untyped_tensor.get();
 
         tensor       = untyped_tensor->as_typed_tensor<uint8_t>();
@@ -57,7 +57,6 @@ protected:
     neuropods::TypedNeuropodTensor<uint8_t> *      tensor;
     const neuropods::TypedNeuropodTensor<uint8_t> *const_tensor;
 };
-
 
 TEST(test_stream_operator, untyped_tensor)
 {

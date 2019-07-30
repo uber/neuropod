@@ -4,15 +4,14 @@
 
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
-
 #include "neuropods/backends/test_backend/test_neuropod_backend.hh"
 #include "neuropods/serialization/serialization.hh"
 
-using ::testing::ElementsAreArray;
 using ::testing::ElementsAre;
+using ::testing::ElementsAreArray;
 
 template <typename T>
-static void expect_eq(const neuropods::NeuropodTensor& expected, const neuropods::NeuropodTensor& actual)
+static void expect_eq(const neuropods::NeuropodTensor &expected, const neuropods::NeuropodTensor &actual)
 {
     ASSERT_EQ(actual.get_tensor_type(), expected.get_tensor_type());
     EXPECT_THAT(actual.get_dims(), ElementsAreArray(expected.get_dims()));
@@ -21,12 +20,13 @@ static void expect_eq(const neuropods::NeuropodTensor& expected, const neuropods
 }
 
 template <typename T>
-static void expect_eq(const neuropods::NeuropodTensor& expected, const neuropods::NeuropodValue& actual)
+static void expect_eq(const neuropods::NeuropodTensor &expected, const neuropods::NeuropodValue &actual)
 {
     expect_eq<T>(expected, dynamic_cast<const neuropods::NeuropodTensor &>(actual));
 }
 
-std::shared_ptr<neuropods::NeuropodTensor> serialize_deserialize(neuropods::NeuropodTensorAllocator &allocator, const neuropods::NeuropodTensor &tensor)
+std::shared_ptr<neuropods::NeuropodTensor> serialize_deserialize(neuropods::NeuropodTensorAllocator &allocator,
+                                                                 const neuropods::NeuropodTensor &   tensor)
 {
     // Serialize the tensor
     std::stringstream ss;

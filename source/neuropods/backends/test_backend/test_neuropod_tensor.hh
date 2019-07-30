@@ -4,17 +4,16 @@
 
 #pragma once
 
-#include <iostream>
-#include <string>
-#include <memory>
-#include <vector>
-
 #include "neuropods/internal/deleter.hh"
 #include "neuropods/internal/neuropod_tensor.hh"
 
+#include <iostream>
+#include <memory>
+#include <string>
+#include <vector>
+
 namespace neuropods
 {
-
 
 // This is used along with the TestNeuropodBackend in tests
 template <typename T>
@@ -30,15 +29,15 @@ private:
 public:
     TestNeuropodTensor(const std::vector<int64_t> &dims) : TypedNeuropodTensor<T>(dims)
     {
-        data_ = malloc(this->get_num_elements() * sizeof(T));
-        deleter_handle_ = register_deleter([](void * data) { free(data); }, data_);
+        data_           = malloc(this->get_num_elements() * sizeof(T));
+        deleter_handle_ = register_deleter([](void *data) { free(data); }, data_);
     }
 
     // Wrap existing memory
-    TestNeuropodTensor(const std::vector<int64_t> &dims, void * data, const Deleter &deleter)
+    TestNeuropodTensor(const std::vector<int64_t> &dims, void *data, const Deleter &deleter)
         : TypedNeuropodTensor<T>(dims)
     {
-        data_ = data;
+        data_           = data;
         deleter_handle_ = register_deleter(deleter, data);
     }
 
@@ -59,21 +58,13 @@ private:
     std::vector<std::string> data_;
 
 public:
-    TestNeuropodTensor(const std::vector<int64_t> &dims) : TypedNeuropodTensor<std::string>(dims)
-    {
-    }
+    TestNeuropodTensor(const std::vector<int64_t> &dims) : TypedNeuropodTensor<std::string>(dims) {}
 
     ~TestNeuropodTensor() = default;
 
-    void set(const std::vector<std::string> &data)
-    {
-        data_ = data;
-    }
+    void set(const std::vector<std::string> &data) { data_ = data; }
 
-    std::vector<std::string> get_data_as_vector() const
-    {
-        return data_;
-    }
+    std::vector<std::string> get_data_as_vector() const { return data_; }
 };
 
 } // namespace neuropods

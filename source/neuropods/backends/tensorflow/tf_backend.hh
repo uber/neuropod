@@ -4,19 +4,18 @@
 
 #pragma once
 
-#include <unordered_map>
-#include <string>
-#include <vector>
-
-#include <tensorflow/c/c_api.h>
-
 #include "neuropods/backends/neuropod_backend.hh"
 #include "neuropods/backends/tensorflow/tf_tensor.hh"
 #include "neuropods/backends/tensorflow/tf_wrappers.hh"
 
+#include <tensorflow/c/c_api.h>
+
+#include <string>
+#include <unordered_map>
+#include <vector>
+
 namespace neuropods
 {
-
 
 // This backend can execute TensorFlow models
 class TensorflowNeuropodBackend : public NeuropodBackendWithDefaultAllocator<TensorflowNeuropodTensor>

@@ -4,13 +4,13 @@
 
 #pragma once
 
+#include "neuropods/backends/neuropod_backend.hh"
+#include "neuropods/internal/config_utils.hh"
+
 #include <memory>
 #include <string>
 #include <unordered_map>
 #include <vector>
-
-#include "neuropods/backends/neuropod_backend.hh"
-#include "neuropods/internal/config_utils.hh"
 
 namespace neuropods
 {
@@ -75,8 +75,7 @@ public:
 
     // Allocate a tensor of a certain shape and type
     template <typename T>
-    std::shared_ptr<TypedNeuropodTensor<T>> allocate_tensor(
-        const std::vector<int64_t> &input_dims);
+    std::shared_ptr<TypedNeuropodTensor<T>> allocate_tensor(const std::vector<int64_t> &input_dims);
 
     // Allocate a tensor of a certain shape and type with existing data
     // The user-provided memory will be wrapped and `deleter`
@@ -86,10 +85,9 @@ public:
     // Note: Some backends may have specific alignment requirements (e.g. tensorflow).
     // To support all the built-in backends, `data` should be aligned to 64 bytes.
     template <typename T>
-    std::shared_ptr<TypedNeuropodTensor<T>> tensor_from_memory(
-        const std::vector<int64_t> &input_dims,
-        T *                         data,
-        const Deleter &             deleter);
+    std::shared_ptr<TypedNeuropodTensor<T>> tensor_from_memory(const std::vector<int64_t> &input_dims,
+                                                               T *                         data,
+                                                               const Deleter &             deleter);
 };
 
 } // namespace neuropods

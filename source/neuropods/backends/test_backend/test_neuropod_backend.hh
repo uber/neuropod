@@ -4,11 +4,11 @@
 
 #pragma once
 
-#include <string>
-#include <vector>
-
 #include "neuropods/backends/neuropod_backend.hh"
 #include "neuropods/backends/test_backend/test_neuropod_tensor.hh"
+
+#include <string>
+#include <vector>
 
 namespace neuropods
 {

@@ -34,7 +34,6 @@ struct unique_if<T[N]>
 
 } // namespace detail
 
-
 // See http://en.cppreference.com/w/cpp/memory/unique_ptr/make_unique
 template <typename T, typename... Args>
 typename detail::unique_if<T>::unique_ptr make_unique(Args &&... args)
