@@ -13,8 +13,10 @@ cc_library(
     strip_include_prefix = "include",
 )
 
-cc_import(
+cc_library(
     name = "libtensorflow",
-    interface_library = "lib/libtensorflow.so",
-    system_provided = True,
+    srcs = select({
+        "@bazel_tools//src/conditions:darwin": glob(["lib/libtensorflow.so", "lib/libtensorflow.1.dylib"]),
+        "//conditions:default": glob(["lib/libtensorflow.so", "lib/libtensorflow.so.1"]),
+    }),
 )

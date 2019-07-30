@@ -5,6 +5,7 @@
 import numpy as np
 import os
 import subprocess
+import sys
 import tensorflow as tf
 import unittest
 from testpath.tempdir import TemporaryDirectory
@@ -29,7 +30,8 @@ def create_tf_addition_model(custom_op_path):
 
     return g.as_graph_def()
 
-
+@unittest.skipIf(tf.__version__ == '1.14.0' and sys.platform == 'darwin',
+                 'See https://github.com/tensorflow/tensorflow/issues/30633')
 class TestTensorflowCustomOps(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -38,7 +40,7 @@ class TestTensorflowCustomOps(unittest.TestCase):
         # TF_LFLAGS=( $(python -c 'import tensorflow as tf; print(" ".join(tf.sysconfig.get_link_flags()))') )
         # g++ -std=c++11 -shared addition_op.cc -o addition_op.so -fPIC ${TF_CFLAGS[@]} ${TF_LFLAGS[@]} -O2
         current_dir = os.path.dirname(os.path.abspath(__file__))
-        subprocess.check_call(["g++", "-std=c++11", "-shared", "addition_op.cc", "-o", "addition_op.so", "-fPIC"] + tf.sysconfig.get_compile_flags() + tf.sysconfig.get_link_flags() + ["-O2"], cwd=current_dir)
+        subprocess.check_call([os.getenv("TF_CXX", "g++"), "-std=c++11", "-shared", "addition_op.cc", "-o", "addition_op.so", "-fPIC"] + tf.sysconfig.get_compile_flags() + tf.sysconfig.get_link_flags() + ["-O2"], cwd=current_dir)
         cls.custom_op_path = os.path.join(current_dir, "addition_op.so")
 
     def package_simple_addition_model(self, do_fail=False):

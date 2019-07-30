@@ -22,6 +22,9 @@ else
     # Install bazel and python dev
     sudo apt-get update
     sudo apt-get install -y bazel ${NEUROPODS_PYTHON_BINARY}-dev ${NEUROPODS_PYTHON_BINARY}-pip
+
+    # Install g++-4.8 for TensorFlow custom op builds
+    sudo apt-get install -y g++-4.8
 fi
 
 # Run a bazel command to extract the bazel installation
