@@ -66,24 +66,24 @@ def check_addition_model(neuropod_path):
     Validate that the inputs and outputs of the loaded neuropod match
     the problem spec
     """
-    neuropod = load_neuropod(neuropod_path, load_custom_ops=False)
-    target = get_addition_model_spec()
+    with load_neuropod(neuropod_path, load_custom_ops=False) as neuropod:
+        target = get_addition_model_spec()
 
-    # Validate that the specs match
-    check_specs_match(neuropod.inputs, target["input_spec"])
-    check_specs_match(neuropod.outputs, target["output_spec"])
+        # Validate that the specs match
+        check_specs_match(neuropod.inputs, target["input_spec"])
+        check_specs_match(neuropod.outputs, target["output_spec"])
 
 def check_strings_model(neuropod_path):
     """
     Validate that the inputs and outputs of the loaded neuropod match
     the problem spec
     """
-    neuropod = load_neuropod(neuropod_path, load_custom_ops=False)
-    target = get_string_concat_model_spec()
+    with load_neuropod(neuropod_path, load_custom_ops=False) as neuropod:
+        target = get_string_concat_model_spec()
 
-    # Validate that the specs match
-    check_specs_match(neuropod.inputs, target["input_spec"])
-    check_specs_match(neuropod.outputs, target["output_spec"])
+        # Validate that the specs match
+        check_specs_match(neuropod.inputs, target["input_spec"])
+        check_specs_match(neuropod.outputs, target["output_spec"])
 
 def check_specs_match(specs, targets):
     """
