@@ -90,16 +90,17 @@ Our build matrix is defined as all combinations of the following:
 
 **Framework versions (each row of the table):**
 
-| TF | Torch |
-| --- | --- |
-| 1.11.0 | 1.2.0.dev20190601 |
-| 1.12.0 | 1.2.0.dev20190717 |
-| 1.14.0 | 1.1.0 |
+| CUDA | TF | Torch |
+| --- | --- | --- |
+| 9.0 | 1.11.0 | 1.1.0 |
+| 9.0 | 1.12.0 | 1.2.0.dev20190601 |
+| 10.0 | 1.13.1 | 1.2.0 |
+| 10.0 | 1.14.0 | 1.3.0.dev20190820 |
 
 We also have an additional build that runs natively on an Ubuntu 16.04 machine (outside of docker)
 to make sure that we don't accidentally break workflows of users not using docker.
 
-This is a total of 19 builds (3 * 2 * 3 + 1) running in CI
+This is a total of 25 builds (4 * 2 * 3 + 1) running in CI
 
 The current build matrix is defined in [build/ci_matrix.py](https://github.com/uber/neuropods/blob/master/build/ci_matrix.py#L73-L91)
 

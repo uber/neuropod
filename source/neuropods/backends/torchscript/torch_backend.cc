@@ -269,18 +269,18 @@ std::unique_ptr<NeuropodValueMap> TorchNeuropodBackend::infer(const NeuropodValu
     bool has_class_type = false;
 
 #if CAFFE2_NIGHTLY_VERSION >= 20190717
-    if (arguments.size() > 0 && arguments.at(0).type()->isSubclass(c10::TypeKind::ClassType))
+    if (arguments.size() > 0 && arguments.at(0).type()->kind() == c10::TypeKind::ClassType)
     {
         has_class_type = true;
     }
 #endif
 
-    if (arguments.size() == 2 && has_class_type && arguments.at(1).type()->isSubclass(c10::TypeKind::DictType))
+    if (arguments.size() == 2 && has_class_type && arguments.at(1).type()->kind() == c10::TypeKind::DictType)
     {
         is_dict_input = true;
     }
 
-    if (arguments.size() == 1 && arguments.at(0).type()->isSubclass(c10::TypeKind::DictType))
+    if (arguments.size() == 1 && arguments.at(0).type()->kind() == c10::TypeKind::DictType)
     {
         is_dict_input = true;
     }
