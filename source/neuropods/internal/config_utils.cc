@@ -88,14 +88,10 @@ std::vector<int64_t> get_dims_from_json(const Json::Value &json_shape)
             {
                 out.emplace_back(item.asInt64());
             }
-            else if (item.isNull())
+            else if (item.isNull() || item.isString())
             {
                 // A dim of size -1 means we won't check the size of that dim
                 out.emplace_back(-1);
-            }
-            else if (item.isString())
-            {
-                // TODO(vip): implement
             }
             else
             {
