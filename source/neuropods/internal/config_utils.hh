@@ -9,10 +9,18 @@
 
 #include <memory>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 namespace neuropods
 {
+
+// Device types that are supported in the Neuropod configuration
+enum DeviceType
+{
+    CPU,
+    GPU
+};
 
 // A struct that stores a specification for a tensor
 struct TensorSpec
@@ -35,6 +43,9 @@ struct ModelConfig
     const std::vector<TensorSpec> outputs;
 
     const std::vector<std::string> custom_ops;
+
+    // A map from an input tensor name to a device type
+    const std::unordered_map<std::string, DeviceType> input_tensor_device;
 };
 
 std::unique_ptr<ModelConfig> load_model_config(const std::string &neuropod_path);
