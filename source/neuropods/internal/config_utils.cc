@@ -88,10 +88,16 @@ std::vector<int64_t> get_dims_from_json(const Json::Value &json_shape)
             {
                 out.emplace_back(item.asInt64());
             }
-            else if (item.isNull() || item.isString())
+            else if (item.isNull())
             {
                 // A dim of size -1 means we won't check the size of that dim
                 out.emplace_back(-1);
+            }
+            else if (item.isString())
+            {
+                // TODO: In the future, named dimensions will be assigned unique negative values,
+                // but for now we always assign -2
+                out.emplace_back(-2);
             }
             else
             {
