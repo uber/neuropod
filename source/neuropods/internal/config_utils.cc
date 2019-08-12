@@ -95,7 +95,9 @@ std::vector<int64_t> get_dims_from_json(const Json::Value &json_shape)
             }
             else if (item.isString())
             {
-                // TODO(vip): implement
+                // TODO: In the future, named dimensions will be assigned unique negative values,
+                // but for now we always assign -2
+                out.emplace_back(-2);
             }
             else
             {
