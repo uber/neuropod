@@ -21,7 +21,10 @@ const std::string VALID_SPEC = "{"
                                "    \"dtype\": \"float32\","
                                "    \"shape\": [null, 2, \"some_symbol\"],"
                                "    \"name\": \"y\""
-                               "  }]"
+                               "  }],"
+                               "  \"input_tensor_device\": {"
+                               "    \"x\": \"GPU\""
+                               "  }"
                                "}";
 
 std::string replace(const std::string &search, const std::string &replace)
@@ -86,4 +89,16 @@ TEST(test_config_utils, invalid_spec_shape_element)
     // true is not valid in a shape
     std::istringstream config(replace("[null, 2, \"some_symbol\"]", "[null, 2, \"some_symbol\", true]"));
     EXPECT_THROW(neuropods::load_model_config(config), std::runtime_error);
+}
+
+TEST(test_config_utils, invalid_device)
+{
+    std::istringstream config(replace("\"x\": \"GPU\"", "\"x\": \"TPU\""));
+    EXPECT_THROW(neuropods::load_model_config(config), std::runtime_error);
+}
+
+TEST(test_config_utils, device_cpu)
+{
+    std::istringstream config(replace("\"x\": \"GPU\"", "\"x\": \"CPU\""));
+    neuropods::load_model_config(config);
 }

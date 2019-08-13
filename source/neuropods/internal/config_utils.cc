@@ -202,8 +202,41 @@ std::unique_ptr<ModelConfig> load_model_config(std::istream &input_stream)
         }
     }
 
+    // Load the device mapping if any
+    std::unordered_map<std::string, DeviceType> input_tensor_device;
+    if (obj.isMember("input_tensor_device"))
+    {
+        const Json::Value &device_mapping = obj["input_tensor_device"];
+        const auto names = device_mapping.getMemberNames();
+        for (const auto &name : names)
+        {
+            const auto type = device_mapping[name].asString();
+            if (type == "GPU")
+            {
+                input_tensor_device[name]  = DeviceType::GPU;
+            }
+            else if (type == "CPU")
+            {
+                input_tensor_device[name]  = DeviceType::CPU;
+            }
+            else
+            {
+                throw_neuropod_config_error("Invalid device type: " + type);
+            }
+        }
+    }
+    else
+    {
+        // Default all the tensors to GPU
+        // TODO(vip): Remove this on version increase
+        for (const auto &input : inputs)
+        {
+            input_tensor_device[input.name] = DeviceType::GPU;
+        }
+    }
+
     // Not directly using make_unique because of brace initialization
-    return stdx::make_unique<ModelConfig>(ModelConfig{name, platform, inputs, outputs, custom_ops});
+    return stdx::make_unique<ModelConfig>(ModelConfig{name, platform, inputs, outputs, custom_ops, input_tensor_device});
 }
 
 } // namespace neuropods
