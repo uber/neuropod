@@ -12,6 +12,7 @@ cc_binary(
         "type_utils.hh",
         "//neuropods:libneuropods.so",
     ],
+    copts = ["-D_GLIBCXX_USE_CXX11_ABI=0"],
     linkshared = True,
     linkstatic = True,
     linkopts = ["-Wl,-rpath ."],
