@@ -22,7 +22,8 @@ namespace
 {
 
 std::shared_ptr<torch::jit::script::Module> load_model_from_path(const std::string &             graph_path,
-                                                                 const std::vector<std::string> &custom_op_paths)
+                                                                 const std::vector<std::string> &custom_op_paths,
+                                                                 const torch::Device &           device)
 {
     // Load custom ops
     // TODO(vip): Add a flag allowing users to opt out of loading custom ops
@@ -58,9 +59,9 @@ std::shared_ptr<torch::jit::script::Module> load_model_from_path(const std::stri
     }
 
 #if CAFFE2_NIGHTLY_VERSION >= 20190717
-    auto model = std::make_shared<torch::jit::script::Module>(torch::jit::load(stream));
+    auto model = std::make_shared<torch::jit::script::Module>(torch::jit::load(stream, device));
 #else
-    auto model = torch::jit::load(stream);
+    auto model = torch::jit::load(stream, device);
 #endif
 
     if (!model)
@@ -114,7 +115,9 @@ void insert_value_in_output(NeuropodValueMap & output,
     if (value.isTensor())
     {
         // Torch tensor
-        auto tensor = value.toTensor();
+        // Transfer it to CPU
+        // .to(device) is a no-op if the tensor is already transferred
+        auto tensor = value.toTensor().to(torch::kCPU);
 
         // Get the type and make a TorchNeuropodTensor
         auto tensor_type     = get_neuropod_type_from_torch_type(tensor.scalar_type());
@@ -158,12 +161,34 @@ void insert_value_in_output(NeuropodValueMap & output,
     }
 }
 
+torch::jit::IValue maybe_set_device(const torch::jit::IValue &item, const torch::Device &device)
+{
+    if (item.isTensor())
+    {
+        // .to(device) is a no-op if the tensor is already transferred
+        return item.toTensor().to(device);
+    }
+
+    return item;
+}
+
 } // namespace
 
-TorchNeuropodBackend::TorchNeuropodBackend(const std::string &neuropod_path, std::unique_ptr<ModelConfig> &model_config)
-    : TorchNeuropodBackend(get_graph_path(neuropod_path),
-                           get_custom_ops_from_model_config(neuropod_path, *model_config))
+TorchNeuropodBackend::TorchNeuropodBackend(const std::string &           neuropod_path,
+                                           std::unique_ptr<ModelConfig> &model_config,
+                                           const RuntimeOptions &        options)
+    : options_(options),
+      input_device_mapping_(model_config->input_tensor_device)
 {
+    // Load the model
+    model_ = load_model_from_path(
+        get_graph_path(neuropod_path),
+        get_custom_ops_from_model_config(neuropod_path, *model_config),
+
+        // Load the model onto the appropriate device (ideally a GPU if we have one available)
+        // Note: this uses the options set in the initializer list above
+        get_torch_device(DeviceType::GPU)
+    );
 
     for (const auto &tensor_spec : model_config->outputs)
     {
@@ -178,11 +203,30 @@ TorchNeuropodBackend::TorchNeuropodBackend(const std::string &torchscript_model_
 
 TorchNeuropodBackend::TorchNeuropodBackend(const std::string &             torchscript_model_path,
                                            const std::vector<std::string> &custom_op_paths)
-    : model_(load_model_from_path(torchscript_model_path, custom_op_paths))
+    : model_(load_model_from_path(torchscript_model_path, custom_op_paths, torch::kCUDA))
 {
 }
 
 TorchNeuropodBackend::~TorchNeuropodBackend() = default;
+
+torch::Device TorchNeuropodBackend::get_torch_device(neuropods::DeviceType target_device)
+{
+    if (options_.visible_device == Device::CPU || !torch::cuda::is_available())
+    {
+        // No matter what the target device is, we don't have a choice other than running on CPU
+        // TODO(vip): warn if visible_device is set to a GPU but CUDA isn't available
+        return torch::kCPU;
+    }
+
+    if (target_device == DeviceType::CPU)
+    {
+        return torch::kCPU;
+    }
+    else
+    {
+        return torch::Device(torch::kCUDA, options_.visible_device);
+    }
+}
 
 #if CAFFE2_NIGHTLY_VERSION >= 20190717
 #define MAKE_DICT(name) c10::impl::GenericDict name((c10::impl::deprecatedUntypedDict()));
@@ -249,9 +293,10 @@ std::unique_ptr<NeuropodValueMap> TorchNeuropodBackend::infer(const NeuropodValu
         MAKE_DICT(input_dict);
         for (const auto &entry : inputs)
         {
-            // TODO(vip): transfer to the correct device
-            // .to(device) is a no-op if the tensor is already transferred
-            DICT_INSERT(input_dict, entry.first, get_ivalue_from_torch_tensor(entry.second));
+            const auto device = get_torch_device(input_device_mapping_.at(entry.first));
+            const auto &value = get_ivalue_from_torch_tensor(entry.second);
+
+            DICT_INSERT(input_dict, entry.first, maybe_set_device(value, device));
         }
 
         torch_inputs.at(0) = input_dict;
@@ -270,9 +315,9 @@ std::unique_ptr<NeuropodValueMap> TorchNeuropodBackend::infer(const NeuropodValu
                 NEUROPOD_ERROR("Input '" << input_name.c_str() << "' does not exist. Model inputs " << schema);
             }
 
-            // TODO(vip): transfer to the correct device
-            // .to(device) is a no-op if the tensor is already transferred
-            torch_inputs.at(arg_index.value() - (has_class_type ? 1 : 0)) = input_data;
+            const auto device = get_torch_device(input_device_mapping_.at(input_name));
+
+            torch_inputs.at(arg_index.value() - (has_class_type ? 1 : 0)) = maybe_set_device(input_data, device);
         }
     }
 

@@ -100,6 +100,9 @@ class NeuropodExecutor(object):
         # Read the neuropod config
         self.neuropod_config = config_utils.read_neuropod_config(neuropod_path)
 
+        # Generate the tensor to device mapping
+        self.input_device_mapping = {tensor["name"] : self.neuropod_config["input_tensor_device"][tensor["name"]] for tensor in self.inputs}
+
     @property
     def inputs(self):
         """

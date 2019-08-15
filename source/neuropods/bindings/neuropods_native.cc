@@ -55,14 +55,40 @@ py::bytes serialize_binding(py::array numpy_array)
     return py::bytes(buffer_stream.str());
 }
 
+template <typename... Params>
+std::unique_ptr<Neuropod> make_neuropod(py::kwargs kwargs, Params &&... params)
+{
+    RuntimeOptions options;
+
+    if (kwargs.contains("visible_gpu"))
+    {
+        if (kwargs["visible_gpu"].is_none())
+        {
+            options.visible_device = Device::CPU;
+        }
+        else
+        {
+            options.visible_device = kwargs["visible_gpu"].cast<int>();
+        }
+    }
+
+    return stdx::make_unique<Neuropod>(std::forward<Params>(params)..., options);
+}
+
 } // namespace
 
 PYBIND11_MODULE(neuropods_native, m)
 {
     py::class_<Neuropod>(m, "Neuropod")
-        .def(py::init<const std::string &>())
-        .def(py::init<const std::string &, const std::unordered_map<std::string, std::string> &>())
-        .def(py::init<const std::string &, const std::string &>())
+        .def(py::init([](const std::string &path, py::kwargs kwargs) {
+            return make_neuropod(kwargs, path);
+        }))
+        .def(py::init([](const std::string &path, const std::unordered_map<std::string, std::string> &default_backend_overrides, py::kwargs kwargs) {
+            return make_neuropod(kwargs, path, default_backend_overrides);
+        }))
+        .def(py::init([](const std::string &path, const std::string &backend_name, py::kwargs kwargs) {
+            return make_neuropod(kwargs, path, backend_name);
+        }))
         .def("infer", &infer);
 
     m.def("serialize", &serialize_binding, "Convert a numpy array to a NeuropodTensor and serialize it");

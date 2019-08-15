@@ -40,6 +40,7 @@ private:
 public:
     PythonBridge(const std::string &             neuropod_path,
                  std::unique_ptr<ModelConfig> &  model_config,
+                 const RuntimeOptions &          options,
                  const std::vector<std::string> &python_path_additions = get_default_python_path());
 
     ~PythonBridge();

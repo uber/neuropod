@@ -18,7 +18,9 @@ class TestNeuropodBackend : public NeuropodBackendWithDefaultAllocator<TestNeuro
 {
 public:
     TestNeuropodBackend();
-    TestNeuropodBackend(const std::string &neuropod_path, std::unique_ptr<ModelConfig> &model_config);
+    TestNeuropodBackend(const std::string &           neuropod_path,
+                        std::unique_ptr<ModelConfig> &model_config,
+                        const RuntimeOptions &        options);
     ~TestNeuropodBackend();
 
     // Run inference

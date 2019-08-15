@@ -19,7 +19,9 @@ def create_torchscript_neuropod(
         custom_ops=[],
         test_input_data=None,
         test_expected_out=None,
-        persist_test_data=True):
+        persist_test_data=True,
+        input_tensor_device=None,
+        default_input_tensor_device="GPU"):
     """
     Packages a TorchScript model as a neuropod package.
 
@@ -68,6 +70,22 @@ def create_torchscript_neuropod(
                                 }
 
     :param  persist_test_data:  Optionally saves the test data within the packaged neuropod. default True.
+
+    :param  input_tensor_device:    A dict mapping input tensor names to the device
+                                    that the model expects them to be on. This can
+                                    either be `GPU` or `CPU`. Any tensors in `input_spec`
+                                    not specified in this mapping will use the
+                                    `default_input_tensor_device` specified below.
+                                    If a GPU is selected at inference time, Neuropods
+                                    will move tensors to the appropriate devices before
+                                    running the model. Otherwise, it will attempt to run
+                                    the model on CPU and move all tensors (and the model)
+                                    to CPU.
+                                    See the docstring for `load_neuropod` for more info.
+                                    Ex: `{"x": "GPU"}`
+
+    :param  default_input_tensor_device:    The default device that input tensors are expected
+                                            to be on. This can either be `GPU` or `CPU`.
     """
     try:
         # Create the neuropod folder
@@ -88,7 +106,9 @@ def create_torchscript_neuropod(
         platform="torchscript",
         input_spec=input_spec,
         output_spec=output_spec,
-        custom_ops=[os.path.basename(op) for op in custom_ops]
+        custom_ops=[os.path.basename(op) for op in custom_ops],
+        input_tensor_device=input_tensor_device,
+        default_input_tensor_device=default_input_tensor_device,
     )
 
     # Create a folder to store the model

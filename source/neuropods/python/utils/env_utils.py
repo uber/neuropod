@@ -35,7 +35,7 @@ def create_virtualenv(venv_path, packages_to_install=[], verbose=False):
         shutil.copytree(neuropods.__path__[0], os.path.join(venv_path, "neuropod_test_libs", "neuropods"))
 
 
-def eval_in_virtualenv(neuropod_path, input_data, venv_path):
+def eval_in_virtualenv(neuropod_path, input_data, venv_path, **kwargs):
     """
     Loads and runs a neuropod model in a separate process with specified input data.
     It also does this in a virtualenv in order to make sure that the model was
@@ -51,24 +51,30 @@ def eval_in_virtualenv(neuropod_path, input_data, venv_path):
         neuropod_path,
         input_data,
         os.path.join(venv_path, 'bin', 'python'),
-        env={"PYTHONPATH": os.path.join(venv_path, "neuropod_test_libs")}
+        env={"PYTHONPATH": os.path.join(venv_path, "neuropod_test_libs")},
+        **kwargs
     )
 
-def eval_in_new_process(neuropod_path, input_data, binary_path=sys.executable, extra_args=[], **kwargs):
+def eval_in_new_process(neuropod_path, input_data, binary_path=sys.executable, extra_args=[], neuropod_load_args={}, **kwargs):
     """
     Loads and runs a neuropod model in a separate process with specified input data.
 
     Raises a CalledProcessError if there was an error evaluating the neuropod
 
-    :param  neuropod_path   The path to the neuropod to load
-    :param  input_data      A pickleable dict containing sample input to the model
-    :param  binary_path     The binary to run. Defaults to "python"
-    :param  extra_args      Optional extra command line args to provide
+    :param  neuropod_path       The path to the neuropod to load
+    :param  input_data          A pickleable dict containing sample input to the model
+    :param  binary_path         The binary to run. Defaults to "python"
+    :param  extra_args          Optional extra command line args to provide
+    :param  neuropod_load_args  A pickleable dict containing args to provide to `load_neuropod`
     """
     with TemporaryDirectory() as tmpdir:
         _, input_filepath = mkstemp(dir=tmpdir)
         with open(input_filepath, 'wb') as input_pkl:
             pickle.dump(input_data, input_pkl, protocol=-1)
+
+        _, args_filepath = mkstemp(dir=tmpdir)
+        with open(args_filepath, 'wb') as args_pkl:
+            pickle.dump(neuropod_load_args, args_pkl, protocol=-1)
 
         _, output_filepath = mkstemp(dir=tmpdir)
 
@@ -76,6 +82,7 @@ def eval_in_new_process(neuropod_path, input_data, binary_path=sys.executable, e
                                '--neuropod-path', neuropod_path,
                                '--input-pkl-path', input_filepath,
                                '--output-pkl-path', output_filepath,
+                               '--args-pkl-path', args_filepath,
                                ] + extra_args, **kwargs)
 
         with open(output_filepath, 'rb') as output_pkl:

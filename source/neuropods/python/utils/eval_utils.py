@@ -47,15 +47,7 @@ def print_output_summary(out):
             raise ValueError("All outputs must be numpy arrays! Output `{}` was of type `{}`".format(key, type(value)))
 
 
-def eval_in_process(neuropod_path, test_input_data):
-    """
-    Used to run evaluation without a virtualenv
-    """
-    with load_neuropod(neuropod_path) as model:
-        # Run inference and return the output
-        return model.infer(test_input_data)
-
-def load_and_test_native(neuropod_path, test_input_data, test_expected_out=None):
+def load_and_test_native(neuropod_path, test_input_data, test_expected_out=None, **kwargs):
     """
     Loads a neuropod using the python bindings and runs inference.
     If expected output is specified, the output of the model is checked against
@@ -66,14 +58,16 @@ def load_and_test_native(neuropod_path, test_input_data, test_expected_out=None)
     # Converts unicode to ascii for Python 3
     test_input_data = maybe_convert_bindings_types(test_input_data)
 
-    out = eval_in_new_process(neuropod_path, test_input_data, extra_args=["--use-native"])
+    out = eval_in_new_process(neuropod_path, test_input_data, extra_args=["--use-native"], **kwargs)
+
     # Check the output
     if test_expected_out is not None:
         # Throws a ValueError if the output doesn't match the expected value
         check_output_matches_expected(out, test_expected_out)
 
 def load_and_test_neuropod(neuropod_path, test_input_data, test_expected_out=None,
-                           use_virtualenv=False, test_deps=[], test_virtualenv=None):
+                           use_virtualenv=False, test_deps=[], test_virtualenv=None,
+                           neuropod_load_args={}):
     """
     Loads a neuropod in a virtualenv and verifies that inference runs.
     If expected output is specified, the output of the model is checked against
@@ -82,7 +76,7 @@ def load_and_test_neuropod(neuropod_path, test_input_data, test_expected_out=Non
     Raises a ValueError if the outputs don't match the expected values
     """
     if RUN_NATIVE_TESTS:
-        return load_and_test_native(neuropod_path, test_input_data, test_expected_out)
+        return load_and_test_native(neuropod_path, test_input_data, test_expected_out, neuropod_load_args=neuropod_load_args)
 
     if use_virtualenv:
         # Run the model in a virtualenv
@@ -90,14 +84,14 @@ def load_and_test_neuropod(neuropod_path, test_input_data, test_expected_out=Non
             # Create a temporary virtualenv if one is not specified
             with TemporaryDirectory() as virtualenv_dir:
                 create_virtualenv(virtualenv_dir, packages_to_install=test_deps)
-                out = eval_in_virtualenv(neuropod_path, test_input_data, virtualenv_dir)
+                out = eval_in_virtualenv(neuropod_path, test_input_data, virtualenv_dir, neuropod_load_args=neuropod_load_args)
         else:
             # Otherwise run in the specified virtualenv
-            out = eval_in_virtualenv(neuropod_path, test_input_data, test_virtualenv)
+            out = eval_in_virtualenv(neuropod_path, test_input_data, test_virtualenv, neuropod_load_args=neuropod_load_args)
     else:
         # Run the evaluation in a new process. This is important to make sure
         # custom ops are being tested correctly
-        out = eval_in_new_process(neuropod_path, test_input_data)
+        out = eval_in_new_process(neuropod_path, test_input_data, neuropod_load_args=neuropod_load_args)
 
     # Check the output
     if test_expected_out is not None:
