@@ -2,8 +2,12 @@
 # Uber, Inc. (c) 2018
 #
 
+import atexit
 import os
+import six
 import sys
+import tempfile
+import uuid
 import importlib
 import json
 
@@ -11,30 +15,23 @@ import numpy as np
 
 from neuropods.backends.neuropod_executor import NeuropodExecutor
 
+# Create the neuropod package symlink directory
+SYMLINKS_DIR = tempfile.mkdtemp(suffix=".neuropod_python_symlinks")
+open(os.path.join(SYMLINKS_DIR, "__init__.py"), "a").close()
 
-def _validate_not_importable(package):
-    """
-    Try to import `package` and all its parents and verify that they are not
-    importable. Throws a ValueError if any of these are importable
+# Add it to our path if necessary
+sys.path.insert(0, SYMLINKS_DIR)
 
-    This ensures that when we're loading a neuropod, we're not overwriting any
-    existing packages and the neuropod is being loaded correctly.
+# Make sure we clean up this directory at exit
+def cleanup_symlink():
+    # Remove the symlinks (and __init__.py)
+    for f in os.listdir(SYMLINKS_DIR):
+        os.unlink(os.path.join(SYMLINKS_DIR, f))
 
-    :param  package:    The package to verify is not importable.
-                        Ex: `petastorm.workers_pool.process_pool`
-    """
-    while "." in package:
-        try:
-            importlib.import_module(package)
-            raise ValueError(("Package `{}` is importable before loading the neuropod! "
-                              "This means that your neuropod package clashes with something already "
-                              "accessible by python. Please check your PYTHONPATH and try again").format(package))
-        except ImportError:
-            pass
+    # Delete the directory
+    os.rmdir(SYMLINKS_DIR)
 
-        # Remove everything following the last "." (including the ".")
-        package = package.rsplit(".", 1)[0]
-
+atexit.register(cleanup_symlink)
 
 class PythonNeuropodExecutor(NeuropodExecutor):
     """
@@ -59,16 +56,46 @@ class PythonNeuropodExecutor(NeuropodExecutor):
         entrypoint_package_path = model_config["entrypoint_package"]
         entrypoint_fn_name = model_config["entrypoint"]
 
-        # Verify that loading this neuropod won't clash with anything in our existing path
-        _validate_not_importable(entrypoint_package_path)
-
-        # Add the neuropod code and custom op paths to the beginning of the python path
+        # Add the custom op paths to the beginning of the python path
+        # Note: there currently isn't a good way to handle multiple custom ops with the same name.
+        # Depending on the underlying framework, there can be a global registry that the ops register themselves with
+        # If multiple neuropods are loaded that contain ops with the same name, this can cause a conflict or silently
+        # use an incorrect op.
+        #
+        # For complete isolation, out of process execution is the best solution
         if load_custom_ops:
-            sys.path.insert(0, os.path.join(neuropod_path, "0", "ops"))
-        sys.path.insert(0, os.path.join(neuropod_path, "0", "code"))
+            custom_op_path = os.path.abspath(os.path.join(neuropod_path, "0", "ops"))
+
+            if os.path.isdir(custom_op_path):
+                # Try to avoid silently using the incorrect op
+                for item in os.listdir(custom_op_path):
+                    # Make sure there isn't something already loadable with the
+                    # same name as this op
+                    op_name = os.path.splitext(item)[0]
+                    try:
+                        importlib.import_module(op_name)
+                        raise ValueError(("Package `{}` is importable before loading the neuropod! "
+                                          "This means that a custom op in your neuropod package clashes with something already "
+                                          "accessible by python. Please check your PYTHONPATH and try again").format(op_name))
+                    except ImportError:
+                        pass
+
+                # Add the ops directory to the path
+                sys.path.insert(0, custom_op_path)
+
+        # Create a symlink to our code directory
+        neuropod_code_path = os.path.abspath(os.path.join(neuropod_path, "0", "code"))
+        rand_id = str(uuid.uuid4()).replace("-", "_")
+        self.symlink_path = os.path.join(SYMLINKS_DIR, rand_id)
+        os.symlink(neuropod_code_path, self.symlink_path)
 
         # Import the entrypoint package
-        entrypoint_package = importlib.import_module(entrypoint_package_path)
+        if six.PY3:
+            # We need to clear the import system caches to make sure it can find the new module
+            # See https://docs.python.org/3/library/importlib.html#importlib.import_module
+            importlib.invalidate_caches()
+
+        entrypoint_package = importlib.import_module("{}.{}".format(rand_id, entrypoint_package_path))
 
         # Get the entrypoint function and run it with the data path
         self.model = entrypoint_package.__dict__[entrypoint_fn_name](data_path)

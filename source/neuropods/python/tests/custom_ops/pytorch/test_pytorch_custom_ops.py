@@ -12,6 +12,7 @@ import unittest
 from tempfile import mkdtemp
 from testpath.tempdir import TemporaryDirectory
 
+from neuropods.loader import load_neuropod
 from neuropods.packagers import create_pytorch_neuropod
 from neuropods.tests.utils import get_addition_model_spec
 
@@ -39,49 +40,64 @@ class TestPytorchPackaging(unittest.TestCase):
         subprocess.check_call([sys.executable, "setup.py", "build"], cwd=current_dir)
         cls.custom_op_path = glob.glob(os.path.join(current_dir, "build", "lib*", "addition_op.so"))[0]
 
-    def package_simple_addition_model(self, do_fail=False):
-        with TemporaryDirectory() as test_dir:
-            neuropod_path = os.path.join(test_dir, "test_neuropod")
-            model_code_dir = os.path.join(test_dir, "model_code")
-            os.makedirs(model_code_dir)
+    def package_simple_addition_model(self, test_dir, do_fail=False):
+        neuropod_path = os.path.join(test_dir, "test_neuropod")
+        model_code_dir = os.path.join(test_dir, "model_code")
+        os.makedirs(model_code_dir)
 
-            with open(os.path.join(model_code_dir, "addition_model.py"), "w") as f:
-                f.write(ADDITION_MODEL_SOURCE)
+        with open(os.path.join(model_code_dir, "addition_model.py"), "w") as f:
+            f.write(ADDITION_MODEL_SOURCE)
 
-            # `create_pytorch_neuropod` runs inference with the test data immediately
-            # after creating the neuropod. Raises a ValueError if the model output
-            # does not match the expected output.
-            create_pytorch_neuropod(
-                neuropod_path=neuropod_path,
-                model_name="addition_model",
-                data_paths=[],
-                code_path_spec=[{
-                    "python_root": model_code_dir,
-                    "dirs_to_package": [
-                        ""  # Package everything in the python_root
-                    ],
-                }],
-                entrypoint_package="addition_model",
-                entrypoint="get_model",
-                test_deps=['torch', 'numpy'],
-                custom_ops=[self.custom_op_path],
-                # This runs the test in the current process instead of in a new virtualenv
-                # We are using this to ensure the test will work even if the CI environment
-                # is restrictive
-                skip_virtualenv=True,
-                # Get the input/output spec along with test data
-                **get_addition_model_spec(do_fail=do_fail)
-            )
+        # `create_pytorch_neuropod` runs inference with the test data immediately
+        # after creating the neuropod. Raises a ValueError if the model output
+        # does not match the expected output.
+        create_pytorch_neuropod(
+            neuropod_path=neuropod_path,
+            model_name="addition_model",
+            data_paths=[],
+            code_path_spec=[{
+                "python_root": model_code_dir,
+                "dirs_to_package": [
+                    ""  # Package everything in the python_root
+                ],
+            }],
+            entrypoint_package="addition_model",
+            entrypoint="get_model",
+            test_deps=['torch', 'numpy'],
+            custom_ops=[self.custom_op_path],
+            # This runs the test in the current process instead of in a new virtualenv
+            # We are using this to ensure the test will work even if the CI environment
+            # is restrictive
+            skip_virtualenv=True,
+            # Get the input/output spec along with test data
+            **get_addition_model_spec(do_fail=do_fail)
+        )
+
+        return neuropod_path
 
     def test_simple_addition_model(self):
         # Tests a case where packaging works correctly and
         # the model output matches the expected output
-        self.package_simple_addition_model()
+        with TemporaryDirectory() as test_dir:
+            self.package_simple_addition_model(test_dir)
 
     def test_simple_addition_model_failure(self):
         # Tests a case where the output does not match the expected output
-        with self.assertRaises(ValueError):
-            self.package_simple_addition_model(do_fail=True)
+        with TemporaryDirectory() as test_dir:
+            with self.assertRaises(ValueError):
+                self.package_simple_addition_model(test_dir, do_fail=True)
+
+    def test_custom_op_conflict(self):
+        # Test that we throw an error when there is a custom op conflict
+        with TemporaryDirectory() as test_dir1:
+            with TemporaryDirectory() as test_dir2:
+                path1 = self.package_simple_addition_model(test_dir1)
+                path2 = self.package_simple_addition_model(test_dir2)
+
+                with load_neuropod(path1) as n1:
+                    with self.assertRaises(ValueError):
+                        with load_neuropod(path2) as n2:
+                            pass
 
 
 if __name__ == '__main__':
