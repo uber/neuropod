@@ -6,6 +6,7 @@
 
 #include "neuropods/internal/error_utils.hh"
 #include "neuropods/internal/memory_utils.hh"
+#include "neuropods/internal/tensor_accessor.hh"
 #include "neuropods/internal/type_macros.hh"
 
 #include <cstring>
@@ -106,12 +107,12 @@ private:
     // The dimensions of the tensor
     const std::vector<int64_t> dims_;
 
+    // The strides of the tensor
+    const std::vector<int64_t> strides_;
+
 public:
-    // Create a NeuropodTensor with a name and type
-    NeuropodTensor(TensorType tensor_type, const std::vector<int64_t> dims)
-        : NeuropodValue(true), tensor_type_(tensor_type), dims_(dims)
-    {
-    }
+    // Create a NeuropodTensor with a type and dims
+    NeuropodTensor(TensorType tensor_type, const std::vector<int64_t> dims);
 
     NeuropodTensor(const NeuropodTensor &) = delete;
 
@@ -248,7 +249,7 @@ protected:
     }
     void assure_rank(size_t expected_rank) const
     {
-        const auto   dims = this->get_dims();
+        const auto  &dims = this->get_dims();
         const size_t rank = dims.size();
         if (rank != expected_rank)
         {
@@ -256,6 +257,9 @@ protected:
                                                                  << rank);
         }
     }
+
+    // Get the strides of the tensor
+    const std::vector<int64_t> &get_strides() const { return strides_; }
 };
 
 // A TypedNeuropodTensor is a NeuropodTensor of a specific type.
@@ -271,31 +275,41 @@ public:
     virtual T *      get_raw_data_ptr()       = 0;
     virtual const T *get_raw_data_ptr() const = 0;
 
-    virtual const T &operator[](uint32_t r) const { return (*this)(r); }
-    virtual T &      operator[](uint32_t r) { return (*this)(r); }
-
-    virtual const T &operator()(uint32_t r) const
-    {
-        this->assure_rank(1);
-        return get_raw_data_ptr()[r];
+    template<size_t N>
+    TensorAccessor<T, N> accessor() {
+        static_assert(N > 0, "`accessor()` is used for indexing a tensors, for scalars use `as_scalar()`");
+        this->assure_rank(N);
+        return TensorAccessor<T, N>(get_raw_data_ptr(), get_strides().data());
     }
 
-    virtual T &operator()(uint32_t r)
-    {
-        this->assure_rank(1);
-        return get_raw_data_ptr()[r];
+    template<size_t N>
+    TensorAccessor<const T, N> accessor() const {
+        static_assert(N > 0, "`accessor()` is used for indexing tensors, for scalars use `as_scalar()`");
+        this->assure_rank(N);
+        return TensorAccessor<const T, N>(get_raw_data_ptr(), get_strides().data());
     }
 
-    virtual const T &operator()(uint32_t r, uint32_t c) const
+    const T &operator[](uint32_t r) const { return (*this)(r); }
+    T &      operator[](uint32_t r) { return (*this)(r); }
+
+    const T &operator()(uint32_t r) const
     {
-        this->assure_rank(2);
-        return get_raw_data_ptr()[r * this->get_dims()[1] + c];
+        return accessor<1>()[r];
     }
 
-    virtual T &operator()(uint32_t r, uint32_t c)
+    T &operator()(uint32_t r)
     {
-        this->assure_rank(2);
-        return get_raw_data_ptr()[r * this->get_dims()[1] + c];
+        return accessor<1>()[r];
+    }
+
+    const T &operator()(uint32_t r, uint32_t c) const
+    {
+        return accessor<2>()[r][c];
+    }
+
+    T &operator()(uint32_t r, uint32_t c)
+    {
+        return accessor<2>()[r][c];
     }
 
     const T *begin() const

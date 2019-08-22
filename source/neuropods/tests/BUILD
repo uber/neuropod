@@ -115,6 +115,20 @@ cc_test(
 )
 
 cc_test(
+    name = "test_accessor",
+    srcs = [
+        "test_accessor.cc",
+        "//neuropods:libneuropods.so",
+        "//neuropods/backends/test_backend:libneuropod_test_backend.so",
+    ],
+    deps = [
+        "@gtest//:main",
+        "//neuropods/backends/test_backend:test_backend_hdrs",
+        "//neuropods:neuropods_hdrs",
+    ],
+)
+
+cc_test(
     name = "test_internal_neuropod_tensor",
     srcs = [
         "test_internal_neuropod_tensor.cc",

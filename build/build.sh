@@ -11,7 +11,7 @@ python setup.py bdist_wheel && pip install dist/*.whl
 popd
 
 # Build the native code
-bazel build "$@" //...:all
+bazel build -c opt "$@" //...:all
 
 if [[ $(uname -s) == 'Linux' ]]; then
     # Copy the build artificts into a dist folder
