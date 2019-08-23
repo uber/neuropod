@@ -7,6 +7,38 @@
 namespace neuropods
 {
 
+namespace
+{
+
+std::vector<int64_t> compute_strides(const std::vector<int64_t> &dims)
+{
+    // To compute strides from the dimensions, we want to do the following:
+    // For an index i, if i is the last element:
+    //     strides[i] = 1
+    // else
+    //     strides[i] = product(dims[i + 1:])
+    std::vector<int64_t> out(dims.size());
+
+    int64_t running_product = 1;
+    for (int i = out.size() - 1; i >= 0; i--)
+    {
+        // Set the stride
+        out[i] = running_product;
+
+        // Update the running product
+        running_product *= dims[i];
+    }
+
+    return out;
+}
+
+} // namespace
+
+NeuropodTensor::NeuropodTensor(TensorType tensor_type, const std::vector<int64_t> dims)
+    : NeuropodValue(true), tensor_type_(tensor_type), dims_(dims), strides_(compute_strides(dims))
+{
+}
+
 NeuropodTensor *NeuropodValue::as_tensor()
 {
     assure_tensor();
