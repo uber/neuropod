@@ -5,9 +5,9 @@ pushd source
 # Set LD_LIBRARY_PATH
 source ../build/set_build_env.sh
 
-# Build a wheel + install locally
+# Build a wheel
 pushd python
-python setup.py bdist_wheel && pip install dist/*.whl
+python setup.py bdist_wheel
 popd
 
 # Build the native code
