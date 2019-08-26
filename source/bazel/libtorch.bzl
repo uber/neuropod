@@ -7,16 +7,52 @@ def _impl(repository_ctx):
     IS_GPU  = (repository_ctx.os.environ.get("NEUROPODS_IS_GPU") or None) != None
     CUDA_VERSION = repository_ctx.os.environ.get("NEUROPODS_CUDA_VERSION") or "10.0"
 
+    # Get the torch cuda string (e.g. cpu, cu90, cu92, cu100)
+    torch_cuda_string = "cu" + CUDA_VERSION.replace(".", "") if IS_GPU else "cpu"
+
+    # The base version of torch (e.g. 1.2.0)
+    version_base = None
+
+    # If this is a nightly build, what's the date (e.g. 20190809)
+    version_date = None
+
+    # The base download url
     download_url = "https://download.pytorch.org/libtorch"
     defines = []
-    if "dev" in version:
-        download_url += "/nightly"
-        defines.append("CAFFE2_NIGHTLY_VERSION=" + version.split("dev")[1])
 
-    if IS_GPU:
-        download_url += "/cu" + CUDA_VERSION.replace(".", "")
+    # Get the version info
+    if "dev" in version:
+        version_base, version_date = version.split(".dev")
     else:
-        download_url += "/cpu"
+        version_base = version
+
+    # If this is a nightly build, we want to define a variable
+    # to let our code know what nightly version this is
+    # See https://github.com/pytorch/pytorch/issues/23094
+    if version_date != None:
+        download_url += "/nightly"
+        defines.append("CAFFE2_NIGHTLY_VERSION=" + version_date)
+
+    # Mac builds do not have the cuda string as part of the version
+    if not IS_MAC:
+        # If this is a nightly build after they started adding the cuda string to the packages
+        if version_date != None and int(version_date) > 20190723:
+            if version_base == "1.3.0" and torch_cuda_string == "cu100":
+                # At some point between 20190723 and 20190820, they stopped adding
+                # cu100 to the build versions...
+                pass
+            else:
+                version += "%2B" + torch_cuda_string
+
+        # If this is the 1.2.0 stable release
+        if version_base == "1.2.0" and version_date == None:
+            # The initial version of the 1.2.0 stable release was broken
+            # The manual rebuilds of this release don't include the CUDA version in the URLs
+            # See https://github.com/pytorch/pytorch/issues/24120
+            pass
+
+    # Add the CUDA variant to the URL
+    download_url += "/" + torch_cuda_string
 
     if IS_MAC:
         download_url += "/libtorch-macos-" + version + ".zip"
