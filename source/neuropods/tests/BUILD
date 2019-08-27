@@ -175,6 +175,30 @@ cc_test(
 )
 
 cc_test(
+    name = "test_multiprocess_worker",
+    srcs = [
+        "test_multiprocess_worker.cc",
+        "//neuropods:libneuropods.so",
+    ],
+    deps = [
+        ":timing_utils",
+        "@gtest//:main",
+        "//neuropods/multiprocess:multiprocess_worker",
+    ],
+)
+
+cc_test(
+    name = "test_multiprocess_allowed_transitions",
+    srcs = [
+        "test_multiprocess_allowed_transitions.cc",
+    ],
+    deps = [
+        "@gtest//:main",
+        "//neuropods/multiprocess:message_utils",
+    ],
+)
+
+cc_test(
     name = "test_internal_neuropod_tensor",
     srcs = [
         "test_internal_neuropod_tensor.cc",

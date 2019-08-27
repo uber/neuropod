@@ -54,3 +54,36 @@ cc_library(
         ":shm_tensor",
     ],
 )
+
+cc_library(
+    name = "multiprocess_worker",
+    hdrs = [
+        "multiprocess_worker.hh",
+    ],
+    srcs = [
+        "multiprocess_worker.cc",
+        "tensor_utils.hh",
+    ],
+    visibility = [
+        "//neuropods:__subpackages__",
+    ],
+    deps = [
+        ":message_utils",
+        "//neuropods:neuropods_hdrs",
+    ],
+)
+
+cc_binary(
+    name = "neuropod_multiprocess_worker",
+    srcs = [
+        "multiprocess_worker_main.cc",
+        "//neuropods:libneuropods.so",
+    ],
+    linkstatic = True,
+    visibility = [
+        "//neuropods:__subpackages__",
+    ],
+    deps = [
+        ":multiprocess_worker",
+    ],
+)
