@@ -163,6 +163,18 @@ cc_test(
 )
 
 cc_test(
+    name = "test_shm_message_utils",
+    srcs = [
+        "test_shm_message_utils.cc",
+    ],
+    deps = [
+        ":timing_utils",
+        "@gtest//:main",
+        "//neuropods/multiprocess:message_utils",
+    ],
+)
+
+cc_test(
     name = "test_internal_neuropod_tensor",
     srcs = [
         "test_internal_neuropod_tensor.cc",
