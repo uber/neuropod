@@ -2,6 +2,7 @@
 // Uber, Inc. (c) 2019
 //
 
+#include <array>
 #include <memory>
 
 namespace neuropods
@@ -26,7 +27,7 @@ namespace neuropods
 // Note: the three functions below are all threadsafe
 
 // The block ID is just 24 opaque bytes (from the perspective of users of this allocator)
-using SHMBlockID = char[24];
+using SHMBlockID = std::array<char, 24>;
 
 class UnusedPool;
 class SHMAllocator {
