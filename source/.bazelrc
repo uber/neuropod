@@ -15,3 +15,6 @@ build --extra_toolchains=@bazel_tools//tools/python:autodetecting_toolchain_nons
 
 # Use ASAN
 build:asan -c dbg --copt='-fsanitize=address' --copt='-fno-omit-frame-pointer' --linkopt='-fsanitize=address' --test_env=ASAN_OPTIONS --test_env=ASAN_SYMBOLIZER_PATH
+
+# Build with coverage
+build --copt='-fprofile-instr-generate' --copt='-fcoverage-mapping' --linkopt='-fprofile-instr-generate' --linkopt='-fcoverage-mapping'

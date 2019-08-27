@@ -46,6 +46,12 @@ ENV NEUROPODS_CUDA_VERSION=$NEUROPODS_CUDA_VERSION
 # Install python dependencies
 RUN /usr/src/build/install_python_deps.sh
 
+# Enable code coverage
+ENV LLVM_PROFILE_FILE="/tmp/neuropod_coverage/code-%p-%9m.profraw"
+ENV COVERAGE_PROCESS_START=.coveragerc
+RUN echo "import coverage; coverage.process_startup()" > \
+    `python -c "from distutils.sysconfig import get_python_lib; print(get_python_lib())"`/coverage.pth
+
 # Copy the rest of the code in
 COPY . /usr/src
 
