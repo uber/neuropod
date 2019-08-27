@@ -21,3 +21,19 @@ cc_library(
         "@boost_repo//:boost",
     ],
 )
+
+cc_library(
+    name = "shm_tensor",
+    srcs = [
+        "shm_tensor.cc",
+        "shm_tensor.hh",
+    ],
+    visibility = [
+        "//neuropods:__subpackages__",
+    ],
+    deps = [
+        "//neuropods/backends:neuropod_backend",
+        "//neuropods/internal:deleter",
+        ":shm_allocator",
+    ],
+)
