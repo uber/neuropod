@@ -1,0 +1,37 @@
+{
+    "name": "random_model", 
+    "input_spec": [
+        {
+            "dtype": "uint8", 
+            "shape": [
+                1200, 
+                1920, 
+                3
+            ], 
+            "name": "image"
+        }
+    ], 
+    "output_spec": [
+        {
+            "dtype": "float32", 
+            "shape": [
+                "num_detections", 
+                4
+            ], 
+            "name": "boxes"
+        }, 
+        {
+            "dtype": "float32", 
+            "shape": [
+                "num_detections", 
+                "num_classes"
+            ], 
+            "name": "object_class_probability"
+        }
+    ], 
+    "platform": "tensorflow", 
+    "custom_ops": [], 
+    "input_tensor_device": {
+        "image": "GPU"
+    }
+}
