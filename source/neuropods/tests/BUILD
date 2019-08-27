@@ -199,6 +199,41 @@ cc_test(
 )
 
 cc_test(
+    name = "test_multiprocess",
+    srcs = [
+        "test_multiprocess.cc",
+        "//neuropods:libneuropods.so",
+    ],
+    deps = [
+        ":neuropods_test_utils",
+        "//neuropods/multiprocess:multiprocess_hdrs",
+    ],
+    data = [
+        "//neuropods/backends/python_bridge:libneuropod_pythonbridge_backend.so",
+        "//neuropods/backends/torchscript:libneuropod_torchscript_backend.so",
+        "//neuropods/backends/tensorflow:libneuropod_tensorflow_backend.so",
+    ],
+)
+
+cc_test(
+    name = "test_multiprocess_perf",
+    srcs = [
+        "test_multiprocess_perf.cc",
+        "//neuropods:libneuropods.so",
+    ],
+    deps = [
+        ":neuropods_test_utils",
+        ":timing_utils",
+        "//neuropods/multiprocess:multiprocess_hdrs",
+    ],
+    data = [
+        "//neuropods/backends/python_bridge:libneuropod_pythonbridge_backend.so",
+        "//neuropods/backends/torchscript:libneuropod_torchscript_backend.so",
+        "//neuropods/backends/tensorflow:libneuropod_tensorflow_backend.so",
+    ],
+)
+
+cc_test(
     name = "test_internal_neuropod_tensor",
     srcs = [
         "test_internal_neuropod_tensor.cc",

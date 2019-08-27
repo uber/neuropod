@@ -69,8 +69,8 @@ void multiprocess_worker_loop(const std::string &control_queue_name)
     // data back to the main process
     NeuropodValueMap last_outputs;
 
-    // Send a heartbeat every 2 seconds
-    HeartbeatController heartbeat_controller(control_channel, 2000);
+    // Send a heartbeat periodically
+    HeartbeatController heartbeat_controller(control_channel, HEARTBEAT_INTERVAL_MS);
 
     while (true)
     {

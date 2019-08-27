@@ -33,6 +33,7 @@ cc_binary(
         ":neuropods_hdrs",
         "//neuropods/internal:backend_registration_impl",
         "//neuropods/internal:tensor_serialization_impl",
+        "//neuropods/multiprocess:multiprocess_impl",
         "//neuropods/serialization:serialization_impl",
     ]
 )

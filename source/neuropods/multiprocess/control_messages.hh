@@ -57,6 +57,16 @@ enum MessageType
 // in a single message
 constexpr int MAX_NUM_TENSORS_PER_MESSAGE = 20;
 
+// The worker process should send a heartbeat every 2 seconds
+constexpr int HEARTBEAT_INTERVAL_MS = 2000;
+
+// 5 second timeout for the main process to receive a message from the worker
+// This is generous since the worker sends heartbeats every 2 seconds (defined above)
+constexpr int MESSAGE_TIMEOUT_MS = 5000;
+
+// Ensure the timeout is larger than the heartbeat interval
+static_assert(MESSAGE_TIMEOUT_MS > HEARTBEAT_INTERVAL_MS);
+
 // TODO(vip): split into multiple structs
 struct __attribute__((__packed__)) control_message
 {
