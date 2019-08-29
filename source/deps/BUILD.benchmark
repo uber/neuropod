@@ -1,0 +1,29 @@
+#
+# Uber, Inc. (c) 2019
+#
+
+# Based on https://github.com/google/benchmark/blob/master/BUILD.bazel
+
+cc_library(
+    name = "benchmark",
+    srcs = glob(
+        [
+            "src/*.cc",
+            "src/*.h",
+        ],
+        exclude = ["src/benchmark_main.cc"],
+    ),
+    hdrs = ["include/benchmark/benchmark.h"],
+    linkopts = ["-pthread"],
+    strip_include_prefix = "include",
+    visibility = ["//visibility:public"],
+)
+
+cc_library(
+    name = "benchmark_main",
+    srcs = ["src/benchmark_main.cc"],
+    hdrs = ["include/benchmark/benchmark.h"],
+    strip_include_prefix = "include",
+    visibility = ["//visibility:public"],
+    deps = [":benchmark"],
+)

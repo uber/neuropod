@@ -11,7 +11,7 @@ python setup.py bdist_wheel
 popd
 
 # Build the native code
-bazel build -c opt "$@" //...:all
+bazel build "$@" //...:all
 
 if [[ $(uname -s) == 'Linux' ]]; then
     # Copy the build artificts into a dist folder
