@@ -6,9 +6,16 @@ NEUROPODS_PYTHON_BINARY="${NEUROPODS_PYTHON_BINARY:-python}"
 
 if [[ $(uname -s) == 'Darwin' ]]; then
     # Install bazel
+    tmpdir=$(mktemp -d)
+    pushd $tmpdir
+    curl -sSL -o bazel.sh https://github.com/bazelbuild/bazel/releases/download/0.28.1/bazel-0.28.1-installer-darwin-x86_64.sh
+    chmod +x ./bazel.sh
+    ./bazel.sh
+    popd
+    rm -rf $tmpdir
+
+    # Install libomp
     export HOMEBREW_NO_AUTO_UPDATE=1
-    brew tap bazelbuild/tap
-    brew install bazelbuild/tap/bazel
     brew install libomp
 else
     # Install pip and bazel dependencies
