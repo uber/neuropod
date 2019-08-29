@@ -1,3 +1,6 @@
+# Always optimize
+build --copt='-O3'
+
 # Pass python virtual envs through to the test runner
 build --test_env=VIRTUAL_ENV
 
@@ -13,8 +16,11 @@ build --cxxopt='-D_GLIBCXX_USE_CXX11_ABI=0'
 # Disable strict python version checking added in Bazel 0.27
 build --extra_toolchains=@bazel_tools//tools/python:autodetecting_toolchain_nonstrict
 
+# Build with coverage info
+build --copt='-fprofile-instr-generate' --copt='-fcoverage-mapping' --linkopt='-fprofile-instr-generate' --linkopt='-fcoverage-mapping'
+
 # Use ASAN
 build:asan -c dbg --copt='-fsanitize=address' --copt='-fno-omit-frame-pointer' --linkopt='-fsanitize=address' --test_env=ASAN_OPTIONS --test_env=ASAN_SYMBOLIZER_PATH
 
-# Build with coverage
-build --copt='-fprofile-instr-generate' --copt='-fcoverage-mapping' --linkopt='-fprofile-instr-generate' --linkopt='-fcoverage-mapping'
+# For profiling builds
+build:profile -c dbg --copt='-fno-omit-frame-pointer'
