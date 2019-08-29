@@ -1,0 +1,919 @@
+{
+    "name": "random_model", 
+    "input_spec": [
+        {
+            "dtype": "float32", 
+            "shape": [
+                10, 
+                5
+            ], 
+            "name": "small_input0"
+        }, 
+        {
+            "dtype": "float32", 
+            "shape": [
+                10, 
+                5
+            ], 
+            "name": "small_input1"
+        }, 
+        {
+            "dtype": "float32", 
+            "shape": [
+                10, 
+                5
+            ], 
+            "name": "small_input2"
+        }, 
+        {
+            "dtype": "float32", 
+            "shape": [
+                10, 
+                5
+            ], 
+            "name": "small_input3"
+        }, 
+        {
+            "dtype": "float32", 
+            "shape": [
+                10, 
+                5
+            ], 
+            "name": "small_input4"
+        }, 
+        {
+            "dtype": "float32", 
+            "shape": [
+                10, 
+                5
+            ], 
+            "name": "small_input5"
+        }, 
+        {
+            "dtype": "float32", 
+            "shape": [
+                10, 
+                5
+            ], 
+            "name": "small_input6"
+        }, 
+        {
+            "dtype": "float32", 
+            "shape": [
+                10, 
+                5
+            ], 
+            "name": "small_input7"
+        }, 
+        {
+            "dtype": "float32", 
+            "shape": [
+                10, 
+                5
+            ], 
+            "name": "small_input8"
+        }, 
+        {
+            "dtype": "float32", 
+            "shape": [
+                10, 
+                5
+            ], 
+            "name": "small_input9"
+        }, 
+        {
+            "dtype": "float32", 
+            "shape": [
+                10, 
+                5
+            ], 
+            "name": "small_input10"
+        }, 
+        {
+            "dtype": "float32", 
+            "shape": [
+                10, 
+                5
+            ], 
+            "name": "small_input11"
+        }, 
+        {
+            "dtype": "float32", 
+            "shape": [
+                10, 
+                5
+            ], 
+            "name": "small_input12"
+        }, 
+        {
+            "dtype": "float32", 
+            "shape": [
+                10, 
+                5
+            ], 
+            "name": "small_input13"
+        }, 
+        {
+            "dtype": "float32", 
+            "shape": [
+                10, 
+                5
+            ], 
+            "name": "small_input14"
+        }, 
+        {
+            "dtype": "float32", 
+            "shape": [
+                10, 
+                5
+            ], 
+            "name": "small_input15"
+        }, 
+        {
+            "dtype": "float32", 
+            "shape": [
+                10, 
+                5
+            ], 
+            "name": "small_input16"
+        }, 
+        {
+            "dtype": "float32", 
+            "shape": [
+                10, 
+                5
+            ], 
+            "name": "small_input17"
+        }, 
+        {
+            "dtype": "float32", 
+            "shape": [
+                10, 
+                5
+            ], 
+            "name": "small_input18"
+        }, 
+        {
+            "dtype": "float32", 
+            "shape": [
+                10, 
+                5
+            ], 
+            "name": "small_input19"
+        }, 
+        {
+            "dtype": "float32", 
+            "shape": [
+                10, 
+                5
+            ], 
+            "name": "small_input20"
+        }, 
+        {
+            "dtype": "float32", 
+            "shape": [
+                10, 
+                5
+            ], 
+            "name": "small_input21"
+        }, 
+        {
+            "dtype": "float32", 
+            "shape": [
+                10, 
+                5
+            ], 
+            "name": "small_input22"
+        }, 
+        {
+            "dtype": "float32", 
+            "shape": [
+                10, 
+                5
+            ], 
+            "name": "small_input23"
+        }, 
+        {
+            "dtype": "float32", 
+            "shape": [
+                10, 
+                5
+            ], 
+            "name": "small_input24"
+        }, 
+        {
+            "dtype": "float32", 
+            "shape": [
+                10, 
+                5
+            ], 
+            "name": "small_input25"
+        }, 
+        {
+            "dtype": "float32", 
+            "shape": [
+                10, 
+                5
+            ], 
+            "name": "small_input26"
+        }, 
+        {
+            "dtype": "float32", 
+            "shape": [
+                10, 
+                5
+            ], 
+            "name": "small_input27"
+        }, 
+        {
+            "dtype": "float32", 
+            "shape": [
+                10, 
+                5
+            ], 
+            "name": "small_input28"
+        }, 
+        {
+            "dtype": "float32", 
+            "shape": [
+                10, 
+                5
+            ], 
+            "name": "small_input29"
+        }, 
+        {
+            "dtype": "float32", 
+            "shape": [
+                10, 
+                5
+            ], 
+            "name": "small_input30"
+        }, 
+        {
+            "dtype": "float32", 
+            "shape": [
+                10, 
+                5
+            ], 
+            "name": "small_input31"
+        }, 
+        {
+            "dtype": "float32", 
+            "shape": [
+                10, 
+                5
+            ], 
+            "name": "small_input32"
+        }, 
+        {
+            "dtype": "float32", 
+            "shape": [
+                10, 
+                5
+            ], 
+            "name": "small_input33"
+        }, 
+        {
+            "dtype": "float32", 
+            "shape": [
+                10, 
+                5
+            ], 
+            "name": "small_input34"
+        }, 
+        {
+            "dtype": "float32", 
+            "shape": [
+                10, 
+                5
+            ], 
+            "name": "small_input35"
+        }, 
+        {
+            "dtype": "float32", 
+            "shape": [
+                10, 
+                5
+            ], 
+            "name": "small_input36"
+        }, 
+        {
+            "dtype": "float32", 
+            "shape": [
+                10, 
+                5
+            ], 
+            "name": "small_input37"
+        }, 
+        {
+            "dtype": "float32", 
+            "shape": [
+                10, 
+                5
+            ], 
+            "name": "small_input38"
+        }, 
+        {
+            "dtype": "float32", 
+            "shape": [
+                10, 
+                5
+            ], 
+            "name": "small_input39"
+        }, 
+        {
+            "dtype": "float32", 
+            "shape": [
+                10, 
+                5
+            ], 
+            "name": "small_input40"
+        }, 
+        {
+            "dtype": "float32", 
+            "shape": [
+                10, 
+                5
+            ], 
+            "name": "small_input41"
+        }, 
+        {
+            "dtype": "float32", 
+            "shape": [
+                10, 
+                5
+            ], 
+            "name": "small_input42"
+        }, 
+        {
+            "dtype": "float32", 
+            "shape": [
+                10, 
+                5
+            ], 
+            "name": "small_input43"
+        }, 
+        {
+            "dtype": "float32", 
+            "shape": [
+                10, 
+                5
+            ], 
+            "name": "small_input44"
+        }, 
+        {
+            "dtype": "float32", 
+            "shape": [
+                10, 
+                5
+            ], 
+            "name": "small_input45"
+        }, 
+        {
+            "dtype": "float32", 
+            "shape": [
+                10, 
+                5
+            ], 
+            "name": "small_input46"
+        }, 
+        {
+            "dtype": "float32", 
+            "shape": [
+                10, 
+                5
+            ], 
+            "name": "small_input47"
+        }, 
+        {
+            "dtype": "float32", 
+            "shape": [
+                10, 
+                5
+            ], 
+            "name": "small_input48"
+        }, 
+        {
+            "dtype": "float32", 
+            "shape": [
+                10, 
+                5
+            ], 
+            "name": "small_input49"
+        }, 
+        {
+            "dtype": "float32", 
+            "shape": [
+                10, 
+                5
+            ], 
+            "name": "small_input50"
+        }, 
+        {
+            "dtype": "float32", 
+            "shape": [
+                10, 
+                5
+            ], 
+            "name": "small_input51"
+        }, 
+        {
+            "dtype": "float32", 
+            "shape": [
+                10, 
+                5
+            ], 
+            "name": "small_input52"
+        }, 
+        {
+            "dtype": "float32", 
+            "shape": [
+                10, 
+                5
+            ], 
+            "name": "small_input53"
+        }, 
+        {
+            "dtype": "float32", 
+            "shape": [
+                10, 
+                5
+            ], 
+            "name": "small_input54"
+        }, 
+        {
+            "dtype": "float32", 
+            "shape": [
+                10, 
+                5
+            ], 
+            "name": "small_input55"
+        }, 
+        {
+            "dtype": "float32", 
+            "shape": [
+                10, 
+                5
+            ], 
+            "name": "small_input56"
+        }, 
+        {
+            "dtype": "float32", 
+            "shape": [
+                10, 
+                5
+            ], 
+            "name": "small_input57"
+        }, 
+        {
+            "dtype": "float32", 
+            "shape": [
+                10, 
+                5
+            ], 
+            "name": "small_input58"
+        }, 
+        {
+            "dtype": "float32", 
+            "shape": [
+                10, 
+                5
+            ], 
+            "name": "small_input59"
+        }, 
+        {
+            "dtype": "float32", 
+            "shape": [
+                10, 
+                5
+            ], 
+            "name": "small_input60"
+        }, 
+        {
+            "dtype": "float32", 
+            "shape": [
+                10, 
+                5
+            ], 
+            "name": "small_input61"
+        }, 
+        {
+            "dtype": "float32", 
+            "shape": [
+                10, 
+                5
+            ], 
+            "name": "small_input62"
+        }, 
+        {
+            "dtype": "float32", 
+            "shape": [
+                10, 
+                5
+            ], 
+            "name": "small_input63"
+        }, 
+        {
+            "dtype": "float32", 
+            "shape": [
+                10, 
+                5
+            ], 
+            "name": "small_input64"
+        }, 
+        {
+            "dtype": "float32", 
+            "shape": [
+                10, 
+                5
+            ], 
+            "name": "small_input65"
+        }, 
+        {
+            "dtype": "float32", 
+            "shape": [
+                10, 
+                5
+            ], 
+            "name": "small_input66"
+        }, 
+        {
+            "dtype": "float32", 
+            "shape": [
+                10, 
+                5
+            ], 
+            "name": "small_input67"
+        }, 
+        {
+            "dtype": "float32", 
+            "shape": [
+                10, 
+                5
+            ], 
+            "name": "small_input68"
+        }, 
+        {
+            "dtype": "float32", 
+            "shape": [
+                10, 
+                5
+            ], 
+            "name": "small_input69"
+        }, 
+        {
+            "dtype": "float32", 
+            "shape": [
+                10, 
+                5
+            ], 
+            "name": "small_input70"
+        }, 
+        {
+            "dtype": "float32", 
+            "shape": [
+                10, 
+                5
+            ], 
+            "name": "small_input71"
+        }, 
+        {
+            "dtype": "float32", 
+            "shape": [
+                10, 
+                5
+            ], 
+            "name": "small_input72"
+        }, 
+        {
+            "dtype": "float32", 
+            "shape": [
+                10, 
+                5
+            ], 
+            "name": "small_input73"
+        }, 
+        {
+            "dtype": "float32", 
+            "shape": [
+                10, 
+                5
+            ], 
+            "name": "small_input74"
+        }, 
+        {
+            "dtype": "float32", 
+            "shape": [
+                10, 
+                5
+            ], 
+            "name": "small_input75"
+        }, 
+        {
+            "dtype": "float32", 
+            "shape": [
+                10, 
+                5
+            ], 
+            "name": "small_input76"
+        }, 
+        {
+            "dtype": "float32", 
+            "shape": [
+                10, 
+                5
+            ], 
+            "name": "small_input77"
+        }, 
+        {
+            "dtype": "float32", 
+            "shape": [
+                10, 
+                5
+            ], 
+            "name": "small_input78"
+        }, 
+        {
+            "dtype": "float32", 
+            "shape": [
+                10, 
+                5
+            ], 
+            "name": "small_input79"
+        }, 
+        {
+            "dtype": "float32", 
+            "shape": [
+                10, 
+                5
+            ], 
+            "name": "small_input80"
+        }, 
+        {
+            "dtype": "float32", 
+            "shape": [
+                10, 
+                5
+            ], 
+            "name": "small_input81"
+        }, 
+        {
+            "dtype": "float32", 
+            "shape": [
+                10, 
+                5
+            ], 
+            "name": "small_input82"
+        }, 
+        {
+            "dtype": "float32", 
+            "shape": [
+                10, 
+                5
+            ], 
+            "name": "small_input83"
+        }, 
+        {
+            "dtype": "float32", 
+            "shape": [
+                10, 
+                5
+            ], 
+            "name": "small_input84"
+        }, 
+        {
+            "dtype": "float32", 
+            "shape": [
+                10, 
+                5
+            ], 
+            "name": "small_input85"
+        }, 
+        {
+            "dtype": "float32", 
+            "shape": [
+                10, 
+                5
+            ], 
+            "name": "small_input86"
+        }, 
+        {
+            "dtype": "float32", 
+            "shape": [
+                10, 
+                5
+            ], 
+            "name": "small_input87"
+        }, 
+        {
+            "dtype": "float32", 
+            "shape": [
+                10, 
+                5
+            ], 
+            "name": "small_input88"
+        }, 
+        {
+            "dtype": "float32", 
+            "shape": [
+                10, 
+                5
+            ], 
+            "name": "small_input89"
+        }, 
+        {
+            "dtype": "float32", 
+            "shape": [
+                10, 
+                5
+            ], 
+            "name": "small_input90"
+        }, 
+        {
+            "dtype": "float32", 
+            "shape": [
+                10, 
+                5
+            ], 
+            "name": "small_input91"
+        }, 
+        {
+            "dtype": "float32", 
+            "shape": [
+                10, 
+                5
+            ], 
+            "name": "small_input92"
+        }, 
+        {
+            "dtype": "float32", 
+            "shape": [
+                10, 
+                5
+            ], 
+            "name": "small_input93"
+        }, 
+        {
+            "dtype": "float32", 
+            "shape": [
+                10, 
+                5
+            ], 
+            "name": "small_input94"
+        }, 
+        {
+            "dtype": "float32", 
+            "shape": [
+                10, 
+                5
+            ], 
+            "name": "small_input95"
+        }, 
+        {
+            "dtype": "float32", 
+            "shape": [
+                10, 
+                5
+            ], 
+            "name": "small_input96"
+        }, 
+        {
+            "dtype": "float32", 
+            "shape": [
+                10, 
+                5
+            ], 
+            "name": "small_input97"
+        }, 
+        {
+            "dtype": "float32", 
+            "shape": [
+                10, 
+                5
+            ], 
+            "name": "small_input98"
+        }, 
+        {
+            "dtype": "float32", 
+            "shape": [
+                10, 
+                5
+            ], 
+            "name": "small_input99"
+        }
+    ], 
+    "output_spec": [
+        {
+            "dtype": "float32", 
+            "shape": [
+                10, 
+                5
+            ], 
+            "name": "output"
+        }
+    ], 
+    "platform": "tensorflow", 
+    "custom_ops": [], 
+    "input_tensor_device": {
+        "small_input92": "GPU", 
+        "small_input93": "GPU", 
+        "small_input90": "GPU", 
+        "small_input91": "GPU", 
+        "small_input96": "GPU", 
+        "small_input97": "GPU", 
+        "small_input94": "GPU", 
+        "small_input95": "GPU", 
+        "small_input98": "GPU", 
+        "small_input99": "GPU", 
+        "small_input18": "GPU", 
+        "small_input19": "GPU", 
+        "small_input12": "GPU", 
+        "small_input13": "GPU", 
+        "small_input10": "GPU", 
+        "small_input11": "GPU", 
+        "small_input16": "GPU", 
+        "small_input17": "GPU", 
+        "small_input14": "GPU", 
+        "small_input15": "GPU", 
+        "small_input27": "GPU", 
+        "small_input26": "GPU", 
+        "small_input25": "GPU", 
+        "small_input24": "GPU", 
+        "small_input23": "GPU", 
+        "small_input22": "GPU", 
+        "small_input21": "GPU", 
+        "small_input20": "GPU", 
+        "small_input29": "GPU", 
+        "small_input28": "GPU", 
+        "small_input45": "GPU", 
+        "small_input44": "GPU", 
+        "small_input47": "GPU", 
+        "small_input46": "GPU", 
+        "small_input41": "GPU", 
+        "small_input40": "GPU", 
+        "small_input43": "GPU", 
+        "small_input42": "GPU", 
+        "small_input49": "GPU", 
+        "small_input48": "GPU", 
+        "small_input30": "GPU", 
+        "small_input31": "GPU", 
+        "small_input32": "GPU", 
+        "small_input33": "GPU", 
+        "small_input34": "GPU", 
+        "small_input35": "GPU", 
+        "small_input36": "GPU", 
+        "small_input37": "GPU", 
+        "small_input38": "GPU", 
+        "small_input39": "GPU", 
+        "small_input56": "GPU", 
+        "small_input57": "GPU", 
+        "small_input54": "GPU", 
+        "small_input55": "GPU", 
+        "small_input52": "GPU", 
+        "small_input53": "GPU", 
+        "small_input50": "GPU", 
+        "small_input51": "GPU", 
+        "small_input58": "GPU", 
+        "small_input59": "GPU", 
+        "small_input63": "GPU", 
+        "small_input62": "GPU", 
+        "small_input61": "GPU", 
+        "small_input60": "GPU", 
+        "small_input67": "GPU", 
+        "small_input66": "GPU", 
+        "small_input65": "GPU", 
+        "small_input64": "GPU", 
+        "small_input69": "GPU", 
+        "small_input68": "GPU", 
+        "small_input0": "GPU", 
+        "small_input1": "GPU", 
+        "small_input2": "GPU", 
+        "small_input3": "GPU", 
+        "small_input4": "GPU", 
+        "small_input5": "GPU", 
+        "small_input6": "GPU", 
+        "small_input7": "GPU", 
+        "small_input8": "GPU", 
+        "small_input9": "GPU", 
+        "small_input81": "GPU", 
+        "small_input80": "GPU", 
+        "small_input83": "GPU", 
+        "small_input82": "GPU", 
+        "small_input85": "GPU", 
+        "small_input84": "GPU", 
+        "small_input87": "GPU", 
+        "small_input86": "GPU", 
+        "small_input89": "GPU", 
+        "small_input88": "GPU", 
+        "small_input78": "GPU", 
+        "small_input79": "GPU", 
+        "small_input74": "GPU", 
+        "small_input75": "GPU", 
+        "small_input76": "GPU", 
+        "small_input77": "GPU", 
+        "small_input70": "GPU", 
+        "small_input71": "GPU", 
+        "small_input72": "GPU", 
+        "small_input73": "GPU"
+    }
+}
