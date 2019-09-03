@@ -59,7 +59,13 @@ def _impl(repository_ctx):
     else:
         download_url += "/libtorch-shared-with-deps-" + version + ".zip"
 
-    repository_ctx.download_and_extract(download_url, stripPrefix="libtorch")
+    # To prevent redownloading Torch during local development, we'll
+    # provide a sha256 value for the default build
+    sha256 = ""
+    if download_url == "https://download.pytorch.org/libtorch/cpu/libtorch-shared-with-deps-1.1.0.zip":
+        sha256 = "c863a0073ff4c7b6feb958799c7dc3202b3449e86ff1cec9c85c7da9d1fe0218"
+
+    repository_ctx.download_and_extract(download_url, stripPrefix="libtorch", sha256=sha256)
 
     # Generate a build file based on the template
     repository_ctx.template(
