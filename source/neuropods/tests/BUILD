@@ -114,6 +114,14 @@ cc_test(
     ],
 )
 
+cc_library(
+    name = "timing_utils",
+    hdrs = ["timing_utils.hh"],
+    visibility = [
+        "//visibility:public",
+    ],
+)
+
 cc_test(
     name = "test_accessor",
     srcs = [
@@ -122,9 +130,23 @@ cc_test(
         "//neuropods/backends/test_backend:libneuropod_test_backend.so",
     ],
     deps = [
+        ":timing_utils",
         "@gtest//:main",
         "//neuropods/backends/test_backend:test_backend_hdrs",
         "//neuropods:neuropods_hdrs",
+    ],
+)
+
+cc_test(
+    name = "test_shm_allocator",
+    srcs = [
+        "test_shm_allocator.cc",
+    ],
+    deps = [
+        ":timing_utils",
+        "@gtest//:main",
+        "@benchmark//:benchmark",
+        "//neuropods/multiprocess:shm_allocator",
     ],
 )
 

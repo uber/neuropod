@@ -2,40 +2,10 @@
 // Uber, Inc. (c) 2019
 //
 
+#include "timing_utils.hh"
 #include "gtest/gtest.h"
 #include "neuropods/neuropods.hh"
 #include "neuropods/backends/test_backend/test_neuropod_backend.hh"
-
-#include <chrono>
-
-namespace
-{
-
-template<typename Resolution, typename T>
-float time_lambda(size_t warmup, size_t iterations, T fn)
-{
-    std::vector<size_t> times;
-
-    for (int i = 0; i < warmup + iterations; i++)
-    {
-        auto start = std::chrono::high_resolution_clock::now();
-
-        fn();
-
-        auto end = std::chrono::high_resolution_clock::now();
-
-        // Ignore the warmup period
-        if (i > warmup)
-        {
-            times.emplace_back(std::chrono::duration_cast<Resolution>(end - start).count());
-        }
-    }
-
-    return std::accumulate(times.begin(), times.end(), 0.0) / times.size();
-}
-
-
-} // namespace
 
 TEST(test_accessor_timing, test_accessor_timing)
 {
