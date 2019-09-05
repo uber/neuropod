@@ -37,3 +37,17 @@ cc_library(
         ":shm_allocator",
     ],
 )
+
+cc_library(
+    name = "message_utils",
+    hdrs = [
+        "message_utils.hh",
+        "control_messages.hh",
+    ],
+    visibility = [
+        "//neuropods:__subpackages__",
+    ],
+    deps = [
+        ":shm_tensor",
+    ],
+)
