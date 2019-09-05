@@ -44,6 +44,9 @@ cc_library(
         "message_utils.hh",
         "control_messages.hh",
     ],
+    srcs = [
+        "message_utils.cc",
+    ],
     visibility = [
         "//neuropods:__subpackages__",
     ],
