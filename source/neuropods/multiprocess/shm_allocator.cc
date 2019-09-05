@@ -72,7 +72,7 @@ struct __attribute__((__packed__)) shm_block_id
 };
 
 // Make sure the size of the ID struct matches the size of the user facing version
-static_assert(sizeof(shm_block_id) == sizeof(SHMBlockID), "The size of shm_block_id must match the size of SHMBlockID");
+static_assert(sizeof(shm_block_id) == std::tuple_size<SHMBlockID>::value, "The size of shm_block_id must match the size of SHMBlockID");
 
 // Controls a block of shared memory
 class SHMBlock
@@ -303,7 +303,7 @@ std::shared_ptr<void> SHMAllocator::allocate_shm(size_t size_bytes, SHMBlockID &
 
     // Return the ID of this block as well
     auto id = block->get_id();
-    memcpy(block_id, &id, sizeof(id));
+    memcpy(block_id.data(), &id, sizeof(id));
 
     return out;
 }
@@ -311,7 +311,7 @@ std::shared_ptr<void> SHMAllocator::allocate_shm(size_t size_bytes, SHMBlockID &
 std::shared_ptr<void> SHMAllocator::load_shm(const SHMBlockID &block_id)
 {
     // Load an existing block of shared memory by ID
-    auto block = std::make_shared<SHMBlock>(reinterpret_cast<const shm_block_id *>(block_id));
+    auto block = std::make_shared<SHMBlock>(reinterpret_cast<const shm_block_id *>(block_id.data()));
 
     // Create a shared pointer to the underlying data with a custom deleter
     // that keeps the block alive
