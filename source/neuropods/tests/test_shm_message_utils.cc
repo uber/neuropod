@@ -4,6 +4,7 @@
 
 #include "timing_utils.hh"
 #include "neuropods/multiprocess/message_utils.hh"
+#include "neuropods/multiprocess/shm_tensor.hh"
 
 #include "gtest/gtest.h"
 
