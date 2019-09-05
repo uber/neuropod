@@ -12,5 +12,5 @@ source/bazel-source/external/llvm_toolchain/bin/llvm-profdata merge -output=/tmp
 
 # Generate a coverage report
 pushd source
-bazel query 'kind("cc_binary", ...)' | sed 's/\/\//-object bazel-bin\//g' |  sed 's/:/\//g' | paste -sd ' ' | xargs ./bazel-source/external/llvm_toolchain/bin/llvm-cov report -instr-profile=/tmp/neuropod_coverage/code.profdata -ignore-filename-regex=external
+bazel query 'kind("cc_binary|cc_test", ...)' | sed 's/\/\//-object bazel-bin\//g' |  sed 's/:/\//g' | paste -sd ' ' | xargs ./bazel-source/external/llvm_toolchain/bin/llvm-cov report -instr-profile=/tmp/neuropod_coverage/code.profdata -ignore-filename-regex="(external|tests)"
 popd
