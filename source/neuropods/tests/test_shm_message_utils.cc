@@ -61,7 +61,7 @@ TEST(test_shm_message_utils, simple)
 
         for (int i = 0; i < received.num_tensors; i++)
         {
-            // Get the uuid and create a tensor
+            // Get the ID and create a tensor
             neuropods::SHMBlockID block_id;
             std::copy_n(received.tensor_id[i], block_id.size(), block_id.begin());
             auto shm_tensor = neuropods::tensor_from_id(block_id);
