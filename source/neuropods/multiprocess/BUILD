@@ -39,13 +39,13 @@ cc_library(
 )
 
 cc_library(
-    name = "message_utils",
+    name = "ipc_control_channel",
     hdrs = [
-        "message_utils.hh",
+        "ipc_control_channel.hh",
         "control_messages.hh",
     ],
     srcs = [
-        "message_utils.cc",
+        "ipc_control_channel.cc",
     ],
     visibility = [
         "//neuropods:__subpackages__",
@@ -68,7 +68,7 @@ cc_library(
         "//neuropods:__subpackages__",
     ],
     deps = [
-        ":message_utils",
+        ":ipc_control_channel",
         "//neuropods:neuropods_hdrs",
     ],
 )

@@ -163,14 +163,14 @@ cc_test(
 )
 
 cc_test(
-    name = "test_shm_message_utils",
+    name = "test_ipc_control_channel",
     srcs = [
-        "test_shm_message_utils.cc",
+        "test_ipc_control_channel.cc",
     ],
     deps = [
         ":timing_utils",
         "@gtest//:main",
-        "//neuropods/multiprocess:message_utils",
+        "//neuropods/multiprocess:ipc_control_channel",
     ],
 )
 
@@ -194,7 +194,7 @@ cc_test(
     ],
     deps = [
         "@gtest//:main",
-        "//neuropods/multiprocess:message_utils",
+        "//neuropods/multiprocess:ipc_control_channel",
     ],
 )
 
