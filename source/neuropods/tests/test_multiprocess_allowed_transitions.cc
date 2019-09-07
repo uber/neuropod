@@ -2,7 +2,7 @@
 // Uber, Inc. (c) 2019
 //
 
-#include "neuropods/multiprocess/control_messages.hh"
+#include "neuropods/multiprocess/ipc_control_channel.hh"
 
 #include "gtest/gtest.h"
 

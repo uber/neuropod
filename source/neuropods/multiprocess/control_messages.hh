@@ -52,53 +52,6 @@ enum MessageType
     SHUTDOWN,
 };
 
-// Validates that state machine transitions are happening correctly
-class TransitionVerifier {
-private:
-    MessageType last_type_;
-    bool is_first_message_ = true;
-
-public:
-    // Verifies that a state transition is allowed from the last state
-    // to the current state
-    void assert_transition_allowed(MessageType current_type)
-    {
-        if (current_type == HEARTBEAT || current_type == SHUTDOWN)
-        {
-            // These messages are allowed at any time
-            return;
-        }
-
-        // Special case for the first message
-        if (is_first_message_ && current_type != LOAD_NEUROPOD)
-        {
-            NEUROPOD_ERROR("OPE: Invalid state transition. Expected LOAD_NEUROPOD as first state. Got " << current_type);
-        }
-
-        // Using `set` instead of `unordered_set` because it doesn't require the type to be
-        // hashable
-        static const std::set<std::pair<MessageType, MessageType>> allowed_transitions = {
-            std::make_pair(LOAD_NEUROPOD, ADD_INPUT),
-            std::make_pair(ADD_INPUT, ADD_INPUT),
-            std::make_pair(ADD_INPUT, INFER),
-            std::make_pair(INFER, RETURN_OUTPUT),
-            std::make_pair(RETURN_OUTPUT, RETURN_OUTPUT),
-            std::make_pair(RETURN_OUTPUT, END_OUTPUT),
-            std::make_pair(END_OUTPUT, INFER_COMPLETE),
-            std::make_pair(INFER_COMPLETE, ADD_INPUT),
-            std::make_pair(INFER_COMPLETE, LOAD_NEUROPOD),
-        };
-
-        if (!is_first_message_ && allowed_transitions.find(std::make_pair(last_type_, current_type)) == allowed_transitions.end())
-        {
-            NEUROPOD_ERROR("OPE: Invalid state transition. Got transition from state " << last_type_ << " to " << current_type);
-        }
-
-        last_type_ = current_type;
-        is_first_message_ = false;
-    }
-};
-
 // We can batch multiple tensors into a single message in order to minimize
 // communication overhead. This is the maximum number of tensors we can include
 // in a single message
