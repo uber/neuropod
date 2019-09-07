@@ -12,6 +12,9 @@ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:`pwd`/bazel-bin/neuropods/backends/pytho
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:`pwd`/bazel-bin/neuropods/backends/torchscript/
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:`pwd`/bazel-bin/neuropods/backends/tensorflow/
 
+# The worker process for the multiprocess backend needs to be on the path
+export PATH=$PATH:`pwd`/bazel-bin/neuropods/multiprocess/
+
 # Ignore ODR errors from ASAN
 # See https://github.com/google/sanitizers/wiki/AddressSanitizerOneDefinitionRuleViolation
 export ASAN_OPTIONS=detect_odr_violation=0

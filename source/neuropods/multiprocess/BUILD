@@ -87,3 +87,39 @@ cc_binary(
         ":multiprocess_worker",
     ],
 )
+
+cc_library(
+    name = "multiprocess_hdrs",
+    hdrs = [
+        "multiprocess.hh",
+    ],
+    visibility = [
+        "//neuropods:__subpackages__",
+    ],
+    deps = [
+        "//neuropods:neuropods_hdrs",
+    ],
+    data = [
+        ":neuropod_multiprocess_worker",
+    ],
+)
+
+cc_library(
+    name = "multiprocess_impl",
+    srcs = [
+        "multiprocess.cc",
+    ],
+    hdrs = [
+        "multiprocess.hh",
+    ],
+    visibility = [
+        "//neuropods:__subpackages__",
+    ],
+    deps = [
+        ":ipc_control_channel",
+        "//neuropods:neuropods_hdrs",
+        "//neuropods/backends:neuropod_backend",
+        "//neuropods/internal:deleter",
+        "@boost_repo//:boost",
+    ],
+)
