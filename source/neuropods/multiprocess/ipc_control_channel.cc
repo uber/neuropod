@@ -154,7 +154,7 @@ bool IPCControlChannel::recv_message(control_message &received, size_t timeout_m
     // Get a message
     size_t received_size;
     unsigned int priority;
-    auto timeout_at = boost::posix_time::microsec_clock::local_time() + boost::posix_time::milliseconds(timeout_ms);
+    auto timeout_at = boost::interprocess::microsec_clock::universal_time() + boost::posix_time::milliseconds(timeout_ms);
 
     bool successful_read = recv_queue_->timed_receive(&received, sizeof(control_message), received_size, priority, timeout_at);
     if (successful_read)

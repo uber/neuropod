@@ -65,7 +65,7 @@ constexpr int HEARTBEAT_INTERVAL_MS = 2000;
 constexpr int MESSAGE_TIMEOUT_MS = 5000;
 
 // Ensure the timeout is larger than the heartbeat interval
-static_assert(MESSAGE_TIMEOUT_MS > HEARTBEAT_INTERVAL_MS);
+static_assert(MESSAGE_TIMEOUT_MS > HEARTBEAT_INTERVAL_MS, "Message timeout must be larger than the heartbeat interval");
 
 // TODO(vip): split into multiple structs
 struct __attribute__((__packed__)) control_message
