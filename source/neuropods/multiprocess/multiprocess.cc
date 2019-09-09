@@ -106,16 +106,19 @@ public:
                 const auto exit_code = WEXITSTATUS(status);
                 if (exit_code != 0)
                 {
-                    NEUROPOD_ERROR("Worker process exited abnormally. Exit code: " << exit_code);
+                    // We don't want to throw an error in the destructor so we'll just log for now
+                    std::cerr << "Worker process exited abnormally. Exit code: " << exit_code << std::endl;
                 }
             }
             else if(WIFSIGNALED(status))
             {
-                NEUROPOD_ERROR("Worker process exited abnormally. Was terminated by signal: " << WTERMSIG(status));
+                // We don't want to throw an error in the destructor so we'll just log for now
+                std::cerr << "Worker process exited abnormally. Was terminated by signal: " << WTERMSIG(status) << std::endl;
             }
             else
             {
-                NEUROPOD_ERROR("Worker process exited abnormally.");
+                // We don't want to throw an error in the destructor so we'll just log for now
+                std::cerr << "Worker process exited abnormally." << std::endl;
             }
 
             // Delete the control channels
