@@ -17,6 +17,7 @@ cc_library(
     }),
     deps = [
         "//neuropods/internal:error_utils",
+        "//neuropods/internal:logging",
         "//neuropods/internal:memory_utils",
         "@boost_repo//:boost",
     ],
