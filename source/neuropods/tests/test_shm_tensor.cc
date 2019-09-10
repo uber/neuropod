@@ -2,23 +2,23 @@
 // Uber, Inc. (c) 2019
 //
 
-#include "timing_utils.hh"
-#include "neuropods/multiprocess/shm_tensor.hh"
-
 #include "gtest/gtest.h"
+#include "neuropods/multiprocess/shm_tensor.hh"
+#include "timing_utils.hh"
 
 TEST(test_shm_tensor, simple)
 {
     // A tensor allocator that allocates tensors in shared memory
-    std::unique_ptr<neuropods::NeuropodTensorAllocator> allocator = neuropods::stdx::make_unique<neuropods::DefaultTensorAllocator<neuropods::SHMNeuropodTensor>>();
+    std::unique_ptr<neuropods::NeuropodTensorAllocator> allocator =
+        neuropods::stdx::make_unique<neuropods::DefaultTensorAllocator<neuropods::SHMNeuropodTensor>>();
 
     // Store tensors we allocate so they don't go out of scope
     std::vector<std::shared_ptr<neuropods::NeuropodTensor>> items;
-    std::vector<neuropods::SHMBlockID> block_ids;
+    std::vector<neuropods::SHMBlockID>                      block_ids;
 
     // Sample data
-    constexpr size_t num_items = 1024;
-    const std::vector<int64_t> dims = {2, 4, 8, 16};
+    constexpr size_t           num_items = 1024;
+    const std::vector<int64_t> dims      = {2, 4, 8, 16};
 
     // Allocate some tensors
     for (uint8_t i = 0; i < 16; i++)
@@ -30,8 +30,8 @@ TEST(test_shm_tensor, simple)
         tensor->copy_from(some_data, num_items);
 
         // Store the block ID
-        const auto &block_id
-            = std::dynamic_pointer_cast<neuropods::NativeDataContainer<neuropods::SHMBlockID>>(tensor)->get_native_data();
+        const auto &block_id =
+            std::dynamic_pointer_cast<neuropods::NativeDataContainer<neuropods::SHMBlockID>>(tensor)->get_native_data();
 
         block_ids.emplace_back(block_id);
 
@@ -52,7 +52,7 @@ TEST(test_shm_tensor, simple)
 
         // Make sure the data is what we expect
         const uint8_t expected_data[num_items] = {i};
-        auto actual_data = tensor->as_typed_tensor<uint8_t>()->get_raw_data_ptr();
+        auto          actual_data              = tensor->as_typed_tensor<uint8_t>()->get_raw_data_ptr();
         EXPECT_EQ(memcmp(actual_data, expected_data, num_items * sizeof(uint8_t)), 0);
     }
 }

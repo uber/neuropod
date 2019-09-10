@@ -177,18 +177,15 @@ torch::jit::IValue maybe_set_device(const torch::jit::IValue &item, const torch:
 TorchNeuropodBackend::TorchNeuropodBackend(const std::string &           neuropod_path,
                                            std::unique_ptr<ModelConfig> &model_config,
                                            const RuntimeOptions &        options)
-    : options_(options),
-      input_device_mapping_(model_config->input_tensor_device)
+    : options_(options), input_device_mapping_(model_config->input_tensor_device)
 {
     // Load the model
-    model_ = load_model_from_path(
-        get_graph_path(neuropod_path),
-        get_custom_ops_from_model_config(neuropod_path, *model_config),
+    model_ = load_model_from_path(get_graph_path(neuropod_path),
+                                  get_custom_ops_from_model_config(neuropod_path, *model_config),
 
-        // Load the model onto the appropriate device (ideally a GPU if we have one available)
-        // Note: this uses the options set in the initializer list above
-        get_torch_device(DeviceType::GPU)
-    );
+                                  // Load the model onto the appropriate device (ideally a GPU if we have one available)
+                                  // Note: this uses the options set in the initializer list above
+                                  get_torch_device(DeviceType::GPU));
 
     for (const auto &tensor_spec : model_config->outputs)
     {
@@ -293,8 +290,8 @@ std::unique_ptr<NeuropodValueMap> TorchNeuropodBackend::infer(const NeuropodValu
         MAKE_DICT(input_dict);
         for (const auto &entry : inputs)
         {
-            const auto device = get_torch_device(input_device_mapping_.at(entry.first));
-            const auto &value = get_ivalue_from_torch_tensor(entry.second);
+            const auto  device = get_torch_device(input_device_mapping_.at(entry.first));
+            const auto &value  = get_ivalue_from_torch_tensor(entry.second);
 
             DICT_INSERT(input_dict, entry.first, maybe_set_device(value, device));
         }

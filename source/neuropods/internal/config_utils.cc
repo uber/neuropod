@@ -30,7 +30,8 @@ std::string get_config_path(const std::string &neuropod_path)
     return neuropod_path + "/config.json";
 }
 
-[[noreturn]] void throw_neuropod_config_error(const std::string &message) {
+[[noreturn]] void throw_neuropod_config_error(const std::string &message)
+{
     NEUROPOD_ERROR("Error loading neuropod config! Please check your config file. " << message);
 }
 
@@ -207,17 +208,17 @@ std::unique_ptr<ModelConfig> load_model_config(std::istream &input_stream)
     if (obj.isMember("input_tensor_device"))
     {
         const Json::Value &device_mapping = obj["input_tensor_device"];
-        const auto names = device_mapping.getMemberNames();
+        const auto         names          = device_mapping.getMemberNames();
         for (const auto &name : names)
         {
             const auto type = device_mapping[name].asString();
             if (type == "GPU")
             {
-                input_tensor_device[name]  = DeviceType::GPU;
+                input_tensor_device[name] = DeviceType::GPU;
             }
             else if (type == "CPU")
             {
-                input_tensor_device[name]  = DeviceType::CPU;
+                input_tensor_device[name] = DeviceType::CPU;
             }
             else
             {
@@ -236,7 +237,8 @@ std::unique_ptr<ModelConfig> load_model_config(std::istream &input_stream)
     }
 
     // Not directly using make_unique because of brace initialization
-    return stdx::make_unique<ModelConfig>(ModelConfig{name, platform, inputs, outputs, custom_ops, input_tensor_device});
+    return stdx::make_unique<ModelConfig>(
+        ModelConfig{name, platform, inputs, outputs, custom_ops, input_tensor_device});
 }
 
 } // namespace neuropods

@@ -4,18 +4,18 @@
 
 #pragma once
 
-#include <cassert>
-#include <chrono>
-#include <iostream>
-#include <string>
-#include <memory>
-#include <mutex>
-#include <vector>
-
 #include "neuropods/backends/tensor_allocator.hh"
 #include "neuropods/internal/deleter.hh"
 #include "neuropods/internal/neuropod_tensor.hh"
 #include "neuropods/multiprocess/shm_allocator.hh"
+
+#include <cassert>
+#include <chrono>
+#include <iostream>
+#include <memory>
+#include <mutex>
+#include <string>
+#include <vector>
 
 namespace neuropods
 {
@@ -32,15 +32,15 @@ struct __attribute__((__packed__)) shm_tensor
     uint64_t ndims;
     int64_t  dims[MAX_DIMS];
 
-    uint8_t  data[];
+    uint8_t data[];
 };
 
 // TODO(vip): Use std::align
-void * get_next_aligned_offset(void * base)
+void *get_next_aligned_offset(void *base)
 {
     // We want to find an offset such that the data will be 64 byte aligned
-    uint64_t base_address = reinterpret_cast<uint64_t>(base);
-    size_t aligned_offset = 64 - (base_address + sizeof(shm_tensor)) % 64;
+    uint64_t base_address   = reinterpret_cast<uint64_t>(base);
+    size_t   aligned_offset = 64 - (base_address + sizeof(shm_tensor)) % 64;
     return reinterpret_cast<void *>(base_address + aligned_offset);
 }
 
@@ -79,10 +79,11 @@ public:
 
         // Set all the metadata
         data_->tensor_type = this->get_tensor_type();
-        data_->ndims = dims.size();
+        data_->ndims       = dims.size();
         if (data_->ndims >= MAX_DIMS)
         {
-            NEUROPOD_ERROR("For the multiprocess backend, tensors must have less than " << MAX_DIMS << " dimensions. Tried creating tensor with " << data_->ndims << " dimensions")
+            NEUROPOD_ERROR("For the multiprocess backend, tensors must have less than "
+                           << MAX_DIMS << " dimensions. Tried creating tensor with " << data_->ndims << " dimensions")
         }
 
         std::copy(dims.begin(), dims.end(), data_->dims);
@@ -91,19 +92,17 @@ public:
     // Load an existing tensor
     // See tensor_from_id
     SHMNeuropodTensor(const std::vector<int64_t> &dims,
-                      std::shared_ptr<void> block,
-                      shm_tensor *data,
-                      const SHMBlockID &block_id)
+                      std::shared_ptr<void>       block,
+                      shm_tensor *                data,
+                      const SHMBlockID &          block_id)
         : TypedNeuropodTensor<T>(dims), block_(block), data_(data), block_id_(block_id)
     {
         // Make sure data is 64 byte aligned
         assert(reinterpret_cast<uint64_t>(data_->data) % 64 == 0);
     }
 
-
     // This backend cannot wrap existing memory so we need to make a copy
-    SHMNeuropodTensor(const std::vector<int64_t> &dims, void * data, const Deleter &deleter)
-        : SHMNeuropodTensor<T>(dims)
+    SHMNeuropodTensor(const std::vector<int64_t> &dims, void *data, const Deleter &deleter) : SHMNeuropodTensor<T>(dims)
     {
         // Copy in the data
         this->copy_from(static_cast<T *>(data), this->get_num_elements());
@@ -143,15 +142,9 @@ public:
 
     ~SHMNeuropodTensor() = default;
 
-    void set(const std::vector<std::string> &data)
-    {
-        data_ = data;
-    }
+    void set(const std::vector<std::string> &data) { data_ = data; }
 
-    std::vector<std::string> get_data_as_vector() const
-    {
-        return data_;
-    }
+    std::vector<std::string> get_data_as_vector() const { return data_; }
 };
 
 } // namespace neuropods

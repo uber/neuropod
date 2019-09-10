@@ -2,17 +2,17 @@
 // Uber, Inc. (c) 2019
 //
 
+#include "neuropods/multiprocess/control_messages.hh"
+#include "neuropods/multiprocess/ipc_control_channel.hh"
+#include "neuropods/multiprocess/shm_tensor.hh"
+#include "neuropods/multiprocess/tensor_utils.hh"
+#include "neuropods/neuropods.hh"
+
 #include <atomic>
 #include <iostream>
 #include <string>
 #include <thread>
 #include <vector>
-
-#include "neuropods/neuropods.hh"
-#include "neuropods/multiprocess/control_messages.hh"
-#include "neuropods/multiprocess/ipc_control_channel.hh"
-#include "neuropods/multiprocess/shm_tensor.hh"
-#include "neuropods/multiprocess/tensor_utils.hh"
 
 namespace neuropods
 {
@@ -29,18 +29,18 @@ private:
 
 public:
     HeartbeatController(IPCControlChannel &control_channel, size_t interval_ms)
-        : send_heartbeat_(true),
-          heartbeat_thread_([this, &control_channel, interval_ms]()
-        {
-            // Send a heartbeat every 2 seconds
-            while (send_heartbeat_) {
-                // send_message is threadsafe so we don't need
-                // synchronization here
-                control_channel.send_message(HEARTBEAT);
-                std::this_thread::sleep_for(std::chrono::milliseconds(interval_ms));
-            }
-        })
-    {}
+        : send_heartbeat_(true), heartbeat_thread_([this, &control_channel, interval_ms]() {
+              // Send a heartbeat every 2 seconds
+              while (send_heartbeat_)
+              {
+                  // send_message is threadsafe so we don't need
+                  // synchronization here
+                  control_channel.send_message(HEARTBEAT);
+                  std::this_thread::sleep_for(std::chrono::milliseconds(interval_ms));
+              }
+          })
+    {
+    }
 
     ~HeartbeatController()
     {
@@ -111,7 +111,8 @@ void multiprocess_worker_loop(const std::string &control_queue_name)
             for (const auto &entry : *outputs)
             {
                 // Unfortunately, this requires a copy (done within SHMNeuropodTensor)
-                auto shm_tensor = wrap_existing_tensor<SHMNeuropodTensor>(std::dynamic_pointer_cast<NeuropodTensor>(entry.second));
+                auto shm_tensor =
+                    wrap_existing_tensor<SHMNeuropodTensor>(std::dynamic_pointer_cast<NeuropodTensor>(entry.second));
 
                 // This ensures that the tensor stays around long enough for the other process to load it
                 last_outputs[entry.first] = shm_tensor;

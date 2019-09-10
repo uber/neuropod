@@ -28,9 +28,12 @@ namespace
 template <typename T>
 TensorType get_tensor_type_from_cpp() = delete;
 
-#define GET_TENSOR_TYPE_FN(CPP_TYPE, NEUROPOD_TYPE) \
-    template <>                                     \
-    [[gnu::unused]] TensorType get_tensor_type_from_cpp<CPP_TYPE>() { return NEUROPOD_TYPE; }
+#define GET_TENSOR_TYPE_FN(CPP_TYPE, NEUROPOD_TYPE)                 \
+    template <>                                                     \
+    [[gnu::unused]] TensorType get_tensor_type_from_cpp<CPP_TYPE>() \
+    {                                                               \
+        return NEUROPOD_TYPE;                                       \
+    }
 
 FOR_EACH_TYPE_MAPPING_INCLUDING_STRING(GET_TENSOR_TYPE_FN)
 
@@ -249,7 +252,7 @@ protected:
     }
     void assure_rank(size_t expected_rank) const
     {
-        const auto  &dims = this->get_dims();
+        const auto & dims = this->get_dims();
         const size_t rank = dims.size();
         if (rank != expected_rank)
         {
@@ -275,15 +278,17 @@ public:
     virtual T *      get_raw_data_ptr()       = 0;
     virtual const T *get_raw_data_ptr() const = 0;
 
-    template<size_t N>
-    TensorAccessor<T, N> accessor() {
+    template <size_t N>
+    TensorAccessor<T, N> accessor()
+    {
         static_assert(N > 0, "`accessor()` is used for indexing a tensors, for scalars use `as_scalar()`");
         this->assure_rank(N);
         return TensorAccessor<T, N>(get_raw_data_ptr(), get_strides().data());
     }
 
-    template<size_t N>
-    TensorAccessor<const T, N> accessor() const {
+    template <size_t N>
+    TensorAccessor<const T, N> accessor() const
+    {
         static_assert(N > 0, "`accessor()` is used for indexing tensors, for scalars use `as_scalar()`");
         this->assure_rank(N);
         return TensorAccessor<const T, N>(get_raw_data_ptr(), get_strides().data());
@@ -292,25 +297,13 @@ public:
     const T &operator[](uint32_t r) const { return (*this)(r); }
     T &      operator[](uint32_t r) { return (*this)(r); }
 
-    const T &operator()(uint32_t r) const
-    {
-        return accessor<1>()[r];
-    }
+    const T &operator()(uint32_t r) const { return accessor<1>()[r]; }
 
-    T &operator()(uint32_t r)
-    {
-        return accessor<1>()[r];
-    }
+    T &operator()(uint32_t r) { return accessor<1>()[r]; }
 
-    const T &operator()(uint32_t r, uint32_t c) const
-    {
-        return accessor<2>()[r][c];
-    }
+    const T &operator()(uint32_t r, uint32_t c) const { return accessor<2>()[r][c]; }
 
-    T &operator()(uint32_t r, uint32_t c)
-    {
-        return accessor<2>()[r][c];
-    }
+    T &operator()(uint32_t r, uint32_t c) { return accessor<2>()[r][c]; }
 
     const T *begin() const
     {

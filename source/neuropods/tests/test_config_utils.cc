@@ -40,7 +40,7 @@ TEST(test_config_utils, valid_config)
 {
     // Test that the config is valid
     std::istringstream config(VALID_SPEC);
-    auto model_config = neuropods::load_model_config(config);
+    auto               model_config = neuropods::load_model_config(config);
     EXPECT_EQ("x", model_config->inputs[0].name);
     EXPECT_EQ(neuropods::TensorType::FLOAT_TENSOR, model_config->inputs[0].type);
     EXPECT_EQ(std::vector<int64_t>({-1, 2, -2}), model_config->inputs[0].dims);

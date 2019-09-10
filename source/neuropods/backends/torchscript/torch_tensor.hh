@@ -23,7 +23,6 @@
 #endif
 #endif
 
-
 namespace neuropods
 {
 
