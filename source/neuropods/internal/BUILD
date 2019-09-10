@@ -34,6 +34,19 @@ cc_library(
 )
 
 cc_library(
+    name = "logging",
+    hdrs = [
+        "logging.hh",
+    ],
+    srcs = [
+        "logging.cc"
+    ],
+    visibility = [
+        "//neuropods:__subpackages__",
+    ],
+)
+
+cc_library(
     name = "neuropod_tensor",
     srcs = [
         "neuropod_tensor.cc",
