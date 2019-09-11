@@ -18,5 +18,6 @@ cc_library(
     includes = [
         "include/python{PYTHON_VERSION}"
     ],
+    defines = ["PYTHON_VERSION={PYTHON_VERSION}"],
     visibility = ["//visibility:public"],
 )
