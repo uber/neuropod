@@ -47,6 +47,7 @@ cc_library(
     ],
     srcs = [
         "ipc_control_channel.cc",
+        "control_messages.cc",
     ],
     visibility = [
         "//neuropods:__subpackages__",
