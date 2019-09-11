@@ -12,12 +12,13 @@
 #include <boost/date_time/microsec_time_clock.hpp>
 #include <boost/date_time/posix_time/posix_time_types.hpp>
 #include <boost/uuid/uuid.hpp>
-#include <boost/uuid/uuid_io.hpp>
 #include <boost/uuid/uuid_generators.hpp>
+#include <boost/uuid/uuid_io.hpp>
+#include <sys/wait.h>
+
+#include <vector>
 
 #include <signal.h>
-#include <sys/wait.h>
-#include <vector>
 
 namespace neuropods
 {
@@ -37,10 +38,14 @@ pid_t start_worker_process(const std::string &control_queue_name)
     {
         // In the child process
         // Start the worker
-        execlp("neuropod_multiprocess_worker", "neuropod_multiprocess_worker", control_queue_name.c_str(), static_cast<char *>(nullptr));
+        execlp("neuropod_multiprocess_worker",
+               "neuropod_multiprocess_worker",
+               control_queue_name.c_str(),
+               static_cast<char *>(nullptr));
 
         // If we get here, execlp failed
-        std::cerr << "Failed to start the worker process. Failed with code: " << errno << ": " << strerror(errno) << std::endl;
+        std::cerr << "Failed to start the worker process. Failed with code: " << errno << ": " << strerror(errno)
+                  << std::endl;
         exit(EXIT_FAILURE);
     }
     else
@@ -57,16 +62,20 @@ pid_t start_worker_process(const std::string &control_queue_name)
 class MultiprocessNeuropodBackend : public NeuropodBackendWithDefaultAllocator<SHMNeuropodTensor>
 {
 private:
-    pid_t child_pid_ = -1;
+    pid_t       child_pid_ = -1;
     std::string control_queue_name_;
-    bool free_memory_every_cycle_;
+    bool        free_memory_every_cycle_;
 
     // Control channel for interacting with the worker
     IPCControlChannel control_channel_;
 
 public:
-    MultiprocessNeuropodBackend(const std::string &neuropod_path, const std::string &control_queue_name, bool free_memory_every_cycle)
-        : control_queue_name_(control_queue_name), free_memory_every_cycle_(free_memory_every_cycle), control_channel_(control_queue_name, MAIN_PROCESS)
+    MultiprocessNeuropodBackend(const std::string &neuropod_path,
+                                const std::string &control_queue_name,
+                                bool               free_memory_every_cycle)
+        : control_queue_name_(control_queue_name),
+          free_memory_every_cycle_(free_memory_every_cycle),
+          control_channel_(control_queue_name, MAIN_PROCESS)
     {
         // Create a message to tell the worker process to load the specified neuropod
         control_message msg;
@@ -84,7 +93,9 @@ public:
     }
 
     // Generate a control queue name and start a worker
-    MultiprocessNeuropodBackend(const std::string &neuropod_path, bool free_memory_every_cycle) : MultiprocessNeuropodBackend(neuropod_path, boost::uuids::to_string(boost::uuids::random_generator()()), free_memory_every_cycle)
+    MultiprocessNeuropodBackend(const std::string &neuropod_path, bool free_memory_every_cycle)
+        : MultiprocessNeuropodBackend(
+              neuropod_path, boost::uuids::to_string(boost::uuids::random_generator()()), free_memory_every_cycle)
     {
         // Start the worker process
         child_pid_ = start_worker_process(control_queue_name_);
@@ -110,10 +121,11 @@ public:
                     std::cerr << "Worker process exited abnormally. Exit code: " << exit_code << std::endl;
                 }
             }
-            else if(WIFSIGNALED(status))
+            else if (WIFSIGNALED(status))
             {
                 // We don't want to throw an error in the destructor so we'll just log for now
-                std::cerr << "Worker process exited abnormally. Was terminated by signal: " << WTERMSIG(status) << std::endl;
+                std::cerr << "Worker process exited abnormally. Was terminated by signal: " << WTERMSIG(status)
+                          << std::endl;
             }
             else
             {
@@ -143,17 +155,18 @@ public:
 
         // Get the outputs from the worker
         auto to_return = stdx::make_unique<NeuropodValueMap>();
-        while (true) {
+        while (true)
+        {
             // Get a message from the worker
             control_message received;
-            bool successful_read = control_channel_.recv_message(received, MESSAGE_TIMEOUT_MS);
+            bool            successful_read = control_channel_.recv_message(received, MESSAGE_TIMEOUT_MS);
             if (!successful_read)
             {
                 // We timed out
-                NEUROPOD_ERROR(
-                    "Timed out waiting for a response from worker process. "
-                    "Didn't receive a message in " << MESSAGE_TIMEOUT_MS << "ms, but expected a heartbeat every " << HEARTBEAT_INTERVAL_MS << "ms."
-                );
+                NEUROPOD_ERROR("Timed out waiting for a response from worker process. "
+                               "Didn't receive a message in "
+                               << MESSAGE_TIMEOUT_MS << "ms, but expected a heartbeat every " << HEARTBEAT_INTERVAL_MS
+                               << "ms.");
             }
 
             if (received.type == END_OUTPUT)
@@ -199,9 +212,12 @@ std::unique_ptr<Neuropod> load_neuropod_in_new_process(const std::string &neurop
     return stdx::make_unique<Neuropod>(neuropod_path, backend);
 }
 
-std::unique_ptr<Neuropod> load_neuropod_in_worker(const std::string &neuropod_path, const std::string &control_queue_name, bool free_memory_every_cycle)
+std::unique_ptr<Neuropod> load_neuropod_in_worker(const std::string &neuropod_path,
+                                                  const std::string &control_queue_name,
+                                                  bool               free_memory_every_cycle)
 {
-    auto backend = std::make_shared<MultiprocessNeuropodBackend>(neuropod_path, control_queue_name, free_memory_every_cycle);
+    auto backend =
+        std::make_shared<MultiprocessNeuropodBackend>(neuropod_path, control_queue_name, free_memory_every_cycle);
     return stdx::make_unique<Neuropod>(neuropod_path, backend);
 }
 

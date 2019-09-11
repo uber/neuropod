@@ -20,9 +20,10 @@ Neuropod::Neuropod(const std::string &neuropod_path, const RuntimeOptions &optio
 // Find the right backend to use and load the neuropod
 Neuropod::Neuropod(const std::string &                                 neuropod_path,
                    const std::unordered_map<std::string, std::string> &default_backend_overrides,
-                   const RuntimeOptions &options)
+                   const RuntimeOptions &                              options)
     : model_config_(load_model_config(neuropod_path)),
-      backend_(get_backend_for_type(default_backend_overrides, model_config_->platform)(neuropod_path, model_config_, options))
+      backend_(get_backend_for_type(default_backend_overrides,
+                                    model_config_->platform)(neuropod_path, model_config_, options))
 {
 }
 

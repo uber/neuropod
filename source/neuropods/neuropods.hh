@@ -18,16 +18,16 @@ namespace neuropods
 typedef int NeuropodDevice;
 namespace Device
 {
-    constexpr int CPU  = -1;
-    constexpr int GPU0 = 0;
-    constexpr int GPU1 = 1;
-    constexpr int GPU2 = 2;
-    constexpr int GPU3 = 3;
-    constexpr int GPU4 = 4;
-    constexpr int GPU5 = 5;
-    constexpr int GPU6 = 6;
-    constexpr int GPU7 = 7;
-}
+constexpr int CPU  = -1;
+constexpr int GPU0 = 0;
+constexpr int GPU1 = 1;
+constexpr int GPU2 = 2;
+constexpr int GPU3 = 3;
+constexpr int GPU4 = 4;
+constexpr int GPU5 = 5;
+constexpr int GPU6 = 6;
+constexpr int GPU7 = 7;
+} // namespace Device
 
 struct RuntimeOptions
 {
@@ -60,12 +60,10 @@ public:
     // already been loaded
     Neuropod(const std::string &                                 neuropod_path,
              const std::unordered_map<std::string, std::string> &default_backend_overrides,
-             const RuntimeOptions &options = {});
+             const RuntimeOptions &                              options = {});
 
     // Use a specific backend to execute the neuropod
-    Neuropod(const std::string &neuropod_path,
-             const std::string &backend_name,
-             const RuntimeOptions &options = {});
+    Neuropod(const std::string &neuropod_path, const std::string &backend_name, const RuntimeOptions &options = {});
 
     // Allows an already-initialized backend to be passed in. This enables backends that need
     // non-standard arguments. For example, this can be used to build a proxy that runs a

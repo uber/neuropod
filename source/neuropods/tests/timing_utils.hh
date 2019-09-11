@@ -10,7 +10,7 @@
 // Runs `fn` for `warmup` iterations without storing timing information
 // and then runs it for `iterations` iterations while storing timing information
 // Returns the mean time that `fn` took to execute
-template<typename Resolution, typename T>
+template <typename Resolution, typename T>
 float time_lambda(size_t warmup, size_t iterations, T fn)
 {
     std::vector<size_t> times;

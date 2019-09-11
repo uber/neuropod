@@ -30,7 +30,8 @@ namespace neuropods
 using SHMBlockID = std::array<char, 24>;
 
 class UnusedPool;
-class SHMAllocator {
+class SHMAllocator
+{
 private:
     // Keeps track of unused blocks of shared memory so we can reuse them
     std::unique_ptr<UnusedPool> unused_pool_;

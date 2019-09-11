@@ -2,16 +2,15 @@
 // Uber, Inc. (c) 2019
 //
 
-#include "timing_utils.hh"
-#include "neuropods/multiprocess/shm_allocator.hh"
-
-#include "gtest/gtest.h"
 #include "benchmark/benchmark.h"
+#include "gtest/gtest.h"
+#include "neuropods/multiprocess/shm_allocator.hh"
+#include "timing_utils.hh"
 
 TEST(test_shm_allocator, memcpy)
 {
-    const uint8_t some_image_data[1200 * 1920 * 3] = {0};
-    constexpr size_t num_bytes = 1200 * 1920 * 3 * sizeof(uint8_t);
+    const uint8_t    some_image_data[1200 * 1920 * 3] = {0};
+    constexpr size_t num_bytes                        = 1200 * 1920 * 3 * sizeof(uint8_t);
 
     neuropods::SHMAllocator allocator;
 
@@ -21,7 +20,7 @@ TEST(test_shm_allocator, memcpy)
 
         // Allocate some memory
         neuropods::SHMBlockID block_id;
-        auto data = allocator.allocate_shm(num_bytes, block_id);
+        auto                  data = allocator.allocate_shm(num_bytes, block_id);
 
         // Copy in data
         memcpy(data.get(), some_image_data, num_bytes);
@@ -31,7 +30,7 @@ TEST(test_shm_allocator, memcpy)
         // Allocate some memory
         // This should reuse bocks of memory from previous allocations
         neuropods::SHMBlockID block_id;
-        auto data = allocator.allocate_shm(num_bytes, block_id);
+        auto                  data = allocator.allocate_shm(num_bytes, block_id);
 
         // Copy in data
         memcpy(data.get(), some_image_data, num_bytes);
@@ -64,18 +63,17 @@ TEST(test_shm_allocator, memcpy)
     EXPECT_LE(shm_time * 5, shm_time_force_new);
 }
 
-
 TEST(test_shm_allocator, simple)
 {
     neuropods::SHMAllocator allocator;
     for (uint8_t i = 0; i < 16; i++)
     {
-        const uint8_t some_image_data[1200 * 1920 * 3] = {i};
-        constexpr size_t num_bytes = 1200 * 1920 * 3 * sizeof(uint8_t);
+        const uint8_t    some_image_data[1200 * 1920 * 3] = {i};
+        constexpr size_t num_bytes                        = 1200 * 1920 * 3 * sizeof(uint8_t);
 
         // Allocate some memory and copy in data
         neuropods::SHMBlockID block_id;
-        auto data = allocator.allocate_shm(num_bytes, block_id);
+        auto                  data = allocator.allocate_shm(num_bytes, block_id);
         memcpy(data.get(), some_image_data, num_bytes);
 
         // Load the block of memory and ensure the data
@@ -92,7 +90,7 @@ TEST(test_shm_allocator, out_of_scope)
     // Allocate some shared memory and let everything go out of scope
     {
         neuropods::SHMAllocator allocator;
-        auto data = allocator.allocate_shm(1024, block_id);
+        auto                    data = allocator.allocate_shm(1024, block_id);
     }
 
     // Try loading the block we previously allocated
@@ -104,7 +102,7 @@ TEST(test_shm_allocator, out_of_scope)
 
 TEST(test_shm_allocator, stale)
 {
-    neuropods::SHMBlockID block_id;
+    neuropods::SHMBlockID   block_id;
     neuropods::SHMAllocator allocator;
 
     // Allocate some shared memory and let it go out of scope
@@ -114,7 +112,7 @@ TEST(test_shm_allocator, stale)
 
     // This allocation should reuse the previously allocated block of memory
     neuropods::SHMBlockID other_id;
-    auto data = allocator.allocate_shm(1024, other_id);
+    auto                  data = allocator.allocate_shm(1024, other_id);
 
     // Try loading a block with the original ID (which is now stale)
     // This should throw an error because the block of memory has been reused

@@ -37,11 +37,12 @@ template <typename T>
 bool register_serializable(std::function<void(const T &, boost::archive::binary_oarchive &)> serialize_fn,
                            deserialize_fn_t                                                  deserialize_fn)
 {
-    register_serializer_internal(T::get_static_serialize_tag(),
-                                 [serialize_fn](const NeuropodValue &val, boost::archive::binary_oarchive &out) {
-                                     serialize_fn(dynamic_cast<const T &>(val), out);
-                                 },
-                                 deserialize_fn);
+    register_serializer_internal(
+        T::get_static_serialize_tag(),
+        [serialize_fn](const NeuropodValue &val, boost::archive::binary_oarchive &out) {
+            serialize_fn(dynamic_cast<const T &>(val), out);
+        },
+        deserialize_fn);
 
     return true;
 }

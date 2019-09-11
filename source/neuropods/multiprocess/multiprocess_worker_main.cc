@@ -2,10 +2,10 @@
 // Uber, Inc. (c) 2019
 //
 
+#include "neuropods/multiprocess/multiprocess_worker.hh"
+
 #include <iostream>
 #include <string>
-
-#include "neuropods/multiprocess/multiprocess_worker.hh"
 
 // A worker process that runs a neuropod
 int main(int argc, char *argv[])
@@ -21,5 +21,4 @@ int main(int argc, char *argv[])
 
     // Start the main loop
     neuropods::multiprocess_worker_loop(control_queue_name);
-
 }

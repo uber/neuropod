@@ -17,11 +17,12 @@ namespace neuropods
 {
 
 // Validates that state machine transitions are happening correctly
-class TransitionVerifier {
+class TransitionVerifier
+{
 private:
     MessageType last_type_;
-    bool is_first_message_ = true;
-    std::mutex mutex_;
+    bool        is_first_message_ = true;
+    std::mutex  mutex_;
 
 public:
     // Verifies that a state transition is allowed from the last state
@@ -36,10 +37,11 @@ enum ProcessType
     MAIN_PROCESS,
 };
 
-class IPCControlChannel {
+class IPCControlChannel
+{
 private:
     // Control channels for communicating between the main process and worker process
-    std::string control_queue_name_;
+    std::string                         control_queue_name_;
     std::unique_ptr<ipc::message_queue> send_queue_;
     std::unique_ptr<ipc::message_queue> recv_queue_;
 

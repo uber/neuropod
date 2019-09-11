@@ -33,7 +33,6 @@ void log(LogSeverity severity, const char *fname, int line, const std::string &m
 
 #define NEUROPOD_LOG(severity, MSG) NEUROPOD_LOG_WITH_LINE_AND_FILE(severity, __FILE__, __LINE__, MSG)
 
-
 #define NEUROPOD_LOG_DEBUG(MSG) NEUROPOD_LOG(LogSeverity::DEBUG, MSG)
 #define NEUROPOD_LOG_INFO(MSG) NEUROPOD_LOG(LogSeverity::INFO, MSG)
 #define NEUROPOD_LOG_WARN(MSG) NEUROPOD_LOG(LogSeverity::WARN, MSG)
