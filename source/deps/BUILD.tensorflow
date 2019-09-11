@@ -20,3 +20,10 @@ cc_library(
         "//conditions:default": glob(["lib/libtensorflow.so", "lib/libtensorflow.so.1"]),
     }),
 )
+
+filegroup(
+    name = "libtensorflow_libs",
+    srcs = glob([
+        "lib/*",
+    ])
+)
