@@ -9,6 +9,8 @@
 #include "neuropods/internal/config_utils.hh"
 #include "neuropods/internal/neuropod_tensor.hh"
 
+#include <dlfcn.h>
+
 namespace neuropods
 {
 
@@ -89,5 +91,42 @@ std::shared_ptr<TypedNeuropodTensor<T>> Neuropod::tensor_from_memory(const std::
 
 FOR_EACH_TYPE_MAPPING_EXCEPT_STRING(INIT_TEMPLATES_FOR_TYPE);
 FOR_EACH_TYPE_MAPPING_INCLUDING_STRING(INIT_STRING_TEMPLATES_FOR_TYPE);
+
+bool is_cuda_available() {
+    // Try to load cuda
+    void *handle = dlopen("libcudart.so", RTLD_LAZY);
+    if (!handle)
+    {
+        // Couldn't load the CUDA runtime
+        return false;
+    }
+
+    // Load the functions we care about
+    // Using an int instead of the `cudaError_t` enum defined in `driver_types.h`
+    int (*cudaGetDeviceCount)(int*) = reinterpret_cast<int (*)(int*)>(dlsym(handle, "cudaGetDeviceCount"));
+    int (*cudaGetLastError)() = reinterpret_cast<int (*)()>(dlsym(handle, "cudaGetLastError"));
+
+    // Get device count
+    // Based on https://github.com/pytorch/pytorch/blob/master/c10/cuda/CUDAFunctions.h#L19
+    int count;
+    int err = cudaGetDeviceCount(&count);
+
+    // Check if CUDA gave us an error
+    if (err != 0 /* cudaSuccess */)
+    {
+        // Clear out the error state, so we don't spuriously trigger someone else.
+        cudaGetLastError();
+        return false;
+    }
+
+    // Check if we have a GPU
+    if (count <= 0)
+    {
+        return false;
+    }
+
+    // We have CUDA!
+    return true;
+}
 
 } // namespace neuropods

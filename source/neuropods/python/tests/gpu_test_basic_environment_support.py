@@ -16,6 +16,10 @@ class TestGPUEnvSupport(unittest.TestCase):
         import tensorflow as tf
         self.assertTrue(tf.test.is_built_with_cuda() and tf.test.is_gpu_available())
 
+    def test_neuropod_is_cuda_available(self):
+        import neuropods_native
+        self.assertTrue(neuropods_native.is_cuda_available())
+
 
 if __name__ == '__main__':
     unittest.main()

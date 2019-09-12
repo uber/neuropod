@@ -95,6 +95,8 @@ PYBIND11_MODULE(neuropods_native, m)
     m.def("deserialize",
           &deserialize_binding,
           "Deserialize a string of bytes to a NeuropodTensor (and return it as a numpy array)");
+
+    m.def("is_cuda_available", &is_cuda_available);
 }
 
 } // namespace neuropods

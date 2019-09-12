@@ -115,4 +115,7 @@ public:
                                                                const Deleter &             deleter);
 };
 
+// Returns whether or not CUDA is available
+bool is_cuda_available();
+
 } // namespace neuropods
