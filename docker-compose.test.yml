@@ -11,6 +11,8 @@ services:
       context: .
       dockerfile: build/neuropods.dockerfile
       target: neuropod-build
+      args:
+        NEUROPODS_DO_PACKAGE: "true"
     privileged: true
 
   test-gpu:

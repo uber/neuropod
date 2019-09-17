@@ -2,6 +2,7 @@
 # Uber, Inc. (c) 2018
 #
 
+load("@bazel_tools//tools/build_defs/pkg:pkg.bzl", "pkg_tar")
 load("//bazel:copy_libs.bzl", "copy_libs")
 
 cc_binary(
@@ -35,4 +36,17 @@ cc_binary(
 copy_libs(
     name = "copy_libtensorflow",
     libs = "@tensorflow_repo//:libtensorflow_libs"
+)
+
+pkg_tar(
+    name = "neuropod_tensorflow_backend",
+    srcs = [
+        ":libneuropod_tensorflow_backend.so",
+        "@tensorflow_repo//:libtensorflow_libs",
+    ],
+    tags = ["manual"],
+    extension = "tar.gz",
+    visibility = [
+        "//visibility:public",
+    ],
 )

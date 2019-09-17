@@ -2,6 +2,8 @@
 # Uber, Inc. (c) 2018
 #
 
+load("@bazel_tools//tools/build_defs/pkg:pkg.bzl", "pkg_tar")
+
 cc_binary(
     name = "libneuropod_pythonbridge_backend.so",
     srcs = [
@@ -12,7 +14,7 @@ cc_binary(
     linkshared = True,
     linkstatic = True,
     linkopts = [
-        "-Wl,-rpath .",
+        "-Wl,-rpath,$$ORIGIN",
         "-ldl",
     ],
     visibility = [
@@ -23,5 +25,17 @@ cc_binary(
         "//neuropods/backends/test_backend:test_backend_hdrs",
         "//neuropods/bindings:bindings",
         "//neuropods/internal:deleter",
+    ],
+)
+
+pkg_tar(
+    name = "neuropod_pythonbridge_backend",
+    srcs = [
+        ":libneuropod_pythonbridge_backend.so",
+    ],
+    tags = ["manual"],
+    extension = "tar.gz",
+    visibility = [
+        "//visibility:public",
     ],
 )

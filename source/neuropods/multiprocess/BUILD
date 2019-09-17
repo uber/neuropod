@@ -82,6 +82,7 @@ cc_binary(
         "//neuropods:libneuropods.so",
     ],
     linkstatic = True,
+    linkopts = ["-Wl,-rpath,$$ORIGIN"],
     visibility = [
         "//neuropods:__subpackages__",
     ],

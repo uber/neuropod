@@ -13,6 +13,11 @@ popd
 # Build the native code
 bazel build "$@" //...:all
 
+# Build the packages if we need to (at least one of these are not empty)
+if [[ ! -z "${NEUROPODS_DO_PACKAGE}${BUILDKITE_TAG}${TRAVIS_TAG}" ]]; then
+    bazel build "$@" //neuropods:packages
+fi
+
 if [[ $(uname -s) == 'Linux' ]]; then
     # Copy the build artificts into a dist folder
     mkdir -p /tmp/neuropod_dist && \

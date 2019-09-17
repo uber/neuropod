@@ -55,6 +55,12 @@ RUN echo "import coverage; coverage.process_startup()" > \
 # Copy the rest of the code in
 COPY . /usr/src
 
+# Whether we should generate release packages
+# We don't do this by default because packaging torch and TF can take a bit of time
+# (packages are built if this is not empty)
+ARG NEUROPODS_DO_PACKAGE
+ENV NEUROPODS_DO_PACKAGE=$NEUROPODS_DO_PACKAGE
+
 # Build
 # To only build (and skip tests), pass `--target neuropod-build` to docker build
 FROM neuropod-base as neuropod-build

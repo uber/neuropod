@@ -4,7 +4,7 @@ set -e
 # Install deps for the python interface
 # (the -f flag tells pip where to find the torch nightly builds)
 pushd source/python
-pip install -U pip setuptools numpy coverage
+pip install -U pip setuptools numpy coverage requests
 python setup.py egg_info
 cat neuropods.egg-info/requires.txt | sed '/^\[/ d' | paste -sd " " - | xargs pip install
 popd

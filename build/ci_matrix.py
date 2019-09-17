@@ -47,6 +47,8 @@ services:
       context: .
       dockerfile: build/neuropods.dockerfile
       target: neuropod-build
+      args:
+        NEUROPODS_DO_PACKAGE: "true"
     privileged: true
 
   test-gpu:
@@ -134,6 +136,9 @@ for platform, py_version, framework_version in itertools.product(PLATFORMS, PY_V
         "      - docker-compose:\n",
         "          run: {}\n".format(variant_name),
         "          config: docker-compose.test.yml\n",
+        "          env:\n",
+        "            - BUILDKITE_TAG\n",
+        "            - GH_UPLOAD_TOKEN\n",
         "\n",
         ])
 
