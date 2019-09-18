@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "neuropods/version.hh"
 #include "neuropods/backends/neuropod_backend.hh"
 #include "neuropods/internal/config_utils.hh"
 

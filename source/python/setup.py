@@ -9,7 +9,7 @@ REQUIRED_PACKAGES = [
 
 setup(
     name="neuropods",
-    version="0.0.1",
+    version="0.1.0",
     install_requires=REQUIRED_PACKAGES,
     packages=find_packages(),
 )
