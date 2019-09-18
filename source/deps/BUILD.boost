@@ -14,6 +14,7 @@ cc_library(
         "libs/serialization/src/**/*.ipp",
     ]),
     hdrs = glob([
+        "boost/**/*.h",
         "boost/**/*.hpp",
         "boost/**/*.ipp",
     ]),
