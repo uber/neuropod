@@ -8,6 +8,7 @@ cc_library(
     name = "neuropods_hdrs",
     hdrs = [
         "neuropods.hh",
+        "version.hh",
     ],
     visibility = [
         "//visibility:public",
@@ -44,6 +45,7 @@ pkg_tar(
     srcs = [
         # Headers
         ":neuropods.hh",
+        ":version.hh",
     ],
     deps = [
         "//neuropods/internal:libneuropods_internal_hdrs",
