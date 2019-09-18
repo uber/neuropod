@@ -33,3 +33,6 @@ popd
 # Run native tests
 python ../build/run_cpp_tests.py
 popd
+
+# Maybe upload a release
+python build/upload_release.py

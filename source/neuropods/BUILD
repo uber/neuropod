@@ -23,6 +23,7 @@ cc_binary(
     name = "libneuropods.so",
     linkshared = True,
     linkstatic = True,
+    linkopts = ["-Wl,-rpath,$$ORIGIN"],
     srcs = [
         "neuropods.cc",
     ],
@@ -56,11 +57,7 @@ pkg_tar(
     name = "libneuropods_libs",
     package_dir = "lib/",
     srcs = [
-        # Libs
         ":libneuropods.so",
-        "//neuropods/backends/python_bridge:libneuropod_pythonbridge_backend.so",
-        "//neuropods/backends/torchscript:libneuropod_torchscript_backend.so",
-        "//neuropods/backends/tensorflow:libneuropod_tensorflow_backend.so",
     ]
 )
 
@@ -71,4 +68,14 @@ pkg_tar(
         ":libneuropods_hdrs",
         ":libneuropods_libs",
     ]
+)
+
+filegroup(
+    name = "packages",
+    tags = ["manual"],
+    srcs = [
+        "//neuropods/backends/python_bridge:neuropod_pythonbridge_backend",
+        "//neuropods/backends/torchscript:neuropod_torchscript_backend",
+        "//neuropods/backends/tensorflow:neuropod_tensorflow_backend",
+    ],
 )
