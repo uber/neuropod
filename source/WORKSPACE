@@ -40,10 +40,10 @@ http_archive(
 http_archive(
     name = "boost_repo",
     build_file = "@//deps:BUILD.boost",
-    sha256 = "8361ddefbc1c9c2e449ec94cb8e0da6649d076102cde4ea11adfdd2a73e8411e",
+    sha256 = "3b1db0b67079266c40b98329d85916e910bbadfc3db3e860c049056788d4d5cd",
     type = "zip",
-    url = "https://downloads.sourceforge.net/project/boost/boost/1.54.0/boost_1_54_0.zip",
-    strip_prefix = "boost_1_54_0",
+    url = "https://downloads.sourceforge.net/project/boost/boost/1.68.0/boost_1_68_0.zip",
+    strip_prefix = "boost_1_68_0",
 )
 
 http_archive(
