@@ -87,6 +87,19 @@ cc_library(
 )
 
 cc_library(
+    name = "framework_version",
+    hdrs = [
+        "framework_version.hh",
+    ],
+    visibility = [
+        "//neuropods:__subpackages__",
+    ],
+    deps = [
+        ":error_utils",
+    ],
+)
+
+cc_library(
     name = "backend_registration",
     hdrs = [
         "backend_registration.hh",
@@ -96,6 +109,8 @@ cc_library(
     ],
     deps = [
         ":error_utils",
+        ":framework_version",
+        ":logging",
         ":memory_utils",
         ":neuropod_config_utils",
     ],
@@ -105,6 +120,7 @@ cc_library(
     name = "backend_registration_impl",
     srcs = [
         "backend_registration.cc",
+        "framework_version.cc",
     ],
     visibility = [
         "//neuropods:__subpackages__",
