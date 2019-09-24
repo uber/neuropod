@@ -4,24 +4,15 @@
 
 #pragma once
 
+#include "neuropods/backends/torchscript/version_utils.hh"
 #include "neuropods/internal/deleter.hh"
 #include "neuropods/internal/neuropod_tensor.hh"
 
-#include <caffe2/core/macros.h>
 #include <torch/script.h>
 #include <torch/torch.h>
 
 #include <string>
 #include <vector>
-
-// If we're not building with a nightly relase of torch,
-// set the date to match the date of the official release
-#ifndef CAFFE2_NIGHTLY_VERSION
-#if CAFFE2_VERSION == 10200
-// The date of the official torch 1.2.0 release
-#define CAFFE2_NIGHTLY_VERSION 20190808
-#endif
-#endif
 
 namespace neuropods
 {

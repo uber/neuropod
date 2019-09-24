@@ -8,11 +8,14 @@ load("//bazel:copy_libs.bzl", "copy_libs")
 cc_binary(
     name = "libneuropod_torchscript_backend.so",
     srcs = [
+        "infer_utils.cc",
+        "infer_utils.hh",
         "torch_backend.cc",
         "torch_backend.hh",
         "torch_tensor.hh",
         "type_utils.cc",
         "type_utils.hh",
+        "version_utils.hh",
         "//neuropods:libneuropods.so",
     ],
     linkshared = True,

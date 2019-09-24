@@ -4,72 +4,17 @@
 
 #include "torch_backend.hh"
 
+#include "neuropods/backends/torchscript/infer_utils.hh"
 #include "neuropods/backends/torchscript/type_utils.hh"
 #include "neuropods/internal/tensor_types.hh"
 
-#include <caffe2/core/macros.h>
-
-#include <iostream>
-#include <sstream>
 #include <stdexcept>
-
-#include <dlfcn.h>
 
 namespace neuropods
 {
 
 namespace
 {
-
-std::shared_ptr<torch::jit::script::Module> load_model_from_path(const std::string &             graph_path,
-                                                                 const std::vector<std::string> &custom_op_paths,
-                                                                 const torch::Device &           device)
-{
-    // Load custom ops
-    // TODO(vip): Add a flag allowing users to opt out of loading custom ops
-
-#ifndef __APPLE__
-// We need to do this so the custom ops can see the symbols from torch
-// This binary is already linked against `libtorch.so`; the dlopen just
-// promotes it to RTLD_GLOBAL.
-#if CAFFE2_NIGHTLY_VERSION >= 20190601
-    void *libtorch = dlopen("libtorch.so", RTLD_NOW | RTLD_GLOBAL | RTLD_NOLOAD);
-#else
-    void *libtorch = dlopen("libtorch.so.1", RTLD_NOW | RTLD_GLOBAL | RTLD_NOLOAD);
-#endif
-
-    if (libtorch == nullptr)
-    {
-        NEUROPOD_ERROR("Failed to promote libtorch to RTLD_GLOBAL. Error from dlopen: " << dlerror());
-    }
-#endif
-
-    for (const auto &path : custom_op_paths)
-    {
-        if (dlopen(path.c_str(), RTLD_NOW) == nullptr)
-        {
-            NEUROPOD_ERROR("Failed to load custom op. Error from dlopen: " << dlerror());
-        }
-    }
-
-    std::ifstream stream(graph_path, std::ios_base::binary);
-    if (!stream.good())
-    {
-        NEUROPOD_ERROR("Failed to load graph from path " << graph_path.c_str());
-    }
-
-#if CAFFE2_NIGHTLY_VERSION >= 20190717
-    auto model = std::make_shared<torch::jit::script::Module>(torch::jit::load(stream, device));
-#else
-    auto model = torch::jit::load(stream, device);
-#endif
-
-    if (!model)
-    {
-        NEUROPOD_ERROR("Failed to deserialize graph from path " << graph_path.c_str());
-    }
-    return model;
-}
 
 // Get graph path from a neuropod path
 std::string get_graph_path(const std::string &neuropod_path)
@@ -180,12 +125,14 @@ TorchNeuropodBackend::TorchNeuropodBackend(const std::string &           neuropo
     : options_(options), input_device_mapping_(model_config->input_tensor_device)
 {
     // Load the model
-    model_ = load_model_from_path(get_graph_path(neuropod_path),
-                                  get_custom_ops_from_model_config(neuropod_path, *model_config),
+    model_ = stdx::make_unique<TorchInferenceWrapper>(
+        get_graph_path(neuropod_path),
+        get_custom_ops_from_model_config(neuropod_path, *model_config),
 
-                                  // Load the model onto the appropriate device (ideally a GPU if we have one available)
-                                  // Note: this uses the options set in the initializer list above
-                                  get_torch_device(DeviceType::GPU));
+        // Load the model onto the appropriate device (ideally a GPU if we have one available)
+        // Note: this uses the options set in the initializer list above
+        get_torch_device(DeviceType::GPU)
+    );
 
     for (const auto &tensor_spec : model_config->outputs)
     {
@@ -200,7 +147,7 @@ TorchNeuropodBackend::TorchNeuropodBackend(const std::string &torchscript_model_
 
 TorchNeuropodBackend::TorchNeuropodBackend(const std::string &             torchscript_model_path,
                                            const std::vector<std::string> &custom_op_paths)
-    : model_(load_model_from_path(torchscript_model_path, custom_op_paths, torch::kCUDA))
+    : model_(stdx::make_unique<TorchInferenceWrapper>(torchscript_model_path, custom_op_paths, torch::kCUDA))
 {
 }
 
@@ -225,101 +172,22 @@ torch::Device TorchNeuropodBackend::get_torch_device(neuropods::DeviceType targe
     }
 }
 
-#if CAFFE2_NIGHTLY_VERSION >= 20190717
-#define MAKE_DICT(name) c10::impl::GenericDict name((c10::impl::deprecatedUntypedDict()));
-#elif CAFFE2_NIGHTLY_VERSION >= 20190601
-#define MAKE_DICT(name) auto name = c10::make_dict<torch::jit::IValue, torch::jit::IValue>();
-#else
-#define MAKE_DICT(name) torch::ivalue::UnorderedMap name;
-#endif
-
-#if CAFFE2_NIGHTLY_VERSION >= 20190717
-#define SCHEMA(method) method.function().getSchema()
-#else
-#define SCHEMA(method) method.getSchema()
-#endif
-
-#if CAFFE2_NIGHTLY_VERSION >= 20190601
-#define KEY(elem) (elem.key())
-#define VALUE(elem) (elem.value())
-#define DICT_INSERT(dict, key, value) dict.insert(key, value);
-#else
-#define KEY(elem) (elem.first)
-#define VALUE(elem) (elem.second)
-#define DICT_INSERT(dict, key, value) dict[key] = value;
-#endif
-
 // Run inference
 std::unique_ptr<NeuropodValueMap> TorchNeuropodBackend::infer(const NeuropodValueMap &inputs)
 {
-    torch::NoGradGuard guard;
+    std::unordered_map<std::string, torch::jit::IValue> torch_inputs;
 
-    // Get inference schema
-    const auto &method    = model_->get_method("forward");
-    const auto &schema    = SCHEMA(method);
-    const auto &arguments = schema.arguments();
-
-    // Whether or not this model expects a dictionary as an input
-    bool is_dict_input = false;
-
-    // Torch 1.2.0 adds a ClassType argument to every model
-    bool has_class_type = false;
-
-#if CAFFE2_NIGHTLY_VERSION >= 20190717
-    if (arguments.size() > 0 && arguments.at(0).type()->kind() == c10::TypeKind::ClassType)
+    // TODO(vip): check if this needs to be optimized
+    for (const auto &entry : inputs)
     {
-        has_class_type = true;
-    }
-#endif
+        const auto  device = get_torch_device(input_device_mapping_.at(entry.first));
+        const auto &value  = get_ivalue_from_torch_tensor(entry.second);
 
-    if (arguments.size() == 2 && has_class_type && arguments.at(1).type()->kind() == c10::TypeKind::DictType)
-    {
-        is_dict_input = true;
-    }
-
-    if (arguments.size() == 1 && arguments.at(0).type()->kind() == c10::TypeKind::DictType)
-    {
-        is_dict_input = true;
-    }
-
-    // Define the vector of inputs and add the inputs
-    std::vector<torch::jit::IValue> torch_inputs(arguments.size() - (has_class_type ? 1 : 0));
-    if (is_dict_input)
-    {
-        // This model expects a dict as input
-        MAKE_DICT(input_dict);
-        for (const auto &entry : inputs)
-        {
-            const auto  device = get_torch_device(input_device_mapping_.at(entry.first));
-            const auto &value  = get_ivalue_from_torch_tensor(entry.second);
-
-            DICT_INSERT(input_dict, entry.first, maybe_set_device(value, device));
-        }
-
-        torch_inputs.at(0) = input_dict;
-    }
-    else
-    {
-        // Pass inputs normally
-        for (const auto &entry : inputs)
-        {
-            const auto  input_name = entry.first;
-            const auto &input_data = get_ivalue_from_torch_tensor(entry.second);
-
-            const auto arg_index = schema.argumentIndexWithName(input_name);
-            if (!arg_index.has_value())
-            {
-                NEUROPOD_ERROR("Input '" << input_name.c_str() << "' does not exist. Model inputs " << schema);
-            }
-
-            const auto device = get_torch_device(input_device_mapping_.at(input_name));
-
-            torch_inputs.at(arg_index.value() - (has_class_type ? 1 : 0)) = maybe_set_device(input_data, device);
-        }
+        torch_inputs[entry.first] = maybe_set_device(value, device);
     }
 
     // Run inference
-    c10::IValue result = model_->forward(torch_inputs);
+    c10::IValue result = model_->infer(torch_inputs, true);
 
     // Get outputs
     auto to_return = stdx::make_unique<NeuropodValueMap>();

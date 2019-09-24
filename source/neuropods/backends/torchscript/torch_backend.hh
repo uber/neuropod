@@ -18,13 +18,15 @@
 namespace neuropods
 {
 
+class TorchInferenceWrapper;
+
 // This backend can execute TorchScript models using the
 // native C++ torch API
 class TorchNeuropodBackend : public NeuropodBackendWithDefaultAllocator<TorchNeuropodTensor>
 {
 private:
-    // The loaded TorchScript Module
-    std::shared_ptr<torch::jit::script::Module> model_;
+    // A wrapper around the loaded TorchScript Module
+    std::unique_ptr<TorchInferenceWrapper> model_;
 
     // The model output specification from ModelConfig
     std::vector<TensorSpec> output_specs_;
