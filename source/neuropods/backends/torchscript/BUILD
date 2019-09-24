@@ -10,6 +10,7 @@ cc_binary(
     srcs = [
         "torch_backend.cc",
         "torch_backend.hh",
+        "torch_tensor.cc",
         "torch_tensor.hh",
         "type_utils.cc",
         "type_utils.hh",

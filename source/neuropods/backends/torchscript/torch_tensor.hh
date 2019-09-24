@@ -204,10 +204,21 @@ public:
 #endif
 };
 
-// Utility function to get an IValue from a torch tensor
-torch::jit::IValue get_ivalue_from_torch_tensor(const std::shared_ptr<NeuropodValue> &tensor)
+// TorchNeuropodValue is used to store torch types that cannot be represented by `TorchNeuropodTensor`
+// (e.g. `Dict[str, str]`)
+class TorchNeuropodValue : public NeuropodValue, public NativeDataContainer<torch::jit::IValue>
 {
-    return std::dynamic_pointer_cast<NativeDataContainer<torch::jit::IValue>>(tensor)->get_native_data();
-}
+private:
+    torch::jit::IValue item_;
+
+public:
+    TorchNeuropodValue(torch::jit::IValue &item);
+    ~TorchNeuropodValue();
+
+    torch::jit::IValue get_native_data();
+};
+
+// Utility function to get an IValue from a torch tensor
+torch::jit::IValue get_ivalue_from_torch_tensor(const std::shared_ptr<NeuropodValue> &tensor);
 
 } // namespace neuropods
