@@ -10,6 +10,7 @@ import tensorflow as tf
 import unittest
 from testpath.tempdir import TemporaryDirectory
 
+from neuropods.backends.tensorflow.trt import is_trt_available
 from neuropods.packagers import create_tensorflow_neuropod
 from neuropods.loader import load_neuropod
 from neuropods.tests.utils import get_addition_model_spec
@@ -23,8 +24,8 @@ def create_tf_addition_model(custom_op_path):
     g = tf.Graph()
     with g.as_default():
         with tf.name_scope("some_namespace"):
-            x = tf.placeholder(tf.float32, name="in_x")
-            y = tf.placeholder(tf.float32, name="in_y")
+            x = tf.placeholder(tf.float32, name="in_x", shape=(None,))
+            y = tf.placeholder(tf.float32, name="in_y", shape=(None,))
 
             out = addition_op_module.neuropod_addition(x, y, name="out")
 
@@ -43,7 +44,7 @@ class TestTensorflowCustomOps(unittest.TestCase):
         subprocess.check_call([os.getenv("TF_CXX", "g++"), "-std=c++11", "-shared", "addition_op.cc", "-o", "addition_op.so", "-fPIC"] + tf.sysconfig.get_compile_flags() + tf.sysconfig.get_link_flags() + ["-O2"], cwd=current_dir)
         cls.custom_op_path = os.path.join(current_dir, "addition_op.so")
 
-    def package_simple_addition_model(self, do_fail=False):
+    def package_simple_addition_model(self, do_fail=False, use_trt=False):
         with TemporaryDirectory() as test_dir:
             neuropod_path = os.path.join(test_dir, "test_neuropod")
 
@@ -60,6 +61,7 @@ class TestTensorflowCustomOps(unittest.TestCase):
                     "out": "some_namespace/out:0",
                 },
                 custom_ops=[self.custom_op_path],
+                use_trt=use_trt,
                 # Get the input/output spec along with test data
                 **get_addition_model_spec(do_fail=do_fail)
             )
@@ -73,6 +75,11 @@ class TestTensorflowCustomOps(unittest.TestCase):
         # Tests a case where the output does not match the expected output
         with self.assertRaises(ValueError):
             self.package_simple_addition_model(do_fail=True)
+
+    @unittest.skipIf(not is_trt_available(), "TRT is not available in this version of TF")
+    def test_simple_addition_model_trt(self):
+        # Tests TRT optimization
+        self.package_simple_addition_model(use_trt=True)
 
 if __name__ == '__main__':
     unittest.main()

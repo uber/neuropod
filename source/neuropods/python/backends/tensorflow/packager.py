@@ -8,6 +8,7 @@ import shutil
 import tensorflow as tf
 
 from neuropods.backends import config_utils
+from neuropods.backends.tensorflow.trt import trt_optimize
 from neuropods.utils.eval_utils import save_test_data, load_and_test_neuropod
 
 
@@ -23,7 +24,8 @@ def create_tensorflow_neuropod(
         custom_ops=[],
         test_input_data=None,
         test_expected_out=None,
-        persist_test_data=True):
+        persist_test_data=True,
+        use_trt=False):
     """
     Packages a TensorFlow model as a neuropod package.
 
@@ -83,6 +85,8 @@ def create_tensorflow_neuropod(
                                 }
 
     :param  persist_test_data:  Optionally saves the test data within the packaged neuropod. default True.
+
+    :param  use_trt:            Whether or not to optimize the model with TensorRT. default False.
     """
     try:
         # Create the neuropod folder
@@ -114,6 +118,21 @@ def create_tensorflow_neuropod(
     neuropod_data_path = os.path.join(neuropod_path, "0", "data")
     os.makedirs(neuropod_data_path)
 
+    # Preprocess init_op_names
+    if init_op_names is None:
+        init_op_names = []
+    else:
+        init_op_names = init_op_names if isinstance(init_op_names, list) else [init_op_names]
+
+    if use_trt:
+        # Run a TRT optimization
+        graph_def = trt_optimize(
+            frozen_graph_path=frozen_graph_path,
+            graph_def=graph_def,
+            nodes_blacklist=[node_name_mapping[item["name"]] for item in output_spec] + init_op_names,
+        )
+        frozen_graph_path = None
+
     if frozen_graph_path is not None:
         # Copy in the frozen graph
         shutil.copyfile(frozen_graph_path, os.path.join(neuropod_data_path, "model.pb"))
@@ -124,11 +143,6 @@ def create_tensorflow_neuropod(
     # We also need to save the node name mapping so we know how to run the model
     # This is tensorflow specific config so it's not saved in the overall neuropod config
     with open(os.path.join(neuropod_path, "0", "config.json"), "w") as config_file:
-        if init_op_names is None:
-            init_op_names = []
-        else:
-            init_op_names = init_op_names if isinstance(init_op_names, list) else [init_op_names]
-
         json.dump({
             "node_name_mapping": node_name_mapping,
             "init_op_names": init_op_names,

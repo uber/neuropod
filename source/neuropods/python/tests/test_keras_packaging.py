@@ -10,6 +10,7 @@ from tensorflow.keras.models import Model
 import unittest
 from testpath.tempdir import TemporaryDirectory
 
+from neuropods.backends.tensorflow.trt import is_trt_available
 from neuropods.backends.keras.packager import create_keras_neuropod, \
     infer_keras_input_spec, infer_keras_output_spec
 from neuropods.loader import load_neuropod
@@ -35,7 +36,7 @@ def create_keras_addition_model(node_name_mapping=None):
 
 
 class TestKerasPackaging(unittest.TestCase):
-    def package_simple_addition_model(self, alias_names=False, do_fail=False):
+    def package_simple_addition_model(self, alias_names=False, do_fail=False, use_trt=False):
         with TemporaryDirectory() as test_dir:
             neuropod_path = os.path.join(test_dir, "test_neuropod")
 
@@ -53,6 +54,7 @@ class TestKerasPackaging(unittest.TestCase):
                 sess=tf.keras.backend.get_session(),
                 model=create_keras_addition_model(node_name_mapping),
                 node_name_mapping=node_name_mapping,
+                use_trt=use_trt,
                 # Get the input/output spec along with test data
                 **get_addition_model_spec(do_fail=do_fail)
             )
@@ -69,6 +71,16 @@ class TestKerasPackaging(unittest.TestCase):
         # Tests a case where packaging works correctly and
         # the model output matches the expected output
         self.package_simple_addition_model(alias_names=True)
+
+    @unittest.skipIf(not is_trt_available(), "TRT is not available in this version of TF")
+    def test_simple_addition_model_trt(self):
+        # Tests TRT optimization
+        self.package_simple_addition_model(use_trt=True)
+
+    @unittest.skipIf(not is_trt_available(), "TRT is not available in this version of TF")
+    def test_simple_addition_model_with_alias_trt(self):
+        # Tests TRT optimization
+        self.package_simple_addition_model(alias_names=True, use_trt=True)
 
     def test_simple_addition_model_failure(self):
         # Tests a case where the output does not match the expected output

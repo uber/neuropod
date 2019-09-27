@@ -17,7 +17,8 @@ def create_keras_neuropod(
         output_spec=None,
         test_input_data=None,
         test_expected_out=None,
-        persist_test_data=True):
+        persist_test_data=True,
+        use_trt=False):
     """
     Packages a Keras model as a neuropod package. Currently, only the TensorFlow backend is supported.
 
@@ -75,6 +76,8 @@ def create_keras_neuropod(
                                 }
 
     :param  persist_test_data:  Optionally saves the test data within the packaged neuropod. default True.
+
+    :param  use_trt:            Whether or not to optimize the model with TensorRT. default False.
     """
     if input_spec is None:
         input_spec = infer_keras_input_spec(model, node_name_mapping)
@@ -121,6 +124,7 @@ def create_keras_neuropod(
         test_input_data=test_input_data,
         test_expected_out=test_expected_out,
         persist_test_data=persist_test_data,
+        use_trt=use_trt,
     )
 
 
