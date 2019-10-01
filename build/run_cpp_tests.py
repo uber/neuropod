@@ -7,8 +7,10 @@
 # integrity protection on Mac.
 # Because of this, we're manually running all the bazel tests
 
+import argparse
 import re
 import subprocess
+import sys
 import unittest
 
 class TestBazelTargets(unittest.TestCase):
@@ -24,6 +26,11 @@ def make_test(test_target):
     return test
 
 if __name__ == '__main__':
+    # Parse args
+    parser = argparse.ArgumentParser(description='Run C++ Neuropod tests')
+    parser.add_argument('--run-gpu-tests', action='store_true')
+    args = parser.parse_args()
+
     # Get all the bazel test targets
     CPP_TESTS = subprocess.check_output(['bazel', 'query', 'kind(".*_test rule", //...)']).splitlines()
 
@@ -31,6 +38,10 @@ if __name__ == '__main__':
     for test_target in CPP_TESTS:
         # Needed for python 3
         test_target = test_target.decode("utf-8")
+
+        # Skip GPU tests by default
+        if test_target.split(":")[1].startswith("gpu") and not args.run_gpu_tests:
+            continue
 
         # Name the test and squeeze underscores
         test_name = "test_{}".format(test_target.replace("/", "_").replace(":", "_"))
@@ -40,5 +51,5 @@ if __name__ == '__main__':
         print("Creating unittest: {}".format(test_name))
         setattr(TestBazelTargets, test_name, make_test(test_target))
 
-    # Run the tests
-    unittest.main()
+    # Run the tests (and ignore command line args)
+    unittest.main(argv=[sys.argv[0]])

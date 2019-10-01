@@ -45,6 +45,18 @@ cc_test(
 )
 
 cc_test(
+    name = "gpu_test_python_bridge",
+    srcs = [
+        "gpu_test_python_bridge.cc",
+        "//neuropods:libneuropods.so",
+        "//neuropods/backends/python_bridge:libneuropod_pythonbridge_backend.so",
+    ],
+    deps = [
+        ":neuropods_test_utils",
+    ],
+)
+
+cc_test(
     name = "test_torchscript_backend",
     srcs = [
         "test_torchscript_backend.cc",

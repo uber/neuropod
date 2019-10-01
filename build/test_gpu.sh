@@ -31,7 +31,7 @@ NEUROPODS_RUN_NATIVE_TESTS=true python -m unittest discover --verbose neuropods/
 popd
 
 # Run native tests
-python ../build/run_cpp_tests.py
+python ../build/run_cpp_tests.py --run-gpu-tests
 popd
 
 # Maybe upload a release

@@ -34,8 +34,8 @@ std::vector<std::string> get_default_python_path()
 class PythonBridge : public NeuropodBackendWithDefaultAllocator<TestNeuropodTensor>
 {
 private:
-    py::object neuropod_;
-    py::object maybe_convert_bindings_types_;
+    std::unique_ptr<py::object> neuropod_;
+    std::unique_ptr<py::object> maybe_convert_bindings_types_;
 
 public:
     PythonBridge(const std::string &             neuropod_path,

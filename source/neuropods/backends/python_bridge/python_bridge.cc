@@ -37,11 +37,12 @@ void set_python_path(const std::vector<std::string> &paths_to_add)
     setenv("PYTHONPATH", python_path.str().c_str(), 1);
 }
 
-bool maybe_initialize()
+// Initialize python if necessary and make sure we don't lock the GIL
+std::unique_ptr<py::gil_scoped_release> maybe_initialize()
 {
     if (Py_IsInitialized())
     {
-        return false;
+        return nullptr;
     }
 
     #ifndef __APPLE__
@@ -69,11 +70,13 @@ bool maybe_initialize()
 
     // TODO: shutdown the interpreter once we know that there are no more python objects left
     // atexit(py::finalize_interpreter);
-    return true;
+    return stdx::make_unique<py::gil_scoped_release>();
 }
 
 // Handle interpreter startup and shutdown
-static auto did_initialize = maybe_initialize();
+// If we initialized the interpreter, make sure we don't have a lock on the GIL by storing a
+// py::gil_scoped_release
+static auto gil_release = maybe_initialize();
 
 } // namespace
 
@@ -85,30 +88,44 @@ PythonBridge::PythonBridge(const std::string &             neuropod_path,
     // Modify PYTHONPATH
     set_python_path(python_path_additions);
 
+    // Acquire the GIL
+    py::gil_scoped_acquire gil;
+
     // Get the neuropod loader
     py::object load_neuropod = py::module::import("neuropods.loader").attr("load_neuropod");
 
     // Converts from unicode to ascii for python 3 string arrays
-    maybe_convert_bindings_types_ =
-        py::module::import("neuropods.utils.dtype_utils").attr("maybe_convert_bindings_types");
+    maybe_convert_bindings_types_ = stdx::make_unique<py::object>(
+        py::module::import("neuropods.utils.dtype_utils").attr("maybe_convert_bindings_types"));
 
     // Load the neuropod and save a reference to it
-    neuropod_ = load_neuropod(neuropod_path);
+    neuropod_ = stdx::make_unique<py::object>(load_neuropod(neuropod_path));
 }
 
-PythonBridge::~PythonBridge() = default;
+PythonBridge::~PythonBridge()
+{
+    // Acquire the GIL
+    py::gil_scoped_acquire gil;
+
+    // Delete the stored objects
+    maybe_convert_bindings_types_.reset();
+    neuropod_.reset();
+}
 
 // Run inference
 std::unique_ptr<NeuropodValueMap> PythonBridge::infer(const NeuropodValueMap &inputs)
 {
+    // Acquire the GIL
+    py::gil_scoped_acquire gil;
+
     // Convert to a py::dict
     py::dict model_inputs = to_numpy_dict(const_cast<NeuropodValueMap &>(inputs));
 
     // Run inference
-    py::dict model_outputs_raw = neuropod_.attr("infer")(model_inputs).cast<py::dict>();
+    py::dict model_outputs_raw = neuropod_->attr("infer")(model_inputs).cast<py::dict>();
 
     // Postprocess for python 3
-    py::dict model_outputs = maybe_convert_bindings_types_(model_outputs_raw).cast<py::dict>();
+    py::dict model_outputs = (*maybe_convert_bindings_types_)(model_outputs_raw).cast<py::dict>();
 
     // Get the outputs
     auto outputs = from_numpy_dict(*get_tensor_allocator(), model_outputs);
