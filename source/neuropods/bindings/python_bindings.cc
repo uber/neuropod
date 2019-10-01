@@ -101,7 +101,11 @@ std::shared_ptr<NeuropodTensor> tensor_from_numpy(NeuropodTensorAllocator &alloc
 
     // Capture the array in our deleter so it doesn't get deallocated
     // until we're done
-    auto deleter = [array](void *unused) {};
+    auto to_delete = std::make_shared<py::array>(array);
+    auto deleter = [to_delete](void *unused) mutable {
+        py::gil_scoped_acquire gil;
+        to_delete.reset();
+    };
 
     // Create a vector with the shape info
     std::vector<int64_t> shape(&dims[0], &dims[ndims]);
