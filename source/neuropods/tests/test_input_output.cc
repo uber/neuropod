@@ -59,7 +59,7 @@ std::shared_ptr<neuropods::NeuropodTensor> serialize_deserialize(
     neuropods::serialize(ss, *tensor);
 
     // Deserialize the tensor
-    auto value = neuropods::deserialize(ss, allocator);
+    auto value = neuropods::deserialize<std::shared_ptr<neuropods::NeuropodValue>>(ss, allocator);
     return std::dynamic_pointer_cast<neuropods::NeuropodTensor>(value);
 }
 

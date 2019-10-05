@@ -11,6 +11,7 @@
 
 #include <functional>
 #include <memory>
+#include <unordered_map>
 #include <string>
 
 namespace neuropods
@@ -19,6 +20,10 @@ namespace neuropods
 // Forward declarations
 class NeuropodValue;
 class NeuropodTensorAllocator;
+
+// A map from a tensor name to a pointer to a NeuropodValue
+// This is the input and output type of `infer`
+using NeuropodValueMap = std::unordered_map<std::string, std::shared_ptr<NeuropodValue>>;
 
 // Types for serialization and deserialization functions
 using serialize_fn_t = std::function<void(const NeuropodValue &, boost::archive::binary_oarchive &)>;
@@ -47,11 +52,22 @@ bool register_serializable(std::function<void(const T &, boost::archive::binary_
     return true;
 }
 
+template<typename ReturnType>
+ReturnType deserialize(boost::archive::binary_iarchive &ar, NeuropodTensorAllocator &allocator);
+
 // Serialize a NeuropodValue
 void serialize(boost::archive::binary_oarchive &out, const NeuropodValue &item);
 
 // Deserialize from an archive
+template<>
 std::shared_ptr<NeuropodValue> deserialize(boost::archive::binary_iarchive &ar, NeuropodTensorAllocator &allocator);
+
+// Serialize a NeuropodValueMap
+void serialize(boost::archive::binary_oarchive &out, const NeuropodValueMap &item);
+
+// Deserialize a NeuropodValueMap from an archive
+template<>
+NeuropodValueMap deserialize(boost::archive::binary_iarchive &ar, NeuropodTensorAllocator &allocator);
 
 } // namespace detail
 
@@ -73,8 +89,8 @@ void serialize(std::ostream &out, Params &&... params)
 }
 
 // A function to read from an archive that starts with the serialization version
-template <typename... Params>
-std::shared_ptr<NeuropodValue> deserialize(std::istream &in, Params &&... params)
+template <typename ReturnType, typename... Params>
+ReturnType deserialize(std::istream &in, Params &&... params)
 {
     boost::archive::binary_iarchive ar{in};
     int                             version;
@@ -86,7 +102,7 @@ std::shared_ptr<NeuropodValue> deserialize(std::istream &in, Params &&... params
                        << SERIALIZATION_VERSION << " but got " << version);
     }
 
-    return detail::deserialize(ar, std::forward<Params>(params)...);
+    return detail::deserialize<ReturnType>(ar, std::forward<Params>(params)...);
 }
 
 // Utility to register serializable types
