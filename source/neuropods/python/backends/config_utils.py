@@ -117,7 +117,16 @@ def canonicalize_tensor_spec(spec):
     return transformed
 
 
-def write_neuropod_config(neuropod_path, model_name, platform, input_spec, output_spec, custom_ops=None, input_tensor_device=None, default_input_tensor_device="GPU"):
+def write_neuropod_config(
+    neuropod_path,
+    model_name,
+    platform,
+    input_spec,
+    output_spec,
+    custom_ops=None,
+    input_tensor_device=None,
+    default_input_tensor_device="GPU",
+    **kwargs):
     """
     Creates the neuropod config file
 

@@ -7,23 +7,15 @@ import os
 import shutil
 import tensorflow as tf
 
-from neuropods.backends import config_utils
-from neuropods.utils.eval_utils import save_test_data, load_and_test_neuropod
+from neuropods.utils.packaging_utils import create_neuropod
 
 
 def create_tensorflow_neuropod(
-        neuropod_path,
-        model_name,
         node_name_mapping,
-        input_spec,
-        output_spec,
         frozen_graph_path=None,
         graph_def=None,
-        init_op_names=None,
-        custom_ops=[],
-        test_input_data=None,
-        test_expected_out=None,
-        persist_test_data=True):
+        init_op_names=[],
+        **kwargs):
     """
     Packages a TensorFlow model as a neuropod package.
 
@@ -84,63 +76,32 @@ def create_tensorflow_neuropod(
 
     :param  persist_test_data:  Optionally saves the test data within the packaged neuropod. default True.
     """
-    try:
-        # Create the neuropod folder
-        os.mkdir(neuropod_path)
-    except OSError:
-        raise ValueError("The specified neuropod path ({}) already exists! Aborting...".format(neuropod_path))
-
     # Make sure the inputs are valid
     if (frozen_graph_path is not None and graph_def is not None) or (frozen_graph_path is None and graph_def is None):
         raise ValueError("Exactly one of 'frozen_graph_path' and 'graph_def' must be provided.")
 
-    # Store the custom ops (if any)
-    neuropod_custom_op_path = os.path.join(neuropod_path, "0", "ops")
-    os.makedirs(neuropod_custom_op_path)
-    for op in custom_ops:
-        shutil.copy(op, neuropod_custom_op_path)
+    def packager_fn(neuropod_path):
+        # Create a folder to store the model
+        neuropod_data_path = os.path.join(neuropod_path, "0", "data")
+        os.makedirs(neuropod_data_path)
 
-    # Write the neuropod config file
-    config_utils.write_neuropod_config(
-        neuropod_path=neuropod_path,
-        model_name=model_name,
+        if frozen_graph_path is not None:
+            # Copy in the frozen graph
+            shutil.copyfile(frozen_graph_path, os.path.join(neuropod_data_path, "model.pb"))
+        elif graph_def is not None:
+            # Write out the frozen graph
+            tf.train.write_graph(graph_def, neuropod_data_path, "model.pb", as_text=False)
+
+        # We also need to save the node name mapping so we know how to run the model
+        # This is tensorflow specific config so it's not saved in the overall neuropod config
+        with open(os.path.join(neuropod_path, "0", "config.json"), "w") as config_file:
+            json.dump({
+                "node_name_mapping": node_name_mapping,
+                "init_op_names": init_op_names if isinstance(init_op_names, list) else [init_op_names],
+            }, config_file)
+
+    create_neuropod(
+        packager_fn=packager_fn,
         platform="tensorflow",
-        input_spec=input_spec,
-        output_spec=output_spec,
-        custom_ops=[os.path.basename(op) for op in custom_ops]
+        **kwargs
     )
-
-    # Create a folder to store the model
-    neuropod_data_path = os.path.join(neuropod_path, "0", "data")
-    os.makedirs(neuropod_data_path)
-
-    if frozen_graph_path is not None:
-        # Copy in the frozen graph
-        shutil.copyfile(frozen_graph_path, os.path.join(neuropod_data_path, "model.pb"))
-    elif graph_def is not None:
-        # Write out the frozen graph
-        tf.train.write_graph(graph_def, neuropod_data_path, "model.pb", as_text=False)
-
-    # We also need to save the node name mapping so we know how to run the model
-    # This is tensorflow specific config so it's not saved in the overall neuropod config
-    with open(os.path.join(neuropod_path, "0", "config.json"), "w") as config_file:
-        if init_op_names is None:
-            init_op_names = []
-        else:
-            init_op_names = init_op_names if isinstance(init_op_names, list) else [init_op_names]
-
-        json.dump({
-            "node_name_mapping": node_name_mapping,
-            "init_op_names": init_op_names,
-        }, config_file)
-
-    if test_input_data is not None:
-        if persist_test_data:
-            save_test_data(neuropod_path, test_input_data, test_expected_out)
-        # Load and run the neuropod to make sure that packaging worked correctly
-        # Throws a ValueError if the output doesn't match the expected output (if specified)
-        load_and_test_neuropod(
-            neuropod_path,
-            test_input_data,
-            test_expected_out,
-        )

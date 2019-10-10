@@ -8,16 +8,12 @@ from neuropods.backends.tensorflow.packager import create_tensorflow_neuropod
 
 
 def create_keras_neuropod(
-        neuropod_path,
-        model_name,
         sess,
         model,
         node_name_mapping=None,
         input_spec=None,
         output_spec=None,
-        test_input_data=None,
-        test_expected_out=None,
-        persist_test_data=True):
+        **kwargs):
     """
     Packages a Keras model as a neuropod package. Currently, only the TensorFlow backend is supported.
 
@@ -112,15 +108,11 @@ def create_keras_neuropod(
     tf_node_name_mapping = {name: tensor.name for name, tensor in tf_node_mapping.items()}
 
     create_tensorflow_neuropod(
-        neuropod_path=neuropod_path,
-        model_name=model_name,
         graph_def=frozen_graph_def,
         node_name_mapping=tf_node_name_mapping,
         input_spec=input_spec,
         output_spec=output_spec,
-        test_input_data=test_input_data,
-        test_expected_out=test_expected_out,
-        persist_test_data=persist_test_data,
+        **kwargs
     )
 
 
