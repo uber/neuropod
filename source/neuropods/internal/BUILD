@@ -18,6 +18,7 @@ cc_library(
     deps = [
         ":error_utils",
         ":memory_utils",
+        ":neuropod_loader",
         ":neuropod_tensor",
         "@libjsoncpp_repo//:libjsoncpp",
     ],
@@ -131,6 +132,34 @@ cc_library(
     visibility = [
         "//neuropods:__subpackages__",
     ],
+)
+
+cc_library(
+    name = "neuropod_loader",
+    hdrs = [
+        "neuropod_loader.hh",
+    ],
+    visibility = [
+        "//neuropods:__subpackages__",
+    ],
+)
+
+cc_library(
+    name = "neuropod_loader_impl",
+    srcs = [
+        "neuropod_loader.cc",
+    ],
+    deps = [
+        ":error_utils",
+        ":neuropod_loader",
+        ":memory_utils",
+        "@filesystem_repo//:filesystem",
+        "@zipper_repo//:zipper",
+    ],
+    visibility = [
+        "//neuropods:__subpackages__",
+    ],
+    linkopts = ["-lz"],
 )
 
 # Package all the header files
