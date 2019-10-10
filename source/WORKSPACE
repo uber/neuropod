@@ -92,3 +92,27 @@ http_archive(
     url = "https://github.com/intel/mkl-dnn/releases/download/v0.19/mklml_mac_2019.0.5.20190502.tgz",
     strip_prefix = "mklml_mac_2019.0.5.20190502",
 )
+
+http_archive(
+    name = "zipper_repo",
+    build_file = "@//deps:BUILD.zipper",
+    sha256 = "ab64b4dd7c43eddd8cdc0935e578fd8d62d3be26696dc6f3acd2cbfc7538831c",
+    url = "https://github.com/sebastiandev/zipper/archive/v1.0.1.zip",
+    strip_prefix = "zipper-1.0.1",
+)
+
+http_archive(
+    name = "minizip_repo",
+    build_file = "@//deps:BUILD.minizip",
+    sha256 = "a83155b27ddc0843e5d4f8b637011fc4321a59278bb50a18be02afd62d4def47",
+    url = "https://github.com/sebastiandev/minizip/archive/e3a8cb79a034cb4f2ffc3abb6bd916ffa8678fed.zip",
+    strip_prefix = "minizip-e3a8cb79a034cb4f2ffc3abb6bd916ffa8678fed",
+)
+
+http_archive(
+    name = "filesystem_repo",
+    build_file = "@//deps:BUILD.filesystem",
+    sha256 = "29b482791dc35a3099e5e27263cb75bf6d1e332e9b4ed6489cca82c0781818b5",
+    url = "https://github.com/gulrak/filesystem/archive/v1.2.6.zip",
+    strip_prefix = "filesystem-1.2.6",
+)

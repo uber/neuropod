@@ -1,0 +1,21 @@
+#
+# Uber, Inc. (c) 2019
+#
+
+package(
+    default_visibility = ["//visibility:public"],
+)
+
+cc_library(
+    name = "minizip",
+    srcs = glob([
+        "**/*.c",
+    ], exclude = ["minizip.c", "miniunz.c", "iowin32.c", "iowin32.h"]),
+    hdrs = glob([
+        "**/*.h",
+    ]),
+    includes = [
+        "."
+    ],
+    visibility = ["//visibility:public"],
+)

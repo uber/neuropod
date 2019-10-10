@@ -1,0 +1,18 @@
+#
+# Uber, Inc. (c) 2019
+#
+
+package(
+    default_visibility = ["//visibility:public"],
+)
+
+cc_library(
+    name = "filesystem",
+    hdrs = [
+        "include/ghc/filesystem.hpp",
+    ],
+    includes = [
+        "include"
+    ],
+    visibility = ["//visibility:public"],
+)

@@ -5,6 +5,7 @@
 #include "config_utils.hh"
 
 #include "neuropods/internal/error_utils.hh"
+#include "neuropods/internal/neuropod_loader.hh"
 
 #include <json/json.h>
 
@@ -18,17 +19,6 @@ namespace neuropods
 
 namespace
 {
-
-// Get graph path from a neuropod path
-std::string get_config_path(const std::string &neuropod_path)
-{
-    if (neuropod_path.back() == '/')
-    {
-        return neuropod_path + "config.json";
-    }
-
-    return neuropod_path + "/config.json";
-}
 
 [[noreturn]] void throw_neuropod_config_error(const std::string &message)
 {
@@ -126,17 +116,16 @@ TensorSpec::~TensorSpec() = default;
 
 std::unique_ptr<ModelConfig> load_model_config(const std::string &neuropod_path)
 {
-    auto path = get_config_path(neuropod_path);
+    auto loader = get_loader(neuropod_path);
 
     // Load the config file
-    std::ifstream ifs(path);
-
-    if (!ifs)
+    auto stream = loader->get_istream_for_file("config.json");
+    if (!stream)
     {
-        NEUROPOD_ERROR("Error loading config file with path '" << path << "'!");
+        NEUROPOD_ERROR("Error loading config file for neuropod '" << neuropod_path << "'!");
     }
 
-    return load_model_config(ifs);
+    return load_model_config(*stream);
 }
 
 std::unique_ptr<ModelConfig> load_model_config(std::istream &input_stream)
