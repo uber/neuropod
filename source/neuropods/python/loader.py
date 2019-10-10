@@ -3,7 +3,7 @@
 #
 
 from neuropods.backends import config_utils
-
+from neuropods.utils import zip_loader
 
 def load_neuropod(neuropod_path, **kwargs):
     """
@@ -15,6 +15,9 @@ def load_neuropod(neuropod_path, **kwargs):
                                 to `None` will attempt to run this model on CPU.
     :param  load_custom_ops:    Whether or not to load custom ops included in the model.
     """
+    # If we were given a zipfile, extract it to a temp dir and use it
+    neuropod_path = zip_loader.extract_neuropod_if_necessary(neuropod_path)
+
     # Figure out what type of neuropod this is
     neuropod_config = config_utils.read_neuropod_config(neuropod_path)
     platform = neuropod_config["platform"]
