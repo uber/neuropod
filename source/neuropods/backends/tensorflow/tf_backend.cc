@@ -19,47 +19,11 @@ namespace neuropods
 namespace
 {
 
-// Get graph path from a neuropod path
-std::string get_graph_path(const std::string &neuropod_path)
-{
-    if (neuropod_path.back() == '/')
-    {
-        return neuropod_path + "0/data/model.pb";
-    }
-
-    return neuropod_path + "/0/data/model.pb";
-}
-
-// Get tf config path from a neuropod path
-std::string get_tf_config_path(const std::string &neuropod_path)
-{
-    if (neuropod_path.back() == '/')
-    {
-        return neuropod_path + "0/config.json";
-    }
-
-    return neuropod_path + "/0/config.json";
-}
-
-// Get a custom op path
-std::string get_custom_op_path(const std::string &neuropod_path, const std::string &op_basename)
-{
-    if (neuropod_path.back() == '/')
-    {
-        return neuropod_path + "0/ops/" + op_basename;
-    }
-
-    return neuropod_path + "/0/ops/" + op_basename;
-}
-
 // Load a mapping from neuropod node names to node names in the TF graph
-void setup_node_mapping_and_init_ops(const std::string &                           neuropod_path,
+void setup_node_mapping_and_init_ops(std::istream &                                ifs,
                                      std::unordered_map<std::string, std::string> &mapping,
                                      std::vector<std::string> &                    init_ops)
 {
-    // Load the config file
-    std::ifstream ifs(get_tf_config_path(neuropod_path));
-
     // Parse it
     Json::CharReaderBuilder rbuilder;
     Json::Value             obj;
@@ -128,21 +92,27 @@ TF_Output get_graph_node_from_name(const std::string &node_name_with_index, cons
 TensorflowNeuropodBackend::TensorflowNeuropodBackend(const std::string &           neuropod_path,
                                                      std::unique_ptr<ModelConfig> &model_config,
                                                      const RuntimeOptions &        options)
+    : NeuropodBackendWithDefaultAllocator<TensorflowNeuropodTensor>(neuropod_path)
 {
     // Load custom ops (if any)
     status_.reset(TF_NewStatus());
     for (const auto &item : model_config->custom_ops)
     {
-        TF_DeleteLibraryHandle(TF_LoadLibrary(get_custom_op_path(neuropod_path, item).c_str(), status_.get()));
+        TF_DeleteLibraryHandle(TF_LoadLibrary(loader_->get_file_path("0/ops/" + item).c_str(), status_.get()));
         check_status();
     }
 
-    // Get the graph path and load the graph
-    load_graph(get_graph_path(neuropod_path));
+    // Get the graph and load it
+    auto graph_stream = loader_->get_istream_for_file("0/data/model.pb");
+    if (!load_graph(*graph_stream))
+    {
+        NEUROPOD_ERROR("Failed to load TensorFlow graph for neuropod " << neuropod_path);
+    }
 
     // Setup the nodename mapping and get the init ops (if any)
     std::vector<std::string> init_ops;
-    setup_node_mapping_and_init_ops(neuropod_path, node_name_mapping_, init_ops);
+    auto config_stream = loader_->get_istream_for_file("0/config.json");
+    setup_node_mapping_and_init_ops(*config_stream, node_name_mapping_, init_ops);
 
     // Get a list of the output nodes
     for (const auto &output : model_config->outputs)
@@ -169,9 +139,8 @@ void TensorflowNeuropodBackend::check_status() const
 }
 
 // Load a TensorFlow graph
-void TensorflowNeuropodBackend::load_graph(const std::string &graph_path)
+bool TensorflowNeuropodBackend::load_graph(std::istream &ifs)
 {
-    std::ifstream ifs(graph_path, std::ios_base::binary);
     if (ifs.good())
     {
         ifs.seekg(0, ifs.end);
@@ -182,7 +151,7 @@ void TensorflowNeuropodBackend::load_graph(const std::string &graph_path)
         ifs.read(buffer.data(), length);
         if (ifs.fail())
         {
-            NEUROPOD_ERROR("Failed to read graph file: " << graph_path);
+            return false;
         }
 
         status_.reset(TF_NewStatus());
@@ -202,8 +171,10 @@ void TensorflowNeuropodBackend::load_graph(const std::string &graph_path)
     }
     else
     {
-        NEUROPOD_ERROR("Failed to load graph: " << graph_path);
+        return false;
     }
+
+    return true;
 }
 
 // Run target ops

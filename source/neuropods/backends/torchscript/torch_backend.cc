@@ -21,7 +21,7 @@ namespace neuropods
 namespace
 {
 
-std::shared_ptr<torch::jit::script::Module> load_model_from_path(const std::string &             graph_path,
+std::shared_ptr<torch::jit::script::Module> load_model_from_path(std::istream &                  graph_stream,
                                                                  const std::vector<std::string> &custom_op_paths,
                                                                  const torch::Device &           device)
 {
@@ -52,57 +52,32 @@ std::shared_ptr<torch::jit::script::Module> load_model_from_path(const std::stri
         }
     }
 
+#if CAFFE2_NIGHTLY_VERSION >= 20190717
+    auto model = std::make_shared<torch::jit::script::Module>(torch::jit::load(graph_stream, device));
+#else
+    auto model = torch::jit::load(graph_stream, device);
+#endif
+    return model;
+}
+
+std::shared_ptr<torch::jit::script::Module> load_model_from_path(const std::string &             graph_path,
+                                                                 const std::vector<std::string> &custom_op_paths,
+                                                                 const torch::Device &           device)
+{
     std::ifstream stream(graph_path, std::ios_base::binary);
     if (!stream.good())
     {
         NEUROPOD_ERROR("Failed to load graph from path " << graph_path.c_str());
     }
 
-#if CAFFE2_NIGHTLY_VERSION >= 20190717
-    auto model = std::make_shared<torch::jit::script::Module>(torch::jit::load(stream, device));
-#else
-    auto model = torch::jit::load(stream, device);
-#endif
+    auto model = load_model_from_path(stream, custom_op_paths, device);
 
     if (!model)
     {
         NEUROPOD_ERROR("Failed to deserialize graph from path " << graph_path.c_str());
     }
+
     return model;
-}
-
-// Get graph path from a neuropod path
-std::string get_graph_path(const std::string &neuropod_path)
-{
-    if (neuropod_path.back() == '/')
-    {
-        return neuropod_path + "0/data/model.pt";
-    }
-
-    return neuropod_path + "/0/data/model.pt";
-}
-
-// Get a custom op path
-std::string get_custom_op_path(const std::string &neuropod_path, const std::string &op_basename)
-{
-    if (neuropod_path.back() == '/')
-    {
-        return neuropod_path + "0/ops/" + op_basename;
-    }
-
-    return neuropod_path + "/0/ops/" + op_basename;
-}
-
-std::vector<std::string> get_custom_ops_from_model_config(const std::string &neuropod_path,
-                                                          const ModelConfig &model_config)
-{
-    std::vector<std::string> out;
-    for (const auto &item : model_config.custom_ops)
-    {
-        out.emplace_back(get_custom_op_path(neuropod_path, item));
-    }
-
-    return out;
 }
 
 // insert IValue to the output map at key with some type validation
@@ -177,15 +152,31 @@ torch::jit::IValue maybe_set_device(const torch::jit::IValue &item, const torch:
 TorchNeuropodBackend::TorchNeuropodBackend(const std::string &           neuropod_path,
                                            std::unique_ptr<ModelConfig> &model_config,
                                            const RuntimeOptions &        options)
-    : options_(options), input_device_mapping_(model_config->input_tensor_device)
+    : NeuropodBackendWithDefaultAllocator<TorchNeuropodTensor>(neuropod_path),
+      options_(options),
+      input_device_mapping_(model_config->input_tensor_device)
 {
-    // Load the model
-    model_ = load_model_from_path(get_graph_path(neuropod_path),
-                                  get_custom_ops_from_model_config(neuropod_path, *model_config),
+    // Get the model from the neuropod
+    auto graph_stream = loader_->get_istream_for_file("0/data/model.pt");
+
+    // Custom ops
+    std::vector<std::string> custom_ops;
+    for (const auto &item : model_config->custom_ops)
+    {
+        custom_ops.emplace_back(loader_->get_file_path("0/ops/" + item));
+    }
+
+    model_ = load_model_from_path(*graph_stream,
+                                  custom_ops,
 
                                   // Load the model onto the appropriate device (ideally a GPU if we have one available)
                                   // Note: this uses the options set in the initializer list above
                                   get_torch_device(DeviceType::GPU));
+
+    if (!model_)
+    {
+      NEUROPOD_ERROR("Failed to load TorchScript graph for neuropod" << neuropod_path.c_str());
+    }
 
     for (const auto &tensor_spec : model_config->outputs)
     {

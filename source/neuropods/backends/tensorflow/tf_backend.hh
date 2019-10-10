@@ -26,7 +26,7 @@ private:
     void check_status() const;
 
     // Loads a frozen graph from a protobuf file
-    void load_graph(const std::string &graph_path);
+    bool load_graph(std::istream &graph_stream);
 
     // Run target ops in the graph
     void run_target_ops(const std::vector<std::string> &target_op_names);
