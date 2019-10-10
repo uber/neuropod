@@ -6,7 +6,9 @@ load("@bazel_tools//tools/build_defs/pkg:pkg.bzl", "pkg_tar")
 
 cc_library(
     name = "neuropod_backend",
-    srcs = [],
+    srcs = [
+        "neuropod_backend.cc",
+    ],
     hdrs = [
         "tensor_allocator.hh",
         "neuropod_backend.hh",
@@ -18,6 +20,7 @@ cc_library(
         "//neuropods/internal:backend_registration",
         "//neuropods/internal:deleter",
         "//neuropods/internal:neuropod_tensor",
+        "//neuropods/internal:neuropod_loader",
     ],
 )
 

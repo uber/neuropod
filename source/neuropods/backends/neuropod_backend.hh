@@ -7,6 +7,7 @@
 #include "neuropods/backends/tensor_allocator.hh"
 #include "neuropods/internal/backend_registration.hh"
 #include "neuropods/internal/deleter.hh"
+#include "neuropods/internal/neuropod_loader.hh"
 #include "neuropods/internal/neuropod_tensor.hh"
 #include "neuropods/internal/tensor_types.hh"
 
@@ -27,13 +28,19 @@ using NeuropodValueMap = std::unordered_map<std::string, std::shared_ptr<Neuropo
 class NeuropodBackend
 {
 public:
-    virtual ~NeuropodBackend() {}
+    NeuropodBackend();
+    NeuropodBackend(const std::string &neuropod_path);
+    virtual ~NeuropodBackend();
 
     // Returns an allocator that can allocate tensors compatible with this backend
     virtual std::shared_ptr<NeuropodTensorAllocator> get_tensor_allocator() = 0;
 
     // Run inference
     virtual std::unique_ptr<NeuropodValueMap> infer(const NeuropodValueMap &inputs) = 0;
+
+protected:
+    // Used to load files in a Neuropod
+    std::unique_ptr<NeuropodLoader> loader_;
 };
 
 template <template <class> class TensorImpl>
@@ -44,6 +51,9 @@ private:
     std::mutex                               allocator_lock_;
 
 public:
+    NeuropodBackendWithDefaultAllocator() = default;
+    NeuropodBackendWithDefaultAllocator(const std::string &neuropod_path) : NeuropodBackend(neuropod_path) {}
+
     std::shared_ptr<NeuropodTensorAllocator> get_tensor_allocator()
     {
         std::lock_guard<std::mutex> lock(allocator_lock_);
