@@ -6,26 +6,16 @@ import os
 import json
 import shutil
 
-from neuropods.backends import config_utils
-from neuropods.utils.eval_utils import save_test_data, load_and_test_neuropod
+from neuropods.utils.packaging_utils import create_neuropod
 
 
 def create_python_neuropod(
-        neuropod_path,
-        model_name,
         data_paths,
         code_path_spec,
         entrypoint_package,
         entrypoint,
-        input_spec,
-        output_spec,
-        custom_ops=[],
-        test_input_data=None,
-        test_expected_out=None,
-        test_deps=[],
-        test_virtualenv=None,
         skip_virtualenv=False,
-        persist_test_data=True):
+        **kwargs):
     """
     Packages arbitrary python code as a neuropod package.
 
@@ -113,77 +103,48 @@ def create_python_neuropod(
 
     :param  persist_test_data:  Optionally save the test data within the packaged neuropod. default True.
     """
-    try:
-        # Create the neuropod folder
-        os.mkdir(neuropod_path)
-    except OSError:
-        raise ValueError("The specified neuropod path ({}) already exists! Aborting...".format(neuropod_path))
+    def packager_fn(neuropod_path):
+        neuropod_data_path = os.path.join(neuropod_path, "0", "data")
+        neuropod_code_path = os.path.join(neuropod_path, "0", "code")
 
-    # Store the custom ops (if any)
-    neuropod_custom_op_path = os.path.join(neuropod_path, "0", "ops")
-    os.makedirs(neuropod_custom_op_path)
-    for op in custom_ops:
-        shutil.copy(op, neuropod_custom_op_path)
+        # Create a folder to store the packaged data
+        os.makedirs(neuropod_data_path)
 
-    # Write the neuropod config file
-    config_utils.write_neuropod_config(
-        neuropod_path=neuropod_path,
-        model_name=model_name,
+        # Copy the data to be packaged
+        for data_path_spec in data_paths:
+            shutil.copyfile(data_path_spec["path"], os.path.join(neuropod_data_path, data_path_spec["packaged_name"]))
+
+        # Copy the specified source code while preserving package paths
+        for copy_spec in code_path_spec:
+            python_root = copy_spec["python_root"]
+
+            if os.path.realpath(neuropod_path).startswith(os.path.realpath(python_root) + os.sep):
+                raise ValueError("`neuropod_path` cannot be a subdirectory of `python_root`")
+
+            for dir_to_package in copy_spec["dirs_to_package"]:
+                shutil.copytree(
+                    os.path.join(python_root, dir_to_package),
+                    os.path.join(neuropod_code_path, dir_to_package),
+                    ignore=shutil.ignore_patterns('*.pyc'),
+                )
+
+        # Add __init__.py files as needed
+        for root, subdirs, files in os.walk(neuropod_code_path):
+            if "__init__.py" not in files:
+                with open(os.path.join(root, "__init__.py"), "w"):
+                    # We just need to create the file
+                    pass
+
+        # We also need to save the entrypoint package name so we know what to load at runtime
+        # This is python specific config so it's not saved in the overall neuropod config
+        with open(os.path.join(neuropod_path, "0", "config.json"), "w") as config_file:
+            json.dump({
+                "entrypoint_package": entrypoint_package,
+                "entrypoint": entrypoint
+            }, config_file)
+
+    create_neuropod(
+        packager_fn=packager_fn,
         platform="python",
-        input_spec=input_spec,
-        output_spec=output_spec,
-        custom_ops=[os.path.basename(op) for op in custom_ops]
+        **kwargs
     )
-
-    neuropod_data_path = os.path.join(neuropod_path, "0", "data")
-    neuropod_code_path = os.path.join(neuropod_path, "0", "code")
-
-    # Create a folder to store the packaged data
-    os.makedirs(neuropod_data_path)
-
-    # Copy the data to be packaged
-    for data_path_spec in data_paths:
-        shutil.copyfile(data_path_spec["path"], os.path.join(neuropod_data_path, data_path_spec["packaged_name"]))
-
-    # Copy the specified source code while preserving package paths
-    for copy_spec in code_path_spec:
-        python_root = copy_spec["python_root"]
-
-        if os.path.realpath(neuropod_path).startswith(os.path.realpath(python_root) + os.sep):
-            raise ValueError("`neuropod_path` cannot be a subdirectory of `python_root`")
-
-        for dir_to_package in copy_spec["dirs_to_package"]:
-            shutil.copytree(
-                os.path.join(python_root, dir_to_package),
-                os.path.join(neuropod_code_path, dir_to_package),
-                ignore=shutil.ignore_patterns('*.pyc'),
-            )
-
-    # Add __init__.py files as needed
-    for root, subdirs, files in os.walk(neuropod_code_path):
-        if "__init__.py" not in files:
-            with open(os.path.join(root, "__init__.py"), "w"):
-                # We just need to create the file
-                pass
-
-    # We also need to save the entrypoint package name so we know what to load at runtime
-    # This is python specific config so it's not saved in the overall neuropod config
-    with open(os.path.join(neuropod_path, "0", "config.json"), "w") as config_file:
-        json.dump({
-            "entrypoint_package": entrypoint_package,
-            "entrypoint": entrypoint
-        }, config_file)
-
-    if test_input_data is not None:
-        if persist_test_data:
-            save_test_data(neuropod_path, test_input_data, test_expected_out)
-        # Load and run the neuropod to make sure that packaging worked correctly
-        # Throws a ValueError if the output doesn't match the expected output (if specified)
-        load_and_test_neuropod(
-            neuropod_path,
-            test_input_data,
-            test_expected_out,
-            use_virtualenv=not skip_virtualenv,
-            test_deps=test_deps,
-            test_virtualenv=test_virtualenv,
-        )

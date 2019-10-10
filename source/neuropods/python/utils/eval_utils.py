@@ -67,7 +67,7 @@ def load_and_test_native(neuropod_path, test_input_data, test_expected_out=None,
 
 def load_and_test_neuropod(neuropod_path, test_input_data, test_expected_out=None,
                            use_virtualenv=False, test_deps=[], test_virtualenv=None,
-                           neuropod_load_args={}):
+                           neuropod_load_args={}, **kwargs):
     """
     Loads a neuropod in a virtualenv and verifies that inference runs.
     If expected output is specified, the output of the model is checked against
