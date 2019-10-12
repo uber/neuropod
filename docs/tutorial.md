@@ -227,15 +227,13 @@ with load_neuropod(ADDITION_MODEL_PATH) as neuropod:
 
 ### From C++
 
-To show two different ways of adding data, one of our inputs is an array and the other is a vector.
-
 ```cpp
 #include "neuropods/neuropods.hh"
 
 const std::vector<int64_t> shape = {4};
 
-// To show different usages of `add_tensor`, one of our inputs is a vector
-// and the other is an array
+// To show two different ways of adding data, one of our inputs is an array
+// and the other is a vector.
 const float[]            x_data = {1, 2, 3, 4};
 const std::vector<float> y_data = {5, 6, 7, 8};
 
