@@ -4,9 +4,10 @@
 
 import tensorflow as tf
 
-from neuropods.backends.tensorflow.packager import create_tensorflow_neuropod
+from neuropods.backends.tensorflow.packager import create_tensorflow_neuropod, set_packager_docstring
 
 
+@set_packager_docstring
 def create_keras_neuropod(
         sess,
         model,
@@ -17,9 +18,7 @@ def create_keras_neuropod(
     """
     Packages a Keras model as a neuropod package. Currently, only the TensorFlow backend is supported.
 
-    :param  neuropod_path:      The output neuropod path.
-
-    :param  model_name:         The name of the model.
+    {common_doc_pre}
 
     :param  sess:               A TensorFlow session containing weights (usually `keras.backend.get_session()`).
 
@@ -33,44 +32,7 @@ def create_keras_neuropod(
 
                                 Defaults to using Keras input/output names as neuropod input/output names.
 
-    :param  input_spec:         An optional list of dicts specifying the input to the model. For each input, if shape
-                                is set to `None`, no validation is done on the shape. If shape is a tuple, the
-                                dimensions of the input are validated against that tuple.  A value of
-                                `None` for any of the dimensions means that dimension will not be checked.
-                                `dtype` can be any valid numpy datatype string.
-                                Ex: [
-                                    {"name": "x", "dtype": "float32", "shape": (None,)},
-                                    {"name": "y", "dtype": "float32", "shape": (None,)},
-                                ]
-
-                                Defaults to a spec auto-generated using `infer_keras_input_spec()`.
-
-    :param  output_spec:        An optional list of dicts specifying the output of the model. See the documentation for
-                                the `input_spec` parameter for more details.
-                                Ex: [
-                                    {"name": "out", "dtype": "float32", "shape": (None,)},
-                                ]
-
-                                Defaults to a spec auto-generated using `infer_keras_input_spec()`.
-
-    :param  test_input_data:    Optional sample input data. This is a dict mapping input names to
-                                values. If this is provided, inference will be run in an isolated environment
-                                immediately after packaging to ensure that the neuropod was created
-                                successfully. Must be provided if `test_expected_out` is provided.
-
-                                Throws a ValueError if inference failed.
-                                Ex: {
-                                    "x": np.arange(5),
-                                    "y": np.arange(5),
-                                }
-
-    :param  test_expected_out:  Optional expected output. Throws a ValueError if the output of model inference
-                                does not match the expected output.
-                                Ex: {
-                                    "out": np.arange(5) + np.arange(5)
-                                }
-
-    :param  persist_test_data:  Optionally saves the test data within the packaged neuropod. default True.
+    {common_doc_post}
     """
     if input_spec is None:
         input_spec = infer_keras_input_spec(model, node_name_mapping)
