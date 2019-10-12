@@ -227,6 +227,8 @@ with load_neuropod(ADDITION_MODEL_PATH) as neuropod:
 
 ### From C++
 
+To show two different ways of adding data, one of our inputs is an array and the other is a vector.
+
 ```cpp
 #include "neuropods/neuropods.hh"
 
@@ -242,10 +244,10 @@ Neuropod neuropod(ADDITION_MODEL_PATH);
 
 // Add the input data using two different signatures of `copy_from`
 // (one with a pointer and size, one with a vector)
-auto x_tensor = neuropod.allocate_tensor<float>("x", shape);
+auto x_tensor = neuropod.allocate_tensor<float>(shape);
 x_tensor->copy_from(x_data, 4);
 
-auto y_tensor = neuropod.allocate_tensor<float>("y", shape);
+auto y_tensor = neuropod.allocate_tensor<float>(shape);
 y_tensor->copy_from(y_data);
 
 // Run inference
