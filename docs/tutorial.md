@@ -227,7 +227,11 @@ with load_neuropod(ADDITION_MODEL_PATH) as neuropod:
 
 ### From C++
 
+Required Bazel dependencies: "@neuropods_repo//:py_neuropods" (otherwise you get "ImportError: No module named neuropods.loader" at run time on the C++ side), "@neuropods_repo//:neuropods_hdrs".
+
 ```cpp
+#include "neuropods/neuropods.hh"
+
 const std::vector<int64_t> shape = {4};
 
 // To show different usages of `add_tensor`, one of our inputs is a vector
@@ -240,14 +244,17 @@ Neuropod neuropod(ADDITION_MODEL_PATH);
 
 // Add the input data using two different signatures of `copy_from`
 // (one with a pointer and size, one with a vector)
-auto x_tensor = neuropod->allocate_tensor<float>("x", shape);
+auto x_tensor = neuropod.allocate_tensor<float>("x", shape);
 x_tensor->copy_from(x_data, 4);
 
-auto y_tensor = neuropod->allocate_tensor<float>("y", shape);
+auto y_tensor = neuropod.allocate_tensor<float>("y", shape);
 y_tensor->copy_from(y_data);
 
 // Run inference
-const auto output_data = neuropod.infer({x_tensor, y_tensor});
+const auto output_data = neuropod.infer({
+    {"x", x_tensor},
+    {"y", y_tensor}
+});
 
 const auto out_tensor = output_data->at("out");
 
