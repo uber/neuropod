@@ -227,8 +227,6 @@ with load_neuropod(ADDITION_MODEL_PATH) as neuropod:
 
 ### From C++
 
-Required Bazel dependencies: "@neuropods_repo//:py_neuropods" (otherwise you get "ImportError: No module named neuropods.loader" at run time on the C++ side), "@neuropods_repo//:neuropods_hdrs".
-
 ```cpp
 #include "neuropods/neuropods.hh"
 
