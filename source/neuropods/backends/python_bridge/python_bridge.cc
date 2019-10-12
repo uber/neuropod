@@ -84,6 +84,7 @@ PythonBridge::PythonBridge(const std::string &             neuropod_path,
                            std::unique_ptr<ModelConfig> &  model_config,
                            const RuntimeOptions &          options,
                            const std::vector<std::string> &python_path_additions)
+    : NeuropodBackendWithDefaultAllocator<TestNeuropodTensor>(neuropod_path)
 {
     // Modify PYTHONPATH
     set_python_path(python_path_additions);
@@ -98,8 +99,12 @@ PythonBridge::PythonBridge(const std::string &             neuropod_path,
     maybe_convert_bindings_types_ = stdx::make_unique<py::object>(
         py::module::import("neuropods.utils.dtype_utils").attr("maybe_convert_bindings_types"));
 
+    // Make sure that the model is local
+    // Note: we could also delegate this to the python implementation
+    const auto local_path = loader_->ensure_local();
+
     // Load the neuropod and save a reference to it
-    neuropod_ = stdx::make_unique<py::object>(load_neuropod(neuropod_path));
+    neuropod_ = stdx::make_unique<py::object>(load_neuropod(local_path));
 }
 
 PythonBridge::~PythonBridge()
