@@ -25,6 +25,12 @@ static void expect_eq(const neuropods::NeuropodTensor &expected, const neuropods
     expect_eq<T>(expected, dynamic_cast<const neuropods::NeuropodTensor &>(actual));
 }
 
+template <typename T>
+static void expect_eq(const neuropods::NeuropodValue &expected, const neuropods::NeuropodValue &actual)
+{
+    expect_eq<T>(dynamic_cast<const neuropods::NeuropodTensor &>(expected), actual);
+}
+
 std::shared_ptr<neuropods::NeuropodTensor> serialize_deserialize(neuropods::NeuropodTensorAllocator &allocator,
                                                                  const neuropods::NeuropodTensor &   tensor)
 {
@@ -33,7 +39,7 @@ std::shared_ptr<neuropods::NeuropodTensor> serialize_deserialize(neuropods::Neur
     neuropods::serialize(ss, tensor);
 
     // Deserialize the tensor
-    auto value = neuropods::deserialize(ss, allocator);
+    auto value = neuropods::deserialize<std::shared_ptr<neuropods::NeuropodValue>>(ss, allocator);
     return std::dynamic_pointer_cast<neuropods::NeuropodTensor>(value);
 }
 
@@ -108,7 +114,41 @@ TEST(test_allocate_tensor, multiple_tensors_in_a_stream)
     ss.seekg(0, std::ios::beg);
 
     // Deserialize the tensor
-    expect_eq<int32_t>(*int_tensor_2D, *neuropods::deserialize(ss, *allocator));
-    expect_eq<std::string>(*string_tensor_2D, *neuropods::deserialize(ss, *allocator));
-    expect_eq<float>(*float_tensor_1D, *neuropods::deserialize(ss, *allocator));
+    expect_eq<int32_t>(*int_tensor_2D, *neuropods::deserialize<std::shared_ptr<neuropods::NeuropodValue>>(ss, *allocator));
+    expect_eq<std::string>(*string_tensor_2D, *neuropods::deserialize<std::shared_ptr<neuropods::NeuropodValue>>(ss, *allocator));
+    expect_eq<float>(*float_tensor_1D, *neuropods::deserialize<std::shared_ptr<neuropods::NeuropodValue>>(ss, *allocator));
+}
+
+TEST(test_allocate_tensor, neuropod_value_map)
+{
+    neuropods::TestNeuropodBackend backend;
+
+    auto allocator = backend.get_tensor_allocator();
+
+    const std::shared_ptr<neuropods::NeuropodValue> float_tensor_1D = allocator->allocate_tensor({3}, neuropods::FLOAT_TENSOR);
+    float_tensor_1D->as_typed_tensor<float>()->copy_from({0.0, 0.1, 0.2});
+
+    const std::shared_ptr<neuropods::NeuropodValue> string_tensor_2D = allocator->allocate_tensor({2, 2}, neuropods::STRING_TENSOR);
+    string_tensor_2D->as_typed_tensor<std::string>()->set({"A", "B", "C", "D"});
+
+    const std::shared_ptr<neuropods::NeuropodValue> int_tensor_2D = allocator->allocate_tensor({2, 3}, neuropods::INT32_TENSOR);
+    int_tensor_2D->as_typed_tensor<int32_t>()->copy_from({0, 1, 2, 3, 4, 5});
+
+    // Create a map
+    neuropods::NeuropodValueMap data;
+    data["int"] = int_tensor_2D;
+    data["string"] = string_tensor_2D;
+    data["float"] = float_tensor_1D;
+
+    // Serialize the map
+    std::stringstream ss;
+    neuropods::serialize(ss, data);
+
+    // Deserialize the map
+    ss.seekg(0, std::ios::beg);
+    const auto deserialized = neuropods::deserialize<neuropods::NeuropodValueMap>(ss, *allocator);
+
+    expect_eq<int32_t>(*int_tensor_2D, *deserialized.at("int"));
+    expect_eq<std::string>(*string_tensor_2D, *deserialized.at("string"));
+    expect_eq<float>(*float_tensor_1D, *deserialized.at("float"));
 }

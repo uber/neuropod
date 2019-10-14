@@ -36,8 +36,8 @@ py::array deserialize_binding(py::bytes buffer)
 {
     // Deserialize to a NeuropodTensor
     std::istringstream input_stream(buffer);
-    auto               allocator = DefaultTensorAllocator<neuropods::TestNeuropodTensor>();
-    auto               val       = deserialize(input_stream, allocator);
+    auto               allocator = DefaultTensorAllocator<TestNeuropodTensor>();
+    auto               val       = deserialize<std::shared_ptr<NeuropodValue>>(input_stream, allocator);
 
     // Wrap it in a numpy array and return
     return tensor_to_numpy(std::dynamic_pointer_cast<NeuropodTensor>(val));

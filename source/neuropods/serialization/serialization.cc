@@ -56,6 +56,7 @@ void serialize(boost::archive::binary_oarchive &out, const NeuropodValue &item)
     registered_serializers->at(tag)(item, out);
 }
 
+template<>
 std::shared_ptr<NeuropodValue> deserialize(boost::archive::binary_iarchive &ar, NeuropodTensorAllocator &allocator)
 {
     // Read the tag
@@ -70,6 +71,36 @@ std::shared_ptr<NeuropodValue> deserialize(boost::archive::binary_iarchive &ar, 
 
     // Get the function and run it
     return registered_deserializers->at(tag)(ar, allocator);
+}
+
+void serialize(boost::archive::binary_oarchive &out, const NeuropodValueMap &item)
+{
+    int num_items = item.size();
+    out << num_items;
+
+    for (const auto &pair : item)
+    {
+        out << pair.first;
+        serialize(out, *pair.second);
+    }
+}
+
+template<>
+NeuropodValueMap deserialize(boost::archive::binary_iarchive &ar, NeuropodTensorAllocator &allocator)
+{
+    NeuropodValueMap out;
+    int num_items;
+    ar >> num_items;
+
+    for (int i = 0; i < num_items; i++)
+    {
+        std::string key;
+        ar >> key;
+
+        out[key] = deserialize<std::shared_ptr<NeuropodValue>>(ar, allocator);
+    }
+
+    return out;
 }
 
 } // namespace detail
