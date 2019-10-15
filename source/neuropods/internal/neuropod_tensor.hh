@@ -421,18 +421,11 @@ public:
     // We can't get a raw pointer from a string tensor
     // virtual std::string *get_raw_data_ptr() = 0;
 
-    // TODO(vip): make this pure virtual once all the existing backends have
-    // implementations.
     // Set the data in the string tensor
-    virtual void set(const std::vector<std::string> &data) { NEUROPOD_ERROR("Children must implement `set`"); }
+    virtual void set(const std::vector<std::string> &data) = 0;
 
-    // TODO(vip): make this pure virtual once all the existing backends have
-    // implementations.
     // Get the data in the string tensor
-    virtual std::vector<std::string> get_data_as_vector() const
-    {
-        NEUROPOD_ERROR("Children must implement `get_data_as_vector`");
-    };
+    virtual std::vector<std::string> get_data_as_vector() const = 0;
 };
 
 // Utility to make a tensor of a specific type

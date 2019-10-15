@@ -65,6 +65,7 @@ cc_test(
     ],
     deps = [
         ":neuropods_test_utils",
+        "//neuropods/backends/torchscript:neuropod_torchscript_backend_hdrs",
     ],
 )
 
@@ -272,5 +273,43 @@ cc_test(
         "//neuropods/backends/test_backend:test_backend_hdrs",
         "//neuropods/conversions:eigen",
         "@eigen3_repo//:eigen3",
+    ],
+)
+
+cc_test(
+    name = "test_test_backend",
+    srcs = [
+        "test_test_backend.cc",
+        "//neuropods:libneuropods.so",
+        "//neuropods/backends/test_backend:libneuropod_test_backend.so",
+    ],
+    deps = [
+        "@gtest//:main",
+        "//neuropods:neuropods_hdrs",
+        "//neuropods/backends/test_backend:test_backend_hdrs",
+    ],
+)
+
+cc_test(
+    name = "test_logging",
+    srcs = [
+        "test_logging.cc",
+    ],
+    deps = [
+        "@gtest//:main",
+        "//neuropods/internal:logging",
+    ],
+)
+
+cc_test(
+    name = "test_backend_registration",
+    srcs = [
+        "test_backend_registration.cc",
+        "//neuropods:libneuropods.so",
+    ],
+    deps = [
+        "@gtest//:main",
+        "//neuropods:neuropods_hdrs",
+        "//neuropods/internal:backend_registration",
     ],
 )
