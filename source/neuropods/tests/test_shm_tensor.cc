@@ -23,11 +23,8 @@ TEST(test_shm_tensor, simple)
     // Allocate some tensors
     for (uint8_t i = 0; i < 16; i++)
     {
-        const uint8_t some_data[num_items] = {i};
-
-        // Allocate some memory and copy in data
-        auto tensor = allocator->allocate_tensor<uint8_t>(dims);
-        tensor->copy_from(some_data, num_items);
+        // Allocate a tensor filled with a specific value
+        auto tensor = allocator->full<uint8_t>(dims, i);
 
         // Store the block ID
         const auto &block_id =
@@ -50,8 +47,14 @@ TEST(test_shm_tensor, simple)
         auto actual_dims = tensor->get_dims();
         EXPECT_EQ(actual_dims, dims);
 
+        // Make sure our hardcoded size is correct
+        const auto actual_numel = tensor->get_num_elements();
+        EXPECT_EQ(actual_numel, num_items);
+
         // Make sure the data is what we expect
-        const uint8_t expected_data[num_items] = {i};
+        uint8_t expected_data[num_items];
+        std::fill_n(expected_data, num_items, i);
+
         auto          actual_data              = tensor->as_typed_tensor<uint8_t>()->get_raw_data_ptr();
         EXPECT_EQ(memcmp(actual_data, expected_data, num_items * sizeof(uint8_t)), 0);
     }

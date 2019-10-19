@@ -313,3 +313,16 @@ cc_test(
         "//neuropods/internal:backend_registration",
     ],
 )
+
+cc_test(
+    name = "test_factories",
+    srcs = [
+        "test_factories.cc",
+        "//neuropods:libneuropods.so",
+        "//neuropods/backends/test_backend:libneuropod_test_backend.so",
+    ],
+    deps = [
+        "@gtest//:main",
+        "//neuropods/backends/test_backend:test_backend_hdrs",
+    ],
+)
