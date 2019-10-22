@@ -326,3 +326,19 @@ cc_test(
         "//neuropods/backends/test_backend:test_backend_hdrs",
     ],
 )
+
+cc_test(
+    name = "test_loader",
+    srcs = [
+        "test_loader.cc",
+        "//neuropods:libneuropods.so",
+    ],
+    deps = [
+        "@gtest//:main",
+        "//neuropods:neuropods_hdrs",
+        "//neuropods/internal:neuropod_loader",
+    ],
+    data = [
+        "//neuropods/tests/test_data"
+    ],
+)

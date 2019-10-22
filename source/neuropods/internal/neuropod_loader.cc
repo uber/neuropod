@@ -7,8 +7,10 @@
 #include "neuropods/internal/error_utils.hh"
 
 #include <ghc/filesystem.hpp>
+#include <picosha2.h>
 #include <unzipper.h>
 
+#include <iterator>
 #include <fstream>
 #include <sstream>
 
@@ -138,6 +140,16 @@ public:
 } // namespace
 
 NeuropodLoader::~NeuropodLoader() = default;
+
+// Get the SHA256 of a file
+std::string NeuropodLoader::get_hash_for_file(const std::string &path)
+{
+    auto stream = get_istream_for_file(path);
+    std::vector<unsigned char> hash(picosha2::k_digest_size);
+    picosha2::hash256(std::istreambuf_iterator<char>(*stream), std::istreambuf_iterator<char>(), hash.begin(), hash.end());
+
+    return picosha2::bytes_to_hex_string(hash.begin(), hash.end());
+}
 
 // Get a loader given a path to a file or directory.
 // If this is a file, it is assumed to be a zipfile containing a neuropod
