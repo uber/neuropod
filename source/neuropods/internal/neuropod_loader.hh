@@ -25,6 +25,9 @@ public:
     // file
     virtual std::string get_file_path(const std::string &path) = 0;
 
+    // Get the SHA256 of a file
+    std::string get_hash_for_file(const std::string &path);
+
     // If this is a zipped neuropod, extract to a temp dir and return the extracted path
     // Otherwise, return the neuropod_path
     virtual std::string ensure_local() = 0;

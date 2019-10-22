@@ -116,3 +116,11 @@ http_archive(
     url = "https://github.com/gulrak/filesystem/archive/v1.2.6.zip",
     strip_prefix = "filesystem-1.2.6",
 )
+
+http_archive(
+    name = "picosha2_repo",
+    build_file = "@//deps:BUILD.picosha2",
+    sha256 = "d9b23652e4838eb84db96d9090cf143a8809c27d09207e74de90f2340f8a37e1",
+    url = "https://github.com/okdshin/PicoSHA2/archive/b699e6c900be6e00152db5a3d123c1db42ea13d0.zip",
+    strip_prefix = "PicoSHA2-b699e6c900be6e00152db5a3d123c1db42ea13d0",
+)

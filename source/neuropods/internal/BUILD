@@ -154,6 +154,7 @@ cc_library(
         ":neuropod_loader",
         ":memory_utils",
         "@filesystem_repo//:filesystem",
+        "@picosha2_repo//:picosha2",
         "@zipper_repo//:zipper",
     ],
     visibility = [
