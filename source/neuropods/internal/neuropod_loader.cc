@@ -155,6 +155,11 @@ std::string NeuropodLoader::get_hash_for_file(const std::string &path)
 // If this is a file, it is assumed to be a zipfile containing a neuropod
 std::unique_ptr<NeuropodLoader> get_loader(const std::string &neuropod_path)
 {
+    if (!fs::exists(neuropod_path))
+    {
+        NEUROPOD_ERROR("Error loading Neuropod. No file or directory at '" << neuropod_path << "'");
+    }
+
     if (fs::is_directory(neuropod_path))
     {
         return stdx::make_unique<LocalLoader>(neuropod_path);
