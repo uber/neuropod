@@ -28,9 +28,8 @@ def create_keras_addition_model(node_name_mapping=None):
 
     x = Input(batch_shape=(None,), name=node_name_mapping['x'])
     y = Input(batch_shape=(None,), name=node_name_mapping['y'])
-    optional = Input(batch_shape=(None,), name=node_name_mapping['optional'], dtype=tf.string)
     out = Add(name=node_name_mapping['out'])([x, y])
-    model = Model(inputs=[x, y, optional], outputs=[out])
+    model = Model(inputs=[x, y], outputs=[out])
     return model
 
 
@@ -40,7 +39,7 @@ class TestKerasPackaging(unittest.TestCase):
             neuropod_path = os.path.join(test_dir, "test_neuropod")
 
             if alias_names:
-                node_name_mapping = {'x': 'x_', 'y': 'y_', 'optional': 'optional_', 'out': 'out_'}
+                node_name_mapping = {'x': 'x_', 'y': 'y_', 'out': 'out_'}
             else:
                 node_name_mapping = None
 

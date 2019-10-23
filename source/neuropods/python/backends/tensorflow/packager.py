@@ -12,6 +12,8 @@ from neuropods.utils.packaging_utils import create_neuropod, set_packager_docstr
 
 @set_packager_docstring
 def create_tensorflow_neuropod(
+        input_spec,
+        output_spec,
         node_name_mapping,
         frozen_graph_path=None,
         graph_def=None,
@@ -22,7 +24,9 @@ def create_tensorflow_neuropod(
 
     {common_doc_pre}
 
-    :param  node_name_mapping:  Mapping from a neuropod input/output name to a node in the graph
+    :param  node_name_mapping:  Mapping from a neuropod input/output name to a node in the graph. The `:0` is
+                                optional.
+
                                 Ex: {
                                     "x": "some_namespace/in_x:0",
                                     "y": "some_namespace/in_y:0",
@@ -57,6 +61,18 @@ def create_tensorflow_neuropod(
             # Write out the frozen graph
             tf.train.write_graph(graph_def, neuropod_data_path, "model.pb", as_text=False)
 
+        # Make sure we have mappings for everything in the spec
+        expected_keys = set()
+        for spec in [input_spec, output_spec]:
+            for tensor in spec:
+                expected_keys.add(tensor["name"])
+
+        actual_keys = set(node_name_mapping.keys())
+        missing_keys = expected_keys - actual_keys
+
+        if len(missing_keys) > 0:
+            raise ValueError("Expected an item in `node_name_mapping` for every tensor in input_spec and output_spec. Missing: `{}`".format(missing_keys))
+
         # We also need to save the node name mapping so we know how to run the model
         # This is tensorflow specific config so it's not saved in the overall neuropod config
         with open(os.path.join(neuropod_path, "0", "config.json"), "w") as config_file:
@@ -68,5 +84,7 @@ def create_tensorflow_neuropod(
     create_neuropod(
         packager_fn=packager_fn,
         platform="tensorflow",
+        input_spec=input_spec,
+        output_spec=output_spec,
         **kwargs
     )
