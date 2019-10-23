@@ -66,7 +66,8 @@ void setup_node_mapping_and_init_ops(std::istream &                             
     }
 }
 
-// Get a graph node given a node name of the format `name:index`. Namespaces are supported as well
+// Get a graph node given a node name of the format `name:index`. Namespaces are supported as well.
+// If the index is 0, ":0" optional.
 // Ex: `some_namespace/input:0`
 TF_Output get_graph_node_from_name(const std::string &node_name_with_index, const TF_GraphPtr &graph_)
 {
@@ -75,7 +76,11 @@ TF_Output get_graph_node_from_name(const std::string &node_name_with_index, cons
     const auto node_name = node_name_with_index.substr(0, colon_pos);
 
     // The index of the output for the specified op
-    const auto node_index = node_name_with_index.substr(colon_pos + 1);
+    int node_index = 0;
+    if (colon_pos != std::string::npos)
+    {
+        node_index = std::stoi(node_name_with_index.substr(colon_pos + 1));
+    }
 
     TF_Operation *oper = TF_GraphOperationByName(graph_.get(), node_name.c_str());
     if (!oper)
@@ -84,7 +89,7 @@ TF_Output get_graph_node_from_name(const std::string &node_name_with_index, cons
     }
     // TensorFlow uses TF_Output everywhere, including input placeholders
     // Operations can have several outputs, they are indexed started from 0
-    return TF_Output{oper, std::stoi(node_index)};
+    return TF_Output{oper, node_index};
 }
 
 } // namespace

@@ -18,7 +18,6 @@ def get_addition_model_spec(do_fail=False):
         input_spec=[
             {"name": "x", "dtype": "float32", "shape": ("batch_size",)},
             {"name": "y", "dtype": "float32", "shape": ("batch_size",)},
-            {"name": "optional", "dtype": "string", "shape": ("batch_size",)},
         ],
         output_spec=[
             {"name": "out", "dtype": "float32", "shape": ("batch_size",)},

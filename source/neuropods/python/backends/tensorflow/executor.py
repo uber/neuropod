@@ -40,6 +40,12 @@ class TensorflowNeuropodExecutor(NeuropodExecutor):
 
             # Get the node name mapping and store it
             self.node_name_mapping = model_config["node_name_mapping"]
+
+            # Make sure every node in the mapping ends with `:index`
+            for k, v in self.node_name_mapping.items():
+                if ":" not in v:
+                    self.node_name_mapping[k] = v + ":0"
+
             init_op_names = model_config["init_op_names"]
 
         # Setup the graph from the definition

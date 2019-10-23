@@ -61,7 +61,9 @@ class TestTensorflowPackaging(unittest.TestCase):
                 node_name_mapping={
                     "x": "some_namespace/in_x:0",
                     "y": "some_namespace/in_y:0",
-                    "out": "some_namespace/out:0",
+
+                    # The `:0` is optional
+                    "out": "some_namespace/out",
                 },
                 # Get the input/output spec along with test data
                 **get_addition_model_spec(do_fail=do_fail)
