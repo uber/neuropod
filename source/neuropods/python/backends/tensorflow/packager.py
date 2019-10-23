@@ -7,11 +7,12 @@ import os
 import shutil
 import tensorflow as tf
 
-from neuropods.utils.packaging_utils import create_neuropod, set_packager_docstring
+from neuropods.utils.packaging_utils import packager
 
 
-@set_packager_docstring
+@packager(platform="tensorflow")
 def create_tensorflow_neuropod(
+        neuropod_path,
         input_spec,
         output_spec,
         node_name_mapping,
@@ -49,42 +50,33 @@ def create_tensorflow_neuropod(
     if (frozen_graph_path is not None and graph_def is not None) or (frozen_graph_path is None and graph_def is None):
         raise ValueError("Exactly one of 'frozen_graph_path' and 'graph_def' must be provided.")
 
-    def packager_fn(neuropod_path):
-        # Create a folder to store the model
-        neuropod_data_path = os.path.join(neuropod_path, "0", "data")
-        os.makedirs(neuropod_data_path)
+    # Create a folder to store the model
+    neuropod_data_path = os.path.join(neuropod_path, "0", "data")
+    os.makedirs(neuropod_data_path)
 
-        if frozen_graph_path is not None:
-            # Copy in the frozen graph
-            shutil.copyfile(frozen_graph_path, os.path.join(neuropod_data_path, "model.pb"))
-        elif graph_def is not None:
-            # Write out the frozen graph
-            tf.train.write_graph(graph_def, neuropod_data_path, "model.pb", as_text=False)
+    if frozen_graph_path is not None:
+        # Copy in the frozen graph
+        shutil.copyfile(frozen_graph_path, os.path.join(neuropod_data_path, "model.pb"))
+    elif graph_def is not None:
+        # Write out the frozen graph
+        tf.train.write_graph(graph_def, neuropod_data_path, "model.pb", as_text=False)
 
-        # Make sure we have mappings for everything in the spec
-        expected_keys = set()
-        for spec in [input_spec, output_spec]:
-            for tensor in spec:
-                expected_keys.add(tensor["name"])
+    # Make sure we have mappings for everything in the spec
+    expected_keys = set()
+    for spec in [input_spec, output_spec]:
+        for tensor in spec:
+            expected_keys.add(tensor["name"])
 
-        actual_keys = set(node_name_mapping.keys())
-        missing_keys = expected_keys - actual_keys
+    actual_keys = set(node_name_mapping.keys())
+    missing_keys = expected_keys - actual_keys
 
-        if len(missing_keys) > 0:
-            raise ValueError("Expected an item in `node_name_mapping` for every tensor in input_spec and output_spec. Missing: `{}`".format(missing_keys))
+    if len(missing_keys) > 0:
+        raise ValueError("Expected an item in `node_name_mapping` for every tensor in input_spec and output_spec. Missing: `{}`".format(missing_keys))
 
-        # We also need to save the node name mapping so we know how to run the model
-        # This is tensorflow specific config so it's not saved in the overall neuropod config
-        with open(os.path.join(neuropod_path, "0", "config.json"), "w") as config_file:
-            json.dump({
-                "node_name_mapping": node_name_mapping,
-                "init_op_names": init_op_names if isinstance(init_op_names, list) else [init_op_names],
-            }, config_file)
-
-    create_neuropod(
-        packager_fn=packager_fn,
-        platform="tensorflow",
-        input_spec=input_spec,
-        output_spec=output_spec,
-        **kwargs
-    )
+    # We also need to save the node name mapping so we know how to run the model
+    # This is tensorflow specific config so it's not saved in the overall neuropod config
+    with open(os.path.join(neuropod_path, "0", "config.json"), "w") as config_file:
+        json.dump({
+            "node_name_mapping": node_name_mapping,
+            "init_op_names": init_op_names if isinstance(init_op_names, list) else [init_op_names],
+        }, config_file)

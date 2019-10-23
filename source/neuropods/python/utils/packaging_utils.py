@@ -97,7 +97,31 @@ def set_packager_docstring(f):
     f.__doc__ = f.__doc__.replace("{common_doc_pre}", COMMON_DOC_PRE).replace("{common_doc_post}", COMMON_DOC_POST)
     return f
 
-def create_neuropod(
+def packager(platform):
+    # A decorator that wraps a `platform` specific packager with generic packaging and sets docstrings correctly
+
+    def inner(f):
+        # Expects the functon to have a docstring including
+        # {common_doc_pre} and {common_doc_post}
+
+        def wrapper(**kwargs):
+            # Runs create neuropod
+            _create_neuropod(
+                packager_fn=f,
+                platform=platform,
+                **kwargs
+            )
+
+        # We can't easily use `.format` because the docstrings contain {}
+        wrapper.__doc__  = f.__doc__.replace("{common_doc_pre}", COMMON_DOC_PRE).replace("{common_doc_post}", COMMON_DOC_POST)
+        wrapper.__name__ = f.__name__
+        return wrapper
+
+    return inner
+
+
+
+def _create_neuropod(
     neuropod_path,
     packager_fn,
     package_as_zip=True,
@@ -132,7 +156,7 @@ def create_neuropod(
     )
 
     # Run the packager
-    packager_fn(package_path)
+    packager_fn(neuropod_path=package_path, **kwargs)
 
     # Persist the test data
     if test_input_data is not None and persist_test_data:
