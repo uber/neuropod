@@ -5,13 +5,10 @@
 import os
 import torch
 
-from neuropods.utils.packaging_utils import create_neuropod, set_packager_docstring
+from neuropods.utils.packaging_utils import packager
 
-@set_packager_docstring
-def create_torchscript_neuropod(
-        module,
-        **kwargs
-        ):
+@packager(platform="torchscript")
+def create_torchscript_neuropod(neuropod_path, module, **kwargs):
     """
     Packages a TorchScript model as a neuropod package.
 
@@ -26,17 +23,10 @@ def create_torchscript_neuropod(
 
     {common_doc_post}
     """
-    def packager_fn(neuropod_path):
-        # Create a folder to store the model
-        neuropod_data_path = os.path.join(neuropod_path, "0", "data")
-        os.makedirs(neuropod_data_path)
+    # Create a folder to store the model
+    neuropod_data_path = os.path.join(neuropod_path, "0", "data")
+    os.makedirs(neuropod_data_path)
 
-        # Save the model
-        model_path = os.path.join(neuropod_data_path, "model.pt")
-        torch.jit.save(module, model_path)
-
-    create_neuropod(
-        packager_fn=packager_fn,
-        platform="torchscript",
-        **kwargs
-    )
+    # Save the model
+    model_path = os.path.join(neuropod_data_path, "model.pt")
+    torch.jit.save(module, model_path)

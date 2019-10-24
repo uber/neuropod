@@ -47,7 +47,7 @@ def create_tf_accumulator_model():
 
 
 class TestTensorflowPackaging(unittest.TestCase):
-    def package_simple_addition_model(self, do_fail=False):
+    def package_simple_addition_model(self, do_fail=False, package_as_zip=True):
         with TemporaryDirectory() as test_dir:
             neuropod_path = os.path.join(test_dir, "test_neuropod")
 
@@ -65,6 +65,7 @@ class TestTensorflowPackaging(unittest.TestCase):
                     # The `:0` is optional
                     "out": "some_namespace/out",
                 },
+                package_as_zip=package_as_zip,
                 # Get the input/output spec along with test data
                 **get_addition_model_spec(do_fail=do_fail)
             )
@@ -105,6 +106,11 @@ class TestTensorflowPackaging(unittest.TestCase):
         # Tests a case where packaging works correctly and
         # the model output matches the expected output
         self.package_simple_addition_model()
+
+    def test_simple_addition_model_no_zip(self):
+        # Tests a case where packaging works correctly and
+        # the model output matches the expected output
+        self.package_simple_addition_model(package_as_zip=False)
 
     def test_simple_addition_model_failure(self):
         # Tests a case where the output does not match the expected output
