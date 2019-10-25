@@ -26,10 +26,15 @@ def create_keras_neuropod(
     :param  model:              A Keras model object.
 
     :param  node_name_mapping:  Optional mapping from a neuropod input/output name to a name of Keras input/output
-                                Ex: {
-                                    "x": "input_1",
-                                    "out": "fc1000",
-                                }
+
+                                !!! note ""
+                                    ***Example***:
+                                    ```
+                                    {
+                                        "x": "input_1",
+                                        "out": "fc1000",
+                                    }
+                                    ```
 
                                 Defaults to using Keras input/output names as neuropod input/output names.
 
