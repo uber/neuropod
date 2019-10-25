@@ -2,6 +2,7 @@
 # Uber, Inc. (c) 2019
 #
 
+import inspect
 import os
 import tempfile
 import shutil
@@ -115,11 +116,45 @@ def packager(platform):
         # We can't easily use `.format` because the docstrings contain {}
         wrapper.__doc__  = f.__doc__.replace("{common_doc_pre}", COMMON_DOC_PRE).replace("{common_doc_post}", COMMON_DOC_POST)
         wrapper.__name__ = f.__name__
+
+        # The default args for a packager come from combining the default args
+        # of all of these functions
+        wrapper.neuropod_default_arg_list = _generate_default_arg_map([
+            config_utils.write_neuropod_config,
+            load_and_test_neuropod,
+            _create_neuropod,
+            f,
+        ])
         return wrapper
 
     return inner
 
+def _get_default_args(f):
+    """
+    get the default args of a functon `f` as a list of tuples of the format
+    (arg, default_value)
+    """
+    argspec = inspect.getargspec(f)
+    if argspec.defaults:
+        # Generate tuples of (arg, default_value)
+        # According to https://docs.python.org/2/library/inspect.html#inspect.getargspec,
+        # if defaults has n elements, they correspond to the last n elements listed in args.
+        return list(zip(reversed(argspec.args), reversed(argspec.defaults)))
 
+    return []
+
+def _generate_default_arg_map(f_list):
+    """
+    Given a list of functions, generates a map from an arg name to a default value
+
+    Note: later functions take priority
+    """
+    default_args = {}
+    for f in f_list:
+        for arg, default in _get_default_args(f):
+            default_args[arg] = default
+
+    return default_args
 
 def _create_neuropod(
     neuropod_path,
