@@ -30,16 +30,26 @@ COMMON_DOC_POST = """
                                 dimensions of the input are validated against that tuple.  A value of
                                 `None` for any of the dimensions means that dimension will not be checked.
                                 `dtype` can be any valid numpy datatype string.
-                                Ex: [
-                                    {"name": "x", "dtype": "float32", "shape": (None,)},
-                                    {"name": "y", "dtype": "float32", "shape": (None,)},
-                                ]
+
+                                !!! note ""
+                                    ***Example***:
+                                    ```
+                                    [
+                                        {"name": "x", "dtype": "float32", "shape": (None,)},
+                                        {"name": "y", "dtype": "float32", "shape": (None,)},
+                                    ]
+                                    ```
 
     :param  output_spec:        A list of dicts specifying the output of the model. See the documentation for
                                 the `input_spec` parameter for more details.
-                                Ex: [
-                                    {"name": "out", "dtype": "float32", "shape": (None,)},
-                                ]
+
+                                !!! note ""
+                                    ***Example***:
+                                    ```
+                                    [
+                                        {"name": "out", "dtype": "float32", "shape": (None,)},
+                                    ]
+                                    ```
 
     :param  input_tensor_device:    A dict mapping input tensor names to the device
                                     that the model expects them to be on. This can
@@ -55,7 +65,11 @@ COMMON_DOC_POST = """
 
                                     See the docstring for `load_neuropod` for more info.
 
-                                    Ex: `{"x": "GPU"}`
+                                    !!! note ""
+                                        ***Example***:
+                                        ```
+                                        {"x": "GPU"}
+                                        ```
 
     :param  default_input_tensor_device:    The default device that input tensors are expected
                                             to be on. This can either be `GPU` or `CPU`.
@@ -66,9 +80,13 @@ COMMON_DOC_POST = """
                                             that the custom ops were built for. It is the user's responsibility to ensure that their
                                             custom ops are built for the correct platform.
 
-                                            Ex: `["/path/to/my/custom_op.so"]`
+                                            !!! note ""
+                                                ***Example***:
+                                                ```
+                                                ["/path/to/my/custom_op.so"]
+                                                ```
 
-    :param  package_as_zip:     Whether to package the neuropod as a single file or as a directory. Default true (i.e. as a zipfile).
+    :param  package_as_zip:     Whether to package the neuropod as a single file or as a directory.
 
     :param  test_input_data:    Optional sample input data. This is a dict mapping input names to
                                 values. If this is provided, inference will be run in an isolated environment
@@ -76,18 +94,28 @@ COMMON_DOC_POST = """
                                 successfully. Must be provided if `test_expected_out` is provided.
 
                                 Throws a ValueError if inference failed.
-                                Ex: {
-                                    "x": np.arange(5),
-                                    "y": np.arange(5),
-                                }
+
+                                !!! note ""
+                                    ***Example***:
+                                    ```
+                                    {
+                                        "x": np.arange(5),
+                                        "y": np.arange(5),
+                                    }
+                                    ```
 
     :param  test_expected_out:  Optional expected output. Throws a ValueError if the output of model inference
                                 does not match the expected output.
-                                Ex: {
-                                    "out": np.arange(5) + np.arange(5)
-                                }
 
-    :param  persist_test_data:  Optionally saves the test data within the packaged neuropod. default True.
+                                !!! note ""
+                                    ***Example***:
+                                    ```
+                                    {
+                                        "out": np.arange(5) + np.arange(5)
+                                    }
+                                    ```
+
+    :param  persist_test_data:  Optionally saves the test data within the packaged neuropod.
 """
 
 def set_packager_docstring(f):

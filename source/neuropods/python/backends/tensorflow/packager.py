@@ -28,16 +28,20 @@ def create_tensorflow_neuropod(
     :param  node_name_mapping:  Mapping from a neuropod input/output name to a node in the graph. The `:0` is
                                 optional.
 
-                                Ex: {
-                                    "x": "some_namespace/in_x:0",
-                                    "y": "some_namespace/in_y:0",
-                                    "out": "some_namespace/out:0",
-                                }
+                                !!! note ""
+                                    ***Example***:
+                                    ```
+                                    {
+                                        "x": "some_namespace/in_x:0",
+                                        "y": "some_namespace/in_y:0",
+                                        "out": "some_namespace/out:0",
+                                    }
+                                    ```
 
     :param  frozen_graph_path:  The path to a frozen tensorflow graph. If this is not provided, `graph_def` must
                                 be set
 
-    :param  graph_def:          A tensorflow GraphDef object. If this is not provided, `frozen_graph_path` must
+    :param  graph_def:          A tensorflow `GraphDef` object. If this is not provided, `frozen_graph_path` must
                                 be set
 
     :param init_op_names:       A list of initialization operator names. These operations are evaluated in the session

@@ -15,11 +15,16 @@ def create_torchscript_neuropod(neuropod_path, module, **kwargs):
     {common_doc_pre}
 
     :param  module:             An instance of a PyTorch ScriptModule. This model should return the outputs
-                                as a dictionary. For example, a model may output something like this:
+                                as a dictionary.
+
+                                !!! note ""
+                                    For example, a model may output something like this:
+                                    ```
                                     {
                                         "output1": value1,
                                         "output2": value2,
                                     }
+                                    ```
 
     {common_doc_post}
     """

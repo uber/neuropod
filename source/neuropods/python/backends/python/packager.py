@@ -24,17 +24,27 @@ def create_python_neuropod(
     {common_doc_pre}
 
     :param  data_paths:         A list of dicts containing the paths to any data files that needs to be packaged.
-                                Ex: [{
-                                    path: "/path/to/myfile.txt",
-                                    packaged_name: "newfilename.txt"
-                                }]
+
+                                !!! note ""
+                                    ***Example***:
+                                    ```
+                                    [{
+                                        path: "/path/to/myfile.txt",
+                                        packaged_name: "newfilename.txt"
+                                    }]
+                                    ```
 
     :param  code_path_spec:     The folder paths of all the code that will be packaged. Note that
-                                *.pyc files are ignored. This is specified as follows:
-        [{
-            "python_root": "/some/path/to/a/python/root",
-            "dirs_to_package": ["relative/path/to/package"]
-        }, ...]
+                                *.pyc files are ignored.
+
+                                !!! note ""
+                                    This is specified as follows:
+                                    ```
+                                    [{
+                                        "python_root": "/some/path/to/a/python/root",
+                                        "dirs_to_package": ["relative/path/to/package"]
+                                    }, ...]
+                                    ```
 
     :param  entrypoint_package: The python package containing the entrypoint (e.g. some.package.something).
                                 This must contain the entrypoint function specified below.
@@ -43,22 +53,25 @@ def create_python_neuropod(
                                 function must return a callable that takes in the inputs specified in
                                 `input_spec` and returns a dict containing the outputs specified in
                                 `output_spec`. The `entrypoint` function will be provided the path to
-                                a directory containing the packaged data as its first parameter. For example,
-                                a function like:
+                                a directory containing the packaged data as its first parameter.
 
-                                ```
-                                def neuropod_init(data_path):
+                                !!! note ""
+                                    For example,
+                                    a function like:
 
-                                    def addition_model(x, y):
-                                        return {
-                                            "output": x + y
-                                        }
+                                    ```
+                                    def neuropod_init(data_path):
 
-                                    return addition_model
-                                ```
-                                contained in the package 'my.awesome.addition_model' would have
-                                `entrypoint_package='my.awesome.addition_model'` and
-                                `entrypoint='neuropod_init'`
+                                        def addition_model(x, y):
+                                            return {
+                                                "output": x + y
+                                            }
+
+                                        return addition_model
+                                    ```
+                                    contained in the package 'my.awesome.addition_model' would have
+                                    `entrypoint_package='my.awesome.addition_model'` and
+                                    `entrypoint='neuropod_init'`
 
     {common_doc_post}
     """
