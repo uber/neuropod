@@ -1,0 +1,20 @@
+site_name: Neuropods
+theme:
+  name: 'material'
+markdown_extensions:
+  - toc:
+      permalink: true
+  - admonition
+  - codehilite
+  - pymdownx.superfences
+
+nav:
+  - Welcome: index.md
+  - Tutorials:
+      - Basic Introduction: tutorial.md
+  - Packaging API:
+      - TensorFlow: packagers/tensorflow.md
+      - PyTorch: packagers/pytorch.md
+      - TorchScript: packagers/torchscript.md
+      - Keras: packagers/keras.md
+  - Developing Neuropods: developing.md

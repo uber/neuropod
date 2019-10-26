@@ -96,6 +96,7 @@ FRAMEWORK_VERSIONS = [
 travis_matrix = []
 docker_compose_matrix = []
 buildkite_yml_matrix = []
+added_doc_deploy = False
 for platform, py_version, framework_version in itertools.product(PLATFORMS, PY_VERSIONS, FRAMEWORK_VERSIONS):
     # Get versions of all the dependencies
     tf_version = framework_version["tensorflow"]
@@ -137,10 +138,18 @@ for platform, py_version, framework_version in itertools.product(PLATFORMS, PY_V
         "          run: {}\n".format(variant_name),
         "          config: docker-compose.test.yml\n",
         "          env:\n",
+        "            - BUILDKITE_BRANCH\n",
+        "            - BUILDKITE_COMMIT\n",
+        "            - BUILDKITE_PULL_REQUEST\n",
         "            - BUILDKITE_TAG\n",
+        "            - GH_STATUS_TOKEN\n",
         "            - GH_UPLOAD_TOKEN\n",
+        "            - NOW_DEPLOY_TOKEN\n",
+        "            - DEPLOY_DOCS=true\n" if not added_doc_deploy else "",
         "\n",
         ])
+
+        added_doc_deploy = True
 
 
 # Use the templates to create the complete config files

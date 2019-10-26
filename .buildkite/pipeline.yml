@@ -14,8 +14,14 @@ steps:
           run: test-cpu-variant-tf-1.11.0-torch-1.1.0-py2.7
           config: docker-compose.test.yml
           env:
+            - BUILDKITE_BRANCH
+            - BUILDKITE_COMMIT
+            - BUILDKITE_PULL_REQUEST
             - BUILDKITE_TAG
+            - GH_STATUS_TOKEN
             - GH_UPLOAD_TOKEN
+            - NOW_DEPLOY_TOKEN
+            - DEPLOY_DOCS=true
 
   - label: ":docker: CPU Tests (test-cpu-variant-tf-1.12.0-torch-1.2.0.dev20190601-py2.7)"
     agents:
@@ -26,8 +32,13 @@ steps:
           run: test-cpu-variant-tf-1.12.0-torch-1.2.0.dev20190601-py2.7
           config: docker-compose.test.yml
           env:
+            - BUILDKITE_BRANCH
+            - BUILDKITE_COMMIT
+            - BUILDKITE_PULL_REQUEST
             - BUILDKITE_TAG
+            - GH_STATUS_TOKEN
             - GH_UPLOAD_TOKEN
+            - NOW_DEPLOY_TOKEN
 
   - label: ":docker: CPU Tests (test-cpu-variant-tf-1.13.1-torch-1.2.0-py2.7)"
     agents:
@@ -38,8 +49,13 @@ steps:
           run: test-cpu-variant-tf-1.13.1-torch-1.2.0-py2.7
           config: docker-compose.test.yml
           env:
+            - BUILDKITE_BRANCH
+            - BUILDKITE_COMMIT
+            - BUILDKITE_PULL_REQUEST
             - BUILDKITE_TAG
+            - GH_STATUS_TOKEN
             - GH_UPLOAD_TOKEN
+            - NOW_DEPLOY_TOKEN
 
   - label: ":docker: CPU Tests (test-cpu-variant-tf-1.14.0-torch-1.3.0.dev20190820-py2.7)"
     agents:
@@ -50,8 +66,13 @@ steps:
           run: test-cpu-variant-tf-1.14.0-torch-1.3.0.dev20190820-py2.7
           config: docker-compose.test.yml
           env:
+            - BUILDKITE_BRANCH
+            - BUILDKITE_COMMIT
+            - BUILDKITE_PULL_REQUEST
             - BUILDKITE_TAG
+            - GH_STATUS_TOKEN
             - GH_UPLOAD_TOKEN
+            - NOW_DEPLOY_TOKEN
 
   - label: ":docker: CPU Tests (test-cpu-variant-tf-1.11.0-torch-1.1.0-py3)"
     agents:
@@ -62,8 +83,13 @@ steps:
           run: test-cpu-variant-tf-1.11.0-torch-1.1.0-py3
           config: docker-compose.test.yml
           env:
+            - BUILDKITE_BRANCH
+            - BUILDKITE_COMMIT
+            - BUILDKITE_PULL_REQUEST
             - BUILDKITE_TAG
+            - GH_STATUS_TOKEN
             - GH_UPLOAD_TOKEN
+            - NOW_DEPLOY_TOKEN
 
   - label: ":docker: CPU Tests (test-cpu-variant-tf-1.12.0-torch-1.2.0.dev20190601-py3)"
     agents:
@@ -74,8 +100,13 @@ steps:
           run: test-cpu-variant-tf-1.12.0-torch-1.2.0.dev20190601-py3
           config: docker-compose.test.yml
           env:
+            - BUILDKITE_BRANCH
+            - BUILDKITE_COMMIT
+            - BUILDKITE_PULL_REQUEST
             - BUILDKITE_TAG
+            - GH_STATUS_TOKEN
             - GH_UPLOAD_TOKEN
+            - NOW_DEPLOY_TOKEN
 
   - label: ":docker: CPU Tests (test-cpu-variant-tf-1.13.1-torch-1.2.0-py3)"
     agents:
@@ -86,8 +117,13 @@ steps:
           run: test-cpu-variant-tf-1.13.1-torch-1.2.0-py3
           config: docker-compose.test.yml
           env:
+            - BUILDKITE_BRANCH
+            - BUILDKITE_COMMIT
+            - BUILDKITE_PULL_REQUEST
             - BUILDKITE_TAG
+            - GH_STATUS_TOKEN
             - GH_UPLOAD_TOKEN
+            - NOW_DEPLOY_TOKEN
 
   - label: ":docker: CPU Tests (test-cpu-variant-tf-1.14.0-torch-1.3.0.dev20190820-py3)"
     agents:
@@ -98,8 +134,13 @@ steps:
           run: test-cpu-variant-tf-1.14.0-torch-1.3.0.dev20190820-py3
           config: docker-compose.test.yml
           env:
+            - BUILDKITE_BRANCH
+            - BUILDKITE_COMMIT
+            - BUILDKITE_PULL_REQUEST
             - BUILDKITE_TAG
+            - GH_STATUS_TOKEN
             - GH_UPLOAD_TOKEN
+            - NOW_DEPLOY_TOKEN
 
   - label: ":docker: GPU Tests (test-gpu-variant-tf-1.11.0-torch-1.1.0-py2.7)"
     agents:
@@ -110,8 +151,13 @@ steps:
           run: test-gpu-variant-tf-1.11.0-torch-1.1.0-py2.7
           config: docker-compose.test.yml
           env:
+            - BUILDKITE_BRANCH
+            - BUILDKITE_COMMIT
+            - BUILDKITE_PULL_REQUEST
             - BUILDKITE_TAG
+            - GH_STATUS_TOKEN
             - GH_UPLOAD_TOKEN
+            - NOW_DEPLOY_TOKEN
 
   - label: ":docker: GPU Tests (test-gpu-variant-tf-1.12.0-torch-1.2.0.dev20190601-py2.7)"
     agents:
@@ -122,8 +168,13 @@ steps:
           run: test-gpu-variant-tf-1.12.0-torch-1.2.0.dev20190601-py2.7
           config: docker-compose.test.yml
           env:
+            - BUILDKITE_BRANCH
+            - BUILDKITE_COMMIT
+            - BUILDKITE_PULL_REQUEST
             - BUILDKITE_TAG
+            - GH_STATUS_TOKEN
             - GH_UPLOAD_TOKEN
+            - NOW_DEPLOY_TOKEN
 
   - label: ":docker: GPU Tests (test-gpu-variant-tf-1.13.1-torch-1.2.0-py2.7)"
     agents:
@@ -134,8 +185,13 @@ steps:
           run: test-gpu-variant-tf-1.13.1-torch-1.2.0-py2.7
           config: docker-compose.test.yml
           env:
+            - BUILDKITE_BRANCH
+            - BUILDKITE_COMMIT
+            - BUILDKITE_PULL_REQUEST
             - BUILDKITE_TAG
+            - GH_STATUS_TOKEN
             - GH_UPLOAD_TOKEN
+            - NOW_DEPLOY_TOKEN
 
   - label: ":docker: GPU Tests (test-gpu-variant-tf-1.14.0-torch-1.3.0.dev20190820-py2.7)"
     agents:
@@ -146,8 +202,13 @@ steps:
           run: test-gpu-variant-tf-1.14.0-torch-1.3.0.dev20190820-py2.7
           config: docker-compose.test.yml
           env:
+            - BUILDKITE_BRANCH
+            - BUILDKITE_COMMIT
+            - BUILDKITE_PULL_REQUEST
             - BUILDKITE_TAG
+            - GH_STATUS_TOKEN
             - GH_UPLOAD_TOKEN
+            - NOW_DEPLOY_TOKEN
 
   - label: ":docker: GPU Tests (test-gpu-variant-tf-1.11.0-torch-1.1.0-py3)"
     agents:
@@ -158,8 +219,13 @@ steps:
           run: test-gpu-variant-tf-1.11.0-torch-1.1.0-py3
           config: docker-compose.test.yml
           env:
+            - BUILDKITE_BRANCH
+            - BUILDKITE_COMMIT
+            - BUILDKITE_PULL_REQUEST
             - BUILDKITE_TAG
+            - GH_STATUS_TOKEN
             - GH_UPLOAD_TOKEN
+            - NOW_DEPLOY_TOKEN
 
   - label: ":docker: GPU Tests (test-gpu-variant-tf-1.12.0-torch-1.2.0.dev20190601-py3)"
     agents:
@@ -170,8 +236,13 @@ steps:
           run: test-gpu-variant-tf-1.12.0-torch-1.2.0.dev20190601-py3
           config: docker-compose.test.yml
           env:
+            - BUILDKITE_BRANCH
+            - BUILDKITE_COMMIT
+            - BUILDKITE_PULL_REQUEST
             - BUILDKITE_TAG
+            - GH_STATUS_TOKEN
             - GH_UPLOAD_TOKEN
+            - NOW_DEPLOY_TOKEN
 
   - label: ":docker: GPU Tests (test-gpu-variant-tf-1.13.1-torch-1.2.0-py3)"
     agents:
@@ -182,8 +253,13 @@ steps:
           run: test-gpu-variant-tf-1.13.1-torch-1.2.0-py3
           config: docker-compose.test.yml
           env:
+            - BUILDKITE_BRANCH
+            - BUILDKITE_COMMIT
+            - BUILDKITE_PULL_REQUEST
             - BUILDKITE_TAG
+            - GH_STATUS_TOKEN
             - GH_UPLOAD_TOKEN
+            - NOW_DEPLOY_TOKEN
 
   - label: ":docker: GPU Tests (test-gpu-variant-tf-1.14.0-torch-1.3.0.dev20190820-py3)"
     agents:
@@ -194,7 +270,12 @@ steps:
           run: test-gpu-variant-tf-1.14.0-torch-1.3.0.dev20190820-py3
           config: docker-compose.test.yml
           env:
+            - BUILDKITE_BRANCH
+            - BUILDKITE_COMMIT
+            - BUILDKITE_PULL_REQUEST
             - BUILDKITE_TAG
+            - GH_STATUS_TOKEN
             - GH_UPLOAD_TOKEN
+            - NOW_DEPLOY_TOKEN
 
 

@@ -19,3 +19,8 @@ popd
 
 # Maybe upload a release
 python build/upload_release.py
+
+# Maybe build and upload docs
+if [[ ! -z "${DEPLOY_DOCS}" ]]; then
+    ./build/docs.sh
+fi

@@ -31,6 +31,15 @@ else
     sudo ./bazel.sh
     popd
     rm -rf $tmpdir
+
+    # These are used for deploying docs
+    # Note: We're only deploying docs from linux machines
+    # TODO(vip): Only install these when necessary
+    curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -
+    sudo apt-get install -y nodejs
+
+    # Install now
+    npm i -g now
 fi
 
 # Run a bazel command to extract the bazel installation

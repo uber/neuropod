@@ -1,0 +1,17 @@
+{
+  "version": 2,
+  "name": "neuropods",
+  "public": false,
+  "builds": [
+    {
+      "src": "index.js",
+      "use": "@now/node-server",
+      "config": {
+        "includeFiles": ["_static/**/*.js"]
+      }
+    }
+  ],
+  "routes": [
+    { "src": "/(.*)", "dest": "index.js" }
+  ]
+}

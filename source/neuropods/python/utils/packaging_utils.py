@@ -130,9 +130,9 @@ def packager(platform):
     # A decorator that wraps a `platform` specific packager with generic packaging and sets docstrings correctly
 
     def inner(f):
-        # Expects the functon to have a docstring including
-        # {common_doc_pre} and {common_doc_post}
-
+        # The default args for a packager come from combining the default args
+        # of _create_neuropod and the packager itself
+        @expand_default_kwargs(deps=[_create_neuropod, f])
         def wrapper(**kwargs):
             # Runs create neuropod
             _create_neuropod(
@@ -141,35 +141,33 @@ def packager(platform):
                 **kwargs
             )
 
+        # Expects the functon to have a docstring including
+        # {common_doc_pre} and {common_doc_post}
         # We can't easily use `.format` because the docstrings contain {}
         wrapper.__doc__  = f.__doc__.replace("{common_doc_pre}", COMMON_DOC_PRE).replace("{common_doc_post}", COMMON_DOC_POST)
         wrapper.__name__ = f.__name__
 
-        # The default args for a packager come from combining the default args
-        # of all of these functions
-        wrapper.neuropod_default_arg_list = _generate_default_arg_map([
-            config_utils.write_neuropod_config,
-            load_and_test_neuropod,
-            _create_neuropod,
-            f,
-        ])
         return wrapper
 
     return inner
 
 def _get_default_args(f):
     """
-    get the default args of a functon `f` as a list of tuples of the format
-    (arg, default_value)
+    get the default args of a functon `f` as  a map from an arg name to a default value
     """
+    if hasattr(f, "neuropod_default_args"):
+        return f.neuropod_default_args
+
     argspec = inspect.getargspec(f)
     if argspec.defaults:
         # Generate tuples of (arg, default_value)
         # According to https://docs.python.org/2/library/inspect.html#inspect.getargspec,
         # if defaults has n elements, they correspond to the last n elements listed in args.
-        return list(zip(reversed(argspec.args), reversed(argspec.defaults)))
+        default_values = zip(reversed(argspec.args), reversed(argspec.defaults))
 
-    return []
+        return {k : v for k, v in default_values}
+
+    return {}
 
 def _generate_default_arg_map(f_list):
     """
@@ -179,11 +177,22 @@ def _generate_default_arg_map(f_list):
     """
     default_args = {}
     for f in f_list:
-        for arg, default in _get_default_args(f):
-            default_args[arg] = default
+        default_args.update(_get_default_args(f))
 
     return default_args
 
+def expand_default_kwargs(deps):
+    # A decorator for setting neuropod_default_args. This data is used in the docs
+    # for showing default values for args in `kwargs`
+    def inner(f):
+        # The default args for `f` come from combining the default args
+        # of all of `deps` and `f`
+        f.neuropod_default_args = _generate_default_arg_map(deps + [f])
+        return f
+
+    return inner
+
+@expand_default_kwargs(deps=[config_utils.write_neuropod_config, load_and_test_neuropod])
 def _create_neuropod(
     neuropod_path,
     packager_fn,
