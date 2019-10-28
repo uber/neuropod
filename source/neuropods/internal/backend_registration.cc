@@ -62,7 +62,7 @@ void load_default_backend(const std::unordered_map<std::string, std::string> &de
     }
     else
     {
-        if (dlopen(backend_it->second.c_str(), RTLD_NOW) == nullptr)
+        if (dlopen(backend_it->second.c_str(), RTLD_NOW | RTLD_GLOBAL) == nullptr)
         {
             NEUROPOD_ERROR("Loading the default backend for type '" << type
                                                                     << "' failed. "

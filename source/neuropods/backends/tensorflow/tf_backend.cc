@@ -8,6 +8,7 @@
 
 #include <json/json.h>
 
+#include <dlfcn.h>
 #include <fstream>
 #include <iostream>
 #include <sstream>
@@ -94,6 +95,15 @@ TensorflowNeuropodBackend::TensorflowNeuropodBackend(const std::string &        
                                                      const RuntimeOptions &        options)
     : NeuropodBackendWithDefaultAllocator<TensorflowNeuropodTensor>(neuropod_path)
 {
+#ifndef __APPLE__
+    // We need to do this so the custom ops can see the symbols from TF
+    void * libtensorflow = dlopen("libtensorflow_framework.so", RTLD_NOW | RTLD_GLOBAL | RTLD_NOLOAD);
+    if (libtensorflow == nullptr)
+    {
+        NEUROPOD_ERROR("Failed to promote libtensorflow to RTLD_GLOBAL. Error from dlopen: " << dlerror());
+    }
+#endif
+
     // Load custom ops (if any)
     status_.reset(TF_NewStatus());
     for (const auto &item : model_config->custom_ops)
