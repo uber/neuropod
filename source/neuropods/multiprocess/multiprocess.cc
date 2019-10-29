@@ -19,6 +19,9 @@
 #include <vector>
 
 #include <signal.h>
+#include <spawn.h>
+
+extern char **environ;
 
 namespace neuropods
 {
@@ -29,30 +32,21 @@ namespace
 // Start a neuropod worker process given a control queue name
 pid_t start_worker_process(const std::string &control_queue_name)
 {
-    pid_t child_pid = fork();
-    if (child_pid < 0)
-    {
-        NEUROPOD_ERROR("Failed to start worker process.");
-    }
-    else if (child_pid == 0)
-    {
-        // In the child process
-        // Start the worker
-        execlp("neuropod_multiprocess_worker",
-               "neuropod_multiprocess_worker",
-               control_queue_name.c_str(),
-               static_cast<char *>(nullptr));
+    pid_t child_pid;
+    char * argv[] = {
+        "neuropod_multiprocess_worker",
+        const_cast<char *>(control_queue_name.c_str()),
+        NULL
+    };
 
-        // If we get here, execlp failed
-        std::cerr << "Failed to start the worker process. Failed with code: " << errno << ": " << strerror(errno)
-                  << std::endl;
-        exit(EXIT_FAILURE);
-    }
-    else
+    // Spawn a process
+    const auto status = posix_spawnp(&child_pid, "neuropod_multiprocess_worker", NULL, NULL, argv, environ);
+    if (status != 0)
     {
-        // In the parent process
-        return child_pid;
+        NEUROPOD_ERROR("Failed to start the worker process. Failed with code: " << status << ": " << strerror(status));
     }
+
+    return child_pid;
 }
 
 // Note: we don't register this with the library as a backend because it is not
