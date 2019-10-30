@@ -32,10 +32,20 @@ std::vector<int64_t> compute_strides(const std::vector<int64_t> &dims)
     return out;
 }
 
+size_t compute_num_elements(const std::vector<int64_t> &dims)
+{
+    // Get the number of elements in the tensor by multiplying all the dims together
+    return std::accumulate(dims.begin(), dims.end(), 1, std::multiplies<int64_t>());
+}
+
 } // namespace
 
 NeuropodTensor::NeuropodTensor(TensorType tensor_type, const std::vector<int64_t> dims)
-    : NeuropodValue(true), tensor_type_(tensor_type), dims_(dims), strides_(compute_strides(dims))
+    : NeuropodValue(true),
+      tensor_type_(tensor_type),
+      dims_(dims),
+      strides_(compute_strides(dims)),
+      num_elements_(compute_num_elements(dims))
 {
 }
 

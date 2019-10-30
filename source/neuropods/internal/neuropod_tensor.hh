@@ -113,6 +113,9 @@ private:
     // The strides of the tensor
     const std::vector<int64_t> strides_;
 
+    // The number of elements in the tensor
+    const size_t num_elements_;
+
 public:
     // Create a NeuropodTensor with a type and dims
     NeuropodTensor(TensorType tensor_type, const std::vector<int64_t> dims);
@@ -139,12 +142,7 @@ public:
     const std::vector<int64_t> &get_dims() const { return dims_; }
 
     // Get the number of elements in the tensor
-    // by multiplying all the dims together
-    size_t get_num_elements() const
-    {
-        const auto dims = get_dims();
-        return std::accumulate(dims.begin(), dims.end(), 1, std::multiplies<int64_t>());
-    }
+    size_t get_num_elements() const { return num_elements_; }
 
     TensorType get_tensor_type() const { return tensor_type_; }
 
