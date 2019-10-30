@@ -264,7 +264,7 @@ public:
     void add(size_t size_bytes, std::shared_ptr<SHMBlock> block)
     {
         std::lock_guard<std::mutex> lock(unused_pool_mutex_);
-        unused_pool_.insert(std::make_pair(size_bytes, block));
+        unused_pool_.emplace(std::make_pair(size_bytes, std::move(block)));
     }
 
     void clear()
@@ -289,20 +289,18 @@ std::shared_ptr<void> SHMAllocator::allocate_shm(size_t size_bytes, SHMBlockID &
         block = std::make_shared<SHMBlock>(size_bytes);
     }
 
-    // Create a shared pointer to the underlying data with a custom deleter
-    // that adds it to the unused pool
-    std::shared_ptr<void> out(block->get_data(), [this, size_bytes, block](void *unused) {
-        // This tensor was created by the current process and it is unused in the current process
-        // Add it to our unused pool to potentially be reused (once it's no longer used in other
-        // processes)
-        unused_pool_->add(size_bytes, block);
-    });
-
-    // Return the ID of this block as well
+    // Return the ID of this block to the caller
     auto id = block->get_id();
     memcpy(block_id.data(), &id, sizeof(id));
 
-    return out;
+    // Create a shared pointer to the underlying data with a custom deleter
+    // that adds it to the unused pool
+    return std::shared_ptr<void>(block->get_data(), [this, size_bytes, block](void *unused) {
+        // This tensor was created by the current process and it is unused in the current process
+        // Add it to our unused pool to potentially be reused (once it's no longer used in other
+        // processes)
+        unused_pool_->add(size_bytes, std::move(block));
+    });
 }
 
 std::shared_ptr<void> SHMAllocator::load_shm(const SHMBlockID &block_id)
