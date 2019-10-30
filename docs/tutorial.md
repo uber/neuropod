@@ -11,14 +11,15 @@ The Neuropod packaging and inference interfaces also have comprehensive docstrin
 The first step for packaging a model is to define a “problem” (e.g. 2d object detection).
 
 A “problem” is composed of 4 things:
+
 - an `input_spec`
-  - A list of dicts specifying the name, datatype, and shape of an input tensor
+    - A list of dicts specifying the name, datatype, and shape of an input tensor
 - an `output_spec`
-  - A list of dicts specifying the name, datatype, and shape of an output tensor
-- `test_input_data` (optional)
-  - If provided, Neuropods will run inference immediately after packaging to verify that the model was packaged correctly. Must be provided if `test_output_data` is provided
-- `test_output_data` (optional)
-  - If provided, Neuropods will test that the output of inference with `test_input_data` matches `test_output_data`
+    - A list of dicts specifying the name, datatype, and shape of an output tensor
+- `test_input_data` *(optional)*
+    - If provided, Neuropods will run inference immediately after packaging to verify that the model was packaged correctly. Must be provided if `test_output_data` is provided
+- `test_output_data` *(optional)*
+    - If provided, Neuropods will test that the output of inference with `test_input_data` matches `test_output_data`
 
 The shape of a tensor can include `None` in which case any value is acceptable. You can also use “symbols” in these shape definitions. Every instance of that symbol must resolve to the same value at runtime.
 
@@ -51,7 +52,7 @@ The symbol `num_inputs` in the shapes of `x` and `y` must resolve to the same va
 
 For a definition of a “real” problem, see the example problem definitions section in the appendix.
 
-Now that we have a problem defined, we’re going to see how to package a model in each of the three currently supported DL frameworks.
+Now that we have a problem defined, we’re going to see how to package a model in each of the currently supported DL frameworks.
 
 
 ### TensorFlow
@@ -60,7 +61,11 @@ There are two ways to package a TensorFlow model. One is with a `GraphDef` the o
 
 #### GraphDef
 
+If we have a function that returns a `GraphDef` like:
+
 ```py
+import tensorflow as tf
+
 def create_tf_addition_model():
     """
     A simple addition model
@@ -74,10 +79,13 @@ def create_tf_addition_model():
             out = tf.add(x, y, name="out")
 
     return g.as_graph_def()
+```
 
-# `create_tensorflow_neuropod` runs inference with the test data immediately
-# after creating the neuropod. Raises a ValueError if the model output
-# does not match the expected output.
+we can package the model as follows:
+
+```py
+from neuropods.packagers import create_tensorflow_neuropod
+
 create_tensorflow_neuropod(
     neuropod_path=neuropod_path,
     model_name="addition_model",
@@ -94,14 +102,18 @@ create_tensorflow_neuropod(
 )
 ```
 
+
+!!! note
+    `create_tensorflow_neuropod` runs inference with the test data immediately after creating the neuropod. Raises a `ValueError` if the model output does not match the expected output.
+
+
 #### Path to a Frozen Graph
 
 If you already have a frozen graph, you can package the model like this:
 
 ```py
-# `create_tensorflow_neuropod` runs inference with the test data immediately
-# after creating the neuropod. Raises a ValueError if the model output
-# does not match the expected output.
+from neuropods.packagers import create_tensorflow_neuropod
+
 create_tensorflow_neuropod(
     neuropod_path=neuropod_path,
     model_name="addition_model",
@@ -118,9 +130,20 @@ create_tensorflow_neuropod(
 )
 ```
 
+!!! note
+    `create_tensorflow_neuropod` runs inference with the test data immediately after creating the neuropod. Raises a `ValueError` if the model output does not match the expected output.
+
 ### PyTorch
 
-Packaging a PyTorch model is a bit more complicated because you need python code and the weights in order to run the network.
+!!! tip
+    Packaging a PyTorch model is a bit more complicated because you need python code and the weights in order to run the network.
+
+    Converting your model to TorchScript is recommended if possible.
+
+In order to create a portable PyTorch neuropod package, we need to follow a few guidelines:
+
+ - Absolute imports (e.g. `import torch`) are okay as long as your runtime environment has the package installed
+ - For Python 3, all other imports within your package must be relative
 
 Let's say our addition model looks like this (and is stored at `/my/model/code/dir/main.py`):
 
@@ -139,22 +162,26 @@ def get_model(data_root):
 ```
 
 In order to package it, we need 4 things:
+
 - The paths to any data we want to store (e.g. the model weights)
 - The path to the `python_root` of the code along with relative paths for any dirs within the `python_root` we want to package
 - An entrypoint function that returns a model given a path to the packaged data. See the docstring for `create_pytorch_neuropod` for more details and examples.
 - The dependencies of our model. These should be python packages.
 
+!!! tip
+    See the API docs for `create_pytorch_neuropod` for detailed descriptions of every parameter
+
 For our model:
+
 - We don't need to store any data (because our model has no weights)
 - Our python root is `/my/model/code/dir` and we want to store all the code in it
 - Our entrypoint function is `get_model` and our entrypoint_package is `main` (because the code is in `main.py` in the python root)
 
-This translates to the following. See the docstring for `create_pytorch_neuropod` for detailed descriptions of every parameter
+This translates to the following:
 
 ```py
-# `create_pytorch_neuropod` runs inference with the test data immediately
-# after creating the neuropod. Raises a ValueError if the model output
-# does not match the expected output.
+from neuropods.packagers import create_pytorch_neuropod
+
 create_pytorch_neuropod(
     neuropod_path=neuropod_path,
     model_name="addition_model",
@@ -175,11 +202,19 @@ create_pytorch_neuropod(
 )
 ```
 
+!!! note
+    `create_pytorch_neuropod` runs inference with the test data immediately after creating the neuropod. Raises a `ValueError` if the model output does not match the expected output.
+
 ### TorchScript
 
 TorchScript is much easier to package than PyTorch (since we don't need to store any python code).
 
+If we have an addition model that looks like:
+
+
 ```py
+import torch
+
 class AdditionModel(torch.jit.ScriptModule):
     """
     A simple addition model
@@ -191,12 +226,11 @@ class AdditionModel(torch.jit.ScriptModule):
         }
 ```
 
-To package this model, we can do the following:
+We can package it by running:
 
 ```py
-# `create_torchscript_neuropod` runs inference with the test data immediately
-# after creating the neuropod. Raises a ValueError if the model output
-# does not match the expected output.
+from neuropods.packagers import create_torchscript_neuropod
+
 create_torchscript_neuropod(
     neuropod_path=neuropod_path,
     model_name="addition_model",
@@ -207,6 +241,17 @@ create_torchscript_neuropod(
     test_expected_out=addition_problem_definition.TEST_EXPECTED_OUT,
 )
 ```
+
+!!! note
+    `create_torchscript_neuropod` runs inference with the test data immediately after creating the neuropod. Raises a `ValueError` if the model output does not match the expected output.
+
+### Keras
+
+TODO(vip): Keras example
+
+### Python
+
+TODO(vip): Example with arbitrary python code?
 
 ## Run Inference
 
@@ -230,42 +275,47 @@ with load_neuropod(ADDITION_MODEL_PATH) as neuropod:
 ```cpp
 #include "neuropods/neuropods.hh"
 
-const std::vector<int64_t> shape = {4};
+int main()
+{
+    const std::vector<int64_t> shape = {4};
 
-// To show two different ways of adding data, one of our inputs is an array
-// and the other is a vector.
-const float[]            x_data = {1, 2, 3, 4};
-const std::vector<float> y_data = {5, 6, 7, 8};
+    // To show two different ways of adding data, one of our inputs is an array
+    // and the other is a vector.
+    const float[]            x_data = {1, 2, 3, 4};
+    const std::vector<float> y_data = {5, 6, 7, 8};
 
-// Load the neuropod
-Neuropod neuropod(ADDITION_MODEL_PATH);
+    // Load the neuropod
+    Neuropod neuropod(ADDITION_MODEL_PATH);
 
-// Add the input data using two different signatures of `copy_from`
-// (one with a pointer and size, one with a vector)
-auto x_tensor = neuropod.allocate_tensor<float>(shape);
-x_tensor->copy_from(x_data, 4);
+    // Add the input data using two different signatures of `copy_from`
+    // (one with a pointer and size, one with a vector)
+    auto x_tensor = neuropod.allocate_tensor<float>(shape);
+    x_tensor->copy_from(x_data, 4);
 
-auto y_tensor = neuropod.allocate_tensor<float>(shape);
-y_tensor->copy_from(y_data);
+    auto y_tensor = neuropod.allocate_tensor<float>(shape);
+    y_tensor->copy_from(y_data);
 
-// Run inference
-const auto output_data = neuropod.infer({
-    {"x", x_tensor},
-    {"y", y_tensor}
-});
+    // Run inference
+    const auto output_data = neuropod.infer({
+        {"x", x_tensor},
+        {"y", y_tensor}
+    });
 
-const auto out_tensor = output_data->at("out");
+    const auto out_tensor = output_data->at("out");
 
-// {6, 8, 10, 12}
-const auto out_vector = out_tensor->as_typed_tensor<float>()->get_data_as_vector();
+    // {6, 8, 10, 12}
+    const auto out_vector = out_tensor->as_typed_tensor<float>()->get_data_as_vector();
 
-// {4}
-const auto out_shape  = out_tensor->get_dims();
+    // {4}
+    const auto out_shape  = out_tensor->get_dims();
+}
 ```
+!!! note
+    This shows basic usage of the C++ API. For more flexible and memory-efficient usage, please see the API docs
 
-# Appendix
+## Appendix
 
-## Example Problem Definitions
+### Example Problem Definitions
 
 The problem definition for 2d object detection may look something like this:
 
