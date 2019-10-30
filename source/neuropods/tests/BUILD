@@ -3,6 +3,50 @@
 #
 
 cc_test(
+    name = "benchmark_accessor",
+    srcs = [
+        "benchmark_accessor.cc",
+        "//neuropods:libneuropods.so",
+        "//neuropods/backends/test_backend:libneuropod_test_backend.so",
+    ],
+    deps = [
+        "@benchmark//:benchmark_main",
+        "//neuropods/backends/test_backend:test_backend_hdrs",
+        "//neuropods:neuropods_hdrs",
+    ],
+)
+
+cc_test(
+    name = "benchmark_multiprocess",
+    srcs = [
+        "benchmark_multiprocess.cc",
+        "//neuropods:libneuropods.so",
+    ],
+    deps = [
+        "@benchmark//:benchmark_main",
+        "//neuropods:neuropods_hdrs",
+        "//neuropods/multiprocess:multiprocess_hdrs",
+    ],
+    data = [
+        "//neuropods/tests/test_data",
+        "//neuropods/backends/python_bridge:libneuropod_pythonbridge_backend.so",
+        "//neuropods/backends/torchscript:libneuropod_torchscript_backend.so",
+        "//neuropods/backends/tensorflow:libneuropod_tensorflow_backend.so",
+    ],
+)
+
+cc_test(
+    name = "benchmark_shm_allocator",
+    srcs = [
+        "benchmark_shm_allocator.cc",
+    ],
+    deps = [
+        "@benchmark//:benchmark_main",
+        "//neuropods/multiprocess:shm_allocator",
+    ],
+)
+
+cc_test(
     name = "test_input_output",
     srcs = [
         "test_input_output.cc",
@@ -127,14 +171,6 @@ cc_test(
     ],
 )
 
-cc_library(
-    name = "timing_utils",
-    hdrs = ["timing_utils.hh"],
-    visibility = [
-        "//visibility:public",
-    ],
-)
-
 cc_test(
     name = "test_accessor",
     srcs = [
@@ -143,7 +179,6 @@ cc_test(
         "//neuropods/backends/test_backend:libneuropod_test_backend.so",
     ],
     deps = [
-        ":timing_utils",
         "@gtest//:main",
         "//neuropods/backends/test_backend:test_backend_hdrs",
         "//neuropods:neuropods_hdrs",
@@ -156,9 +191,7 @@ cc_test(
         "test_shm_allocator.cc",
     ],
     deps = [
-        ":timing_utils",
         "@gtest//:main",
-        "@benchmark//:benchmark",
         "//neuropods/multiprocess:shm_allocator",
     ],
 )
@@ -169,7 +202,6 @@ cc_test(
         "test_shm_tensor.cc",
     ],
     deps = [
-        ":timing_utils",
         "@gtest//:main",
         "//neuropods/multiprocess:shm_tensor",
     ],
@@ -181,7 +213,6 @@ cc_test(
         "test_ipc_control_channel.cc",
     ],
     deps = [
-        ":timing_utils",
         "@gtest//:main",
         "//neuropods/multiprocess:ipc_control_channel",
     ],
@@ -194,7 +225,6 @@ cc_test(
         "//neuropods:libneuropods.so",
     ],
     deps = [
-        ":timing_utils",
         "@gtest//:main",
         "//neuropods/multiprocess:multiprocess_worker",
     ],
@@ -219,24 +249,6 @@ cc_test(
     ],
     deps = [
         ":neuropods_test_utils",
-        "//neuropods/multiprocess:multiprocess_hdrs",
-    ],
-    data = [
-        "//neuropods/backends/python_bridge:libneuropod_pythonbridge_backend.so",
-        "//neuropods/backends/torchscript:libneuropod_torchscript_backend.so",
-        "//neuropods/backends/tensorflow:libneuropod_tensorflow_backend.so",
-    ],
-)
-
-cc_test(
-    name = "test_multiprocess_perf",
-    srcs = [
-        "test_multiprocess_perf.cc",
-        "//neuropods:libneuropods.so",
-    ],
-    deps = [
-        ":neuropods_test_utils",
-        ":timing_utils",
         "//neuropods/multiprocess:multiprocess_hdrs",
     ],
     data = [

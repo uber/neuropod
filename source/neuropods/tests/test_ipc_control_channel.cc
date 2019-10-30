@@ -5,7 +5,6 @@
 #include "gtest/gtest.h"
 #include "neuropods/multiprocess/ipc_control_channel.hh"
 #include "neuropods/multiprocess/shm_tensor.hh"
-#include "timing_utils.hh"
 
 TEST(test_ipc_control_channel, simple)
 {

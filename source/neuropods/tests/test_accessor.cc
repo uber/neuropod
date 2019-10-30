@@ -5,9 +5,8 @@
 #include "gtest/gtest.h"
 #include "neuropods/backends/test_backend/test_neuropod_backend.hh"
 #include "neuropods/neuropods.hh"
-#include "timing_utils.hh"
 
-TEST(test_accessor_timing, test_accessor_timing)
+TEST(test_accessor, test_accessor)
 {
     // Test that the config is valid
     neuropods::TestNeuropodBackend backend;
@@ -19,7 +18,8 @@ TEST(test_accessor_timing, test_accessor_timing)
     auto accessor = tensor1->accessor<2>();
     auto data_ptr = tensor2->get_raw_data_ptr();
 
-    auto native_time = time_lambda<std::chrono::nanoseconds>(100, 1000, [data_ptr]() {
+    // Manual indexing
+    {
         float *curr = data_ptr;
         for (int i = 0; i < 3; i++)
         {
@@ -28,9 +28,10 @@ TEST(test_accessor_timing, test_accessor_timing)
                 curr[i * 5 + j] = i * 5 + j;
             }
         }
-    });
+    };
 
-    auto accessor_time = time_lambda<std::chrono::nanoseconds>(100, 1000, [&accessor]() {
+    // Accessor
+    {
         for (int i = 0; i < 3; i++)
         {
             for (int j = 0; j < 5; j++)
@@ -38,16 +39,10 @@ TEST(test_accessor_timing, test_accessor_timing)
                 accessor[i][j] = i * 5 + j;
             }
         }
-    });
+    };
 
     // Make sure that tensor 1 and tensor 2 are equal
     EXPECT_EQ(
         memcmp(tensor1->get_raw_data_ptr(), tensor2->get_raw_data_ptr(), tensor1->get_num_elements() * sizeof(float)),
         0);
-
-    std::cout << "Native loop time (nanoseconds): " << native_time << ". Accessor time (nanoseconds): " << accessor_time
-              << std::endl;
-
-    // Note: we're being generous to avoid flakiness on CI
-    EXPECT_LE(accessor_time, native_time * 5);
 }
