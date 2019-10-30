@@ -5,10 +5,11 @@
 import tensorflow as tf
 
 from neuropods.backends.tensorflow.packager import create_tensorflow_neuropod
-from neuropods.utils.packaging_utils import set_packager_docstring
+from neuropods.utils.packaging_utils import set_packager_docstring, expand_default_kwargs
 
 
 @set_packager_docstring
+@expand_default_kwargs(deps=[create_tensorflow_neuropod])
 def create_keras_neuropod(
         sess,
         model,
