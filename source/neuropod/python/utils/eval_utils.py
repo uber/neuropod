@@ -53,7 +53,7 @@ def print_output_summary(out):
 
 
 def load_and_test_native(
-    neuropod_path, test_input_data, test_expected_out=None, **kwargs
+    neuropod_path, test_input_data, test_expected_out=None, neuropod_load_args={}
 ):
     """
     Loads a neuropod using the python bindings and runs inference.
@@ -65,9 +65,21 @@ def load_and_test_native(
     # Converts unicode to ascii for Python 3
     test_input_data = maybe_convert_bindings_types(test_input_data)
 
-    out = eval_in_new_process(
-        neuropod_path, test_input_data, extra_args=["--use-native"], **kwargs
-    )
+    if neuropod_load_args:
+        # Load the model in a new python process (and use the bindings from there) if we have
+        # load args
+        out = eval_in_new_process(
+            neuropod_path,
+            test_input_data,
+            extra_args=["--use-native"],
+            neuropod_load_args=neuropod_load_args,
+        )
+    else:
+        from neuropod_native import load_neuropod_in_new_process
+
+        # Load the model using native out-of-process execution
+        model = load_neuropod_in_new_process(neuropod_path, True)
+        out = model.infer(test_input_data)
 
     # Check the output
     if test_expected_out is not None:

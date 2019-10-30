@@ -4,6 +4,7 @@
 
 #include "neuropod/backends/test_backend/test_neuropod_tensor.hh"
 #include "neuropod/bindings/python_bindings.hh"
+#include "neuropod/multiprocess/multiprocess.hh"
 #include "neuropod/neuropod.hh"
 #include "neuropod/serialization/serialization.hh"
 
@@ -123,6 +124,8 @@ PYBIND11_MODULE(neuropod_native, m)
     m.def("deserialize_dict",
           &deserialize_valuemap_binding,
           "Deserialize a string of bytes to a NeuropodValueMap (and return it as a dict of numpy arrays)");
+
+    m.def("load_neuropod_in_new_process", &load_neuropod_in_new_process, "Load a neuropod in a new process");
 }
 
 } // namespace neuropod
