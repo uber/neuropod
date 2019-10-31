@@ -29,6 +29,7 @@ cc_library(
     ],
     deps = [
         "//neuropods/internal:neuropod_tensor",
+        "//neuropods/internal:neuropod_tensor_raw_data_access",
         "//neuropods:neuropods_hdrs",
         "@pybind11_repo//:pybind11",
     ],

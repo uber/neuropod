@@ -5,6 +5,7 @@
 #include "neuropods/bindings/python_bindings.hh"
 
 #include "neuropods/internal/neuropod_tensor.hh"
+#include "neuropods/internal/neuropod_tensor_raw_data_access.hh"
 #include "neuropods/neuropods.hh"
 
 #include <pybind11/numpy.h>
@@ -18,29 +19,6 @@ namespace py = pybind11;
 
 namespace
 {
-
-struct create_array_visitor : public NeuropodTensorVisitor<py::array>
-{
-    template <typename T>
-    py::array operator()(TypedNeuropodTensor<T> *tensor, std::shared_ptr<NeuropodTensor> &value) const
-    {
-        auto dims = tensor->get_dims();
-        auto data = tensor->get_raw_data_ptr();
-
-        // Make sure we don't deallocate the tensor until the numpy array is deallocated
-        auto deleter        = [value](void *unused) {};
-        auto deleter_handle = register_deleter(deleter, nullptr);
-        auto capsule        = py::capsule(deleter_handle, [](void *handle) { run_deleter(handle); });
-        return py::array_t<T>(dims, data, capsule);
-    }
-
-    py::array operator()(TypedNeuropodTensor<std::string> *tensor, std::shared_ptr<NeuropodTensor> &value) const
-    {
-        auto arr = py::array(py::cast(tensor->get_data_as_vector()));
-        arr.resize(tensor->get_dims());
-        return arr;
-    }
-};
 
 TensorType get_array_type(py::array &array)
 {
@@ -58,6 +36,27 @@ TensorType get_array_type(py::array &array)
     }
 
     NEUROPOD_ERROR("Unsupported array type in python bindings: " << array.dtype().kind())
+#undef IS_INSTANCE_CHECK
+}
+
+
+pybind11::dtype get_py_type(const NeuropodTensor &tensor)
+{
+#define GET_TYPE(CPP_TYPE, NEUROPOD_TYPE)       \
+    case NEUROPOD_TYPE:                         \
+    {                                           \
+        return pybind11::dtype::of<CPP_TYPE>(); \
+    }
+
+
+    const auto &tensor_type = tensor.get_tensor_type();
+    switch (tensor_type)
+    {
+        FOR_EACH_TYPE_MAPPING_EXCEPT_STRING(GET_TYPE)
+    default:
+        NEUROPOD_ERROR("Unsupported array type in python bindings: " << tensor_type);
+    }
+#undef GET_TYPE
 }
 
 std::shared_ptr<NeuropodTensor> tensor_from_string_numpy(NeuropodTensorAllocator &allocator,
@@ -123,7 +122,26 @@ std::shared_ptr<NeuropodTensor> tensor_from_numpy(NeuropodTensorAllocator &alloc
 
 py::array tensor_to_numpy(std::shared_ptr<NeuropodTensor> value)
 {
-    return value->apply_visitor(create_array_visitor{}, value);
+    auto tensor = value->as_tensor();
+
+    if (tensor->get_tensor_type() == STRING_TENSOR)
+    {
+        // This makes a copy
+        auto arr = py::array(py::cast(tensor->as_typed_tensor<std::string>()->get_data_as_vector()));
+        arr.resize(tensor->get_dims());
+        return arr;
+    }
+    else
+    {
+        auto dims = tensor->get_dims();
+        auto data = NeuropodTensorRawDataAccess::get_untyped_data_ptr(*tensor);
+
+        // Make sure we don't deallocate the tensor until the numpy array is deallocated
+        auto deleter        = [value](void *unused) {};
+        auto deleter_handle = register_deleter(deleter, nullptr);
+        auto capsule        = py::capsule(deleter_handle, [](void *handle) { run_deleter(handle); });
+        return py::array(get_py_type(*tensor), dims, data, capsule);
+    }
 }
 
 NeuropodValueMap from_numpy_dict(NeuropodTensorAllocator &allocator, py::dict &items)

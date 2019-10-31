@@ -76,6 +76,7 @@ cc_library(
         "//neuropods:__subpackages__",
     ],
     deps = [
+        ":neuropod_tensor_raw_data_access",
         "@boost_repo//:boost",
         "//neuropods/backends:neuropod_backend",
         "//neuropods/serialization:serialization_hdrs",
@@ -161,6 +162,30 @@ cc_library(
         "//neuropods:__subpackages__",
     ],
     linkopts = ["-lz"],
+)
+
+cc_library(
+    name = "neuropod_tensor_raw_data_access",
+    hdrs = [
+        "neuropod_tensor_raw_data_access.hh",
+    ],
+    visibility = [
+        "//neuropods:__subpackages__",
+    ],
+)
+
+cc_library(
+    name = "neuropod_tensor_raw_data_access_impl",
+    srcs = [
+        "neuropod_tensor_raw_data_access.cc",
+    ],
+    deps = [
+        ":neuropod_tensor",
+        ":neuropod_tensor_raw_data_access",
+    ],
+    visibility = [
+        "//neuropods:__subpackages__",
+    ],
 )
 
 # Package all the header files

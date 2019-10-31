@@ -96,13 +96,6 @@ protected:
     }
 };
 
-// Lets us write visitor functions to cleanly interact with `TypedNeuropodTensor`s
-template <typename ReturnType>
-struct NeuropodTensorVisitor
-{
-    typedef ReturnType return_type;
-};
-
 // A type erased version of a TypedNeuropodTensor. See the documentation for
 // TypedNeuropodTensor for more details.
 // Backends should not extend this class directly for their tensor implementations
@@ -196,48 +189,6 @@ public:
         return (*this->template as_typed_tensor<T>())[0];
     }
 
-    template <typename Visitor, typename... Params>
-    typename Visitor::return_type apply_visitor(const Visitor &visitor, Params &&... params)
-    {
-        // Downcast to the appropriate TypedNeuropodTensor and call the visitor
-#define RUN_VISITOR_FN(CPP_TYPE, NEUROPOD_TYPE)                                       \
-    case NEUROPOD_TYPE:                                                               \
-    {                                                                                 \
-        return visitor(as_typed_tensor<CPP_TYPE>(), std::forward<Params>(params)...); \
-    }
-
-        // Switch on the type
-        switch (get_tensor_type())
-        {
-            FOR_EACH_TYPE_MAPPING_INCLUDING_STRING(RUN_VISITOR_FN)
-        default:
-            NEUROPOD_ERROR("Invalid tensor type" << get_tensor_type());
-        }
-
-#undef RUN_VISITOR_FN
-    }
-
-    template <typename Visitor, typename... Params>
-    typename Visitor::return_type apply_visitor(const Visitor &visitor, Params &&... params) const
-    {
-        // Downcast to the appropriate TypedNeuropodTensor and call the visitor
-#define RUN_VISITOR_FN(CPP_TYPE, NEUROPOD_TYPE)                                       \
-    case NEUROPOD_TYPE:                                                               \
-    {                                                                                 \
-        return visitor(as_typed_tensor<CPP_TYPE>(), std::forward<Params>(params)...); \
-    }
-
-        // Switch on the type
-        switch (get_tensor_type())
-        {
-            FOR_EACH_TYPE_MAPPING_INCLUDING_STRING(RUN_VISITOR_FN)
-        default:
-            NEUROPOD_ERROR("Invalid tensor type" << get_tensor_type());
-        }
-
-#undef RUN_VISITOR_FN
-    }
-
     // This checks equality of contents, not of addresses or underlying implementations
     // (e.g. comparing a TorchNeuropodTensor and a TensorflowNeuropodTensor with identical
     // shapes, types, and content would return true)
@@ -279,6 +230,7 @@ protected:
     const std::vector<int64_t> &get_strides() const { return strides_; }
 
     // Get a raw void * to the underlying data
+    friend struct NeuropodTensorRawDataAccess;
     virtual void *      get_untyped_data_ptr()       = 0;
     virtual const void *get_untyped_data_ptr() const = 0;
 
