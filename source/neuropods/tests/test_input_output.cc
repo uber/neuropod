@@ -91,6 +91,7 @@ TEST(test_allocate_tensor, add_tensors_and_validate)
         const auto ten = serialize_deserialize(*allocator, a_ten);
         check_tensor_eq_ptr(ten, a_data.data(), a_data.size());
         check_vectors_eq(ten->get_dims(), a_shape);
+        EXPECT_EQ(*a_ten, *ten);
     }
 
     // Validate the internal state for b
@@ -98,6 +99,7 @@ TEST(test_allocate_tensor, add_tensors_and_validate)
         const auto ten = serialize_deserialize(*allocator, b_ten);
         check_tensor_eq_ptr(ten, b_data.data(), b_data.size());
         check_vectors_eq(ten->get_dims(), b_shape);
+        EXPECT_EQ(*b_ten, *ten);
     }
 
     // Validate the internal state for c
@@ -105,6 +107,7 @@ TEST(test_allocate_tensor, add_tensors_and_validate)
         const auto ten = serialize_deserialize(*allocator, c_ten);
         check_tensor_eq_ptr(ten, c_data, 4);
         check_vectors_eq(ten->get_dims(), c_shape);
+        EXPECT_EQ(*c_ten, *ten);
     }
 
     // Validate the internal state for d
@@ -112,6 +115,7 @@ TEST(test_allocate_tensor, add_tensors_and_validate)
         const auto ten = serialize_deserialize(*allocator, d_ten);
         check_tensor_eq_ptr(ten, d_data, 4);
         check_vectors_eq(ten->get_dims(), d_shape);
+        EXPECT_EQ(*d_ten, *ten);
     }
 }
 

@@ -77,6 +77,11 @@ public:
     template <typename T>
     const TypedNeuropodTensor<T> *as_typed_tensor() const;
 
+    // This checks equality of contents, not of addresses or underlying implementations
+    // (e.g. comparing a TorchNeuropodTensor and a TensorflowNeuropodTensor with identical
+    // shapes, types, and content would return true)
+    bool operator==(const NeuropodValue &other) const;
+
     // Don't override this manually
     // Use the SET_SERIALIZE_TAG macro instead
     virtual std::string get_serialize_tag() const = 0;
@@ -233,6 +238,17 @@ public:
 #undef RUN_VISITOR_FN
     }
 
+    // This checks equality of contents, not of addresses or underlying implementations
+    // (e.g. comparing a TorchNeuropodTensor and a TensorflowNeuropodTensor with identical
+    // shapes, types, and content would return true)
+    bool operator==(const NeuropodTensor &other) const;
+
+    bool operator==(const NeuropodValue &other) const
+    {
+        // Defer to NeuropodValue equality
+        return other == *this;
+    }
+
     SET_SERIALIZE_TAG("neuropodtensor")
 
 protected:
@@ -261,6 +277,12 @@ protected:
 
     // Get the strides of the tensor
     const std::vector<int64_t> &get_strides() const { return strides_; }
+
+    // Get a raw void * to the underlying data
+    virtual void *      get_untyped_data_ptr()       = 0;
+    virtual const void *get_untyped_data_ptr() const = 0;
+
+    virtual size_t get_bytes_per_element() const = 0;
 };
 
 // A TypedNeuropodTensor is a NeuropodTensor of a specific type.
@@ -273,8 +295,8 @@ public:
 
     virtual ~TypedNeuropodTensor() {}
 
-    virtual T *      get_raw_data_ptr()       = 0;
-    virtual const T *get_raw_data_ptr() const = 0;
+    T *get_raw_data_ptr() { return static_cast<T *>(get_untyped_data_ptr()); }
+    const T *get_raw_data_ptr() const { return static_cast<const T *>(get_untyped_data_ptr()); }
 
     template <size_t N>
     TensorAccessor<T, N> accessor()
@@ -405,6 +427,8 @@ public:
         out << ']';
         return out;
     }
+protected:
+    size_t get_bytes_per_element() const { return sizeof(T); }
 };
 
 // A specialization for strings
@@ -424,6 +448,23 @@ public:
 
     // Get the data in the string tensor
     virtual std::vector<std::string> get_data_as_vector() const = 0;
+
+protected:
+    // We can't get a raw pointer from a string tensor
+    void *get_untyped_data_ptr()
+    {
+        NEUROPOD_ERROR("`get_untyped_data_ptr` is not supported for string tensors");
+    };
+
+    const void *get_untyped_data_ptr() const
+    {
+        NEUROPOD_ERROR("`get_untyped_data_ptr` is not supported for string tensors");
+    };
+
+    size_t get_bytes_per_element() const
+    {
+        NEUROPOD_ERROR("`get_bytes_per_element` is not supported for string tensors");
+    };
 };
 
 // Utility to make a tensor of a specific type

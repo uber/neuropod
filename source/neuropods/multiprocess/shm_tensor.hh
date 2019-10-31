@@ -116,9 +116,9 @@ public:
     ~SHMNeuropodTensor() = default;
 
     // Get a pointer to the underlying data
-    T *get_raw_data_ptr() { return reinterpret_cast<T *>(data_->data); }
+    void *get_untyped_data_ptr() { return data_->data; }
 
-    const T *get_raw_data_ptr() const { return reinterpret_cast<T *>(data_->data); }
+    const void *get_untyped_data_ptr() const { return data_->data; }
 
     SHMBlockID get_native_data() { return block_id_; };
 };

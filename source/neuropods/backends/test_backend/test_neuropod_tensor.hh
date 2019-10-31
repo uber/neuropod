@@ -43,10 +43,11 @@ public:
 
     ~TestNeuropodTensor() { run_deleter(deleter_handle_); }
 
+protected:
     // Get a pointer to the underlying data
-    T *get_raw_data_ptr() { return static_cast<T *>(data_); }
+    void *get_untyped_data_ptr() { return data_; }
 
-    const T *get_raw_data_ptr() const { return static_cast<T *>(data_); }
+    const void *get_untyped_data_ptr() const { return data_; }
 };
 
 // Specialization for strings
