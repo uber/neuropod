@@ -83,16 +83,17 @@ public:
         }
     }
 
-    // Get a pointer to the underlying data
-    T *get_raw_data_ptr() { return static_cast<T *>(TF_TensorData(tensor)); }
-
-    // Get a pointer to the underlying data
-    const T *get_raw_data_ptr() const { return static_cast<T *>(TF_TensorData(tensor)); }
-
     TF_Tensor *get_native_data() { return tensor; }
 
     // The underlying TF tensor
     TF_Tensor *tensor;
+
+protected:
+    // Get a pointer to the underlying data
+    void *get_untyped_data_ptr() { return TF_TensorData(tensor); }
+
+    // Get a pointer to the underlying data
+    const void *get_untyped_data_ptr() const { return TF_TensorData(tensor); }
 };
 
 // Specialization for strings

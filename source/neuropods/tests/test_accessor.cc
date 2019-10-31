@@ -42,7 +42,5 @@ TEST(test_accessor, test_accessor)
     };
 
     // Make sure that tensor 1 and tensor 2 are equal
-    EXPECT_EQ(
-        memcmp(tensor1->get_raw_data_ptr(), tensor2->get_raw_data_ptr(), tensor1->get_num_elements() * sizeof(float)),
-        0);
+    EXPECT_EQ(*tensor1, *tensor2);
 }
