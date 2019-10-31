@@ -3,6 +3,7 @@
 Neuropods uses [Bazel](https://bazel.build/) as a build system.
 
 There are a few ways to build the project:
+
 - Natively on Linux and Mac
 - In Docker (preferred)
 
@@ -61,7 +62,7 @@ In order to debug and/or experiment, it may be useful to build interactively wit
 ./build/test.sh
 ```
 
-# Tests
+## Tests
 
 Neuropods has a set of tests implemented in C++ and a set of tests implemented in Python. Test coverage is described below:
 
@@ -73,18 +74,20 @@ Neuropods has a set of tests implemented in C++ and a set of tests implemented i
 
 The Python tests run against both the Python and C++ libraries by using python bindings. This means that many tests only need to be written in Python.
 
-# CI
+## CI
 
-## Build Matrix
+### Build Matrix
 
 Our build matrix is defined as all combinations of the following:
 
 **Platform:**
+
  - Ubuntu 16.04 GPU (in Docker) - Buildkite
  - Ubuntu 16.04 CPU (in Docker) - Buildkite
  - Mac CPU (native) - Travis CI
 
 **Python:**
+
  - 2.7
  - 3
 
@@ -104,10 +107,11 @@ This is a total of 25 builds (4 * 2 * 3 + 1) running in CI
 
 The current build matrix is defined in [build/ci_matrix.py](https://github.com/uber/neuropods/blob/master/build/ci_matrix.py#L73-L91)
 
-## Future additions
+### Future additions
 
 We're also planning on adding the following configurations to the build matrix:
 
 **Configs:**
+
  - ASAN + Code Coverage
  - Release
