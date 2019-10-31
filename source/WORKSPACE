@@ -6,9 +6,9 @@ load("//bazel:libtorch.bzl", "libtorch_repository")
 # Use an internal LLVM toolchain instead of the system one
 http_archive(
     name = "com_grail_bazel_toolchain",
-    strip_prefix = "bazel-toolchain-664914644452a1eb8b746d3701612877c0eef24d",
-    sha256 = "936f45c9ba7ac16635b1554bea7d8a18957757ec5b454b2837761eb80590aafb",
-    url = "https://github.com/grailbio/bazel-toolchain/archive/664914644452a1eb8b746d3701612877c0eef24d.tar.gz",
+    strip_prefix = "bazel-toolchain-8570c4ccb39f750452b0b5607c9f54a093214f26",
+    sha256 = "dd6b7b877fe7e4f927c9c44b6ea4fbc94dd4c3c0ffe8f5deac28a33b3c78c866",
+    url = "https://github.com/grailbio/bazel-toolchain/archive/8570c4ccb39f750452b0b5607c9f54a093214f26.tar.gz",
     patches = ["@//bazel:toolchain.patch"],
 )
 
@@ -16,7 +16,7 @@ load("@com_grail_bazel_toolchain//toolchain:rules.bzl", "llvm_toolchain")
 
 llvm_toolchain(
     name = "llvm_toolchain",
-    llvm_version = "8.0.0",
+    llvm_version = "9.0.0",
 )
 
 libtorch_repository(
