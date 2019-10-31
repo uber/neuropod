@@ -216,7 +216,9 @@ torch::Device TorchNeuropodBackend::get_torch_device(neuropods::DeviceType targe
     }
 }
 
-#if CAFFE2_NIGHTLY_VERSION >= 20190717
+#if CAFFE2_NIGHTLY_VERSION >= 20191010
+#define MAKE_DICT(name) c10::impl::GenericDict name(c10::AnyType::get(), c10::AnyType::get());
+#elif CAFFE2_NIGHTLY_VERSION >= 20190717
 #define MAKE_DICT(name) c10::impl::GenericDict name((c10::impl::deprecatedUntypedDict()));
 #elif CAFFE2_NIGHTLY_VERSION >= 20190601
 #define MAKE_DICT(name) auto name = c10::make_dict<torch::jit::IValue, torch::jit::IValue>();

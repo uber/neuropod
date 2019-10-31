@@ -51,6 +51,10 @@ def _impl(repository_ctx):
             # See https://github.com/pytorch/pytorch/issues/24120
             pass
 
+        # If this is the 1.3.0 stable release
+        if version_base == "1.3.0" and version_date == None and torch_cuda_string != "cu100":
+            version += "%2B" + torch_cuda_string
+
     # Add the CUDA variant to the URL
     download_url += "/" + torch_cuda_string
 
