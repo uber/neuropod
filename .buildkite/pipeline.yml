@@ -10,7 +10,7 @@ steps:
       queue: private-default
     command: build/test.sh
     plugins:
-      - docker-compose:
+      - docker-compose#v3.1.0:
           run: test-cpu-variant-tf-1.12.0-torch-1.1.0-py2.7
           config: docker-compose.test.yml
           env:
@@ -22,7 +22,7 @@ steps:
       queue: private-default
     command: build/test.sh
     plugins:
-      - docker-compose:
+      - docker-compose#v3.1.0:
           run: test-cpu-variant-tf-1.13.1-torch-1.2.0-py2.7
           config: docker-compose.test.yml
           env:
@@ -34,7 +34,7 @@ steps:
       queue: private-default
     command: build/test.sh
     plugins:
-      - docker-compose:
+      - docker-compose#v3.1.0:
           run: test-cpu-variant-tf-1.14.0-torch-1.3.0.dev20190820-py2.7
           config: docker-compose.test.yml
           env:
@@ -46,7 +46,7 @@ steps:
       queue: private-default
     command: build/test.sh
     plugins:
-      - docker-compose:
+      - docker-compose#v3.1.0:
           run: test-cpu-variant-tf-1.15.0-torch-1.3.0-py2.7
           config: docker-compose.test.yml
           env:
@@ -58,7 +58,7 @@ steps:
       queue: private-default
     command: build/test.sh
     plugins:
-      - docker-compose:
+      - docker-compose#v3.1.0:
           run: test-cpu-variant-tf-1.12.0-torch-1.1.0-py3
           config: docker-compose.test.yml
           env:
@@ -70,7 +70,7 @@ steps:
       queue: private-default
     command: build/test.sh
     plugins:
-      - docker-compose:
+      - docker-compose#v3.1.0:
           run: test-cpu-variant-tf-1.13.1-torch-1.2.0-py3
           config: docker-compose.test.yml
           env:
@@ -82,7 +82,7 @@ steps:
       queue: private-default
     command: build/test.sh
     plugins:
-      - docker-compose:
+      - docker-compose#v3.1.0:
           run: test-cpu-variant-tf-1.14.0-torch-1.3.0.dev20190820-py3
           config: docker-compose.test.yml
           env:
@@ -94,7 +94,7 @@ steps:
       queue: private-default
     command: build/test.sh
     plugins:
-      - docker-compose:
+      - docker-compose#v3.1.0:
           run: test-cpu-variant-tf-1.15.0-torch-1.3.0-py3
           config: docker-compose.test.yml
           env:
@@ -106,7 +106,7 @@ steps:
       queue: private-gpu
     command: build/test_gpu.sh
     plugins:
-      - docker-compose:
+      - docker-compose#v3.1.0:
           run: test-gpu-variant-tf-1.12.0-torch-1.1.0-py2.7
           config: docker-compose.test.yml
           env:
@@ -118,7 +118,7 @@ steps:
       queue: private-gpu
     command: build/test_gpu.sh
     plugins:
-      - docker-compose:
+      - docker-compose#v3.1.0:
           run: test-gpu-variant-tf-1.13.1-torch-1.2.0-py2.7
           config: docker-compose.test.yml
           env:
@@ -130,7 +130,7 @@ steps:
       queue: private-gpu
     command: build/test_gpu.sh
     plugins:
-      - docker-compose:
+      - docker-compose#v3.1.0:
           run: test-gpu-variant-tf-1.14.0-torch-1.3.0.dev20190820-py2.7
           config: docker-compose.test.yml
           env:
@@ -142,7 +142,7 @@ steps:
       queue: private-gpu
     command: build/test_gpu.sh
     plugins:
-      - docker-compose:
+      - docker-compose#v3.1.0:
           run: test-gpu-variant-tf-1.15.0-torch-1.3.0-py2.7
           config: docker-compose.test.yml
           env:
@@ -154,7 +154,7 @@ steps:
       queue: private-gpu
     command: build/test_gpu.sh
     plugins:
-      - docker-compose:
+      - docker-compose#v3.1.0:
           run: test-gpu-variant-tf-1.12.0-torch-1.1.0-py3
           config: docker-compose.test.yml
           env:
@@ -166,7 +166,7 @@ steps:
       queue: private-gpu
     command: build/test_gpu.sh
     plugins:
-      - docker-compose:
+      - docker-compose#v3.1.0:
           run: test-gpu-variant-tf-1.13.1-torch-1.2.0-py3
           config: docker-compose.test.yml
           env:
@@ -178,7 +178,7 @@ steps:
       queue: private-gpu
     command: build/test_gpu.sh
     plugins:
-      - docker-compose:
+      - docker-compose#v3.1.0:
           run: test-gpu-variant-tf-1.14.0-torch-1.3.0.dev20190820-py3
           config: docker-compose.test.yml
           env:
@@ -190,7 +190,7 @@ steps:
       queue: private-gpu
     command: build/test_gpu.sh
     plugins:
-      - docker-compose:
+      - docker-compose#v3.1.0:
           run: test-gpu-variant-tf-1.15.0-torch-1.3.0-py3
           config: docker-compose.test.yml
           env:

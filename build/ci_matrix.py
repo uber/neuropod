@@ -133,7 +133,7 @@ for platform, py_version, framework_version in itertools.product(PLATFORMS, PY_V
         "      queue: private-{}\n".format("gpu" if is_gpu else "default"),
         "    command: build/{}.sh\n".format("test_gpu" if is_gpu else "test"),
         "    plugins:\n",
-        "      - docker-compose:\n",
+        "      - docker-compose#v3.1.0:\n",
         "          run: {}\n".format(variant_name),
         "          config: docker-compose.test.yml\n",
         "          env:\n",
