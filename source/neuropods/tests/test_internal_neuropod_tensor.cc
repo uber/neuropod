@@ -22,9 +22,10 @@ public:
         tensor       = untyped_tensor->as_typed_tensor<uint8_t>();
         const_tensor = tensor;
 
+        auto accessor = tensor->accessor<1>();
         for (size_t i = 0; i < EXPECTED_SIZE; ++i)
         {
-            (*tensor)[i] = i;
+            accessor[i] = i;
         }
     }
 
@@ -75,10 +76,11 @@ TEST(test_stream_operator, typed_tensor)
     auto untyped_tensor = test_backend.get_tensor_allocator()->allocate_tensor({3}, neuropods::UINT8_TENSOR);
 
     auto &typed_tensor = *untyped_tensor->as_typed_tensor<uint8_t>();
+    auto accessor = typed_tensor.accessor<1>();
 
-    typed_tensor[0] = 10;
-    typed_tensor[1] = 11;
-    typed_tensor[2] = 12;
+    accessor[0] = 10;
+    accessor[1] = 11;
+    accessor[2] = 12;
 
     ss << typed_tensor;
     EXPECT_THAT(ss.str(), HasSubstr("NeuropodTensor"));
@@ -93,10 +95,11 @@ TEST(test_stream_operator, typed_float_tensor)
     auto untyped_tensor = test_backend.get_tensor_allocator()->allocate_tensor({TENSOR_SIZE}, neuropods::FLOAT_TENSOR);
 
     auto &typed_tensor = *untyped_tensor->as_typed_tensor<float>();
+    auto accessor = typed_tensor.accessor<1>();
 
     for (int i = 0; i < TENSOR_SIZE; ++i)
     {
-        typed_tensor[i] = i + 0.5;
+        accessor[i] = i + 0.5;
     }
 
     ss << typed_tensor;

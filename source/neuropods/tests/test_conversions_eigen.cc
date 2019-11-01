@@ -20,9 +20,10 @@ public:
         tensor       = untyped_tensor->as_typed_tensor<int32_t>();
         const_tensor = tensor;
 
+        auto accessor = tensor->accessor<1>();
         for (size_t i = 0; i < ROWS; ++i)
         {
-            (*tensor)[i]       = i;
+            accessor[i]        = i;
             expected_vector[i] = i;
         }
     }
@@ -48,12 +49,13 @@ public:
         tensor       = untyped_tensor->as_typed_tensor<int32_t>();
         const_tensor = tensor;
 
+        auto accessor = tensor->accessor<2>();
         int i = 0;
         for (size_t row = 0; row < untyped_tensor->get_dims()[0]; ++row)
         {
             for (size_t col = 0; col < untyped_tensor->get_dims()[1]; ++col)
             {
-                (*tensor)(row, col)       = i;
+                accessor[row][col]        = i;
                 expected_matrix(row, col) = i;
                 ++i;
             }
@@ -83,7 +85,7 @@ TEST_F(int32_tensor_fixture, typed_vector_as_eigen)
     EXPECT_EQ(actual, expected_vector);
     // Make sure we are using the same underlying buffer and the neuropod tensor data is editable
     actual(0) = 42;
-    EXPECT_EQ((*tensor)[0], 42);
+    EXPECT_EQ(tensor->accessor<1>()[0], 42);
 }
 
 TEST_F(int32_tensor_fixture, untyped_vector_as_eigen_type_mismatch)
@@ -101,7 +103,7 @@ TEST_F(int32_tensor_fixture, const_typed_vector_as_eigen)
 {
     const auto actual = neuropods::as_eigen(*const_tensor);
     EXPECT_EQ(actual, expected_vector);
-    (*tensor)[0] = 42;
+    tensor->accessor<1>()[0] = 42;
     EXPECT_EQ(actual(0), 42);
 }
 

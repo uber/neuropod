@@ -180,7 +180,7 @@ public:
         {
             NEUROPOD_ERROR("Tensor is expected to have shape of {1} to be casted to a scalar.");
         }
-        return (*this->template as_typed_tensor<T>())[0];
+        return this->template as_typed_tensor<T>()->template accessor<1>()[0];
     }
 
     template <typename T>
@@ -193,7 +193,7 @@ public:
         {
             NEUROPOD_ERROR("Tensor is expected to have shape of {1} to be casted to a scalar.");
         }
-        return (*this->template as_typed_tensor<T>())[0];
+        return this->template as_typed_tensor<T>()->template accessor<1>()[0];
     }
 
     template <typename Visitor, typename... Params>
@@ -313,17 +313,6 @@ public:
         this->assure_rank(N);
         return TensorAccessor<const T, N>(get_raw_data_ptr(), get_strides().data());
     }
-
-    const T &operator[](uint32_t r) const { return (*this)(r); }
-    T &      operator[](uint32_t r) { return (*this)(r); }
-
-    const T &operator()(uint32_t r) const { return accessor<1>()[r]; }
-
-    T &operator()(uint32_t r) { return accessor<1>()[r]; }
-
-    const T &operator()(uint32_t r, uint32_t c) const { return accessor<2>()[r][c]; }
-
-    T &operator()(uint32_t r, uint32_t c) { return accessor<2>()[r][c]; }
 
     const T *begin() const
     {
