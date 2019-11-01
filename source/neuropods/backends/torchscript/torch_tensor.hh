@@ -21,6 +21,11 @@
 // The date of the official torch 1.2.0 release
 #define CAFFE2_NIGHTLY_VERSION 20190808
 #endif
+
+#if CAFFE2_VERSION == 10300
+// The date of the official torch 1.3.0 release
+#define CAFFE2_NIGHTLY_VERSION 20191010
+#endif
 #endif
 
 namespace neuropods
@@ -32,7 +37,11 @@ namespace
 template <typename T>
 T *get_data_from_torch_tensor(const torch::Tensor &tensor)
 {
+#if CAFFE2_NIGHTLY_VERSION >= 20191010
+    return tensor.data_ptr<T>();
+#else
     return tensor.data<T>();
+#endif
 }
 
 template <>

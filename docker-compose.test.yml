@@ -22,20 +22,12 @@ services:
         NEUROPODS_IS_GPU: "true"
     runtime: nvidia
 
-  test-cpu-variant-tf-1.11.0-torch-1.1.0-py2.7:
-    extends: test-base
-    build:
-      args:
-        NEUROPODS_TENSORFLOW_VERSION: 1.11.0
-        NEUROPODS_TORCH_VERSION: 1.1.0
-        NEUROPODS_PYTHON_BINARY: python
-
-  test-cpu-variant-tf-1.12.0-torch-1.2.0.dev20190601-py2.7:
+  test-cpu-variant-tf-1.12.0-torch-1.1.0-py2.7:
     extends: test-base
     build:
       args:
         NEUROPODS_TENSORFLOW_VERSION: 1.12.0
-        NEUROPODS_TORCH_VERSION: 1.2.0.dev20190601
+        NEUROPODS_TORCH_VERSION: 1.1.0
         NEUROPODS_PYTHON_BINARY: python
 
   test-cpu-variant-tf-1.13.1-torch-1.2.0-py2.7:
@@ -54,20 +46,20 @@ services:
         NEUROPODS_TORCH_VERSION: 1.3.0.dev20190820
         NEUROPODS_PYTHON_BINARY: python
 
-  test-cpu-variant-tf-1.11.0-torch-1.1.0-py3:
+  test-cpu-variant-tf-1.15.0-torch-1.3.0-py2.7:
     extends: test-base
     build:
       args:
-        NEUROPODS_TENSORFLOW_VERSION: 1.11.0
-        NEUROPODS_TORCH_VERSION: 1.1.0
-        NEUROPODS_PYTHON_BINARY: python3
+        NEUROPODS_TENSORFLOW_VERSION: 1.15.0
+        NEUROPODS_TORCH_VERSION: 1.3.0
+        NEUROPODS_PYTHON_BINARY: python
 
-  test-cpu-variant-tf-1.12.0-torch-1.2.0.dev20190601-py3:
+  test-cpu-variant-tf-1.12.0-torch-1.1.0-py3:
     extends: test-base
     build:
       args:
         NEUROPODS_TENSORFLOW_VERSION: 1.12.0
-        NEUROPODS_TORCH_VERSION: 1.2.0.dev20190601
+        NEUROPODS_TORCH_VERSION: 1.1.0
         NEUROPODS_PYTHON_BINARY: python3
 
   test-cpu-variant-tf-1.13.1-torch-1.2.0-py3:
@@ -86,22 +78,21 @@ services:
         NEUROPODS_TORCH_VERSION: 1.3.0.dev20190820
         NEUROPODS_PYTHON_BINARY: python3
 
-  test-gpu-variant-tf-1.11.0-torch-1.1.0-py2.7:
-    extends: test-gpu
+  test-cpu-variant-tf-1.15.0-torch-1.3.0-py3:
+    extends: test-base
     build:
       args:
-        NEUROPODS_CUDA_VERSION: 9.0
-        NEUROPODS_TENSORFLOW_VERSION: 1.11.0
-        NEUROPODS_TORCH_VERSION: 1.1.0
-        NEUROPODS_PYTHON_BINARY: python
+        NEUROPODS_TENSORFLOW_VERSION: 1.15.0
+        NEUROPODS_TORCH_VERSION: 1.3.0
+        NEUROPODS_PYTHON_BINARY: python3
 
-  test-gpu-variant-tf-1.12.0-torch-1.2.0.dev20190601-py2.7:
+  test-gpu-variant-tf-1.12.0-torch-1.1.0-py2.7:
     extends: test-gpu
     build:
       args:
         NEUROPODS_CUDA_VERSION: 9.0
         NEUROPODS_TENSORFLOW_VERSION: 1.12.0
-        NEUROPODS_TORCH_VERSION: 1.2.0.dev20190601
+        NEUROPODS_TORCH_VERSION: 1.1.0
         NEUROPODS_PYTHON_BINARY: python
 
   test-gpu-variant-tf-1.13.1-torch-1.2.0-py2.7:
@@ -122,22 +113,22 @@ services:
         NEUROPODS_TORCH_VERSION: 1.3.0.dev20190820
         NEUROPODS_PYTHON_BINARY: python
 
-  test-gpu-variant-tf-1.11.0-torch-1.1.0-py3:
+  test-gpu-variant-tf-1.15.0-torch-1.3.0-py2.7:
     extends: test-gpu
     build:
       args:
-        NEUROPODS_CUDA_VERSION: 9.0
-        NEUROPODS_TENSORFLOW_VERSION: 1.11.0
-        NEUROPODS_TORCH_VERSION: 1.1.0
-        NEUROPODS_PYTHON_BINARY: python3
+        NEUROPODS_CUDA_VERSION: 10.0
+        NEUROPODS_TENSORFLOW_VERSION: 1.15.0
+        NEUROPODS_TORCH_VERSION: 1.3.0
+        NEUROPODS_PYTHON_BINARY: python
 
-  test-gpu-variant-tf-1.12.0-torch-1.2.0.dev20190601-py3:
+  test-gpu-variant-tf-1.12.0-torch-1.1.0-py3:
     extends: test-gpu
     build:
       args:
         NEUROPODS_CUDA_VERSION: 9.0
         NEUROPODS_TENSORFLOW_VERSION: 1.12.0
-        NEUROPODS_TORCH_VERSION: 1.2.0.dev20190601
+        NEUROPODS_TORCH_VERSION: 1.1.0
         NEUROPODS_PYTHON_BINARY: python3
 
   test-gpu-variant-tf-1.13.1-torch-1.2.0-py3:
@@ -156,6 +147,15 @@ services:
         NEUROPODS_CUDA_VERSION: 10.0
         NEUROPODS_TENSORFLOW_VERSION: 1.14.0
         NEUROPODS_TORCH_VERSION: 1.3.0.dev20190820
+        NEUROPODS_PYTHON_BINARY: python3
+
+  test-gpu-variant-tf-1.15.0-torch-1.3.0-py3:
+    extends: test-gpu
+    build:
+      args:
+        NEUROPODS_CUDA_VERSION: 10.0
+        NEUROPODS_TENSORFLOW_VERSION: 1.15.0
+        NEUROPODS_TORCH_VERSION: 1.3.0
         NEUROPODS_PYTHON_BINARY: python3
 
 
