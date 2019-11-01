@@ -45,6 +45,9 @@ cc_library(
     visibility = [
         "//neuropods:__subpackages__",
     ],
+    deps = [
+        "@spdlog_repo//:spdlog",
+    ],
 )
 
 cc_library(

@@ -87,7 +87,7 @@ void IPCControlChannel::send_message(control_message &msg)
 {
     // Make sure that it is valid to go from the previous message type to the current one
     verifier_.assert_transition_allowed(msg.type);
-    NEUROPOD_LOG_DEBUG("OPE: Sending message " << msg.type);
+    SPDLOG_DEBUG("OPE: Sending message {}", msg.type);
     send_queue_->send(&msg, sizeof(control_message), 0);
 }
 
@@ -156,7 +156,7 @@ void IPCControlChannel::recv_message(control_message &received)
     unsigned int priority;
     recv_queue_->receive(&received, sizeof(control_message), received_size, priority);
 
-    NEUROPOD_LOG_DEBUG("OPE: Received message " << received.type);
+    SPDLOG_DEBUG("OPE: Received message {}", received.type);
 
     // Make sure that it is valid to go from the previous message type to the current one
     verifier_.assert_transition_allowed(received.type);
@@ -176,7 +176,7 @@ bool IPCControlChannel::recv_message(control_message &received, size_t timeout_m
         recv_queue_->timed_receive(&received, sizeof(control_message), received_size, priority, timeout_at);
     if (successful_read)
     {
-        NEUROPOD_LOG_DEBUG("OPE: Received message " << received.type);
+        SPDLOG_DEBUG("OPE: Received message {}", received.type);
 
         // Make sure that it is valid to go from the previous message type to the current one
         verifier_.assert_transition_allowed(received.type);

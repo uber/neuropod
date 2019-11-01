@@ -303,17 +303,6 @@ cc_test(
 )
 
 cc_test(
-    name = "test_logging",
-    srcs = [
-        "test_logging.cc",
-    ],
-    deps = [
-        "@gtest//:main",
-        "//neuropods/internal:logging",
-    ],
-)
-
-cc_test(
     name = "test_backend_registration",
     srcs = [
         "test_backend_registration.cc",

@@ -124,3 +124,11 @@ http_archive(
     url = "https://github.com/okdshin/PicoSHA2/archive/b699e6c900be6e00152db5a3d123c1db42ea13d0.zip",
     strip_prefix = "PicoSHA2-b699e6c900be6e00152db5a3d123c1db42ea13d0",
 )
+
+http_archive(
+    name = "spdlog_repo",
+    build_file = "@//deps:BUILD.spdlog",
+    sha256 = "56b90f0bd5b126cf1b623eeb19bf4369516fa68f036bbc22d9729d2da511fb5a",
+    url = "https://github.com/gabime/spdlog/archive/v1.4.2.zip",
+    strip_prefix = "spdlog-1.4.2",
+)
