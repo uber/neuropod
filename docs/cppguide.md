@@ -79,6 +79,9 @@ TODO(vip): more detail on string tensors
 
 ## Creating tensors
 
+!!! tip
+    See the Efficient Tensor Creation page for a guide on the approach that best fits your use case.
+
 There are many different ways to create `NeuropodTensor`s, but all of them start with an `allocator`.
 
 To get an allocator for a loaded model, you can do something like:
