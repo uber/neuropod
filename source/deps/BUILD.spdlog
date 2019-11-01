@@ -1,0 +1,18 @@
+#
+# Uber, Inc. (c) 2019
+#
+
+package(
+    default_visibility = ["//visibility:public"],
+)
+
+cc_library(
+    name = "spdlog",
+    hdrs = glob([
+        "include/spdlog/**",
+    ]),
+    includes = [
+        "include"
+    ],
+    visibility = ["//visibility:public"],
+)
