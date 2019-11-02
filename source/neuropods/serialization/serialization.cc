@@ -41,6 +41,7 @@ void register_serializer_internal(const std::string &tag, serialize_fn_t seriali
 
 void serialize(boost::archive::binary_oarchive &out, const NeuropodValue &item)
 {
+    init_registrar_if_needed();
     const auto tag = item.get_serialize_tag();
 
     // Write the tag
@@ -53,12 +54,13 @@ void serialize(boost::archive::binary_oarchive &out, const NeuropodValue &item)
     }
 
     // Run the serializer function
-    registered_serializers->at(tag)(item, out);
+    it->second(item, out);
 }
 
 template<>
 std::shared_ptr<NeuropodValue> deserialize(boost::archive::binary_iarchive &ar, NeuropodTensorAllocator &allocator)
 {
+    init_registrar_if_needed();
     // Read the tag
     std::string tag;
     ar >> tag;
@@ -70,7 +72,7 @@ std::shared_ptr<NeuropodValue> deserialize(boost::archive::binary_iarchive &ar, 
     }
 
     // Get the function and run it
-    return registered_deserializers->at(tag)(ar, allocator);
+    return it->second(ar, allocator);
 }
 
 void serialize(boost::archive::binary_oarchive &out, const NeuropodValueMap &item)
