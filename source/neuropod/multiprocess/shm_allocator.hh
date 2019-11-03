@@ -24,18 +24,24 @@ namespace neuropod
 //
 // To free all the currently unused blocks, call `free_unused_shm_blocks`. This should
 // periodically be called to ensure that unused shared memory is freed.
+
+// The allocator also employs a similar approach for loading blocks:
+// If we've loaded a block before, we're likely to load it again.
+//
+// Internally, we maintain a pool of blocks of memory we've loaded in the past.
+// If we are requested to load a block again, we don't need to redo all the work to open
+// the shared memory objects.
+//
+// To free all the currently unused blocks, call `free_unused_shm_blocks`. This should
+// periodically be called to ensure that unused shared memory is freed.
+
 // Note: the three functions below are all threadsafe
 
 // The block ID is just 24 opaque bytes (from the perspective of users of this allocator)
 using SHMBlockID = std::array<char, 24>;
 
-class UnusedPool;
 class SHMAllocator
 {
-private:
-    // Keeps track of unused blocks of shared memory so we can reuse them
-    std::unique_ptr<UnusedPool> unused_pool_;
-
 public:
     SHMAllocator();
     ~SHMAllocator();

@@ -37,6 +37,9 @@ struct __attribute__((__packed__)) shm_block
     // This is okay because we're using `shared_ptr<shm_block>` in each process
     size_t process_refcount = 0;
 
+    // The number of times this block is in any cache across processes
+    size_t cache_refcount = 0;
+
     // Blocks of memory can be reused
     // This is incremented on each reuse
     uint64_t reuse_count = 0;
@@ -75,6 +78,134 @@ struct __attribute__((__packed__)) shm_block_id
 static_assert(sizeof(shm_block_id) == std::tuple_size<SHMBlockID>::value,
               "The size of shm_block_id must match the size of SHMBlockID");
 
+// Represents a shared memory block that isn't currently used in the current
+// process, but is likely to be reused
+struct SHMCacheItem
+{
+    std::unique_ptr<ipc::shared_memory_object> shm_;
+    std::unique_ptr<ipc::mapped_region>        region_;
+    shm_block *                                block_ = nullptr;
+
+    // The block's UUID
+    boost::uuids::uuid uuid_;
+
+    // If this item is in a cache of the current process, we need to
+    // drop the cache refcount on destruction
+    bool is_in_cache = false;
+
+    SHMCacheItem() = default;
+
+    // Delete copy constructors
+    SHMCacheItem(const SHMCacheItem &) = delete;
+    SHMCacheItem &operator=(const SHMCacheItem &) = delete;
+
+    ~SHMCacheItem()
+    {
+        if (shm_ == nullptr)
+        {
+            return;
+        }
+
+        ipc::scoped_lock<ipc::interprocess_mutex> lock(block_->mutex);
+
+        // Drop the cache refcount if we need to
+        if (is_in_cache)
+        {
+            block_->cache_refcount--;
+        }
+
+        if (block_->process_refcount == 0 && block_->cache_refcount == 0)
+        {
+            // This block is unused and we're responsible for deleting it
+
+            // Get the shm_key
+            const auto shm_key = get_key_from_uuid(uuid_);
+
+            // Unlock the scoped lock before we actually delete
+            // This is safe because we're the only one with a reference to this block
+            lock.unlock();
+
+            // Unmap memory
+            region_ = nullptr;
+            shm_    = nullptr;
+
+            // Free the shared memory
+            if (!ipc::shared_memory_object::remove(shm_key.c_str()))
+            {
+                // We shouldn't throw errors from the destructor so let's just
+                // log instead
+                std::cerr << "Error freeing shared memory with key " << shm_key;
+            }
+        }
+        else
+        {
+            // Another process has a reference to this item and is responsible
+            // for deleting it
+        }
+    }
+};
+
+// A cache that stores a map of keys of type `T` to `SHMCacheItem`s
+template <template <typename...> class MapType, typename T>
+class SHMCachePool
+{
+private:
+    // A pool of cached SHM objects
+    std::mutex                                cache_mutex_;
+    MapType<T, std::unique_ptr<SHMCacheItem>> cache_;
+
+public:
+    // Find a cache item with key `query` and run `pred` on it.
+    // `find` will run `pred` on all items matching `query` until it returns true.
+    //
+    // `pred` should extract any data it needs and return true for a desired item.
+    // This item will be removed from the cache.
+    template <typename Predicate>
+    void find(T query, Predicate pred)
+    {
+        // Lock the cache mutex
+        std::lock_guard<std::mutex> lock(cache_mutex_);
+
+        // Get a range of items that match the query and loop through them
+        auto range = cache_.equal_range(query);
+        for (auto it = range.first; it != range.second; it++)
+        {
+            auto &cache_item = it->second;
+            if (pred(*cache_item))
+            {
+                // We found what we're looking for and got the data we want
+                cache_.erase(it);
+                return;
+            }
+        }
+    }
+
+    // Add an item to the cache
+    // NOTE: THIS ASSUMES THAT A LOCK IS HELD ON item->block_
+    void add(T key, std::unique_ptr<SHMCacheItem> &item)
+    {
+        std::lock_guard<std::mutex> lock(cache_mutex_);
+        item->is_in_cache = true;
+        item->block_->cache_refcount++;
+        cache_.emplace(key, std::move(item));
+    }
+
+    // Clear the cache
+    void clear()
+    {
+        std::lock_guard<std::mutex> lock(cache_mutex_);
+        cache_.clear();
+    }
+
+    template <typename Predicate>
+    void clear(Predicate pred)
+    {
+        std::lock_guard<std::mutex> lock(cache_mutex_);
+
+        // TODO(vip): Loop through the cache and clear items that match `pred`
+    }
+};
+
 // Controls a block of shared memory
 class SHMBlock
 {
@@ -83,38 +214,90 @@ private:
     std::unique_ptr<ipc::mapped_region>        region_;
 
     // A pointer to the struct in shared memory
-    shm_block *block_;
+    shm_block *block_ = nullptr;
 
     // The block's UUID
     boost::uuids::uuid uuid_;
 
+    // Whether we created this block or not
+    bool did_create_;
+
+    // If we created this block, the size of it
+    size_t block_size_bytes_;
+
 public:
+    // A cache to optimize creation of shared memory blocks
+    // If we allocate a block of size N, we're likely to do so again
+    static SHMCachePool<std::unordered_multimap, size_t> created_cache_;
+
+    // A cache to optimize loading of shared memory blocks
+    // If we load a particular block once, we're likely to do so again.
+    //
+    // TODO(vip): loop through `loaded_cache_` every once in a while to delete blocks that
+    // are unused in all other processes. Since there are no other references to the block,
+    // we're never going to be asked to load it again and we can delete it.
+    static SHMCachePool<std::unordered_map, std::string> loaded_cache_;
+
     // Allocate a new block of shared memory
-    SHMBlock(size_t size_bytes)
-        // Generate a UUID
-        : uuid_(uuid_generator())
+    SHMBlock(size_t size_bytes) : did_create_(true), block_size_bytes_(size_bytes)
     {
-        // Create a block of shared memory
-        shm_ = stdx::make_unique<ipc::shared_memory_object>(
-            ipc::create_only, get_key_from_uuid(uuid_).c_str(), ipc::read_write);
+        // Try to get an already created block from the cache
+        created_cache_.find(size_bytes, [&](SHMCacheItem &item) {
+            // Lock the mutex
+            auto &                                    cached_block = item.block_;
+            ipc::scoped_lock<ipc::interprocess_mutex> lock(cached_block->mutex);
 
-        // Set the size
-        shm_->truncate(sizeof(shm_block) + size_bytes);
+            // Check whether or not this block is used in another process
+            if (cached_block->process_refcount == 0)
+            {
+                // The block is unused so we can use it!
+                // Increment the refcount
+                cached_block->process_refcount++;
 
-        // Map into memory
-        region_ = stdx::make_unique<ipc::mapped_region>(*shm_, ipc::read_write);
+                // Increase the reuse_count so that stale IDs will no longer work
+                cached_block->reuse_count++;
 
-        // Get a pointer to the struct and initialize it
-        block_ = new (region_->get_address()) shm_block;
+                // Move all the data into this SHMBlock
+                shm_    = std::move(item.shm_);
+                region_ = std::move(item.region_);
+                block_  = item.block_;
+                uuid_   = std::move(item.uuid_);
+                block_->cache_refcount--;
 
-        // Increment the refcount
-        // Note: we don't need to lock the mutex here because this is a brand new instance
-        // and we are the only ones with a reference to it
-        block_->process_refcount++;
+                return true;
+            }
+
+            return false;
+        });
+
+        // Didn't find anything in the cache
+        if (block_ == nullptr)
+        {
+            // Generate a uuid
+            uuid_ = uuid_generator();
+
+            // Create a block of shared memory
+            shm_ = stdx::make_unique<ipc::shared_memory_object>(
+                ipc::create_only, get_key_from_uuid(uuid_).c_str(), ipc::read_write);
+
+            // Set the size
+            shm_->truncate(sizeof(shm_block) + size_bytes);
+
+            // Map into memory
+            region_ = stdx::make_unique<ipc::mapped_region>(*shm_, ipc::read_write);
+
+            // Get a pointer to the struct and initialize it
+            block_ = new (region_->get_address()) shm_block;
+
+            // Increment the refcount
+            // Note: we don't need to lock the mutex here because we are the only ones
+            // with an active reference to this block
+            block_->process_refcount++;
+        }
     }
 
     // Load an existing block of shared memory from an ID
-    SHMBlock(const shm_block_id *block_id)
+    SHMBlock(const shm_block_id *block_id) : did_create_(false)
     {
         // Extract the UUID
         uuid_ = block_id->uuid;
@@ -122,15 +305,36 @@ public:
         // Extract the expected reuse count
         const uint64_t expected_reuse_count = block_id->reuse_count;
 
-        // Load a chunk of shared memory
-        shm_ = stdx::make_unique<ipc::shared_memory_object>(
-            ipc::open_only, get_key_from_uuid(uuid_).c_str(), ipc::read_write);
+        // Get the shm_key
+        const auto shm_key = get_key_from_uuid(uuid_);
 
-        // Map into memory
-        region_ = stdx::make_unique<ipc::mapped_region>(*shm_, ipc::read_write);
+        // Try to get the block from the cache
+        loaded_cache_.find(shm_key, [&](SHMCacheItem &item) {
+            // Move all the data into this SHMBlock
+            shm_    = std::move(item.shm_);
+            region_ = std::move(item.region_);
+            block_  = item.block_;
+            uuid_   = std::move(item.uuid_);
 
-        // Get a pointer to the struct
-        block_ = static_cast<shm_block *>(region_->get_address());
+            // Drop the cache refcount by 1
+            ipc::scoped_lock<ipc::interprocess_mutex> lock(block_->mutex);
+            block_->cache_refcount--;
+
+            return true;
+        });
+
+        // This block wasn't in the cache
+        if (block_ == nullptr)
+        {
+            // Load a chunk of shared memory
+            shm_ = stdx::make_unique<ipc::shared_memory_object>(ipc::open_only, shm_key.c_str(), ipc::read_write);
+
+            // Map into memory
+            region_ = stdx::make_unique<ipc::mapped_region>(*shm_, ipc::read_write);
+
+            // Get a pointer to the struct
+            block_ = static_cast<shm_block *>(region_->get_address());
+        }
 
         // Lock the mutex
         ipc::scoped_lock<ipc::interprocess_mutex> lock(block_->mutex);
@@ -168,52 +372,43 @@ public:
 
     ~SHMBlock()
     {
+        // Create a cache item
+        auto item     = stdx::make_unique<SHMCacheItem>();
+        item->shm_    = std::move(shm_);
+        item->region_ = std::move(region_);
+        item->block_  = block_;
+        item->uuid_   = std::move(uuid_);
+
+        // Lock the mutex
         ipc::scoped_lock<ipc::interprocess_mutex> lock(block_->mutex);
 
         // Decrement the refcount
         block_->process_refcount--;
 
-        if (block_->process_refcount == 0)
+        if (did_create_)
         {
-            // This block is unused!
-            // Since the refcount is zero, that means no other process has a reference to it
-            // Also, since this is the destructor, the object is being deleted so nothing
-            // else in this process has a reference to it
-
-            // Get the shm_key
-            const auto shm_key = get_key_from_uuid(uuid_);
-
-            // Unlock the scoped lock before we actually delete
-            // This is safe because we're the only one with a reference to this block
-            lock.unlock();
-
-            // Unmap memory
-            region_ = nullptr;
-            shm_    = nullptr;
-
-            // Free the shared memory
-            if (!ipc::shared_memory_object::remove(shm_key.c_str()))
+            // We created this block
+            // If we created a block of size `block_size_bytes_` once, we're likely
+            // to do it again so we'll add it to our cache
+            created_cache_.add(block_size_bytes_, item);
+        }
+        else
+        {
+            if (block_->process_refcount == 0 && block_->cache_refcount == 0)
             {
-                // We shouldn't throw errors from the destructor so let's just
-                // log instead
-                std::cerr << "Error freeing shared memory with key " << shm_key;
+                // We didn't create this block (i.e. we loaded it) and no other process has a reference to it
+                // This means we aren't going to be asked to load it again
+                // Don't do anything and let the `SHMCacheItem` destructor delete the shared memory object
+            }
+            else
+            {
+                // We didn't create this block (i.e. we loaded it) and another process has a reference to this block
+                // This means it's fairly likely that we will be asked to load this block again
+                // To avoid unmapping and remapping, we're going to keep the block mapped and move it into our cache
+                const auto shm_key = get_key_from_uuid(item->uuid_);
+                loaded_cache_.add(shm_key, item);
             }
         }
-    }
-
-    // Whether or not this block is used in another process
-    bool claim_if_unused()
-    {
-        ipc::scoped_lock<ipc::interprocess_mutex> lock(block_->mutex);
-        if (block_->process_refcount == 1)
-        {
-            // The refcount is one so this block is not used by any other processes.
-            // Increase the reuse_count so that stale IDs will no longer work
-            block_->reuse_count++;
-            return true;
-        }
-
-        return false;
     }
 
     // Get a pointer to the data stored in shared memory
@@ -226,81 +421,28 @@ public:
     }
 };
 
+// Initialize the caches
+SHMCachePool<std::unordered_multimap, size_t> SHMBlock::created_cache_;
+SHMCachePool<std::unordered_map, std::string> SHMBlock::loaded_cache_;
+
 } // namespace
 
-class UnusedPool
-{
-private:
-    // A pool of objects that the current process has allocated
-    // which are currently not referenced in this process
-    // These may be reused instead of allocating a new block of memory
-    // if they are not used in other processes as well
-    std::unordered_multimap<size_t, std::shared_ptr<SHMBlock>> unused_pool_;
-    std::mutex                                                 unused_pool_mutex_;
-
-public:
-    // Look for an unused block that we have previously allocated that is of size
-    // `size_bytes`. Return the block if found otherwise return nullptr
-    std::shared_ptr<SHMBlock> maybe_get_existing_block(size_t size_bytes)
-    {
-        std::lock_guard<std::mutex> lock(unused_pool_mutex_);
-        auto                        range = unused_pool_.equal_range(size_bytes);
-        for (auto it = range.first; it != range.second; it++)
-        {
-            auto block = it->second;
-
-            if (block->claim_if_unused())
-            {
-                // If we successfully claimed this block, remove it from the unused
-                // pool and return it
-                unused_pool_.erase(it);
-                return block;
-            }
-        }
-
-        return nullptr;
-    }
-
-    void add(size_t size_bytes, std::shared_ptr<SHMBlock> block)
-    {
-        std::lock_guard<std::mutex> lock(unused_pool_mutex_);
-        unused_pool_.emplace(std::make_pair(size_bytes, std::move(block)));
-    }
-
-    void clear()
-    {
-        std::lock_guard<std::mutex> lock(unused_pool_mutex_);
-        unused_pool_.clear();
-    }
-};
-
-SHMAllocator::SHMAllocator() : unused_pool_(stdx::make_unique<UnusedPool>()) {}
+SHMAllocator::SHMAllocator() = default;
 
 SHMAllocator::~SHMAllocator() = default;
 
 std::shared_ptr<void> SHMAllocator::allocate_shm(size_t size_bytes, SHMBlockID &block_id)
 {
-    // Try to get an existing unused block of the requested size
-    auto block = unused_pool_->maybe_get_existing_block(size_bytes);
-
-    // Othewise allocate a new one
-    if (!block)
-    {
-        block = std::make_shared<SHMBlock>(size_bytes);
-    }
+    // Create a block of the requested size
+    auto block = std::make_shared<SHMBlock>(size_bytes);
 
     // Return the ID of this block to the caller
     auto id = block->get_id();
     memcpy(block_id.data(), &id, sizeof(id));
 
     // Create a shared pointer to the underlying data with a custom deleter
-    // that adds it to the unused pool
-    return std::shared_ptr<void>(block->get_data(), [this, size_bytes, block](void *unused) {
-        // This tensor was created by the current process and it is unused in the current process
-        // Add it to our unused pool to potentially be reused (once it's no longer used in other
-        // processes)
-        unused_pool_->add(size_bytes, std::move(block));
-    });
+    // that keeps the block alive
+    return std::shared_ptr<void>(block->get_data(), [block](void *unused) {});
 }
 
 std::shared_ptr<void> SHMAllocator::load_shm(const SHMBlockID &block_id)
@@ -315,8 +457,9 @@ std::shared_ptr<void> SHMAllocator::load_shm(const SHMBlockID &block_id)
 
 void SHMAllocator::free_unused_shm_blocks()
 {
-    // Free all currently unused blocks that were allocated by this process
-    unused_pool_->clear();
+    // Free all currently unused blocks in the caches
+    SHMBlock::created_cache_.clear();
+    SHMBlock::loaded_cache_.clear();
 }
 
 } // namespace neuropod
