@@ -65,11 +65,20 @@ pkg_tar(
 )
 
 pkg_tar(
+    name = "libneuropods_bins",
+    package_dir = "bin/",
+    srcs = [
+        "//neuropods/multiprocess:neuropod_multiprocess_worker"
+    ]
+)
+
+pkg_tar(
     name = "libneuropods",
     extension = "tar.gz",
     deps = [
         ":libneuropods_hdrs",
         ":libneuropods_libs",
+        ":libneuropods_bins",
     ]
 )
 
