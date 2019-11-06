@@ -72,6 +72,7 @@ cc_library(
     deps = [
         ":ipc_control_channel",
         "//neuropods:neuropods_hdrs",
+        "//neuropods/internal:neuropod_tensor_raw_data_access",
     ],
 )
 
