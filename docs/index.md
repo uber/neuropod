@@ -35,7 +35,7 @@ There are many benefits to this:
 - You can easily switch between deep learning frameworks if necessary without changing runtime code.
 - Avoid the learning curve of using the C++ libtorch API and the C/C++ TF API
 
-Any Neuropod model can be run from both C++ and Python. This includes PyTorch models (i.e. not TorchScript).
+Any Neuropod model can be run from both C++ and Python (even PyTorch models that have not been converted to TorchScript).
 
 #### Define a Problem API
 
