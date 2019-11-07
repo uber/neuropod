@@ -32,7 +32,7 @@ py::dict infer(Neuropod &neuropod, py::dict &inputs_dict)
     return to_numpy_dict(*outputs);
 }
 
-py::array deserialize_binding(py::bytes buffer)
+py::array deserialize_tensor_binding(py::bytes buffer)
 {
     // Deserialize to a NeuropodTensor
     std::istringstream input_stream(buffer);
@@ -43,7 +43,7 @@ py::array deserialize_binding(py::bytes buffer)
     return tensor_to_numpy(std::dynamic_pointer_cast<NeuropodTensor>(val));
 }
 
-py::bytes serialize_binding(py::array numpy_array)
+py::bytes serialize_tensor_binding(py::array numpy_array)
 {
     // Wrap the numpy array in a NeuropodTensor
     auto allocator = DefaultTensorAllocator<neuropods::TestNeuropodTensor>();
@@ -52,6 +52,29 @@ py::bytes serialize_binding(py::array numpy_array)
     // Serialize the tensor
     std::stringstream buffer_stream;
     serialize(buffer_stream, *tensor);
+    return py::bytes(buffer_stream.str());
+}
+
+py::dict deserialize_valuemap_binding(py::bytes buffer)
+{
+    // Deserialize to a NeuropodTensor
+    std::istringstream input_stream(buffer);
+    auto               allocator = DefaultTensorAllocator<TestNeuropodTensor>();
+    auto               val       = deserialize<NeuropodValueMap>(input_stream, allocator);
+
+    // Wrap it in a numpy array and return
+    return to_numpy_dict(val);
+}
+
+py::bytes serialize_valuemap_binding(py::dict items)
+{
+    // Wrap the numpy array in a NeuropodTensor
+    auto allocator = DefaultTensorAllocator<neuropods::TestNeuropodTensor>();
+    auto valuemap  = from_numpy_dict(allocator, items);
+
+    // Serialize the tensor
+    std::stringstream buffer_stream;
+    serialize(buffer_stream, valuemap);
     return py::bytes(buffer_stream.str());
 }
 
@@ -91,10 +114,15 @@ PYBIND11_MODULE(neuropods_native, m)
         }))
         .def("infer", &infer);
 
-    m.def("serialize", &serialize_binding, "Convert a numpy array to a NeuropodTensor and serialize it");
+    m.def("serialize", &serialize_tensor_binding, "Convert a numpy array to a NeuropodTensor and serialize it");
     m.def("deserialize",
-          &deserialize_binding,
+          &deserialize_tensor_binding,
           "Deserialize a string of bytes to a NeuropodTensor (and return it as a numpy array)");
+
+    m.def("serialize", &serialize_valuemap_binding, "Convert a dict of numpy arrays to a NeuropodValueMap and serialize it");
+    m.def("deserialize_dict",
+        &deserialize_valuemap_binding,
+        "Deserialize a string of bytes to a NeuropodValueMap (and return it as a dict of numpy arrays)");
 }
 
 } // namespace neuropods
