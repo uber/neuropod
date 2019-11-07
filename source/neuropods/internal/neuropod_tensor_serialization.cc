@@ -30,8 +30,8 @@ void serialize_tensor(const NeuropodTensor &tensor, boost::archive::binary_oarch
     else
     {
         ar << boost::serialization::make_array(
-            static_cast<const uint8_t *>(NeuropodTensorRawDataAccess::get_untyped_data_ptr(tensor)),
-            tensor.get_num_elements() * NeuropodTensorRawDataAccess::get_bytes_per_element(tensor)
+            static_cast<const uint8_t *>(internal::NeuropodTensorRawDataAccess::get_untyped_data_ptr(tensor)),
+            tensor.get_num_elements() * internal::NeuropodTensorRawDataAccess::get_bytes_per_element(tensor)
         );
     }
 }
@@ -54,8 +54,8 @@ std::shared_ptr<NeuropodTensor> deserialize_tensor(boost::archive::binary_iarchi
     else
     {
         ar >> boost::serialization::make_array(
-            static_cast<uint8_t *>(NeuropodTensorRawDataAccess::get_untyped_data_ptr(*out)),
-            out->get_num_elements() * NeuropodTensorRawDataAccess::get_bytes_per_element(*out)
+            static_cast<uint8_t *>(internal::NeuropodTensorRawDataAccess::get_untyped_data_ptr(*out)),
+            out->get_num_elements() * internal::NeuropodTensorRawDataAccess::get_bytes_per_element(*out)
         );
     }
 

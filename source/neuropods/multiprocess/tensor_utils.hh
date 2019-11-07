@@ -33,7 +33,7 @@ std::shared_ptr<NeuropodTensor> wrap_existing_tensor(Neuropod &neuropod, std::sh
     else
     {
         // Get a pointer to the data in the original tensor
-        void *data = NeuropodTensorRawDataAccess::get_untyped_data_ptr(*tensor);
+        void *data = internal::NeuropodTensorRawDataAccess::get_untyped_data_ptr(*tensor);
 
         // Create a "native" tensor with the data in the provided tensor
         // This doesn't do a copy; it just wraps the data and passes it to the
@@ -63,7 +63,7 @@ std::shared_ptr<NeuropodTensor> wrap_existing_tensor(std::shared_ptr<NeuropodTen
     }
     else
     {
-        void *data = NeuropodTensorRawDataAccess::get_untyped_data_ptr(*tensor);
+        void *data = internal::NeuropodTensorRawDataAccess::get_untyped_data_ptr(*tensor);
 
         // Create a new tensor of the specified type with the data in the provided tensor
         // This doesn't do a copy; it just wraps the data and passes it to the
