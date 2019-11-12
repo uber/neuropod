@@ -38,6 +38,11 @@ public:
     // Run inference
     virtual std::unique_ptr<NeuropodValueMap> infer(const NeuropodValueMap &inputs) = 0;
 
+    // Run inference and get a subset of the outputs
+    // The default implementation runs inference, gets all the outputs, and then filters the outputs
+    // Backends can override this to more efficiently generate only the requested outputs
+    virtual std::unique_ptr<NeuropodValueMap> infer(const NeuropodValueMap &inputs, const std::vector<std::string> &requested_outputs);
+
 protected:
     // Used to load files in a Neuropod
     std::unique_ptr<NeuropodLoader> loader_;

@@ -55,6 +55,9 @@ public:
 
     // Run inference
     std::unique_ptr<NeuropodValueMap> infer(const NeuropodValueMap &inputs);
+
+    // Run inference with a set of requested outputs
+    std::unique_ptr<NeuropodValueMap> infer(const NeuropodValueMap &inputs, const std::vector<std::string> &requested_outputs);
 };
 
 } // namespace neuropods
