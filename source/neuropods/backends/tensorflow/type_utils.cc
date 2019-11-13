@@ -1,5 +1,5 @@
 //
-// Uber, Inc. (c) 2018
+// Uber, Inc. (c) 2019
 //
 
 #include "type_utils.hh"
@@ -12,22 +12,22 @@
 namespace neuropods
 {
 
-#define FOR_TF_NEUROPOD_MAPPING(FN) \
-    FN(FLOAT_TENSOR, TF_FLOAT)      \
-    FN(DOUBLE_TENSOR, TF_DOUBLE)    \
-    FN(STRING_TENSOR, TF_STRING)    \
-                                    \
-    FN(INT8_TENSOR, TF_INT8)        \
-    FN(INT16_TENSOR, TF_INT16)      \
-    FN(INT32_TENSOR, TF_INT32)      \
-    FN(INT64_TENSOR, TF_INT64)      \
-                                    \
-    FN(UINT8_TENSOR, TF_UINT8)      \
-    FN(UINT16_TENSOR, TF_UINT16)    \
-    FN(UINT32_TENSOR, TF_UINT32)    \
-    FN(UINT64_TENSOR, TF_UINT64)
+#define FOR_TF_NEUROPOD_MAPPING(FN)          \
+    FN(FLOAT_TENSOR, tensorflow::DT_FLOAT)   \
+    FN(DOUBLE_TENSOR, tensorflow::DT_DOUBLE) \
+    FN(STRING_TENSOR, tensorflow::DT_STRING) \
+                                             \
+    FN(INT8_TENSOR, tensorflow::DT_INT8)     \
+    FN(INT16_TENSOR, tensorflow::DT_INT16)   \
+    FN(INT32_TENSOR, tensorflow::DT_INT32)   \
+    FN(INT64_TENSOR, tensorflow::DT_INT64)   \
+                                             \
+    FN(UINT8_TENSOR, tensorflow::DT_UINT8)   \
+    FN(UINT16_TENSOR, tensorflow::DT_UINT16) \
+    FN(UINT32_TENSOR, tensorflow::DT_UINT32) \
+    FN(UINT64_TENSOR, tensorflow::DT_UINT64)
 
-TensorType get_neuropod_type_from_tf_type(TF_DataType type)
+TensorType get_neuropod_type_from_tf_type(tensorflow::DataType type)
 {
 #define TF_TO_NEUROPOD(NEUROPOD_TYPE, TF_TYPE) \
     case TF_TYPE:                              \
@@ -43,7 +43,7 @@ TensorType get_neuropod_type_from_tf_type(TF_DataType type)
     NEUROPOD_ERROR("Neuropods does not support type: " << type);
 }
 
-TF_DataType get_tf_type_from_neuropod_type(TensorType type)
+tensorflow::DataType get_tf_type_from_neuropod_type(TensorType type)
 {
 #define NEUROPOD_TO_TF(NEUROPOD_TYPE, TF_TYPE) \
     case NEUROPOD_TYPE:                        \

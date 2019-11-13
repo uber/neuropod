@@ -1,0 +1,26 @@
+#
+# Uber, Inc. (c) 2019
+#
+
+package(
+    default_visibility = ["//visibility:public"],
+)
+
+cc_library(
+    name = "tensorflow_hdrs",
+    srcs = [],
+    hdrs = glob(
+        [
+            "tensorflow*.data/purelib/tensorflow*/include/**",
+            "tensorflow_core/include/**"
+        ],
+        exclude = glob(["**/*.so"])
+    ),
+    includes = [
+        "tensorflow_gpu-{TENSORFLOW_VERSION}.data/purelib/tensorflow_core/include/",
+        "tensorflow_gpu-{TENSORFLOW_VERSION}.data/purelib/tensorflow/include/",
+        "tensorflow-{TENSORFLOW_VERSION}.data/purelib/tensorflow_core/include/",
+        "tensorflow-{TENSORFLOW_VERSION}.data/purelib/tensorflow/include/",
+        "tensorflow_core/include/",
+    ],
+)

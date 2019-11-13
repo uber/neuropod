@@ -1,14 +1,14 @@
 //
-// Uber, Inc. (c) 2018
+// Uber, Inc. (c) 2019
 //
 
 #pragma once
 
 #include "neuropods/backends/tensorflow/type_utils.hh"
 #include "neuropods/internal/deleter.hh"
+#include "neuropods/internal/logging.hh"
 #include "neuropods/internal/neuropod_tensor.hh"
-
-#include <tensorflow/c/c_api.h>
+#include "tensorflow/core/framework/tensor.h"
 
 #include <string>
 #include <vector>
@@ -16,44 +16,38 @@
 namespace neuropods
 {
 
-namespace
+namespace detail
 {
 
-// Get the shape of a TF tensor
-std::vector<int64_t> get_shape(TF_Tensor *tensor)
-{
-    const int            dims = TF_NumDims(tensor);
-    std::vector<int64_t> out;
+// Convert shapes
+tensorflow::TensorShape get_tf_shape(const std::vector<int64_t> &dims);
 
-    for (int curr_dim = 0; curr_dim < dims; curr_dim++)
-    {
-        out.push_back(TF_Dim(tensor, curr_dim));
-    }
+// Convert shapes
+std::vector<int64_t> get_dims(const tensorflow::Tensor &tensor);
 
-    return out;
-}
+// Create a TF tensor from existing memory
+void create_tensor_from_existing_memory(const std::vector<int64_t> &dims,
+                                        void *                      data,
+                                        const Deleter &             deleter,
+                                        size_t                      data_size_bytes,
+                                        tensorflow::DataType        type,
+                                        tensorflow::Tensor &        tensor,
+                                        tensorflow::TensorBuffer *& buf);
 
-void deallocator(void *data, size_t len, void *handle)
-{
-    // The tensor is being deallocated, run the deleter that the user provided
-    run_deleter(handle);
-}
+} // namespace detail
 
-} // namespace
-
-// This class is internal to neuropods and should not be exposed
-// to users
 template <typename T>
-class TensorflowNeuropodTensor : public TypedNeuropodTensor<T>, public NativeDataContainer<TF_Tensor *>
+class TensorflowNeuropodTensor : public TypedNeuropodTensor<T>, public NativeDataContainer<tensorflow::Tensor &>
 {
+private:
+    tensorflow::Tensor        tensor_;
+    tensorflow::TensorBuffer *buf_ = nullptr;
+
 public:
     // Allocate a TF tensor
     TensorflowNeuropodTensor(const std::vector<int64_t> &dims)
         : TypedNeuropodTensor<T>(dims),
-          tensor(TF_AllocateTensor(get_tf_type_from_neuropod_type(this->get_tensor_type()),
-                                   dims.data(),
-                                   dims.size(),
-                                   this->get_num_elements() * sizeof(T)))
+          tensor_(get_tf_type_from_neuropod_type(this->get_tensor_type()), detail::get_tf_shape(dims))
     {
     }
 
@@ -61,165 +55,104 @@ public:
     // This data should be 64 byte aligned
     // https://github.com/tensorflow/tensorflow/blob/master/tensorflow/core/framework/allocator.h#L84
     TensorflowNeuropodTensor(const std::vector<int64_t> &dims, void *data, const Deleter &deleter)
-        : TypedNeuropodTensor<T>(dims),
-          tensor(TF_NewTensor(get_tf_type_from_neuropod_type(this->get_tensor_type()),
-                              dims.data(),
-                              dims.size(),
-                              data,
-                              this->get_num_elements() * sizeof(T),
-                              deallocator,
-                              register_deleter(deleter, data)))
+        : TypedNeuropodTensor<T>(dims)
     {
+        detail::create_tensor_from_existing_memory(dims,
+                                                   data,
+                                                   deleter,
+                                                   this->get_num_elements() * sizeof(T),
+                                                   get_tf_type_from_neuropod_type(this->get_tensor_type()),
+                                                   tensor_,
+                                                   buf_);
     }
 
     // Wrap an existing TF tensor
-    TensorflowNeuropodTensor(TF_Tensor *tensor) : TypedNeuropodTensor<T>(get_shape(tensor)), tensor(tensor) {}
+    TensorflowNeuropodTensor(tensorflow::Tensor tensor)
+        : TypedNeuropodTensor<T>(detail::get_dims(tensor)), tensor_(std::move(tensor))
+    {
+    }
 
     ~TensorflowNeuropodTensor()
     {
-        if (tensor != nullptr)
+        if (buf_ != nullptr)
         {
-            TF_DeleteTensor(tensor);
+            // Reset the tensor
+            tensor_ = tensorflow::Tensor();
+
+            // Unref the buffer
+            buf_->Unref();
         }
     }
 
-    TF_Tensor *get_native_data() { return tensor; }
-
-    // The underlying TF tensor
-    TF_Tensor *tensor;
+    tensorflow::Tensor &get_native_data() { return tensor_; }
 
 protected:
     // Get a pointer to the underlying data
-    void *get_untyped_data_ptr() { return TF_TensorData(tensor); }
+    void *get_untyped_data_ptr()
+    {
+        // TODO(vip): make sure this tensor is contiguous
+        return const_cast<char *>(tensor_.tensor_data().data());
+    }
 
     // Get a pointer to the underlying data
-    const void *get_untyped_data_ptr() const { return TF_TensorData(tensor); }
+    const void *get_untyped_data_ptr() const
+    {
+        // TODO(vip): make sure this tensor is contiguous
+        return tensor_.tensor_data().data();
+    }
 };
 
 // Specialization for strings
 template <>
 class TensorflowNeuropodTensor<std::string> : public TypedNeuropodTensor<std::string>,
-                                              public NativeDataContainer<TF_Tensor *>
+                                              public NativeDataContainer<tensorflow::Tensor &>
 {
+private:
+    tensorflow::Tensor tensor_;
+
 public:
     // Allocate a TF tensor
-    TensorflowNeuropodTensor(const std::vector<int64_t> &dims) : TypedNeuropodTensor<std::string>(dims) {}
+    TensorflowNeuropodTensor(const std::vector<int64_t> &dims)
+        : TypedNeuropodTensor<std::string>(dims), tensor_(tensorflow::DT_STRING, detail::get_tf_shape(dims))
+    {
+    }
 
     // Wrap an existing TF tensor
-    TensorflowNeuropodTensor(TF_Tensor *tensor) : TypedNeuropodTensor<std::string>(get_shape(tensor)), tensor(tensor) {}
-
-    ~TensorflowNeuropodTensor()
+    TensorflowNeuropodTensor(tensorflow::Tensor tensor)
+        : TypedNeuropodTensor<std::string>(detail::get_dims(tensor)), tensor_(std::move(tensor))
     {
-        if (tensor != nullptr)
-        {
-            TF_DeleteTensor(tensor);
-        }
     }
+
+    ~TensorflowNeuropodTensor() = default;
 
     void set(const std::vector<std::string> &data)
     {
-        // The format of TF string tensors is described here:
-        // https://github.com/tensorflow/tensorflow/blob/master/tensorflow/c/c_api.h#L214
-
-        // Make sure that the size of the provided data matches the number of
-        // elements in the tensor
-        if (data.size() != this->get_num_elements())
+        auto flat = tensor_.flat<std::string>();
+        if (data.size() != flat.size())
         {
-            NEUROPOD_ERROR("Size of provided vector does not match the number "
-                           "of elements in the tensor");
+            NEUROPOD_ERROR("Supplied vector size (" << data.size() << ") does not match size of tensor (" << flat.size()
+                                                    << ")");
         }
 
-        // Get the size of the index
-        const size_t index_size = sizeof(uint64_t) * data.size();
-
-        // Compute the total size of the tensor
-        size_t total_bytes = index_size;
-        for (const auto &item : data)
+        for (int i = 0; i < data.size(); i++)
         {
-            total_bytes += TF_StringEncodedSize(item.length());
+            flat(i) = data[i];
         }
-
-        // Allocate the tensor
-        const auto dims = get_dims();
-        tensor          = TF_AllocateTensor(TF_STRING, dims.data(), dims.size(), total_bytes);
-
-        // Get pointers to the data
-        void *    tensor_data_ptr = TF_TensorData(tensor);
-        uint64_t *index_ptr       = static_cast<uint64_t *>(tensor_data_ptr);
-        char *    data_ptr        = static_cast<char *>(tensor_data_ptr) + index_size;
-
-        // Set the data
-        TF_Status *status   = TF_NewStatus();
-        size_t     counter  = 0;
-        uint64_t   position = 0;
-        for (const auto &item : data)
-        {
-            // Get the lengths and set the index entry
-            const auto len         = item.length();
-            const auto encoded_len = TF_StringEncodedSize(len);
-            index_ptr[counter++]   = position;
-
-            // Encode the string
-            TF_StringEncode(item.c_str(), len, data_ptr + position, encoded_len, status);
-
-            // Check status
-            if (TF_GetCode(status) != TF_OK)
-            {
-                NEUROPOD_ERROR("Tensorflow error: " << TF_Message(status));
-            }
-
-            // Move the pointer forward
-            position += encoded_len;
-        }
-
-        // Delete the status
-        TF_DeleteStatus(status);
     }
 
     std::vector<std::string> get_data_as_vector() const
     {
-        // The format of TF string tensors is described here:
-        // https://github.com/tensorflow/tensorflow/blob/master/tensorflow/c/c_api.h#L214
-        std::vector<std::string> out;
-
-        // Get pointers to the data and sizes
-        const size_t    tensor_size     = TF_TensorByteSize(tensor);
-        const size_t    numel           = get_num_elements();
-        void *const     tensor_data_ptr = TF_TensorData(tensor);
-        uint64_t *const index_ptr       = static_cast<uint64_t *>(tensor_data_ptr);
-        const size_t    index_size      = sizeof(uint64_t) * numel;
-        char *const     data_ptr        = static_cast<char *>(tensor_data_ptr) + index_size;
-
-        TF_Status *status = TF_NewStatus();
-        for (size_t i = 0; i < numel; i++)
+        auto                     flat = tensor_.flat<std::string>();
+        std::vector<std::string> out(flat.size());
+        for (int i = 0; i < out.size(); i++)
         {
-            const uint64_t position = index_ptr[i];
-            const char *   dst;
-            size_t         buf_len;
-
-            // Decode the string
-            TF_StringDecode(data_ptr + position, tensor_size - position - index_size, &dst, &buf_len, status);
-
-            // Check status
-            if (TF_GetCode(status) != TF_OK)
-            {
-                NEUROPOD_ERROR("Tensorflow error: " << TF_Message(status));
-            }
-
-            // Add the string
-            out.emplace_back(dst, buf_len);
+            out[i] = flat(i);
         }
-
-        // Delete the status
-        TF_DeleteStatus(status);
 
         return out;
     }
 
-    TF_Tensor *get_native_data() { return tensor; }
-
-    // The underlying TF tensor
-    TF_Tensor *tensor;
+    tensorflow::Tensor &get_native_data() { return tensor_; }
 };
 
 } // namespace neuropods
