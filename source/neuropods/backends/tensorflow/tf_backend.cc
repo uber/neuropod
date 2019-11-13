@@ -230,10 +230,18 @@ void TensorflowNeuropodBackend::run_target_ops(const std::vector<std::string> &t
 // Run inference
 std::unique_ptr<NeuropodValueMap> TensorflowNeuropodBackend::infer(const NeuropodValueMap &inputs)
 {
-    std::vector<std::string> output_node_names;
+    return infer(inputs, {});
+}
+
+// Run inference with a set of requested outputs
+std::unique_ptr<NeuropodValueMap> TensorflowNeuropodBackend::infer(const NeuropodValueMap &inputs, const std::vector<std::string> &requested_outputs)
+{
+    // Get the set of outputs we want to compute
+    const auto &output_names = requested_outputs.size() > 0 ? requested_outputs : output_names_;
 
     // Transform neuropod output names to node names in the graph
-    for (const auto &name : output_names_)
+    std::vector<std::string> output_node_names;
+    for (const auto &name : output_names)
     {
         output_node_names.emplace_back(node_name_mapping_[name]);
     }
@@ -289,9 +297,9 @@ std::unique_ptr<NeuropodValueMap> TensorflowNeuropodBackend::infer(const Neuropo
 
     // Read the outputs
     auto to_return = stdx::make_unique<NeuropodValueMap>();
-    for (size_t i = 0; i < output_names_.size(); ++i)
+    for (size_t i = 0; i < output_names.size(); ++i)
     {
-        const auto &output_name   = output_names_[i];
+        const auto &output_name   = output_names[i];
         const auto &output_tensor = output_values[i];
         const auto  tensor_type   = get_neuropod_type_from_tf_type(TF_TensorType(output_tensor));
         (*to_return)[output_name] = make_tensor<TensorflowNeuropodTensor>(tensor_type, output_tensor);

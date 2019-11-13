@@ -388,7 +388,7 @@ TODO(vip): Talk about string tensors
 
 ## Inference
 
-The inference method of a neuropod looks like this:
+The basic inference method of a neuropod looks like this:
 
 ```cpp
 std::unique_ptr<NeuropodValueMap> infer(const NeuropodValueMap &inputs);
@@ -416,6 +416,18 @@ const auto output_data = neuropod.infer({
 
 // Get the outputs
 auto z = output_data->at("z")->as_typed_tensor<float>();
+```
+
+You can also get a subset of the model's output by providing a list of requested outputs:
+
+```cpp
+std::unique_ptr<NeuropodValueMap> infer(const NeuropodValueMap &inputs, const std::vector<std::string> requested_outputs);
+```
+
+For example, if you wanted to return a map containing only the tensor "z", you could do this:
+
+```cpp
+const auto output_data = neuropod.infer(input_data, {"z"});
 ```
 
 ## Serialization

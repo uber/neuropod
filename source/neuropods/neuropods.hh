@@ -90,7 +90,7 @@ public:
     ~Neuropod();
 
     // Run inference
-    std::unique_ptr<NeuropodValueMap> infer(const NeuropodValueMap &inputs);
+    std::unique_ptr<NeuropodValueMap> infer(const NeuropodValueMap &inputs, const std::vector<std::string> &requested_outputs = {});
 
     // Get the inputs and outputs of the loaded Neuropod
     const std::vector<TensorSpec> &get_inputs() const;
