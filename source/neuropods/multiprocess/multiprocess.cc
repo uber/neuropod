@@ -34,7 +34,7 @@ pid_t start_worker_process(const std::string &control_queue_name)
 {
     pid_t child_pid;
     char * argv[] = {
-        "neuropod_multiprocess_worker",
+        const_cast<char*>("neuropod_multiprocess_worker"),
         const_cast<char *>(control_queue_name.c_str()),
         NULL
     };
