@@ -30,7 +30,7 @@ script:
   # This leads to different behavior depending on where the PR came from.
   # To get around this, we always run in a non-interactive shell.
   - set -o pipefail
-  - ./build/travis_build.sh < /dev/null | cat
+  - ./build/ci/travis_build.sh < /dev/null | cat
 """
 
 # Template for docker-compose.test.yml
@@ -131,13 +131,23 @@ for platform, py_version, framework_version in itertools.product(PLATFORMS, PY_V
         "  - label: \":docker: {} Tests ({})\"\n".format("GPU" if is_gpu else "CPU", variant_name),
         "    agents:\n",
         "      queue: private-{}\n".format("gpu" if is_gpu else "default"),
-        "    command: build/{}.sh\n".format("test_gpu" if is_gpu else "test"),
+        "    command: build/ci/{}.sh\n".format("buildkite_test_gpu" if is_gpu else "buildkite_test"),
         "    plugins:\n",
         "      - docker-compose#v3.1.0:\n",
         "          run: {}\n".format(variant_name),
         "          config: docker-compose.test.yml\n",
         "          env:\n",
+        "            - BUILDKITE\n",
+        "            - BUILDKITE_BRANCH\n",
+        "            - BUILDKITE_BUILD_NUMBER\n",
+        "            - BUILDKITE_BUILD_URL\n",
+        "            - BUILDKITE_COMMIT\n",
+        "            - BUILDKITE_JOB_ID\n",
+        "            - BUILDKITE_PROJECT_SLUG\n",
+        "            - BUILDKITE_PULL_REQUEST\n",
         "            - BUILDKITE_TAG\n",
+        "            - CI\n",
+        "            - CODECOV_TOKEN\n",
         "            - GH_UPLOAD_TOKEN\n",
         "\n",
         ])

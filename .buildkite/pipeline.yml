@@ -8,193 +8,353 @@ steps:
   - label: ":docker: CPU Tests (test-cpu-variant-tf-1.12.0-torch-1.1.0-py2.7)"
     agents:
       queue: private-default
-    command: build/test.sh
+    command: build/ci/buildkite_test.sh
     plugins:
       - docker-compose#v3.1.0:
           run: test-cpu-variant-tf-1.12.0-torch-1.1.0-py2.7
           config: docker-compose.test.yml
           env:
+            - BUILDKITE
+            - BUILDKITE_BRANCH
+            - BUILDKITE_BUILD_NUMBER
+            - BUILDKITE_BUILD_URL
+            - BUILDKITE_COMMIT
+            - BUILDKITE_JOB_ID
+            - BUILDKITE_PROJECT_SLUG
+            - BUILDKITE_PULL_REQUEST
             - BUILDKITE_TAG
+            - CI
+            - CODECOV_TOKEN
             - GH_UPLOAD_TOKEN
 
   - label: ":docker: CPU Tests (test-cpu-variant-tf-1.13.1-torch-1.2.0-py2.7)"
     agents:
       queue: private-default
-    command: build/test.sh
+    command: build/ci/buildkite_test.sh
     plugins:
       - docker-compose#v3.1.0:
           run: test-cpu-variant-tf-1.13.1-torch-1.2.0-py2.7
           config: docker-compose.test.yml
           env:
+            - BUILDKITE
+            - BUILDKITE_BRANCH
+            - BUILDKITE_BUILD_NUMBER
+            - BUILDKITE_BUILD_URL
+            - BUILDKITE_COMMIT
+            - BUILDKITE_JOB_ID
+            - BUILDKITE_PROJECT_SLUG
+            - BUILDKITE_PULL_REQUEST
             - BUILDKITE_TAG
+            - CI
+            - CODECOV_TOKEN
             - GH_UPLOAD_TOKEN
 
   - label: ":docker: CPU Tests (test-cpu-variant-tf-1.14.0-torch-1.3.0.dev20190820-py2.7)"
     agents:
       queue: private-default
-    command: build/test.sh
+    command: build/ci/buildkite_test.sh
     plugins:
       - docker-compose#v3.1.0:
           run: test-cpu-variant-tf-1.14.0-torch-1.3.0.dev20190820-py2.7
           config: docker-compose.test.yml
           env:
+            - BUILDKITE
+            - BUILDKITE_BRANCH
+            - BUILDKITE_BUILD_NUMBER
+            - BUILDKITE_BUILD_URL
+            - BUILDKITE_COMMIT
+            - BUILDKITE_JOB_ID
+            - BUILDKITE_PROJECT_SLUG
+            - BUILDKITE_PULL_REQUEST
             - BUILDKITE_TAG
+            - CI
+            - CODECOV_TOKEN
             - GH_UPLOAD_TOKEN
 
   - label: ":docker: CPU Tests (test-cpu-variant-tf-1.15.0-torch-1.3.0-py2.7)"
     agents:
       queue: private-default
-    command: build/test.sh
+    command: build/ci/buildkite_test.sh
     plugins:
       - docker-compose#v3.1.0:
           run: test-cpu-variant-tf-1.15.0-torch-1.3.0-py2.7
           config: docker-compose.test.yml
           env:
+            - BUILDKITE
+            - BUILDKITE_BRANCH
+            - BUILDKITE_BUILD_NUMBER
+            - BUILDKITE_BUILD_URL
+            - BUILDKITE_COMMIT
+            - BUILDKITE_JOB_ID
+            - BUILDKITE_PROJECT_SLUG
+            - BUILDKITE_PULL_REQUEST
             - BUILDKITE_TAG
+            - CI
+            - CODECOV_TOKEN
             - GH_UPLOAD_TOKEN
 
   - label: ":docker: CPU Tests (test-cpu-variant-tf-1.12.0-torch-1.1.0-py3)"
     agents:
       queue: private-default
-    command: build/test.sh
+    command: build/ci/buildkite_test.sh
     plugins:
       - docker-compose#v3.1.0:
           run: test-cpu-variant-tf-1.12.0-torch-1.1.0-py3
           config: docker-compose.test.yml
           env:
+            - BUILDKITE
+            - BUILDKITE_BRANCH
+            - BUILDKITE_BUILD_NUMBER
+            - BUILDKITE_BUILD_URL
+            - BUILDKITE_COMMIT
+            - BUILDKITE_JOB_ID
+            - BUILDKITE_PROJECT_SLUG
+            - BUILDKITE_PULL_REQUEST
             - BUILDKITE_TAG
+            - CI
+            - CODECOV_TOKEN
             - GH_UPLOAD_TOKEN
 
   - label: ":docker: CPU Tests (test-cpu-variant-tf-1.13.1-torch-1.2.0-py3)"
     agents:
       queue: private-default
-    command: build/test.sh
+    command: build/ci/buildkite_test.sh
     plugins:
       - docker-compose#v3.1.0:
           run: test-cpu-variant-tf-1.13.1-torch-1.2.0-py3
           config: docker-compose.test.yml
           env:
+            - BUILDKITE
+            - BUILDKITE_BRANCH
+            - BUILDKITE_BUILD_NUMBER
+            - BUILDKITE_BUILD_URL
+            - BUILDKITE_COMMIT
+            - BUILDKITE_JOB_ID
+            - BUILDKITE_PROJECT_SLUG
+            - BUILDKITE_PULL_REQUEST
             - BUILDKITE_TAG
+            - CI
+            - CODECOV_TOKEN
             - GH_UPLOAD_TOKEN
 
   - label: ":docker: CPU Tests (test-cpu-variant-tf-1.14.0-torch-1.3.0.dev20190820-py3)"
     agents:
       queue: private-default
-    command: build/test.sh
+    command: build/ci/buildkite_test.sh
     plugins:
       - docker-compose#v3.1.0:
           run: test-cpu-variant-tf-1.14.0-torch-1.3.0.dev20190820-py3
           config: docker-compose.test.yml
           env:
+            - BUILDKITE
+            - BUILDKITE_BRANCH
+            - BUILDKITE_BUILD_NUMBER
+            - BUILDKITE_BUILD_URL
+            - BUILDKITE_COMMIT
+            - BUILDKITE_JOB_ID
+            - BUILDKITE_PROJECT_SLUG
+            - BUILDKITE_PULL_REQUEST
             - BUILDKITE_TAG
+            - CI
+            - CODECOV_TOKEN
             - GH_UPLOAD_TOKEN
 
   - label: ":docker: CPU Tests (test-cpu-variant-tf-1.15.0-torch-1.3.0-py3)"
     agents:
       queue: private-default
-    command: build/test.sh
+    command: build/ci/buildkite_test.sh
     plugins:
       - docker-compose#v3.1.0:
           run: test-cpu-variant-tf-1.15.0-torch-1.3.0-py3
           config: docker-compose.test.yml
           env:
+            - BUILDKITE
+            - BUILDKITE_BRANCH
+            - BUILDKITE_BUILD_NUMBER
+            - BUILDKITE_BUILD_URL
+            - BUILDKITE_COMMIT
+            - BUILDKITE_JOB_ID
+            - BUILDKITE_PROJECT_SLUG
+            - BUILDKITE_PULL_REQUEST
             - BUILDKITE_TAG
+            - CI
+            - CODECOV_TOKEN
             - GH_UPLOAD_TOKEN
 
   - label: ":docker: GPU Tests (test-gpu-variant-tf-1.12.0-torch-1.1.0-py2.7)"
     agents:
       queue: private-gpu
-    command: build/test_gpu.sh
+    command: build/ci/buildkite_test_gpu.sh
     plugins:
       - docker-compose#v3.1.0:
           run: test-gpu-variant-tf-1.12.0-torch-1.1.0-py2.7
           config: docker-compose.test.yml
           env:
+            - BUILDKITE
+            - BUILDKITE_BRANCH
+            - BUILDKITE_BUILD_NUMBER
+            - BUILDKITE_BUILD_URL
+            - BUILDKITE_COMMIT
+            - BUILDKITE_JOB_ID
+            - BUILDKITE_PROJECT_SLUG
+            - BUILDKITE_PULL_REQUEST
             - BUILDKITE_TAG
+            - CI
+            - CODECOV_TOKEN
             - GH_UPLOAD_TOKEN
 
   - label: ":docker: GPU Tests (test-gpu-variant-tf-1.13.1-torch-1.2.0-py2.7)"
     agents:
       queue: private-gpu
-    command: build/test_gpu.sh
+    command: build/ci/buildkite_test_gpu.sh
     plugins:
       - docker-compose#v3.1.0:
           run: test-gpu-variant-tf-1.13.1-torch-1.2.0-py2.7
           config: docker-compose.test.yml
           env:
+            - BUILDKITE
+            - BUILDKITE_BRANCH
+            - BUILDKITE_BUILD_NUMBER
+            - BUILDKITE_BUILD_URL
+            - BUILDKITE_COMMIT
+            - BUILDKITE_JOB_ID
+            - BUILDKITE_PROJECT_SLUG
+            - BUILDKITE_PULL_REQUEST
             - BUILDKITE_TAG
+            - CI
+            - CODECOV_TOKEN
             - GH_UPLOAD_TOKEN
 
   - label: ":docker: GPU Tests (test-gpu-variant-tf-1.14.0-torch-1.3.0.dev20190820-py2.7)"
     agents:
       queue: private-gpu
-    command: build/test_gpu.sh
+    command: build/ci/buildkite_test_gpu.sh
     plugins:
       - docker-compose#v3.1.0:
           run: test-gpu-variant-tf-1.14.0-torch-1.3.0.dev20190820-py2.7
           config: docker-compose.test.yml
           env:
+            - BUILDKITE
+            - BUILDKITE_BRANCH
+            - BUILDKITE_BUILD_NUMBER
+            - BUILDKITE_BUILD_URL
+            - BUILDKITE_COMMIT
+            - BUILDKITE_JOB_ID
+            - BUILDKITE_PROJECT_SLUG
+            - BUILDKITE_PULL_REQUEST
             - BUILDKITE_TAG
+            - CI
+            - CODECOV_TOKEN
             - GH_UPLOAD_TOKEN
 
   - label: ":docker: GPU Tests (test-gpu-variant-tf-1.15.0-torch-1.3.0-py2.7)"
     agents:
       queue: private-gpu
-    command: build/test_gpu.sh
+    command: build/ci/buildkite_test_gpu.sh
     plugins:
       - docker-compose#v3.1.0:
           run: test-gpu-variant-tf-1.15.0-torch-1.3.0-py2.7
           config: docker-compose.test.yml
           env:
+            - BUILDKITE
+            - BUILDKITE_BRANCH
+            - BUILDKITE_BUILD_NUMBER
+            - BUILDKITE_BUILD_URL
+            - BUILDKITE_COMMIT
+            - BUILDKITE_JOB_ID
+            - BUILDKITE_PROJECT_SLUG
+            - BUILDKITE_PULL_REQUEST
             - BUILDKITE_TAG
+            - CI
+            - CODECOV_TOKEN
             - GH_UPLOAD_TOKEN
 
   - label: ":docker: GPU Tests (test-gpu-variant-tf-1.12.0-torch-1.1.0-py3)"
     agents:
       queue: private-gpu
-    command: build/test_gpu.sh
+    command: build/ci/buildkite_test_gpu.sh
     plugins:
       - docker-compose#v3.1.0:
           run: test-gpu-variant-tf-1.12.0-torch-1.1.0-py3
           config: docker-compose.test.yml
           env:
+            - BUILDKITE
+            - BUILDKITE_BRANCH
+            - BUILDKITE_BUILD_NUMBER
+            - BUILDKITE_BUILD_URL
+            - BUILDKITE_COMMIT
+            - BUILDKITE_JOB_ID
+            - BUILDKITE_PROJECT_SLUG
+            - BUILDKITE_PULL_REQUEST
             - BUILDKITE_TAG
+            - CI
+            - CODECOV_TOKEN
             - GH_UPLOAD_TOKEN
 
   - label: ":docker: GPU Tests (test-gpu-variant-tf-1.13.1-torch-1.2.0-py3)"
     agents:
       queue: private-gpu
-    command: build/test_gpu.sh
+    command: build/ci/buildkite_test_gpu.sh
     plugins:
       - docker-compose#v3.1.0:
           run: test-gpu-variant-tf-1.13.1-torch-1.2.0-py3
           config: docker-compose.test.yml
           env:
+            - BUILDKITE
+            - BUILDKITE_BRANCH
+            - BUILDKITE_BUILD_NUMBER
+            - BUILDKITE_BUILD_URL
+            - BUILDKITE_COMMIT
+            - BUILDKITE_JOB_ID
+            - BUILDKITE_PROJECT_SLUG
+            - BUILDKITE_PULL_REQUEST
             - BUILDKITE_TAG
+            - CI
+            - CODECOV_TOKEN
             - GH_UPLOAD_TOKEN
 
   - label: ":docker: GPU Tests (test-gpu-variant-tf-1.14.0-torch-1.3.0.dev20190820-py3)"
     agents:
       queue: private-gpu
-    command: build/test_gpu.sh
+    command: build/ci/buildkite_test_gpu.sh
     plugins:
       - docker-compose#v3.1.0:
           run: test-gpu-variant-tf-1.14.0-torch-1.3.0.dev20190820-py3
           config: docker-compose.test.yml
           env:
+            - BUILDKITE
+            - BUILDKITE_BRANCH
+            - BUILDKITE_BUILD_NUMBER
+            - BUILDKITE_BUILD_URL
+            - BUILDKITE_COMMIT
+            - BUILDKITE_JOB_ID
+            - BUILDKITE_PROJECT_SLUG
+            - BUILDKITE_PULL_REQUEST
             - BUILDKITE_TAG
+            - CI
+            - CODECOV_TOKEN
             - GH_UPLOAD_TOKEN
 
   - label: ":docker: GPU Tests (test-gpu-variant-tf-1.15.0-torch-1.3.0-py3)"
     agents:
       queue: private-gpu
-    command: build/test_gpu.sh
+    command: build/ci/buildkite_test_gpu.sh
     plugins:
       - docker-compose#v3.1.0:
           run: test-gpu-variant-tf-1.15.0-torch-1.3.0-py3
           config: docker-compose.test.yml
           env:
+            - BUILDKITE
+            - BUILDKITE_BRANCH
+            - BUILDKITE_BUILD_NUMBER
+            - BUILDKITE_BUILD_URL
+            - BUILDKITE_COMMIT
+            - BUILDKITE_JOB_ID
+            - BUILDKITE_PROJECT_SLUG
+            - BUILDKITE_PULL_REQUEST
             - BUILDKITE_TAG
+            - CI
+            - CODECOV_TOKEN
             - GH_UPLOAD_TOKEN
 
 

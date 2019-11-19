@@ -46,4 +46,4 @@ script:
   # This leads to different behavior depending on where the PR came from.
   # To get around this, we always run in a non-interactive shell.
   - set -o pipefail
-  - ./build/travis_build.sh < /dev/null | cat
+  - ./build/ci/travis_build.sh < /dev/null | cat
