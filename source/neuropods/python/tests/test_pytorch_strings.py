@@ -49,11 +49,6 @@ def package_strings_model(out_dir, do_fail=False):
         }],
         entrypoint_package="strings_model",
         entrypoint="get_model",
-        test_deps=['torch', 'numpy'],
-        # This runs the test in the current process instead of in a new virtualenv
-        # We are using this to ensure the test will work even if the CI environment
-        # is restrictive
-        skip_virtualenv=True,
         # Get the input/output spec along with test data
         **get_string_concat_model_spec(do_fail=do_fail)
     )

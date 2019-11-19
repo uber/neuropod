@@ -198,7 +198,6 @@ create_pytorch_neuropod(
     output_spec=addition_problem_definition.OUTPUT_SPEC,
     test_input_data=addition_problem_definition.TEST_INPUT_DATA,
     test_expected_out=addition_problem_definition.TEST_EXPECTED_OUT,
-    test_deps=['torch', 'numpy'],
 )
 ```
 

@@ -11,7 +11,7 @@ import numpy as np
 from testpath.tempdir import TemporaryDirectory
 
 from neuropods.loader import load_neuropod
-from neuropods.utils.env_utils import create_virtualenv, eval_in_virtualenv, eval_in_new_process
+from neuropods.utils.env_utils import eval_in_new_process
 from neuropods.utils.dtype_utils import maybe_convert_bindings_types
 
 RUN_NATIVE_TESTS   = os.getenv("NEUROPODS_RUN_NATIVE_TESTS") is not None
@@ -66,10 +66,9 @@ def load_and_test_native(neuropod_path, test_input_data, test_expected_out=None,
         check_output_matches_expected(out, test_expected_out)
 
 def load_and_test_neuropod(neuropod_path, test_input_data, test_expected_out=None,
-                           use_virtualenv=False, test_deps=[], test_virtualenv=None,
                            neuropod_load_args={}, **kwargs):
     """
-    Loads a neuropod in a virtualenv and verifies that inference runs.
+    Loads a neuropod in a new process and verifies that inference runs.
     If expected output is specified, the output of the model is checked against
     the expected values.
 
@@ -78,20 +77,9 @@ def load_and_test_neuropod(neuropod_path, test_input_data, test_expected_out=Non
     if RUN_NATIVE_TESTS:
         return load_and_test_native(neuropod_path, test_input_data, test_expected_out, neuropod_load_args=neuropod_load_args)
 
-    if use_virtualenv:
-        # Run the model in a virtualenv
-        if test_virtualenv is None:
-            # Create a temporary virtualenv if one is not specified
-            with TemporaryDirectory() as virtualenv_dir:
-                create_virtualenv(virtualenv_dir, packages_to_install=test_deps)
-                out = eval_in_virtualenv(neuropod_path, test_input_data, virtualenv_dir, neuropod_load_args=neuropod_load_args)
-        else:
-            # Otherwise run in the specified virtualenv
-            out = eval_in_virtualenv(neuropod_path, test_input_data, test_virtualenv, neuropod_load_args=neuropod_load_args)
-    else:
-        # Run the evaluation in a new process. This is important to make sure
-        # custom ops are being tested correctly
-        out = eval_in_new_process(neuropod_path, test_input_data, neuropod_load_args=neuropod_load_args)
+    # Run the evaluation in a new process. This is important to make sure
+    # custom ops are being tested correctly
+    out = eval_in_new_process(neuropod_path, test_input_data, neuropod_load_args=neuropod_load_args)
 
     # Check the output
     if test_expected_out is not None:
