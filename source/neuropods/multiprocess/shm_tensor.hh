@@ -36,7 +36,7 @@ struct __attribute__((__packed__)) shm_tensor
 };
 
 // TODO(vip): Use std::align
-void *get_next_aligned_offset(void *base)
+inline void *get_next_aligned_offset(void *base)
 {
     // We want to find an offset such that the data will be 64 byte aligned
     uint64_t base_address   = reinterpret_cast<uint64_t>(base);
