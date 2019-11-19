@@ -134,7 +134,7 @@ py::array tensor_to_numpy(std::shared_ptr<NeuropodTensor> value)
     else
     {
         auto dims = tensor->get_dims();
-        auto data = NeuropodTensorRawDataAccess::get_untyped_data_ptr(*tensor);
+        auto data = internal::NeuropodTensorRawDataAccess::get_untyped_data_ptr(*tensor);
 
         // Make sure we don't deallocate the tensor until the numpy array is deallocated
         auto deleter        = [value](void *unused) {};

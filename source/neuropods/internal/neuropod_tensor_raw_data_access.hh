@@ -11,6 +11,9 @@ namespace neuropods
 
 class NeuropodTensor;
 
+namespace internal
+{
+
 // This struct is used internally within the library to access raw untyped data
 // from a NeuropodTensor
 //
@@ -24,4 +27,5 @@ struct NeuropodTensorRawDataAccess
     static size_t get_bytes_per_element(const NeuropodTensor &tensor);
 };
 
+} // namespace internal
 } // namespace neuropods

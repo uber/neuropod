@@ -54,6 +54,14 @@ class NeuropodTensor;
 template <typename T>
 class TypedNeuropodTensor;
 
+namespace internal
+{
+
+// A struct used internally to work with NeuropodTensors
+struct NeuropodTensorRawDataAccess;
+
+}
+
 // Base value type for Neuropod
 class NeuropodValue
 {
@@ -229,8 +237,10 @@ protected:
     // Get the strides of the tensor
     const std::vector<int64_t> &get_strides() const { return strides_; }
 
+    // This struct is used internally
+    friend internal::NeuropodTensorRawDataAccess;
+
     // Get a raw void * to the underlying data
-    friend struct NeuropodTensorRawDataAccess;
     virtual void *      get_untyped_data_ptr()       = 0;
     virtual const void *get_untyped_data_ptr() const = 0;
 
