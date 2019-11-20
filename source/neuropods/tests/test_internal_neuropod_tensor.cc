@@ -192,3 +192,95 @@ TEST_F(uint8_scalar_fixture, typed_const_access)
     const auto &actual = const_tensor->as_scalar();
     EXPECT_EQ(actual, 42);
 }
+
+TEST(test_value_equality, non_tensor_error)
+{
+    // We don't currently have any NeuropodValues that are not
+    // tensors so create one in order to test
+    class SomeNonTensorValue : public neuropods::NeuropodValue
+    {
+    public:
+        SomeNonTensorValue() : neuropods::NeuropodValue(false) {}
+        ~SomeNonTensorValue() = default;
+
+        SET_SERIALIZE_TAG("something");
+    };
+
+    neuropods::TestNeuropodBackend backend;
+    auto                           allocator = backend.get_tensor_allocator();
+
+    // Create a tensor
+    auto val1 = allocator->allocate_tensor<float>({5});
+
+    // Create a non-tensor value
+    SomeNonTensorValue val2;
+
+    // We shouldn't be able to convert this to a tensor
+    EXPECT_THROW(val2.as_tensor(), std::runtime_error);
+
+    // Comparing with a NeuropodValue that is not a tensor should throw
+    auto should_throw = [&val1, &val2]() { return *val1 == val2; };
+
+    EXPECT_THROW(should_throw(), std::runtime_error);
+}
+
+TEST(test_tensor_equality, basic_equality)
+{
+    neuropods::TestNeuropodBackend backend;
+    auto                           allocator = backend.get_tensor_allocator();
+
+    auto t1 = allocator->ones<float>({5});
+    auto t2 = allocator->ones<float>({5});
+
+    // Self equality
+    EXPECT_EQ(*t1, *t1);
+
+    // t1 and t2 should be equal
+    EXPECT_EQ(*t1, *t2);
+}
+
+TEST(test_tensor_equality, different_types)
+{
+    neuropods::TestNeuropodBackend backend;
+    auto                           allocator = backend.get_tensor_allocator();
+
+    auto t1 = allocator->ones<float>({5});
+    auto t2 = allocator->ones<double>({5});
+
+    EXPECT_FALSE(*t1 == *t2);
+}
+
+TEST(test_tensor_equality, different_dims)
+{
+    neuropods::TestNeuropodBackend backend;
+    auto                           allocator = backend.get_tensor_allocator();
+
+    auto t1 = allocator->ones<float>({5});
+    auto t2 = allocator->ones<float>({6});
+
+    EXPECT_FALSE(*t1 == *t2);
+}
+
+TEST(test_tensor_equality, different_ranks)
+{
+    neuropods::TestNeuropodBackend backend;
+    auto                           allocator = backend.get_tensor_allocator();
+
+    auto t1 = allocator->ones<float>({30});
+    auto t2 = allocator->ones<float>({5, 6});
+
+    EXPECT_FALSE(*t1 == *t2);
+}
+
+TEST(test_copy_from, different_numel)
+{
+    neuropods::TestNeuropodBackend backend;
+    std::vector<float>             data(4);
+
+    auto allocator = backend.get_tensor_allocator();
+    auto t1        = allocator->allocate_tensor<float>({5});
+
+    // The number of elements in data doesn't match the number of elements
+    // in the tensor
+    EXPECT_THROW(t1->copy_from(data), std::runtime_error);
+}

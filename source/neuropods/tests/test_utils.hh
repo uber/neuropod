@@ -145,7 +145,8 @@ void test_strings_model(neuropods::Neuropod &neuropod)
     y_ten->set(y_data);
 
     // Run inference
-    const auto output_data = neuropod.infer({{"x", x_ten}, {"y", y_ten}});
+    // Requesting the "out" tensor here isn't strictly necessary, but is used to test functionality
+    const auto output_data = neuropod.infer({{"x", x_ten}, {"y", y_ten}}, {"out"});
 
     // Get the data in the output tensor
     const std::vector<std::string> out_vector =
