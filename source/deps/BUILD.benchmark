@@ -17,6 +17,8 @@ cc_library(
     linkopts = ["-pthread"],
     strip_include_prefix = "include",
     visibility = ["//visibility:public"],
+    # Don't warn in third party libs
+    copts = ["-Wno-everything"],
 )
 
 cc_library(
@@ -26,4 +28,6 @@ cc_library(
     strip_include_prefix = "include",
     visibility = ["//visibility:public"],
     deps = [":benchmark"],
+    # Don't warn in third party libs
+    copts = ["-Wno-everything"],
 )

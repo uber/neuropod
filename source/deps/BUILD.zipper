@@ -18,6 +18,8 @@ cc_library(
     includes = [
         "zipper"
     ],
+    # Don't warn in third party libs
+    copts = ["-Wno-everything"],
     deps = [
         "@minizip_repo//:minizip",
     ],
