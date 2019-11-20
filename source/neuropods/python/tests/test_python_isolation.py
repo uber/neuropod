@@ -50,11 +50,6 @@ class TestPythonIsolation(unittest.TestCase):
             }],
             entrypoint_package="dummy_model",
             entrypoint="get_model",
-            test_deps=['numpy'],
-            # This runs the test in the current process instead of in a new virtualenv
-            # We are using this to ensure the test will work even if the CI environment
-            # is restrictive
-            skip_virtualenv=True,
             input_spec=[{"name": "x", "dtype": "float32", "shape": (1,)}],
             output_spec=[{"name": "out", "dtype": "float32", "shape": (1,)}],
             test_input_data={"x": np.array([0.0], dtype=np.float32)},

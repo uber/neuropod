@@ -16,7 +16,6 @@ def create_python_neuropod(
         code_path_spec,
         entrypoint_package,
         entrypoint,
-        skip_virtualenv=False,
         **kwargs):
     """
     Packages arbitrary python code as a neuropod package.
