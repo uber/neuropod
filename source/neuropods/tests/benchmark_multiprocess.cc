@@ -25,7 +25,6 @@ struct load_out_of_process
     }
 };
 
-
 } // namespace
 
 template <typename Loader>
@@ -54,7 +53,6 @@ void benchmark_object_detection(benchmark::State &state)
 
 BENCHMARK_TEMPLATE(benchmark_object_detection, load_in_process);
 BENCHMARK_TEMPLATE(benchmark_object_detection, load_out_of_process);
-
 
 template <typename Loader>
 void benchmark_small_inputs(benchmark::State &state)

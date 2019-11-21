@@ -39,15 +39,12 @@ TensorType get_array_type(py::array &array)
 #undef IS_INSTANCE_CHECK
 }
 
-
 pybind11::dtype get_py_type(const NeuropodTensor &tensor)
 {
 #define GET_TYPE(CPP_TYPE, NEUROPOD_TYPE)       \
-    case NEUROPOD_TYPE:                         \
-    {                                           \
+    case NEUROPOD_TYPE: {                       \
         return pybind11::dtype::of<CPP_TYPE>(); \
     }
-
 
     const auto &tensor_type = tensor.get_tensor_type();
     switch (tensor_type)
@@ -101,7 +98,7 @@ std::shared_ptr<NeuropodTensor> tensor_from_numpy(NeuropodTensorAllocator &alloc
     // Capture the array in our deleter so it doesn't get deallocated
     // until we're done
     auto to_delete = std::make_shared<py::array>(array);
-    auto deleter = [to_delete](void *unused) mutable {
+    auto deleter   = [to_delete](void *unused) mutable {
         py::gil_scoped_acquire gil;
         to_delete.reset();
     };

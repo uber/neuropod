@@ -12,12 +12,12 @@ namespace neuropods
 namespace internal
 {
 
-void * NeuropodTensorRawDataAccess::get_untyped_data_ptr(NeuropodTensor &tensor)
+void *NeuropodTensorRawDataAccess::get_untyped_data_ptr(NeuropodTensor &tensor)
 {
     return tensor.get_untyped_data_ptr();
 }
 
-const void * NeuropodTensorRawDataAccess::get_untyped_data_ptr(const NeuropodTensor &tensor)
+const void *NeuropodTensorRawDataAccess::get_untyped_data_ptr(const NeuropodTensor &tensor)
 {
     return tensor.get_untyped_data_ptr();
 }

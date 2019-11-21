@@ -101,20 +101,23 @@ TEST(test_allocate_tensor, neuropod_value_map)
 
     auto allocator = backend.get_tensor_allocator();
 
-    const std::shared_ptr<neuropods::NeuropodValue> float_tensor_1D = allocator->allocate_tensor({3}, neuropods::FLOAT_TENSOR);
+    const std::shared_ptr<neuropods::NeuropodValue> float_tensor_1D =
+        allocator->allocate_tensor({3}, neuropods::FLOAT_TENSOR);
     float_tensor_1D->as_typed_tensor<float>()->copy_from({0.0, 0.1, 0.2});
 
-    const std::shared_ptr<neuropods::NeuropodValue> string_tensor_2D = allocator->allocate_tensor({2, 2}, neuropods::STRING_TENSOR);
+    const std::shared_ptr<neuropods::NeuropodValue> string_tensor_2D =
+        allocator->allocate_tensor({2, 2}, neuropods::STRING_TENSOR);
     string_tensor_2D->as_typed_tensor<std::string>()->set({"A", "B", "C", "D"});
 
-    const std::shared_ptr<neuropods::NeuropodValue> int_tensor_2D = allocator->allocate_tensor({2, 3}, neuropods::INT32_TENSOR);
+    const std::shared_ptr<neuropods::NeuropodValue> int_tensor_2D =
+        allocator->allocate_tensor({2, 3}, neuropods::INT32_TENSOR);
     int_tensor_2D->as_typed_tensor<int32_t>()->copy_from({0, 1, 2, 3, 4, 5});
 
     // Create a map
     neuropods::NeuropodValueMap data;
-    data["int"] = int_tensor_2D;
+    data["int"]    = int_tensor_2D;
     data["string"] = string_tensor_2D;
-    data["float"] = float_tensor_1D;
+    data["float"]  = float_tensor_1D;
 
     // Serialize the map
     std::stringstream ss;

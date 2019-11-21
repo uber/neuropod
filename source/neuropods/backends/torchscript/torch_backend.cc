@@ -175,7 +175,7 @@ TorchNeuropodBackend::TorchNeuropodBackend(const std::string &           neuropo
 
     if (!model_)
     {
-      NEUROPOD_ERROR("Failed to load TorchScript graph for neuropod" << neuropod_path.c_str());
+        NEUROPOD_ERROR("Failed to load TorchScript graph for neuropod" << neuropod_path.c_str());
     }
 
     for (const auto &tensor_spec : model_config->outputs)

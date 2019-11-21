@@ -54,7 +54,7 @@ TEST(test_shm_tensor, simple)
         uint8_t expected_data[num_items];
         std::fill_n(expected_data, num_items, i);
 
-        auto          actual_data              = tensor->as_typed_tensor<uint8_t>()->get_raw_data_ptr();
+        auto actual_data = tensor->as_typed_tensor<uint8_t>()->get_raw_data_ptr();
         EXPECT_EQ(memcmp(actual_data, expected_data, num_items * sizeof(uint8_t)), 0);
     }
 }

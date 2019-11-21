@@ -3,7 +3,6 @@
 //
 
 #include "gtest/gtest.h"
-
 #include "neuropods/internal/backend_registration.hh"
 
 namespace neuropods

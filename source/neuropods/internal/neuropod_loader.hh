@@ -4,9 +4,9 @@
 
 #pragma once
 
-#include <string>
 #include <iostream>
 #include <memory>
+#include <string>
 
 namespace neuropods
 {

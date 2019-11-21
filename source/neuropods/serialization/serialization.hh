@@ -11,8 +11,8 @@
 
 #include <functional>
 #include <memory>
-#include <unordered_map>
 #include <string>
+#include <unordered_map>
 
 namespace neuropods
 {
@@ -52,21 +52,21 @@ bool register_serializable(std::function<void(const T &, boost::archive::binary_
     return true;
 }
 
-template<typename ReturnType>
+template <typename ReturnType>
 ReturnType deserialize(boost::archive::binary_iarchive &ar, NeuropodTensorAllocator &allocator);
 
 // Serialize a NeuropodValue
 void serialize(boost::archive::binary_oarchive &out, const NeuropodValue &item);
 
 // Deserialize from an archive
-template<>
+template <>
 std::shared_ptr<NeuropodValue> deserialize(boost::archive::binary_iarchive &ar, NeuropodTensorAllocator &allocator);
 
 // Serialize a NeuropodValueMap
 void serialize(boost::archive::binary_oarchive &out, const NeuropodValueMap &item);
 
 // Deserialize a NeuropodValueMap from an archive
-template<>
+template <>
 NeuropodValueMap deserialize(boost::archive::binary_iarchive &ar, NeuropodTensorAllocator &allocator);
 
 } // namespace detail

@@ -45,19 +45,19 @@ std::unique_ptr<py::gil_scoped_release> maybe_initialize()
         return nullptr;
     }
 
-    #ifndef __APPLE__
-    // This binary is already linked against `libpython`; the dlopen just
-    // promotes it to RTLD_GLOBAL.
-    #define STR_HELPER(x) #x
-    #define STR(x) STR_HELPER(x)
-    #define PYTHON_LIB_NAME "libpython" STR(PYTHON_VERSION) ".so"
+#ifndef __APPLE__
+// This binary is already linked against `libpython`; the dlopen just
+// promotes it to RTLD_GLOBAL.
+#define STR_HELPER(x) #x
+#define STR(x) STR_HELPER(x)
+#define PYTHON_LIB_NAME "libpython" STR(PYTHON_VERSION) ".so"
     void *libpython = dlopen(PYTHON_LIB_NAME, RTLD_NOW | RTLD_GLOBAL | RTLD_NOLOAD);
 
     if (libpython == nullptr)
     {
         NEUROPOD_ERROR("Failed to promote libpython to RTLD_GLOBAL. Error from dlopen: " << dlerror());
     }
-    #endif
+#endif
 
     // If we have a virtualenv, use it
     if (auto venv_path = std::getenv("VIRTUAL_ENV"))

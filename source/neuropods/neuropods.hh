@@ -4,9 +4,9 @@
 
 #pragma once
 
-#include "neuropods/version.hh"
 #include "neuropods/backends/neuropod_backend.hh"
 #include "neuropods/internal/config_utils.hh"
+#include "neuropods/version.hh"
 
 #include <memory>
 #include <string>
@@ -90,7 +90,8 @@ public:
     ~Neuropod();
 
     // Run inference
-    std::unique_ptr<NeuropodValueMap> infer(const NeuropodValueMap &inputs, const std::vector<std::string> &requested_outputs = {});
+    std::unique_ptr<NeuropodValueMap> infer(const NeuropodValueMap &        inputs,
+                                            const std::vector<std::string> &requested_outputs = {});
 
     // Get the inputs and outputs of the loaded Neuropod
     const std::vector<TensorSpec> &get_inputs() const;

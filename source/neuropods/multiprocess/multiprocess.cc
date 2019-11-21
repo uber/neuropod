@@ -33,11 +33,8 @@ namespace
 pid_t start_worker_process(const std::string &control_queue_name)
 {
     pid_t child_pid;
-    char * argv[] = {
-        const_cast<char*>("neuropod_multiprocess_worker"),
-        const_cast<char *>(control_queue_name.c_str()),
-        NULL
-    };
+    char *argv[] = {
+        const_cast<char *>("neuropod_multiprocess_worker"), const_cast<char *>(control_queue_name.c_str()), NULL};
 
     // Spawn a process
     const auto status = posix_spawnp(&child_pid, "neuropod_multiprocess_worker", NULL, NULL, argv, environ);
