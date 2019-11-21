@@ -96,6 +96,7 @@ FRAMEWORK_VERSIONS = [
 travis_matrix = []
 docker_compose_matrix = []
 buildkite_yml_matrix = []
+added_lint = False
 for platform, py_version, framework_version in itertools.product(PLATFORMS, PY_VERSIONS, FRAMEWORK_VERSIONS):
     # Get versions of all the dependencies
     tf_version = framework_version["tensorflow"]
@@ -127,11 +128,7 @@ for platform, py_version, framework_version in itertools.product(PLATFORMS, PY_V
         "\n",
         ])
 
-        buildkite_yml_matrix.extend([
-        "  - label: \":docker: {} Tests ({})\"\n".format("GPU" if is_gpu else "CPU", variant_name),
-        "    agents:\n",
-        "      queue: private-{}\n".format("gpu" if is_gpu else "default"),
-        "    command: build/ci/{}.sh\n".format("buildkite_test_gpu" if is_gpu else "buildkite_test"),
+        plugin_config = [
         "    plugins:\n",
         "      - docker-compose#v3.1.0:\n",
         "          run: {}\n".format(variant_name),
@@ -148,9 +145,28 @@ for platform, py_version, framework_version in itertools.product(PLATFORMS, PY_V
         "            - BUILDKITE_TAG\n",
         "            - CI\n",
         "            - CODECOV_TOKEN\n",
+        "            - GH_STATUS_TOKEN\n",
         "            - GH_UPLOAD_TOKEN\n",
         "\n",
-        ])
+        ]
+
+        buildkite_yml_matrix.extend([
+        "  - label: \":docker: {} Tests ({})\"\n".format("GPU" if is_gpu else "CPU", variant_name),
+        "    agents:\n",
+        "      queue: private-{}\n".format("gpu" if is_gpu else "default"),
+        "    command: build/ci/{}.sh\n".format("buildkite_test_gpu" if is_gpu else "buildkite_test"),
+        ] + plugin_config)
+
+        if not is_gpu and not added_lint:
+            # Add a lint job to our build matrix
+            added_lint = True
+
+            buildkite_yml_matrix.extend([
+            "  - label: \":docker: Lint\"\n".format(variant_name),
+            "    agents:\n",
+            "      queue: private-default\n",
+            "    command: build/ci/buildkite_lint.sh\n",
+            ] + plugin_config)
 
 
 # Use the templates to create the complete config files

@@ -121,6 +121,13 @@ py::array tensor_to_numpy(std::shared_ptr<NeuropodTensor> value)
 {
     auto tensor = value->as_tensor();
 
+    // This isn't going to be null, but we do a null check to keep
+    // static analyzers happy
+    if (tensor == nullptr)
+    {
+        NEUROPOD_ERROR("Error converting value to tensor");
+    }
+
     if (tensor->get_tensor_type() == STRING_TENSOR)
     {
         // This makes a copy
