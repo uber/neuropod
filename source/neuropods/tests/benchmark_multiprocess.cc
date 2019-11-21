@@ -2,6 +2,9 @@
 // Uber, Inc. (c) 2019
 //
 
+// Don't run infer on this file
+// NEUROPODS_CI_SKIP_INFER
+
 #include "benchmark/benchmark.h"
 #include "neuropods/multiprocess/multiprocess.hh"
 #include "neuropods/neuropods.hh"

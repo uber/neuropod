@@ -35,6 +35,13 @@ void check_tensor_eq_ptr(const std::shared_ptr<neuropods::NeuropodTensor> &tenso
     // Downcast to a TypedNeuropodTensor so we can get the data pointer
     const auto typed_tensor = tensor->as_typed_tensor<T>();
 
+    // This isn't going to be null, but we do a null check to keep
+    // static analyzers happy
+    if (typed_tensor == nullptr)
+    {
+        NEUROPOD_ERROR("Error converting to typed tensor");
+    }
+
     // Get a pointer to the internal data
     const auto tensor_data_ptr = typed_tensor->get_raw_data_ptr();
 
