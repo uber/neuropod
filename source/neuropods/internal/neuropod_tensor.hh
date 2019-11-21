@@ -60,7 +60,7 @@ namespace internal
 // A struct used internally to work with NeuropodTensors
 struct NeuropodTensorRawDataAccess;
 
-}
+} // namespace internal
 
 // Base value type for Neuropod
 class NeuropodValue
@@ -257,7 +257,7 @@ public:
 
     virtual ~TypedNeuropodTensor() {}
 
-    T *get_raw_data_ptr() { return static_cast<T *>(get_untyped_data_ptr()); }
+    T *      get_raw_data_ptr() { return static_cast<T *>(get_untyped_data_ptr()); }
     const T *get_raw_data_ptr() const { return static_cast<const T *>(get_untyped_data_ptr()); }
 
     template <size_t N>
@@ -378,6 +378,7 @@ public:
         out << ']';
         return out;
     }
+
 protected:
     size_t get_bytes_per_element() const { return sizeof(T); }
 };
@@ -402,10 +403,7 @@ public:
 
 protected:
     // We can't get a raw pointer from a string tensor
-    void *get_untyped_data_ptr()
-    {
-        NEUROPOD_ERROR("`get_untyped_data_ptr` is not supported for string tensors");
-    };
+    void *get_untyped_data_ptr() { NEUROPOD_ERROR("`get_untyped_data_ptr` is not supported for string tensors"); };
 
     const void *get_untyped_data_ptr() const
     {
@@ -420,8 +418,7 @@ protected:
 
 // Utility to make a tensor of a specific type
 #define MAKE_TENSOR(CPP_TYPE, NEUROPOD_TYPE)                                              \
-    case NEUROPOD_TYPE:                                                                   \
-    {                                                                                     \
+    case NEUROPOD_TYPE: {                                                                 \
         return stdx::make_unique<TensorClass<CPP_TYPE>>(std::forward<Params>(params)...); \
     }
 

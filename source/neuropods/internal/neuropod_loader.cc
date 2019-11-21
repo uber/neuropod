@@ -3,16 +3,18 @@
 //
 
 #include "neuropods/internal/neuropod_loader.hh"
-#include "neuropods/internal/memory_utils.hh"
+
 #include "neuropods/internal/error_utils.hh"
+#include "neuropods/internal/memory_utils.hh"
 
 #include <ghc/filesystem.hpp>
+
+#include <fstream>
+#include <iterator>
+#include <sstream>
+
 #include <picosha2.h>
 #include <unzipper.h>
-
-#include <iterator>
-#include <fstream>
-#include <sstream>
 
 namespace neuropods
 {
@@ -29,10 +31,7 @@ private:
     std::string neuropod_path_;
 
 public:
-    LocalLoader(const std::string &neuropod_path)
-        : neuropod_path_(neuropod_path)
-    {
-    }
+    LocalLoader(const std::string &neuropod_path) : neuropod_path_(neuropod_path) {}
 
     ~LocalLoader() = default;
 
@@ -54,10 +53,7 @@ public:
         return fs::absolute(neuropod_path_) / path;
     }
 
-    std::string ensure_local()
-    {
-        return neuropod_path_;
-    }
+    std::string ensure_local() { return neuropod_path_; }
 };
 
 // Loads a neuropod from a zipfile
@@ -73,10 +69,7 @@ private:
     std::string tempdir_;
 
 public:
-    ZipLoader(const std::string neuropod_path)
-        : unzipper_(neuropod_path), did_unzip_(false)
-    {
-    }
+    ZipLoader(const std::string neuropod_path) : unzipper_(neuropod_path), did_unzip_(false) {}
 
     ~ZipLoader()
     {
@@ -131,7 +124,7 @@ public:
 
         // Update metadata to make sure we cleanup
         did_unzip_ = true;
-        tempdir_ = tempdir;
+        tempdir_   = tempdir;
 
         return tempdir;
     }
@@ -144,9 +137,10 @@ NeuropodLoader::~NeuropodLoader() = default;
 // Get the SHA256 of a file
 std::string NeuropodLoader::get_hash_for_file(const std::string &path)
 {
-    auto stream = get_istream_for_file(path);
+    auto                       stream = get_istream_for_file(path);
     std::vector<unsigned char> hash(picosha2::k_digest_size);
-    picosha2::hash256(std::istreambuf_iterator<char>(*stream), std::istreambuf_iterator<char>(), hash.begin(), hash.end());
+    picosha2::hash256(
+        std::istreambuf_iterator<char>(*stream), std::istreambuf_iterator<char>(), hash.begin(), hash.end());
 
     return picosha2::bytes_to_hex_string(hash.begin(), hash.end());
 }

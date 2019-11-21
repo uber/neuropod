@@ -53,7 +53,7 @@ enum MessageType
 };
 
 // Used to print out the enum names rather than just a number
-std::ostream& operator<<(std::ostream& out, const MessageType value);
+std::ostream &operator<<(std::ostream &out, const MessageType value);
 
 // We can batch multiple tensors into a single message in order to minimize
 // communication overhead. This is the maximum number of tensors we can include

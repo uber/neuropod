@@ -8,11 +8,14 @@ namespace neuropods
 {
 
 // Used to print out the enum names rather than just a number
-std::ostream& operator<<(std::ostream& out, const MessageType value)
+std::ostream &operator<<(std::ostream &out, const MessageType value)
 {
-    const char* s = 0;
-#define GENERATE_CASE(item) case(item): s = #item; break;
-    switch(value)
+    const char *s = 0;
+#define GENERATE_CASE(item) \
+    case (item):            \
+        s = #item;          \
+        break;
+    switch (value)
     {
         GENERATE_CASE(LOAD_NEUROPOD);
         GENERATE_CASE(ADD_INPUT);

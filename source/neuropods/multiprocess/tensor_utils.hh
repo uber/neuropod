@@ -2,8 +2,8 @@
 // Uber, Inc. (c) 2019
 //
 
-#include "neuropods/neuropods.hh"
 #include "neuropods/internal/neuropod_tensor_raw_data_access.hh"
+#include "neuropods/neuropods.hh"
 
 #include <iostream>
 #include <string>
@@ -24,7 +24,7 @@ std::shared_ptr<NeuropodTensor> wrap_existing_tensor(Neuropod &neuropod, std::sh
     //
     // In this case, we're capturing `tensor` in the deleter below. This ensures that the tensor
     // doesn't get deallocated until we're done with the new tensor.
-    const auto  deleter = [tensor](void *unused) {};
+    const auto  deleter     = [tensor](void *unused) {};
     const auto &tensor_type = tensor->get_tensor_type();
     if (tensor_type == STRING_TENSOR)
     {
@@ -55,7 +55,7 @@ std::shared_ptr<NeuropodTensor> wrap_existing_tensor(std::shared_ptr<NeuropodTen
     //
     // In this case, we're capturing `tensor` in the deleter below. This ensures that the tensor
     // doesn't get deallocated until we're done with the new tensor.
-    const auto  deleter = [tensor](void *unused) {};
+    const auto  deleter     = [tensor](void *unused) {};
     const auto &tensor_type = tensor->get_tensor_type();
     if (tensor_type == STRING_TENSOR)
     {

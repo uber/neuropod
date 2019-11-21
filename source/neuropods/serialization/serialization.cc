@@ -57,7 +57,7 @@ void serialize(boost::archive::binary_oarchive &out, const NeuropodValue &item)
     it->second(item, out);
 }
 
-template<>
+template <>
 std::shared_ptr<NeuropodValue> deserialize(boost::archive::binary_iarchive &ar, NeuropodTensorAllocator &allocator)
 {
     init_registrar_if_needed();
@@ -87,11 +87,11 @@ void serialize(boost::archive::binary_oarchive &out, const NeuropodValueMap &ite
     }
 }
 
-template<>
+template <>
 NeuropodValueMap deserialize(boost::archive::binary_iarchive &ar, NeuropodTensorAllocator &allocator)
 {
     NeuropodValueMap out;
-    int num_items;
+    int              num_items;
     ar >> num_items;
 
     for (int i = 0; i < num_items; i++)

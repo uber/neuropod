@@ -42,8 +42,8 @@ TEST(test_factories, test_factories)
     const std::vector<int64_t> dims      = {3, 4, 5};
 
     auto zeros = allocator->zeros<uint16_t>(dims);
-    auto ones = allocator->ones<int32_t>(dims);
-    auto full = allocator->full<double>(dims, 1.23);
+    auto ones  = allocator->ones<int32_t>(dims);
+    auto full  = allocator->full<double>(dims, 1.23);
     auto randn = allocator->randn<float>(dims);
 
     EXPECT_TRUE(is_full<uint16_t>(*zeros, 0, num_items));
@@ -68,17 +68,21 @@ TEST(test_factories, test_factories)
     EXPECT_TRUE(matches_expected(*range3, {0, 2, 4, 6, 8}));
 
     auto eye1 = allocator->eye<float>(4, 4);
+    // clang-format off
     EXPECT_TRUE(matches_expected(*eye1, {
         1, 0, 0, 0,
         0, 1, 0, 0,
         0, 0, 1, 0,
         0, 0, 0, 1
     }));
+    // clang-format on
 
     auto eye2 = allocator->eye<float>(3, 7);
+    // clang-format off
     EXPECT_TRUE(matches_expected(*eye2, {
         1, 0, 0, 0, 0, 0, 0,
         0, 1, 0, 0, 0, 0, 0,
         0, 0, 1, 0, 0, 0, 0
     }));
+    // clang-format on
 }

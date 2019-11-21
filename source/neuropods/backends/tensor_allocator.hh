@@ -89,12 +89,12 @@ public:
         // Note: This is intended to be used in tests and therefore is not optimized for performance
 
         // Compute the size and allocate a tensor
-        int64_t size = std::ceil((end - start) / static_cast<double>(step));
-        auto tensor = allocate_tensor<T>({size});
+        int64_t size   = std::ceil((end - start) / static_cast<double>(step));
+        auto    tensor = allocate_tensor<T>({size});
 
         // Fill the tensor
-        auto data_ptr    = tensor->get_raw_data_ptr();
-        const auto numel = tensor->get_num_elements();
+        auto       data_ptr = tensor->get_raw_data_ptr();
+        const auto numel    = tensor->get_num_elements();
         for (int i = 0, val = 0; i < numel; i++, val += step)
         {
             data_ptr[i] = start + val;
@@ -119,8 +119,8 @@ public:
         // Note: This is intended to be used in tests and therefore is not optimized for performance
 
         auto smallest_dim = std::min(M, N);
-        auto tensor = zeros<T>({M, N});
-        auto accessor = tensor->template accessor<2>();
+        auto tensor       = zeros<T>({M, N});
+        auto accessor     = tensor->template accessor<2>();
 
         for (int i = 0; i < smallest_dim; i++)
         {
@@ -141,13 +141,13 @@ public:
         auto tensor = allocate_tensor<T>(input_dims);
 
         // Setup random number generation
-        std::random_device rd;
-        std::mt19937 gen(rd());
+        std::random_device          rd;
+        std::mt19937                gen(rd());
         std::normal_distribution<T> d(mean, stddev);
 
         // Fill the tensor with random numbers
-        auto data_ptr    = tensor->get_raw_data_ptr();
-        const auto numel = tensor->get_num_elements();
+        auto       data_ptr = tensor->get_raw_data_ptr();
+        const auto numel    = tensor->get_num_elements();
         for (int i = 0; i < numel; i++)
         {
             data_ptr[i] = d(gen);

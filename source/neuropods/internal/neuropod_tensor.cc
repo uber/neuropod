@@ -56,10 +56,8 @@ bool NeuropodValue::operator==(const NeuropodValue &other) const
 {
     if (!is_tensor_ || !other.is_tensor_)
     {
-        NEUROPOD_ERROR(
-            "The equality operator is currently only defined for tensor types. "
-            "Tried to compare a value that is not a tensor."
-        );
+        NEUROPOD_ERROR("The equality operator is currently only defined for tensor types. "
+                       "Tried to compare a value that is not a tensor.");
     }
 
     return (*as_tensor()) == (*other.as_tensor());
@@ -86,14 +84,15 @@ bool NeuropodTensor::operator==(const NeuropodTensor &other) const
     if (get_tensor_type() == STRING_TENSOR)
     {
         // TODO(vip): optimize
-        return as_typed_tensor<std::string>()->get_data_as_vector() == other.as_typed_tensor<std::string>()->get_data_as_vector();
+        return as_typed_tensor<std::string>()->get_data_as_vector() ==
+               other.as_typed_tensor<std::string>()->get_data_as_vector();
     }
 
     // Compare the contents of the tensor
     const auto num_bytes = get_num_elements() * get_bytes_per_element();
 
-    const void * first  = get_untyped_data_ptr();
-    const void * second = other.get_untyped_data_ptr();
+    const void *first  = get_untyped_data_ptr();
+    const void *second = other.get_untyped_data_ptr();
 
     // Optimization for comparing tensors pointing to the same memory
     if (first == second)

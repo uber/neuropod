@@ -8,11 +8,12 @@
 
 #include <json/json.h>
 
-#include <dlfcn.h>
 #include <fstream>
 #include <iostream>
 #include <sstream>
 #include <stdexcept>
+
+#include <dlfcn.h>
 
 namespace neuropods
 {
@@ -102,7 +103,7 @@ TensorflowNeuropodBackend::TensorflowNeuropodBackend(const std::string &        
 {
 #ifndef __APPLE__
     // We need to do this so the custom ops can see the symbols from TF
-    void * libtensorflow = dlopen("libtensorflow_framework.so", RTLD_NOW | RTLD_GLOBAL | RTLD_NOLOAD);
+    void *libtensorflow = dlopen("libtensorflow_framework.so", RTLD_NOW | RTLD_GLOBAL | RTLD_NOLOAD);
     if (libtensorflow == nullptr)
     {
         NEUROPOD_ERROR("Failed to promote libtensorflow to RTLD_GLOBAL. Error from dlopen: " << dlerror());
@@ -126,7 +127,7 @@ TensorflowNeuropodBackend::TensorflowNeuropodBackend(const std::string &        
 
     // Setup the nodename mapping and get the init ops (if any)
     std::vector<std::string> init_ops;
-    auto config_stream = loader_->get_istream_for_file("0/config.json");
+    auto                     config_stream = loader_->get_istream_for_file("0/config.json");
     setup_node_mapping_and_init_ops(*config_stream, node_name_mapping_, init_ops);
 
     // Get a list of the output nodes
@@ -234,7 +235,8 @@ std::unique_ptr<NeuropodValueMap> TensorflowNeuropodBackend::infer(const Neuropo
 }
 
 // Run inference with a set of requested outputs
-std::unique_ptr<NeuropodValueMap> TensorflowNeuropodBackend::infer(const NeuropodValueMap &inputs, const std::vector<std::string> &requested_outputs)
+std::unique_ptr<NeuropodValueMap> TensorflowNeuropodBackend::infer(const NeuropodValueMap &        inputs,
+                                                                   const std::vector<std::string> &requested_outputs)
 {
     // Get the set of outputs we want to compute
     const auto &output_names = requested_outputs.size() > 0 ? requested_outputs : output_names_;

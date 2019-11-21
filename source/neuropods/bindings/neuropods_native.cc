@@ -103,12 +103,10 @@ std::unique_ptr<Neuropod> make_neuropod(py::kwargs kwargs, Params &&... params)
 PYBIND11_MODULE(neuropods_native, m)
 {
     py::class_<Neuropod>(m, "Neuropod")
-        .def(py::init([](const std::string &path, py::kwargs kwargs) {
-            return make_neuropod(kwargs, path);
-        }))
-        .def(py::init([](const std::string &path, const std::unordered_map<std::string, std::string> &default_backend_overrides, py::kwargs kwargs) {
-            return make_neuropod(kwargs, path, default_backend_overrides);
-        }))
+        .def(py::init([](const std::string &path, py::kwargs kwargs) { return make_neuropod(kwargs, path); }))
+        .def(py::init([](const std::string &                                 path,
+                         const std::unordered_map<std::string, std::string> &default_backend_overrides,
+                         py::kwargs kwargs) { return make_neuropod(kwargs, path, default_backend_overrides); }))
         .def(py::init([](const std::string &path, const std::string &backend_name, py::kwargs kwargs) {
             return make_neuropod(kwargs, path, backend_name);
         }))
@@ -119,10 +117,12 @@ PYBIND11_MODULE(neuropods_native, m)
           &deserialize_tensor_binding,
           "Deserialize a string of bytes to a NeuropodTensor (and return it as a numpy array)");
 
-    m.def("serialize", &serialize_valuemap_binding, "Convert a dict of numpy arrays to a NeuropodValueMap and serialize it");
+    m.def("serialize",
+          &serialize_valuemap_binding,
+          "Convert a dict of numpy arrays to a NeuropodValueMap and serialize it");
     m.def("deserialize_dict",
-        &deserialize_valuemap_binding,
-        "Deserialize a string of bytes to a NeuropodValueMap (and return it as a dict of numpy arrays)");
+          &deserialize_valuemap_binding,
+          "Deserialize a string of bytes to a NeuropodValueMap (and return it as a dict of numpy arrays)");
 }
 
 } // namespace neuropods

@@ -11,7 +11,7 @@ static void benchmark_raw(benchmark::State &state)
     neuropods::TestNeuropodBackend backend;
 
     auto allocator = backend.get_tensor_allocator();
-    auto tensor = allocator->allocate_tensor<float>({3, 5});
+    auto tensor    = allocator->allocate_tensor<float>({3, 5});
 
     auto data_ptr = tensor->get_raw_data_ptr();
 
@@ -34,7 +34,7 @@ static void benchmark_accessor(benchmark::State &state)
     neuropods::TestNeuropodBackend backend;
 
     auto allocator = backend.get_tensor_allocator();
-    auto tensor = allocator->allocate_tensor<float>({3, 5});
+    auto tensor    = allocator->allocate_tensor<float>({3, 5});
 
     auto accessor = tensor->accessor<2>();
 

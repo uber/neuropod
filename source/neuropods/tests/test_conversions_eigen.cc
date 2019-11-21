@@ -50,7 +50,7 @@ public:
         const_tensor = tensor;
 
         auto accessor = tensor->accessor<2>();
-        int i = 0;
+        int  i        = 0;
         for (size_t row = 0; row < untyped_tensor->get_dims()[0]; ++row)
         {
             for (size_t col = 0; col < untyped_tensor->get_dims()[1]; ++col)

@@ -20,9 +20,9 @@ namespace internal
 // This should NOT be used externally
 struct NeuropodTensorRawDataAccess
 {
-    static void * get_untyped_data_ptr(NeuropodTensor &tensor);
+    static void *get_untyped_data_ptr(NeuropodTensor &tensor);
 
-    static const void * get_untyped_data_ptr(const NeuropodTensor &tensor);
+    static const void *get_untyped_data_ptr(const NeuropodTensor &tensor);
 
     static size_t get_bytes_per_element(const NeuropodTensor &tensor);
 };
