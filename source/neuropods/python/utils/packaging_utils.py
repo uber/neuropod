@@ -11,12 +11,14 @@ import zipfile
 from neuropods.backends import config_utils
 from neuropods.utils.eval_utils import save_test_data, load_and_test_neuropod
 
+
 def _zipdir(path, zf):
     for root, dirs, files in os.walk(path):
         for file in files:
             abspath = os.path.join(root, file)
             relpath = os.path.relpath(abspath, path)
             zf.write(abspath, arcname=relpath)
+
 
 # A docstring common to all packagers
 COMMON_DOC_PRE = """
@@ -119,12 +121,16 @@ COMMON_DOC_POST = """
     :param  persist_test_data:  Optionally saves the test data within the packaged neuropod.
 """
 
+
 def set_packager_docstring(f):
     # Expects the functon to have a docstring including
     # {common_doc_pre} and {common_doc_post}
     # We can't easily use `.format` because the docstrings contain {}
-    f.__doc__ = f.__doc__.replace("{common_doc_pre}", COMMON_DOC_PRE).replace("{common_doc_post}", COMMON_DOC_POST)
+    f.__doc__ = f.__doc__.replace("{common_doc_pre}", COMMON_DOC_PRE).replace(
+        "{common_doc_post}", COMMON_DOC_POST
+    )
     return f
+
 
 def packager(platform):
     # A decorator that wraps a `platform` specific packager with generic packaging and sets docstrings correctly
@@ -135,21 +141,20 @@ def packager(platform):
         @expand_default_kwargs(deps=[_create_neuropod, f])
         def wrapper(**kwargs):
             # Runs create neuropod
-            _create_neuropod(
-                packager_fn=f,
-                platform=platform,
-                **kwargs
-            )
+            _create_neuropod(packager_fn=f, platform=platform, **kwargs)
 
         # Expects the functon to have a docstring including
         # {common_doc_pre} and {common_doc_post}
         # We can't easily use `.format` because the docstrings contain {}
-        wrapper.__doc__  = f.__doc__.replace("{common_doc_pre}", COMMON_DOC_PRE).replace("{common_doc_post}", COMMON_DOC_POST)
+        wrapper.__doc__ = f.__doc__.replace("{common_doc_pre}", COMMON_DOC_PRE).replace(
+            "{common_doc_post}", COMMON_DOC_POST
+        )
         wrapper.__name__ = f.__name__
 
         return wrapper
 
     return inner
+
 
 def _get_default_args(f):
     """
@@ -165,9 +170,10 @@ def _get_default_args(f):
         # if defaults has n elements, they correspond to the last n elements listed in args.
         default_values = zip(reversed(argspec.args), reversed(argspec.defaults))
 
-        return {k : v for k, v in default_values}
+        return {k: v for k, v in default_values}
 
     return {}
+
 
 def _generate_default_arg_map(f_list):
     """
@@ -181,6 +187,7 @@ def _generate_default_arg_map(f_list):
 
     return default_args
 
+
 def expand_default_kwargs(deps):
     # A decorator for setting neuropod_default_args. This data is used in the docs
     # for showing default values for args in `kwargs`
@@ -192,7 +199,10 @@ def expand_default_kwargs(deps):
 
     return inner
 
-@expand_default_kwargs(deps=[config_utils.write_neuropod_config, load_and_test_neuropod])
+
+@expand_default_kwargs(
+    deps=[config_utils.write_neuropod_config, load_and_test_neuropod]
+)
 def _create_neuropod(
     neuropod_path,
     packager_fn,
@@ -201,7 +211,8 @@ def _create_neuropod(
     test_input_data=None,
     test_expected_out=None,
     persist_test_data=True,
-    **kwargs):
+    **kwargs
+):
     if package_as_zip:
         package_path = tempfile.mkdtemp()
     else:
@@ -209,7 +220,11 @@ def _create_neuropod(
             # Create the neuropod folder
             os.mkdir(neuropod_path)
         except OSError:
-            raise ValueError("The specified neuropod path ({}) already exists! Aborting...".format(neuropod_path))
+            raise ValueError(
+                "The specified neuropod path ({}) already exists! Aborting...".format(
+                    neuropod_path
+                )
+            )
 
         package_path = neuropod_path
 
@@ -237,9 +252,13 @@ def _create_neuropod(
     # Zip the directory if necessary
     if package_as_zip:
         if os.path.exists(neuropod_path):
-            raise ValueError("The specified neuropod path ({}) already exists! Aborting...".format(neuropod_path))
+            raise ValueError(
+                "The specified neuropod path ({}) already exists! Aborting...".format(
+                    neuropod_path
+                )
+            )
 
-        zf = zipfile.ZipFile(neuropod_path, 'w', zipfile.ZIP_DEFLATED)
+        zf = zipfile.ZipFile(neuropod_path, "w", zipfile.ZIP_DEFLATED)
         _zipdir(package_path, zf)
         zf.close()
 
@@ -251,8 +270,5 @@ def _create_neuropod(
         # Load and run the neuropod to make sure that packaging worked correctly
         # Throws a ValueError if the output doesn't match the expected output (if specified)
         load_and_test_neuropod(
-            neuropod_path,
-            test_input_data,
-            test_expected_out,
-            **kwargs
+            neuropod_path, test_input_data, test_expected_out, **kwargs
         )

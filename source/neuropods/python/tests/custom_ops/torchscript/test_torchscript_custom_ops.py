@@ -3,7 +3,6 @@
 #
 
 import glob
-import numpy as np
 import os
 import subprocess
 import sys
@@ -14,15 +13,16 @@ from testpath.tempdir import TemporaryDirectory
 from neuropods.packagers import create_torchscript_neuropod
 from neuropods.tests.utils import get_addition_model_spec, check_addition_model
 
+
 class CustomOpModel(torch.jit.ScriptModule):
     """
     A simple addition model that uses a custom op
     """
+
     @torch.jit.script_method
     def forward(self, x, y):
-        return {
-            "out": torch.ops.neuropod_test_ops.add(x, y)
-        }
+        return {"out": torch.ops.neuropod_test_ops.add(x, y)}
+
 
 class TestTorchScriptCustomOps(unittest.TestCase):
     @classmethod
@@ -30,7 +30,9 @@ class TestTorchScriptCustomOps(unittest.TestCase):
         # Build the custom op
         current_dir = os.path.dirname(os.path.abspath(__file__))
         subprocess.check_call([sys.executable, "setup.py", "build"], cwd=current_dir)
-        cls.custom_op_path = glob.glob(os.path.join(current_dir, "build", "lib*", "addition_op.so"))[0]
+        cls.custom_op_path = glob.glob(
+            os.path.join(current_dir, "build", "lib*", "addition_op.so")
+        )[0]
 
         # Load the op
         torch.ops.load_library(cls.custom_op_path)
@@ -66,5 +68,5 @@ class TestTorchScriptCustomOps(unittest.TestCase):
             self.package_simple_addition_model(do_fail=True)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

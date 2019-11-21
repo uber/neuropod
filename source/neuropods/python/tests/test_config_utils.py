@@ -4,7 +4,10 @@
 
 import unittest
 
-from neuropods.backends.config_utils import canonicalize_tensor_spec, validate_neuropod_config
+from neuropods.backends.config_utils import (
+    canonicalize_tensor_spec,
+    validate_neuropod_config,
+)
 
 
 def get_valid_config():
@@ -17,9 +20,7 @@ def get_valid_config():
         "output_spec": [
             {"name": "y", "dtype": "float32", "shape": (None, 2, "some_symbol")},
         ],
-        "input_tensor_device": {
-            "x": "GPU"
-        }
+        "input_tensor_device": {"x": "GPU"},
     }
 
 
@@ -111,5 +112,5 @@ class TestSpecValidation(unittest.TestCase):
             validate_neuropod_config(config)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

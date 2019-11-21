@@ -11,11 +11,14 @@ import zipfile
 # Delete the created directories at process shutdown
 TO_CLEANUP = []
 
+
 def cleanup():
     for item in TO_CLEANUP:
         shutil.rmtree(item)
 
+
 atexit.register(cleanup)
+
 
 def extract_neuropod_if_necessary(path):
     if os.path.isdir(path):

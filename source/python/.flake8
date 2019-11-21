@@ -1,0 +1,6 @@
+[flake8]
+ignore =
+    # https://github.com/psf/black#line-breaks--binary-operators
+    W503,
+    E231,
+    E501

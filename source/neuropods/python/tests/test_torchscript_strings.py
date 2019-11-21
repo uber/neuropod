@@ -2,19 +2,21 @@
 # Uber, Inc. (c) 2018
 #
 
-import numpy as np
 import os
 import torch
 import unittest
 from testpath.tempdir import TemporaryDirectory
+from typing import Dict, List
 
 from neuropods.packagers import create_torchscript_neuropod
 from neuropods.tests.utils import get_string_concat_model_spec, check_strings_model
+
 
 class StringsModel(torch.jit.ScriptModule):
     """
     A model that concatenates two input strings
     """
+
     @torch.jit.script_method
     def forward(self, x, y):
         # type: (List[str], List[str])
@@ -26,9 +28,8 @@ class StringsModel(torch.jit.ScriptModule):
             s = y[i]
             out.append(f + " " + s)
 
-        return {
-            "out": out[1:]
-        }
+        return {"out": out[1:]}
+
 
 class StringsModelDictInput(torch.jit.ScriptModule):
     """
@@ -36,6 +37,7 @@ class StringsModelDictInput(torch.jit.ScriptModule):
     If there are a large number of inputs, it may be more convenient to take the
     input as a dict rather than as individual parameters.
     """
+
     @torch.jit.script_method
     def forward(self, data):
         # type: (Dict[str, List[str]])
@@ -50,14 +52,14 @@ class StringsModelDictInput(torch.jit.ScriptModule):
             s = y[i]
             out.append(f + " " + s)
 
-        return {
-            "out": out[1:]
-        }
+        return {"out": out[1:]}
+
 
 class StringsModelListOutput(torch.jit.ScriptModule):
     """
     A model that concatenates two input strings
     """
+
     @torch.jit.script_method
     def forward(self, x, y):
         # type: (List[str], List[str])
@@ -106,5 +108,5 @@ class TestTorchScriptStrings(unittest.TestCase):
                     package_strings_model(test_dir, model=model, do_fail=True)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

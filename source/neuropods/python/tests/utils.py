@@ -6,6 +6,7 @@ import numpy as np
 
 from neuropods.loader import load_neuropod
 
+
 def get_addition_model_spec(do_fail=False):
     """
     Returns the input/output spec for an addition model along with test data.
@@ -19,9 +20,7 @@ def get_addition_model_spec(do_fail=False):
             {"name": "x", "dtype": "float32", "shape": ("batch_size",)},
             {"name": "y", "dtype": "float32", "shape": ("batch_size",)},
         ],
-        output_spec=[
-            {"name": "out", "dtype": "float32", "shape": ("batch_size",)},
-        ],
+        output_spec=[{"name": "out", "dtype": "float32", "shape": ("batch_size",)},],
         test_input_data={
             "x": np.arange(5, dtype=np.float32),
             "y": np.arange(5, dtype=np.float32),
@@ -30,6 +29,7 @@ def get_addition_model_spec(do_fail=False):
             "out": np.zeros(5) if do_fail else np.arange(5) + np.arange(5)
         },
     )
+
 
 def get_string_concat_model_spec(do_fail=False):
     """
@@ -48,17 +48,14 @@ def get_string_concat_model_spec(do_fail=False):
             {"name": "x", "dtype": "string", "shape": ("batch_size",)},
             {"name": "y", "dtype": "string", "shape": ("batch_size",)},
         ],
-        output_spec=[
-            {"name": "out", "dtype": "string", "shape": ("batch_size",)},
-        ],
+        output_spec=[{"name": "out", "dtype": "string", "shape": ("batch_size",)},],
         test_input_data={
             "x": np.array(["apple", "banana", "carrot"]),
             "y": np.array(["sauce", "pudding", "cake"]),
         },
-        test_expected_out={
-            "out": expected_out,
-        },
+        test_expected_out={"out": expected_out,},
     )
+
 
 def check_addition_model(neuropod_path):
     """
@@ -72,6 +69,7 @@ def check_addition_model(neuropod_path):
         check_specs_match(neuropod.inputs, target["input_spec"])
         check_specs_match(neuropod.outputs, target["output_spec"])
 
+
 def check_strings_model(neuropod_path):
     """
     Validate that the inputs and outputs of the loaded neuropod match
@@ -83,6 +81,7 @@ def check_strings_model(neuropod_path):
         # Validate that the specs match
         check_specs_match(neuropod.inputs, target["input_spec"])
         check_specs_match(neuropod.outputs, target["output_spec"])
+
 
 def check_specs_match(specs, targets):
     """

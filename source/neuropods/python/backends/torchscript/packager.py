@@ -7,6 +7,7 @@ import torch
 
 from neuropods.utils.packaging_utils import packager
 
+
 @packager(platform="torchscript")
 def create_torchscript_neuropod(neuropod_path, module, **kwargs):
     """

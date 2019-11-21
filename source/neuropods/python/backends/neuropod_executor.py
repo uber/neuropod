@@ -10,19 +10,22 @@ import numpy as np
 from neuropods.backends import config_utils
 from neuropods.utils.dtype_utils import get_dtype
 
+
 def validate_tensors_against_specs(tensors, tensor_specs):
     # All instances of a symbol in a specification must
     # resolve to the same value at runtime. See below for more detail
     symbol_actual_map = {}
 
-    spec_tensor_names = {str(t['name']) for t in tensor_specs}
+    spec_tensor_names = {str(t["name"]) for t in tensor_specs}
     input_tensor_names = set(tensors.keys())
 
     unknown_tensor_names = input_tensor_names - spec_tensor_names
     if unknown_tensor_names:
         raise ValueError(
-            'Tensor name(s) \'{}\' are not found in the input spec'.format(
-                ', '.join(unknown_tensor_names)))
+            "Tensor name(s) '{}' are not found in the input spec".format(
+                ", ".join(unknown_tensor_names)
+            )
+        )
 
     # Iterate through all the tensor specs and validate
     # the matching tensor
@@ -42,14 +45,17 @@ def validate_tensors_against_specs(tensors, tensor_specs):
         if tensor.dtype.type != dtype.type:
             raise ValueError(
                 "Tensor '{}' is expected to be of type {}, but was of type {}".format(
-                    name, dtype, tensor.dtype))
+                    name, dtype, tensor.dtype
+                )
+            )
 
         # Validate the number of dimensions
         if len(tensor.shape) != len(shape):
             raise ValueError(
                 "Tensor '{}' is expected to have {} dimensions, but had {}".format(
-                    name, len(shape), len(
-                        tensor.shape)))
+                    name, len(shape), len(tensor.shape)
+                )
+            )
 
         # Validate the shape
         for i, (dim, expected) in enumerate(zip(tensor.shape, shape)):
@@ -61,7 +67,9 @@ def validate_tensors_against_specs(tensors, tensor_specs):
                 if dim != expected:
                     raise ValueError(
                         "Dim {} of tensor '{}' is expected to be of size {}, but was of size {}".format(
-                            i, name, expected, dim))
+                            i, name, expected, dim
+                        )
+                    )
             elif isinstance(expected, six.string_types):
                 # `expected` is a symbol
                 # Every instance of `expected` should have the same value
@@ -74,20 +82,20 @@ def validate_tensors_against_specs(tensors, tensor_specs):
                     # Make sure this usage matches the previous value
                     if dim != actual_value:
                         raise ValueError(
-                            ("All dims with expected value '{}' should be the same size. "
-                             "Dim {} of tensor '{}' was expected to be of size {}, but was of size {}").format(
-                                expected,
-                                i,
-                                name,
-                                actual_value,
-                                dim))
+                            (
+                                "All dims with expected value '{}' should be the same size. "
+                                "Dim {} of tensor '{}' was expected to be of size {}, but was of size {}"
+                            ).format(expected, i, name, actual_value, dim)
+                        )
                 else:
                     # This is the first time we're seeing this symbol
                     # Add it to the map so we can check future occurrences of this symbol
                     symbol_actual_map[expected] = dim
 
             else:
-                raise ValueError("Invalid value of item in expected shape: {}".format(expected))
+                raise ValueError(
+                    "Invalid value of item in expected shape: {}".format(expected)
+                )
 
 
 @six.add_metaclass(abc.ABCMeta)
@@ -101,7 +109,10 @@ class NeuropodExecutor(object):
         self.neuropod_config = config_utils.read_neuropod_config(neuropod_path)
 
         # Generate the tensor to device mapping
-        self.input_device_mapping = {tensor["name"] : self.neuropod_config["input_tensor_device"][tensor["name"]] for tensor in self.inputs}
+        self.input_device_mapping = {
+            tensor["name"]: self.neuropod_config["input_tensor_device"][tensor["name"]]
+            for tensor in self.inputs
+        }
 
     @property
     def inputs(self):

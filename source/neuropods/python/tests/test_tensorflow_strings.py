@@ -2,7 +2,6 @@
 # Uber, Inc. (c) 2018
 #
 
-import numpy as np
 import os
 import tensorflow as tf
 import unittest
@@ -10,6 +9,7 @@ from testpath.tempdir import TemporaryDirectory
 
 from neuropods.packagers import create_tensorflow_neuropod
 from neuropods.tests.utils import get_string_concat_model_spec, check_strings_model
+
 
 def create_tf_strings_model():
     """
@@ -21,8 +21,8 @@ def create_tf_strings_model():
             x = tf.placeholder(tf.string, name="in_x")
             y = tf.placeholder(tf.string, name="in_y")
 
-            # UATG(flake8/F841) Assigned to a variable for clarity
-            out = tf.string_join([x, y], separator=" ", name="out")
+            # Assigned to a variable for clarity
+            out = tf.string_join([x, y], separator=" ", name="out")  # noqa: F841
 
     return g.as_graph_def()
 
@@ -62,5 +62,5 @@ class TestTensorflowStrings(unittest.TestCase):
             self.package_strings_model(do_fail=True)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

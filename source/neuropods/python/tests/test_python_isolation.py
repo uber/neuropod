@@ -4,14 +4,11 @@
 
 import numpy as np
 import os
-import shutil
 import unittest
-from tempfile import mkdtemp
 from testpath.tempdir import TemporaryDirectory
 
 from neuropods.loader import load_neuropod
 from neuropods.packagers import create_python_neuropod
-from neuropods.tests.utils import get_addition_model_spec, check_addition_model
 
 DUMMY_MODEL_SOURCE = """
 import numpy as np
@@ -42,12 +39,12 @@ class TestPythonIsolation(unittest.TestCase):
             neuropod_path=neuropod_path,
             model_name="dummy_model",
             data_paths=[],
-            code_path_spec=[{
-                "python_root": model_code_dir,
-                "dirs_to_package": [
-                    ""  # Package everything in the python_root
-                ],
-            }],
+            code_path_spec=[
+                {
+                    "python_root": model_code_dir,
+                    "dirs_to_package": [""],  # Package everything in the python_root
+                }
+            ],
             entrypoint_package="dummy_model",
             entrypoint="get_model",
             input_spec=[{"name": "x", "dtype": "float32", "shape": (1,)}],
@@ -72,5 +69,5 @@ class TestPythonIsolation(unittest.TestCase):
                         self.assertEqual(n2.infer(input_data)["out"][0], 2.0)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

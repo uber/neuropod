@@ -2,7 +2,6 @@
 # Uber, Inc. (c) 2018
 #
 
-import numpy as np
 import os
 import subprocess
 import sys
@@ -11,8 +10,8 @@ import unittest
 from testpath.tempdir import TemporaryDirectory
 
 from neuropods.packagers import create_tensorflow_neuropod
-from neuropods.loader import load_neuropod
 from neuropods.tests.utils import get_addition_model_spec
+
 
 def create_tf_addition_model(custom_op_path):
     """
@@ -26,12 +25,16 @@ def create_tf_addition_model(custom_op_path):
             x = tf.placeholder(tf.float32, name="in_x")
             y = tf.placeholder(tf.float32, name="in_y")
 
-            out = addition_op_module.neuropod_addition(x, y, name="out")
+            # Assigned to a variable for clarity
+            out = addition_op_module.neuropod_addition(x, y, name="out")  # noqa: F841
 
     return g.as_graph_def()
 
-@unittest.skipIf(tf.__version__ == '1.14.0' and sys.platform == 'darwin',
-                 'See https://github.com/tensorflow/tensorflow/issues/30633')
+
+@unittest.skipIf(
+    tf.__version__ == "1.14.0" and sys.platform == "darwin",
+    "See https://github.com/tensorflow/tensorflow/issues/30633",
+)
 class TestTensorflowCustomOps(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -40,7 +43,21 @@ class TestTensorflowCustomOps(unittest.TestCase):
         # TF_LFLAGS=( $(python -c 'import tensorflow as tf; print(" ".join(tf.sysconfig.get_link_flags()))') )
         # g++ -std=c++11 -shared addition_op.cc -o addition_op.so -fPIC ${TF_CFLAGS[@]} ${TF_LFLAGS[@]} -O2
         current_dir = os.path.dirname(os.path.abspath(__file__))
-        subprocess.check_call([os.getenv("TF_CXX", "g++"), "-std=c++11", "-shared", "addition_op.cc", "-o", "addition_op.so", "-fPIC"] + tf.sysconfig.get_compile_flags() + tf.sysconfig.get_link_flags() + ["-O2"], cwd=current_dir)
+        subprocess.check_call(
+            [
+                os.getenv("TF_CXX", "g++"),
+                "-std=c++11",
+                "-shared",
+                "addition_op.cc",
+                "-o",
+                "addition_op.so",
+                "-fPIC",
+            ]
+            + tf.sysconfig.get_compile_flags()
+            + tf.sysconfig.get_link_flags()
+            + ["-O2"],
+            cwd=current_dir,
+        )
         cls.custom_op_path = os.path.join(current_dir, "addition_op.so")
 
     def package_simple_addition_model(self, do_fail=False):
@@ -74,5 +91,6 @@ class TestTensorflowCustomOps(unittest.TestCase):
         with self.assertRaises(ValueError):
             self.package_simple_addition_model(do_fail=True)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()

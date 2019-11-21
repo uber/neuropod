@@ -7,14 +7,18 @@ import os
 import torch
 import unittest
 from testpath.tempdir import TemporaryDirectory
+from torch import Tensor
+from typing import Dict
 
 from neuropods.packagers import create_torchscript_neuropod
 from neuropods.utils.eval_utils import load_and_test_neuropod
+
 
 class DevicesModel(torch.jit.ScriptModule):
     """
     This model returns which device its inputs are on (0 for cpu and 1 for gpu)
     """
+
     @torch.jit.script_method
     def get_device(self, item):
         if item.device == torch.device("cpu"):
@@ -41,6 +45,7 @@ class DevicesModel(torch.jit.ScriptModule):
             "x": self.get_device(data["x"]),
             "y": self.get_device(data["y"]),
         }
+
 
 class TestTorchScriptDevices(unittest.TestCase):
     def package_devices_model(self):
@@ -85,7 +90,7 @@ class TestTorchScriptDevices(unittest.TestCase):
                     "x": np.array([0], dtype=np.int64),
                     "y": np.array([0], dtype=np.int64),
                 },
-                neuropod_load_args={"visible_gpu": None}
+                neuropod_load_args={"visible_gpu": None},
             )
 
     def test_device_model(self):
@@ -94,5 +99,5 @@ class TestTorchScriptDevices(unittest.TestCase):
         self.package_devices_model()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()
