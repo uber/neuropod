@@ -10,20 +10,23 @@ from six import string_types
 from neuropods.packagers import create_tensorflow_neuropod
 from neuropods.utils.dtype_utils import get_dtype
 
-def _placeholdes_from_input_spec(input_spec, input_prefix='INPUT_API'):
+
+def _placeholdes_from_input_spec(input_spec, input_prefix="INPUT_API"):
     """Creates tf.placeholder for each of the entries in the input_spec. Returns a dictionary with the
     mapping neuropod input name to the fully qualified tensorflow tensor name"""
     node_name_mapping = dict()
     with tf.name_scope(input_prefix):
         for tensor_spec in input_spec:
-            name = tensor_spec['name']
+            name = tensor_spec["name"]
 
-            symbolic_shape = tensor_spec['shape']
+            symbolic_shape = tensor_spec["shape"]
             # When a shape is defined by a string symbol, it means it's a variable intput.
-            shape = tuple((None if isinstance(d, string_types) else d for d in symbolic_shape))
+            shape = tuple(
+                (None if isinstance(d, string_types) else d for d in symbolic_shape)
+            )
 
             # Translate string name to numpy type and the to TF dtype
-            numpy_dtype = tensor_spec['dtype']
+            numpy_dtype = tensor_spec["dtype"]
             tf_dtype = tf.as_dtype(get_dtype(numpy_dtype))
 
             placeholder = tf.placeholder(tf_dtype, name=name, shape=shape)
@@ -33,7 +36,7 @@ def _placeholdes_from_input_spec(input_spec, input_prefix='INPUT_API'):
     return node_name_mapping
 
 
-def _random_from_output_spec(output_spec, output_prefix='OUTPUT_API'):
+def _random_from_output_spec(output_spec, output_prefix="OUTPUT_API"):
     """Adds random matrix generators based on the output spec. Symbolic dimensions in shape definition are respected."""
     node_name_mapping = dict()
 
@@ -46,9 +49,9 @@ def _random_from_output_spec(output_spec, output_prefix='OUTPUT_API'):
     with tf.name_scope(output_prefix):
 
         for tensor_spec in output_spec:
-            name = tensor_spec['name']
+            name = tensor_spec["name"]
 
-            symbolic_shape = tensor_spec['shape']
+            symbolic_shape = tensor_spec["shape"]
 
             # Randomize variable sized dimensions.
             resolved_shape = tuple()
@@ -60,20 +63,32 @@ def _random_from_output_spec(output_spec, output_prefix='OUTPUT_API'):
                 else:
                     resolved_shape += (d,)
 
-            numpy_dtype = tensor_spec['dtype']
+            numpy_dtype = tensor_spec["dtype"]
             tf_dtype = tf.as_dtype(get_dtype(numpy_dtype))
 
-            if numpy_dtype != 'string':
+            if numpy_dtype != "string":
                 # Integers need `maxval=` to be specified explicitly. Also, random_uniform does not support all
                 # integer types.
                 if tf_dtype.is_integer:
-                    output_tensor = tf.cast(tf.random_uniform(shape=resolved_shape, maxval=tf_dtype.max, dtype=tf.int64,
-                                                              name=name) % tf_dtype.max, tf_dtype)
+                    output_tensor = tf.cast(
+                        tf.random_uniform(
+                            shape=resolved_shape,
+                            maxval=tf_dtype.max,
+                            dtype=tf.int64,
+                            name=name,
+                        )
+                        % tf_dtype.max,
+                        tf_dtype,
+                    )
                 else:
-                    output_tensor = tf.random_uniform(shape=resolved_shape, dtype=tf_dtype, name=name)
+                    output_tensor = tf.random_uniform(
+                        shape=resolved_shape, dtype=tf_dtype, name=name
+                    )
             else:
                 # We just convert random floats to strings
-                output_tensor = tf.as_string(tf.random_uniform(shape=resolved_shape, dtype=tf.float32, name=name))
+                output_tensor = tf.as_string(
+                    tf.random_uniform(shape=resolved_shape, dtype=tf.float32, name=name)
+                )
 
             node_name_mapping[name] = output_tensor.name
 
@@ -103,7 +118,7 @@ def randomify_neuropod(output_path, input_spec, output_spec):
 
     create_tensorflow_neuropod(
         neuropod_path=output_path,
-        model_name='random_model',
+        model_name="random_model",
         graph_def=graph_def,
         node_name_mapping=node_name_mapping,
         input_spec=input_spec,

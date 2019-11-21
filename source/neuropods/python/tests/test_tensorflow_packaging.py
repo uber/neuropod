@@ -12,6 +12,7 @@ from neuropods.packagers import create_tensorflow_neuropod
 from neuropods.loader import load_neuropod
 from neuropods.tests.utils import get_addition_model_spec, check_addition_model
 
+
 def create_tf_addition_model():
     """
     A simple addition model
@@ -22,8 +23,8 @@ def create_tf_addition_model():
             x = tf.placeholder(tf.float32, name="in_x")
             y = tf.placeholder(tf.float32, name="in_y")
 
-            # UATG(flake8/F841) Assigned to a variable for clarity
-            out = tf.add(x, y, name="out")
+            # Assigned to a variable for clarity
+            out = tf.add(x, y, name="out")  # noqa: F841
 
     return g.as_graph_def()
 
@@ -35,7 +36,12 @@ def create_tf_accumulator_model():
     g = tf.Graph()
     with g.as_default():
         with tf.name_scope("some_namespace"):
-            acc = tf.get_variable('accumulator', initializer=tf.zeros_initializer(), shape=(), dtype=tf.float32)
+            acc = tf.get_variable(
+                "accumulator",
+                initializer=tf.zeros_initializer(),
+                shape=(),
+                dtype=tf.float32,
+            )
             x = tf.placeholder(tf.float32, name="in_x")
 
             assign_op = tf.assign_add(acc, x)
@@ -61,7 +67,6 @@ class TestTensorflowPackaging(unittest.TestCase):
                 node_name_mapping={
                     "x": "some_namespace/in_x:0",
                     "y": "some_namespace/in_y:0",
-
                     # The `:0` is optional
                     "out": "some_namespace/out",
                 },
@@ -87,19 +92,11 @@ class TestTensorflowPackaging(unittest.TestCase):
                 "x": "some_namespace/in_x:0",
                 "out": "some_namespace/out:0",
             },
-            input_spec=[
-                {"name": "x", "dtype": "float32", "shape": ()},
-            ],
-            output_spec=[
-                {"name": "out", "dtype": "float32", "shape": ()},
-            ],
+            input_spec=[{"name": "x", "dtype": "float32", "shape": ()},],
+            output_spec=[{"name": "out", "dtype": "float32", "shape": ()},],
             init_op_names=[init_op_name] if init_op_name_as_list else init_op_name,
-            test_input_data={
-                "x": np.float32(5.0),
-            },
-            test_expected_out={
-                "out": np.float32(5.0),
-            },
+            test_input_data={"x": np.float32(5.0),},
+            test_expected_out={"out": np.float32(5.0),},
         )
 
     def test_simple_addition_model(self):
@@ -124,9 +121,13 @@ class TestTensorflowPackaging(unittest.TestCase):
                 neuropod_path = os.path.join(test_dir, "test_neuropod")
                 self.package_accumulator_model(neuropod_path, init_op_name_as_list)
                 neuropod_path = load_neuropod(neuropod_path)
-                np.testing.assert_equal(neuropod_path.infer({"x": np.float32(2.0)}), {"out": 2.0})
-                np.testing.assert_equal(neuropod_path.infer({"x": np.float32(4.0)}), {"out": 6.0})
+                np.testing.assert_equal(
+                    neuropod_path.infer({"x": np.float32(2.0)}), {"out": 2.0}
+                )
+                np.testing.assert_equal(
+                    neuropod_path.infer({"x": np.float32(4.0)}), {"out": 6.0}
+                )
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

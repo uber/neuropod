@@ -22,7 +22,7 @@ open(os.path.join(SYMLINKS_DIR, "__init__.py"), "a").close()
 # Add it to our path if necessary
 sys.path.insert(0, SYMLINKS_DIR)
 
-# Make sure we clean up this directory at exit
+
 def cleanup_symlink():
     # Remove the symlinks (and __init__.py)
     for f in os.listdir(SYMLINKS_DIR):
@@ -31,7 +31,10 @@ def cleanup_symlink():
     # Delete the directory
     os.rmdir(SYMLINKS_DIR)
 
+
+# Make sure we clean up this directory at exit
 atexit.register(cleanup_symlink)
+
 
 class PythonNeuropodExecutor(NeuropodExecutor):
     """
@@ -74,9 +77,13 @@ class PythonNeuropodExecutor(NeuropodExecutor):
                     op_name = os.path.splitext(item)[0]
                     try:
                         importlib.import_module(op_name)
-                        raise ValueError(("Package `{}` is importable before loading the neuropod! "
-                                          "This means that a custom op in your neuropod package clashes with something already "
-                                          "accessible by python. Please check your PYTHONPATH and try again").format(op_name))
+                        raise ValueError(
+                            (
+                                "Package `{}` is importable before loading the neuropod! "
+                                "This means that a custom op in your neuropod package clashes with something already "
+                                "accessible by python. Please check your PYTHONPATH and try again"
+                            ).format(op_name)
+                        )
                     except ImportError:
                         pass
 
@@ -95,7 +102,9 @@ class PythonNeuropodExecutor(NeuropodExecutor):
             # See https://docs.python.org/3/library/importlib.html#importlib.import_module
             importlib.invalidate_caches()
 
-        entrypoint_package = importlib.import_module("{}.{}".format(rand_id, entrypoint_package_path))
+        entrypoint_package = importlib.import_module(
+            "{}.{}".format(rand_id, entrypoint_package_path)
+        )
 
         # Get the entrypoint function and run it with the data path
         self.model = entrypoint_package.__dict__[entrypoint_fn_name](data_path)
@@ -120,7 +129,8 @@ class PythonNeuropodExecutor(NeuropodExecutor):
             if not isinstance(value, np.ndarray):
                 raise RuntimeError(
                     "All outputs must be numpy arrays! Output `{}` was of type `{}`".format(
-                        key,
-                        type(value)))
+                        key, type(value)
+                    )
+                )
 
         return out

@@ -7,14 +7,26 @@ import neuropods_native
 import six
 import unittest
 
+
 class TestSerialization(unittest.TestCase):
     def test_different_types_and_shapes(self):
         """
         Exhaustive noop serialization-->deserialization test over all supported datatypes and several distrinct
         shapes
         """
-        _TESTED_DTYPES = [np.float32, np.float64, np.int8, np.uint8, np.int16, np.uint16, np.int32, np.uint32, np.int64,
-                          np.uint64, np.string_]
+        _TESTED_DTYPES = [
+            np.float32,
+            np.float64,
+            np.int8,
+            np.uint8,
+            np.int16,
+            np.uint16,
+            np.int32,
+            np.uint32,
+            np.int64,
+            np.uint64,
+            np.string_,
+        ]
         _TESTED_SHAPES = [(1,), (3,), (2, 3), (2, 3, 4)]
 
         # Used for testing NeuropodValueMap serialization
@@ -58,8 +70,8 @@ class TestSerialization(unittest.TestCase):
 
     def test_invalid_stream_deserialization(self):
         with self.assertRaises(RuntimeError if six.PY2 else TypeError):
-            neuropods_native.deserialize('bogus')
+            neuropods_native.deserialize("bogus")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

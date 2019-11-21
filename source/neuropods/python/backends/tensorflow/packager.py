@@ -12,14 +12,15 @@ from neuropods.utils.packaging_utils import packager
 
 @packager(platform="tensorflow")
 def create_tensorflow_neuropod(
-        neuropod_path,
-        input_spec,
-        output_spec,
-        node_name_mapping,
-        frozen_graph_path=None,
-        graph_def=None,
-        init_op_names=[],
-        **kwargs):
+    neuropod_path,
+    input_spec,
+    output_spec,
+    node_name_mapping,
+    frozen_graph_path=None,
+    graph_def=None,
+    init_op_names=[],
+    **kwargs
+):
     """
     Packages a TensorFlow model as a neuropod package.
 
@@ -51,8 +52,12 @@ def create_tensorflow_neuropod(
     {common_doc_post}
     """
     # Make sure the inputs are valid
-    if (frozen_graph_path is not None and graph_def is not None) or (frozen_graph_path is None and graph_def is None):
-        raise ValueError("Exactly one of 'frozen_graph_path' and 'graph_def' must be provided.")
+    if (frozen_graph_path is not None and graph_def is not None) or (
+        frozen_graph_path is None and graph_def is None
+    ):
+        raise ValueError(
+            "Exactly one of 'frozen_graph_path' and 'graph_def' must be provided."
+        )
 
     # Create a folder to store the model
     neuropod_data_path = os.path.join(neuropod_path, "0", "data")
@@ -75,12 +80,21 @@ def create_tensorflow_neuropod(
     missing_keys = expected_keys - actual_keys
 
     if len(missing_keys) > 0:
-        raise ValueError("Expected an item in `node_name_mapping` for every tensor in input_spec and output_spec. Missing: `{}`".format(missing_keys))
+        raise ValueError(
+            "Expected an item in `node_name_mapping` for every tensor in input_spec and output_spec. Missing: `{}`".format(
+                missing_keys
+            )
+        )
 
     # We also need to save the node name mapping so we know how to run the model
     # This is tensorflow specific config so it's not saved in the overall neuropod config
     with open(os.path.join(neuropod_path, "0", "config.json"), "w") as config_file:
-        json.dump({
-            "node_name_mapping": node_name_mapping,
-            "init_op_names": init_op_names if isinstance(init_op_names, list) else [init_op_names],
-        }, config_file)
+        json.dump(
+            {
+                "node_name_mapping": node_name_mapping,
+                "init_op_names": init_op_names
+                if isinstance(init_op_names, list)
+                else [init_op_names],
+            },
+            config_file,
+        )

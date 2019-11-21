@@ -3,7 +3,6 @@
 #
 
 import json
-import numpy as np
 import os
 from six import string_types, integer_types
 
@@ -13,12 +12,10 @@ ALLOWED_DTYPES = [
     "float32",
     "float64",
     "string",
-
     "int8",
     "int16",
     "int32",
     "int64",
-
     "uint8",
     "uint16",
     "uint32",
@@ -39,20 +36,35 @@ def validate_tensor_spec(spec):
             raise ValueError("{} is not an allowed data type!".format(dtype))
 
         if not isinstance(name, string_types):
-            raise ValueError("Field 'name' must be a string! Got value {} of type {}.".format(name, type(name)))
+            raise ValueError(
+                "Field 'name' must be a string! Got value {} of type {}.".format(
+                    name, type(name)
+                )
+            )
 
         if not isinstance(shape, (list, tuple)):
-            raise ValueError("Field 'shape' must be a tuple! Got value {} of type {}.".format(shape, type(shape)))
+            raise ValueError(
+                "Field 'shape' must be a tuple! Got value {} of type {}.".format(
+                    shape, type(shape)
+                )
+            )
 
         for dim in shape:
             # A bool is an instance of an int so we have to do that check first
-            is_uint = (not isinstance(dim, bool)) and isinstance(dim, integer_types) and dim > 0
+            is_uint = (
+                (not isinstance(dim, bool))
+                and isinstance(dim, integer_types)
+                and dim > 0
+            )
 
             if dim is None or is_uint or isinstance(dim, string_types):
                 continue
             else:
                 raise ValueError(
-                    "All items in 'shape' must either be None, a string, or a positive integer! Got {}".format(dim))
+                    "All items in 'shape' must either be None, a string, or a positive integer! Got {}".format(
+                        dim
+                    )
+                )
 
 
 def validate_neuropod_config(config):
@@ -64,12 +76,18 @@ def validate_neuropod_config(config):
     device_mapping = config["input_tensor_device"]
 
     if not isinstance(name, string_types):
-        raise ValueError("Field 'name' in config must be a string! Got value {} of type {}.".format(name, type(name)))
+        raise ValueError(
+            "Field 'name' in config must be a string! Got value {} of type {}.".format(
+                name, type(name)
+            )
+        )
 
     if not isinstance(platform, string_types):
         raise ValueError(
             "Field 'platform' in config must be a string! Got value {} of type {}.".format(
-                platform, type(platform)))
+                platform, type(platform)
+            )
+        )
 
     validate_tensor_spec(config["input_spec"])
     validate_tensor_spec(config["output_spec"])
@@ -79,11 +97,19 @@ def validate_neuropod_config(config):
         custom_ops = config["custom_ops"]
 
         if not isinstance(custom_ops, list):
-            raise ValueError("Optional field 'custom_ops' must be a list! Got value {} of type {}".format(custom_ops, type(custom_ops)))
+            raise ValueError(
+                "Optional field 'custom_ops' must be a list! Got value {} of type {}".format(
+                    custom_ops, type(custom_ops)
+                )
+            )
 
         for op in custom_ops:
             if not isinstance(op, string_types):
-                raise ValueError("All items in 'custom_ops' must be strings! Got value {} of type {}.".format(op, type(op)))
+                raise ValueError(
+                    "All items in 'custom_ops' must be strings! Got value {} of type {}.".format(
+                        op, type(op)
+                    )
+                )
 
     # Ensure all inputs have a device specified
     input_tensor_names = {item["name"] for item in config["input_spec"]}
@@ -92,14 +118,26 @@ def validate_neuropod_config(config):
     devices_without_input = device_tensor_names - input_tensor_names
 
     if len(inputs_without_device) != 0:
-        raise ValueError("Some input tensors do not have devices specified: {}".format(inputs_without_device))
+        raise ValueError(
+            "Some input tensors do not have devices specified: {}".format(
+                inputs_without_device
+            )
+        )
 
     if len(devices_without_input) != 0:
-        raise ValueError("Devices were specified for some tensors not in the `input_spec`: {}".format(devices_without_input))
+        raise ValueError(
+            "Devices were specified for some tensors not in the `input_spec`: {}".format(
+                devices_without_input
+            )
+        )
 
     for tensor_name, device in device_mapping.items():
-        if not device in ["GPU", "CPU"]:
-            raise ValueError("Device must either be 'GPU' or 'CPU'! Got value '{}' for tensor named '{}'.".format(device, tensor_name))
+        if device not in ["GPU", "CPU"]:
+            raise ValueError(
+                "Device must either be 'GPU' or 'CPU'! Got value '{}' for tensor named '{}'.".format(
+                    device, tensor_name
+                )
+            )
 
 
 def canonicalize_tensor_spec(spec):
@@ -109,11 +147,13 @@ def canonicalize_tensor_spec(spec):
     """
     transformed = []
     for item in spec:
-        transformed.append({
-            "name": item["name"],
-            "dtype": get_dtype_name(item["dtype"]),
-            "shape": item["shape"]
-        })
+        transformed.append(
+            {
+                "name": item["name"],
+                "dtype": get_dtype_name(item["dtype"]),
+                "shape": item["shape"],
+            }
+        )
     return transformed
 
 
@@ -126,7 +166,8 @@ def write_neuropod_config(
     custom_ops=None,
     input_tensor_device=None,
     default_input_tensor_device="GPU",
-    **kwargs):
+    **kwargs
+):
     """
     Creates the neuropod config file
 
@@ -167,7 +208,7 @@ def write_neuropod_config(
         input_tensor_device = {}
 
     # Canonicalize the specs
-    input_spec  = canonicalize_tensor_spec(input_spec)
+    input_spec = canonicalize_tensor_spec(input_spec)
     output_spec = canonicalize_tensor_spec(output_spec)
 
     # Set up the device mapping
@@ -189,7 +230,7 @@ def write_neuropod_config(
             "input_spec": input_spec,
             "output_spec": output_spec,
             "custom_ops": custom_ops,
-            "input_tensor_device": device_mapping
+            "input_tensor_device": device_mapping,
         }
 
         # Verify that the config is correct
@@ -213,7 +254,9 @@ def read_neuropod_config(neuropod_path):
         if "input_tensor_device" not in config:
             # If there is no mapping in the configuration, move all tensors to
             # GPU by default
-            config["input_tensor_device"] = {item["name"]: "GPU" for item in config["input_spec"]}
+            config["input_tensor_device"] = {
+                item["name"]: "GPU" for item in config["input_spec"]
+            }
 
         # Verify that the config is correct
         validate_neuropod_config(config)

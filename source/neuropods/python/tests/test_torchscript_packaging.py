@@ -2,24 +2,26 @@
 # Uber, Inc. (c) 2018
 #
 
-import numpy as np
 import os
 import torch
 import unittest
 from testpath.tempdir import TemporaryDirectory
+from torch import Tensor
+from typing import Dict
 
 from neuropods.packagers import create_torchscript_neuropod
 from neuropods.tests.utils import get_addition_model_spec, check_addition_model
+
 
 class AdditionModel(torch.jit.ScriptModule):
     """
     A simple addition model
     """
+
     @torch.jit.script_method
     def forward(self, x, y):
-        return {
-            "out": x + y
-        }
+        return {"out": x + y}
+
 
 class AdditionModelDictInput(torch.jit.ScriptModule):
     """
@@ -27,20 +29,22 @@ class AdditionModelDictInput(torch.jit.ScriptModule):
     If there are a large number of inputs, it may be more convenient to take the
     input as a dict rather than as individual parameters.
     """
+
     @torch.jit.script_method
     def forward(self, data):
         # type: (Dict[str, Tensor])
-        return {
-            "out": data["x"] + data["y"]
-        }
+        return {"out": data["x"] + data["y"]}
+
 
 class AdditionModelTensorOutput(torch.jit.ScriptModule):
     """
     A simple addition model
     """
+
     @torch.jit.script_method
     def forward(self, x, y):
         return x + y
+
 
 class TestTorchScriptPackaging(unittest.TestCase):
     def package_simple_addition_model(self, do_fail=False):
@@ -73,5 +77,5 @@ class TestTorchScriptPackaging(unittest.TestCase):
             self.package_simple_addition_model(do_fail=True)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

@@ -1,11 +1,6 @@
 from setuptools import setup, find_packages
 
-REQUIRED_PACKAGES = [
-    "numpy<1.17.0",
-    "testpath",
-    "future",
-    "six"
-]
+REQUIRED_PACKAGES = ["numpy<1.17.0", "testpath", "typing", "future", "six"]
 
 setup(
     name="neuropods",

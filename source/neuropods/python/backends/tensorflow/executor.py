@@ -11,6 +11,7 @@ import tensorflow as tf
 from neuropods.backends.neuropod_executor import NeuropodExecutor
 from neuropods.utils.dtype_utils import get_dtype
 
+
 class TensorflowNeuropodExecutor(NeuropodExecutor):
     """
     Executes a Tensorflow neuropod
@@ -30,7 +31,9 @@ class TensorflowNeuropodExecutor(NeuropodExecutor):
                 tf.load_op_library(str(os.path.join(neuropod_path, "0", "ops", op)))
 
         # Load the model
-        with tf.gfile.GFile(os.path.join(neuropod_path, "0", "data", "model.pb"), "rb") as f:
+        with tf.gfile.GFile(
+            os.path.join(neuropod_path, "0", "data", "model.pb"), "rb"
+        ) as f:
             graph_def = tf.GraphDef()
             graph_def.ParseFromString(f.read())
 
@@ -52,7 +55,9 @@ class TensorflowNeuropodExecutor(NeuropodExecutor):
         self.graph = tf.Graph()
         with self.graph.as_default():
             tf.import_graph_def(graph_def, name="")
-            init_ops = [self.graph.get_operation_by_name(op_name) for op_name in init_op_names]
+            init_ops = [
+                self.graph.get_operation_by_name(op_name) for op_name in init_op_names
+            ]
 
         # Create a session
         self.sess = tf.Session(graph=self.graph)
@@ -110,8 +115,12 @@ class TensorflowNeuropodExecutor(NeuropodExecutor):
         for spec in self.neuropod_config["output_spec"]:
             name = spec["name"]
             dtype = get_dtype(spec["dtype"])
-            if dtype.type == np.str_ and outputs[name].dtype == 'object' and type(outputs[name].item(0)) == six.binary_type:
+            if (
+                dtype.type == np.str_
+                and outputs[name].dtype == "object"
+                and type(outputs[name].item(0)) == six.binary_type
+            ):
                 # If the tensor is supposed to be of type string, is of type object, and contains strings
-                outputs[name] = outputs[name].astype('str')
+                outputs[name] = outputs[name].astype("str")
 
         return outputs

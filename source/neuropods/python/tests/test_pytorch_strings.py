@@ -2,7 +2,6 @@
 # Uber, Inc. (c) 2018
 #
 
-import numpy as np
 import os
 import unittest
 from testpath.tempdir import TemporaryDirectory
@@ -41,12 +40,12 @@ def package_strings_model(out_dir, do_fail=False):
         neuropod_path=neuropod_path,
         model_name="strings_model",
         data_paths=[],
-        code_path_spec=[{
-            "python_root": model_code_dir,
-            "dirs_to_package": [
-                ""  # Package everything in the python_root
-            ],
-        }],
+        code_path_spec=[
+            {
+                "python_root": model_code_dir,
+                "dirs_to_package": [""],  # Package everything in the python_root
+            }
+        ],
         entrypoint_package="strings_model",
         entrypoint="get_model",
         # Get the input/output spec along with test data
@@ -71,5 +70,5 @@ class TestPytorchPackaging(unittest.TestCase):
                 package_strings_model(test_dir, do_fail=True)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

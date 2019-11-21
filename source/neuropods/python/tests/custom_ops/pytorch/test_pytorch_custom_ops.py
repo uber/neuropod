@@ -3,13 +3,10 @@
 #
 
 import glob
-import numpy as np
 import os
-import shutil
 import subprocess
 import sys
 import unittest
-from tempfile import mkdtemp
 from testpath.tempdir import TemporaryDirectory
 
 from neuropods.loader import load_neuropod
@@ -31,9 +28,11 @@ def get_model(_):
     return AdditionModel()
 """
 
+
 def build_op(workdir):
     subprocess.check_call([sys.executable, "setup.py", "build"], cwd=workdir)
     return glob.glob(os.path.join(workdir, "build", "lib*", "addition_op.so"))[0]
+
 
 class TestPytorchPackaging(unittest.TestCase):
     @classmethod
@@ -62,12 +61,12 @@ class TestPytorchPackaging(unittest.TestCase):
             neuropod_path=neuropod_path,
             model_name="addition_model",
             data_paths=[],
-            code_path_spec=[{
-                "python_root": model_code_dir,
-                "dirs_to_package": [
-                    ""  # Package everything in the python_root
-                ],
-            }],
+            code_path_spec=[
+                {
+                    "python_root": model_code_dir,
+                    "dirs_to_package": [""],  # Package everything in the python_root
+                }
+            ],
             entrypoint_package="addition_model",
             entrypoint="get_model",
             custom_ops=[custom_op_path],
@@ -81,26 +80,34 @@ class TestPytorchPackaging(unittest.TestCase):
         # Tests a case where packaging works correctly and
         # the model output matches the expected output
         with TemporaryDirectory() as test_dir:
-            self.package_simple_addition_model(test_dir, custom_op_path=self.custom_op_path)
+            self.package_simple_addition_model(
+                test_dir, custom_op_path=self.custom_op_path
+            )
 
     def test_simple_addition_model_failure(self):
         # Tests a case where the output does not match the expected output
         with TemporaryDirectory() as test_dir:
             with self.assertRaises(ValueError):
-                self.package_simple_addition_model(test_dir, do_fail=True, custom_op_path=self.custom_op_path)
+                self.package_simple_addition_model(
+                    test_dir, do_fail=True, custom_op_path=self.custom_op_path
+                )
 
     def test_custom_op_conflict(self):
         # Test that we throw an error when there is a custom op conflict
         with TemporaryDirectory() as test_dir1:
             with TemporaryDirectory() as test_dir2:
-                path1 = self.package_simple_addition_model(test_dir1, custom_op_path=self.custom_op_path)
-                path2 = self.package_simple_addition_model(test_dir2, custom_op_path=self.other_op_path)
+                path1 = self.package_simple_addition_model(
+                    test_dir1, custom_op_path=self.custom_op_path
+                )
+                path2 = self.package_simple_addition_model(
+                    test_dir2, custom_op_path=self.other_op_path
+                )
 
-                with load_neuropod(path1) as n1:
+                with load_neuropod(path1):
                     with self.assertRaises(ValueError):
-                        with load_neuropod(path2) as n2:
+                        with load_neuropod(path2):
                             pass
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

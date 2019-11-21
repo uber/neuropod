@@ -23,7 +23,9 @@ class TestSpecValidation(unittest.TestCase):
         # Shouldn't raise a ValueError
         validate_tensors_against_specs(test_input, TEST_SPEC)
 
-    @unittest.skip("We temporary made all tensors optional, until a proper mechanism is implemented")
+    @unittest.skip(
+        "We temporary made all tensors optional, until a proper mechanism is implemented"
+    )
     def test_missing_tensor(self):
         test_input = {
             "x": np.array([[1, 2], [3, 4]], dtype=np.float32),
@@ -33,7 +35,9 @@ class TestSpecValidation(unittest.TestCase):
             # Missing a tensor
             validate_tensors_against_specs(test_input, TEST_SPEC)
 
-    @unittest.skip("We temporary made all tensors optional, until a proper mechanism is implemented")
+    @unittest.skip(
+        "We temporary made all tensors optional, until a proper mechanism is implemented"
+    )
     def test_missing_tensors(self):
         test_input = {}
 
@@ -54,7 +58,7 @@ class TestSpecValidation(unittest.TestCase):
     def test_incorrect_dtype(self):
         test_input = {
             "x": np.array([[1, 2], [3, 4]], dtype=np.int32),
-            "y": np.array([[1, 2], [3, 4]], dtype=np.int32)
+            "y": np.array([[1, 2], [3, 4]], dtype=np.int32),
         }
 
         with self.assertRaises(ValueError):
@@ -113,7 +117,7 @@ class TestSpecValidation(unittest.TestCase):
     def test_invalid_shape_entry(self):
         test_input = {
             "x": np.array([[1, 2], [3, 4]], dtype=np.float32),
-            "y": np.array([[1, 2], [3, 4]], dtype=np.float32)
+            "y": np.array([[1, 2], [3, 4]], dtype=np.float32),
         }
 
         SPEC = [
@@ -138,5 +142,5 @@ class TestSpecValidation(unittest.TestCase):
         validate_tensors_against_specs(test_input, SPEC)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

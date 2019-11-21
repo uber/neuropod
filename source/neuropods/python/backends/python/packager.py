@@ -11,12 +11,8 @@ from neuropods.utils.packaging_utils import packager
 
 @packager(platform="python")
 def create_python_neuropod(
-        neuropod_path,
-        data_paths,
-        code_path_spec,
-        entrypoint_package,
-        entrypoint,
-        **kwargs):
+    neuropod_path, data_paths, code_path_spec, entrypoint_package, entrypoint, **kwargs
+):
     """
     Packages arbitrary python code as a neuropod package.
 
@@ -82,20 +78,27 @@ def create_python_neuropod(
 
     # Copy the data to be packaged
     for data_path_spec in data_paths:
-        shutil.copyfile(data_path_spec["path"], os.path.join(neuropod_data_path, data_path_spec["packaged_name"]))
+        shutil.copyfile(
+            data_path_spec["path"],
+            os.path.join(neuropod_data_path, data_path_spec["packaged_name"]),
+        )
 
     # Copy the specified source code while preserving package paths
     for copy_spec in code_path_spec:
         python_root = copy_spec["python_root"]
 
-        if os.path.realpath(neuropod_path).startswith(os.path.realpath(python_root) + os.sep):
-            raise ValueError("`neuropod_path` cannot be a subdirectory of `python_root`")
+        if os.path.realpath(neuropod_path).startswith(
+            os.path.realpath(python_root) + os.sep
+        ):
+            raise ValueError(
+                "`neuropod_path` cannot be a subdirectory of `python_root`"
+            )
 
         for dir_to_package in copy_spec["dirs_to_package"]:
             shutil.copytree(
                 os.path.join(python_root, dir_to_package),
                 os.path.join(neuropod_code_path, dir_to_package),
-                ignore=shutil.ignore_patterns('*.pyc'),
+                ignore=shutil.ignore_patterns("*.pyc"),
             )
 
     # Add __init__.py files as needed
@@ -108,7 +111,7 @@ def create_python_neuropod(
     # We also need to save the entrypoint package name so we know what to load at runtime
     # This is python specific config so it's not saved in the overall neuropod config
     with open(os.path.join(neuropod_path, "0", "config.json"), "w") as config_file:
-        json.dump({
-            "entrypoint_package": entrypoint_package,
-            "entrypoint": entrypoint
-        }, config_file)
+        json.dump(
+            {"entrypoint_package": entrypoint_package, "entrypoint": entrypoint},
+            config_file,
+        )
