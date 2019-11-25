@@ -28,7 +28,7 @@ steps:
             - GH_STATUS_TOKEN
             - GH_UPLOAD_TOKEN
 
-  - label: ":docker: Lint"
+  - label: ":docker: Lint + Docs"
     agents:
       queue: private-default
     command: build/ci/buildkite_lint.sh

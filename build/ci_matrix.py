@@ -162,7 +162,7 @@ for platform, py_version, framework_version in itertools.product(PLATFORMS, PY_V
             added_lint = True
 
             buildkite_yml_matrix.extend([
-            "  - label: \":docker: Lint\"\n".format(variant_name),
+            "  - label: \":docker: Lint + Docs\"\n".format(variant_name),
             "    agents:\n",
             "      queue: private-default\n",
             "    command: build/ci/buildkite_lint.sh\n",
