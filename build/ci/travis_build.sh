@@ -20,8 +20,22 @@ source /tmp/neuropod_venv/bin/activate
 # does not match the config files
 python ./build/ci_matrix.py
 
-# Build
-./build/build.sh
+# Install node and npm if we need to
+if [ "$TRAVIS_OS_NAME" = "linux" ]; then
+    curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -
+    sudo apt-get install -y nodejs
+fi
+
+# Used for bazel caching to s3 in CI
+sudo npm install -g bazels3cache
+
+# Start the S3 build cache
+export AWS_ACCESS_KEY_ID=$NEUROPODS_CACHE_ACCESS_KEY
+export AWS_SECRET_ACCESS_KEY=$NEUROPODS_CACHE_ACCESS_SECRET
+bazels3cache --bucket=neuropods-build-cache
+
+# Build with the remote cache
+./build/build.sh --remote_http_cache=http://localhost:7777
 
 # Run tests
 ./build/test.sh
