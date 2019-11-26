@@ -1,9 +1,6 @@
 #!/bin/bash
 set -e
 
-# Make sure we can build the docs
-./build/ci/docs.sh
-
 # Used for bazel caching to s3 in CI
 curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -
 sudo apt-get install -y nodejs
@@ -17,11 +14,14 @@ bazels3cache --bucket=neuropods-build-cache
 # Build with the remote cache
 ./build/build.sh --remote_http_cache=http://localhost:7777
 
-# Install lint deps
-./build/ci/install_lint_deps.sh
+# Run tests
+./build/test.sh
 
-# Run lint
-./build/ci/lint.sh
+# Run coverage
+./build/coverage.sh
+
+# Upload to codecov
+bash <(curl -s https://codecov.io/bash) -X coveragepy
 
 # Shutdown the cache
 curl http://localhost:7777/shutdown

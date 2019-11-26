@@ -46,9 +46,7 @@ services:
     build:
       context: .
       dockerfile: build/neuropods.dockerfile
-      target: neuropod-build
-      args:
-        NEUROPODS_DO_PACKAGE: "true"
+      target: neuropod-base
     privileged: true
 
   test-gpu:
@@ -114,7 +112,7 @@ for platform, py_version, framework_version in itertools.product(PLATFORMS, PY_V
 
     elif "linux" in platform:
         is_gpu = "gpu" in platform
-        variant_name = "test-{}-variant-tf-{}-torch-{}-py{}".format("gpu" if is_gpu else "cpu", tf_version, torch_version, py_version)
+        variant_name = "test-{}-variant-tf-{}-torch-{}-py{}".format("gpu" if is_gpu else "cpu", tf_version, torch_version, py_version).replace(".", "_")
 
         docker_compose_matrix.extend([
         "  {}:\n".format(variant_name),
@@ -131,9 +129,20 @@ for platform, py_version, framework_version in itertools.product(PLATFORMS, PY_V
         plugin_config = [
         "    plugins:\n",
         "      - docker-compose#v3.1.0:\n",
+        "          build: {}\n".format(variant_name),
+        "          config: docker-compose.test.yml\n",
+        "          image-repository: 027047743804.dkr.ecr.us-east-2.amazonaws.com/uber\n",
+        "          cache-from: {}:027047743804.dkr.ecr.us-east-2.amazonaws.com/uber:{}\n".format(variant_name, variant_name),
+        "          push-retries: 5\n",
+        "      - docker-compose#v3.1.0:\n",
+        "          push: {}:027047743804.dkr.ecr.us-east-2.amazonaws.com/uber:{}\n".format(variant_name, variant_name),
+        "          config: docker-compose.test.yml\n",
+        "      - docker-compose#v3.1.0:\n",
         "          run: {}\n".format(variant_name),
         "          config: docker-compose.test.yml\n",
         "          env:\n",
+        "            - NEUROPODS_CACHE_ACCESS_KEY\n",
+        "            - NEUROPODS_CACHE_ACCESS_SECRET\n",
         "            - BUILDKITE\n",
         "            - BUILDKITE_BRANCH\n",
         "            - BUILDKITE_BUILD_NUMBER\n",
@@ -147,6 +156,8 @@ for platform, py_version, framework_version in itertools.product(PLATFORMS, PY_V
         "            - CODECOV_TOKEN\n",
         "            - GH_STATUS_TOKEN\n",
         "            - GH_UPLOAD_TOKEN\n",
+        "    retry:\n",
+        "      automatic: true\n",
         "\n",
         ]
 
@@ -154,7 +165,7 @@ for platform, py_version, framework_version in itertools.product(PLATFORMS, PY_V
         "  - label: \":docker: {} Tests ({})\"\n".format("GPU" if is_gpu else "CPU", variant_name),
         "    agents:\n",
         "      queue: private-{}\n".format("gpu" if is_gpu else "default"),
-        "    command: build/ci/{}.sh\n".format("buildkite_test_gpu" if is_gpu else "buildkite_test"),
+        "    command: build/ci/{}.sh\n".format("buildkite_build_gpu" if is_gpu else "buildkite_build"),
         ] + plugin_config)
 
         if not is_gpu and not added_lint:

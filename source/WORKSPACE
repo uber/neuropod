@@ -42,7 +42,7 @@ http_archive(
     build_file = "@//deps:BUILD.boost",
     sha256 = "3b1db0b67079266c40b98329d85916e910bbadfc3db3e860c049056788d4d5cd",
     type = "zip",
-    url = "https://downloads.sourceforge.net/project/boost/boost/1.68.0/boost_1_68_0.zip",
+    url = "https://dl.bintray.com/boostorg/release/1.68.0/source/boost_1_68_0.zip",
     strip_prefix = "boost_1_68_0",
 )
 

@@ -20,6 +20,12 @@ ENV NEUROPODS_PYTHON_BINARY=$NEUROPODS_PYTHON_BINARY
 # Install system dependencies
 RUN /usr/src/build/install_system_deps.sh
 
+# Prefetch llvm because it's large
+COPY build/workspace_prefetch /usr/src/source/WORKSPACE
+COPY source/bazel/toolchain.patch /usr/src/source/bazel/toolchain.patch
+COPY source/bazel/BUILD /usr/src/source/bazel/BUILD
+RUN cd source && bazel sync
+
 # Do everything in a virtualenv
 ENV VIRTUAL_ENV=/tmp/neuropod_venv
 RUN ${NEUROPODS_PYTHON_BINARY} -m pip install virtualenv && \
