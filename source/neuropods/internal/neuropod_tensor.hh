@@ -26,13 +26,13 @@ namespace
 
 // Utility to get a neuropod tensor type from a c++ type
 template <typename T>
-TensorType get_tensor_type_from_cpp() = delete;
+inline TensorType get_tensor_type_from_cpp() = delete;
 
-#define GET_TENSOR_TYPE_FN(CPP_TYPE, NEUROPOD_TYPE)                 \
-    template <>                                                     \
-    [[gnu::unused]] TensorType get_tensor_type_from_cpp<CPP_TYPE>() \
-    {                                                               \
-        return NEUROPOD_TYPE;                                       \
+#define GET_TENSOR_TYPE_FN(CPP_TYPE, NEUROPOD_TYPE)        \
+    template <>                                            \
+    inline TensorType get_tensor_type_from_cpp<CPP_TYPE>() \
+    {                                                      \
+        return NEUROPOD_TYPE;                              \
     }
 
 FOR_EACH_TYPE_MAPPING_INCLUDING_STRING(GET_TENSOR_TYPE_FN)
