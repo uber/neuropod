@@ -1,10 +1,11 @@
 //
-// Uber, Inc. (c) 2018
+// Uber, Inc. (c) 2019
 //
 
-#include "tf_backend.hh"
+#include "neuropods/backends/tensorflow/tf_backend.hh"
 
-#include "neuropods/backends/tensorflow/type_utils.hh"
+#include "tensorflow/core/framework/graph.pb.h"
+#include "tensorflow/core/public/session.h"
 
 #include <json/json.h>
 
@@ -17,7 +18,6 @@
 
 namespace neuropods
 {
-
 namespace
 {
 
@@ -68,38 +68,12 @@ void setup_node_mapping_and_init_ops(std::istream &                             
     }
 }
 
-// Get a graph node given a node name of the format `name:index`. Namespaces are supported as well.
-// If the index is 0, ":0" optional.
-// Ex: `some_namespace/input:0`
-TF_Output get_graph_node_from_name(const std::string &node_name_with_index, const TF_GraphPtr &graph_)
-{
-    // `node_name` ends with `:index` where index is an integer
-    const auto colon_pos = node_name_with_index.find(":");
-    const auto node_name = node_name_with_index.substr(0, colon_pos);
-
-    // The index of the output for the specified op
-    int node_index = 0;
-    if (colon_pos != std::string::npos)
-    {
-        node_index = std::stoi(node_name_with_index.substr(colon_pos + 1));
-    }
-
-    TF_Operation *oper = TF_GraphOperationByName(graph_.get(), node_name.c_str());
-    if (!oper)
-    {
-        NEUROPOD_ERROR("Operation '" << node_name_with_index << "' is not found");
-    }
-    // TensorFlow uses TF_Output everywhere, including input placeholders
-    // Operations can have several outputs, they are indexed started from 0
-    return TF_Output{oper, node_index};
-}
-
 } // namespace
 
 TensorflowNeuropodBackend::TensorflowNeuropodBackend(const std::string &           neuropod_path,
                                                      std::unique_ptr<ModelConfig> &model_config,
                                                      const RuntimeOptions &        options)
-    : NeuropodBackendWithDefaultAllocator<TensorflowNeuropodTensor>(neuropod_path)
+    : NeuropodBackendWithDefaultAllocator<TensorflowNeuropodTensor>(neuropod_path), session_(tensorflow::NewSession({}))
 {
 #ifndef __APPLE__
     // We need to do this so the custom ops can see the symbols from TF
@@ -111,18 +85,39 @@ TensorflowNeuropodBackend::TensorflowNeuropodBackend(const std::string &        
 #endif
 
     // Load custom ops (if any)
-    status_.reset(TF_NewStatus());
     for (const auto &item : model_config->custom_ops)
     {
-        TF_DeleteLibraryHandle(TF_LoadLibrary(loader_->get_file_path("0/ops/" + item).c_str(), status_.get()));
-        check_status();
+        if (dlopen(loader_->get_file_path("0/ops/" + item).c_str(), RTLD_NOW) == nullptr)
+        {
+            NEUROPOD_ERROR("Failed to load custom op. Error from dlopen: " << dlerror());
+        }
     }
 
-    // Get the graph and load it
+    // Get a stream for the graph
     auto graph_stream = loader_->get_istream_for_file("0/data/model.pb");
-    if (!load_graph(*graph_stream))
+
+    // Create a buffer of the right size
+    graph_stream->seekg(0, graph_stream->end);
+    std::streamsize   graph_length = graph_stream->tellg();
+    std::vector<char> buffer(graph_length);
+
+    // Read into the buffer
+    graph_stream->seekg(0, graph_stream->beg);
+    graph_stream->read(buffer.data(), graph_length);
+    if (graph_stream->fail())
     {
-        NEUROPOD_ERROR("Failed to load TensorFlow graph for neuropod " << neuropod_path);
+        NEUROPOD_ERROR("Error reading TensorFlow GraphDef for neuropod " << neuropod_path);
+    }
+
+    // Read the GraphDef
+    tensorflow::GraphDef graph;
+    tensorflow::ParseProtoUnlimited(&graph, buffer.data(), buffer.size());
+
+    // Create a session
+    auto status = session_->Create(graph);
+    if (!status.ok())
+    {
+        NEUROPOD_ERROR("Error loading TensorFlow graph: " << status.error_message());
     }
 
     // Setup the nodename mapping and get the init ops (if any)
@@ -136,99 +131,18 @@ TensorflowNeuropodBackend::TensorflowNeuropodBackend(const std::string &        
         output_names_.emplace_back(output.name);
     }
 
-    if (init_ops.size() > 0)
+    for (const auto &op_name : init_ops)
     {
-        run_target_ops(init_ops);
+        auto status = session_->Run({}, {}, {op_name}, nullptr);
+        if (!status.ok())
+        {
+            NEUROPOD_ERROR("Error running TensorFlow init op: " << op_name);
+        }
     }
 }
 
 TensorflowNeuropodBackend::~TensorflowNeuropodBackend() = default;
 
-// Check the status of the last TF API call and throw an exception if
-// there was an error
-void TensorflowNeuropodBackend::check_status() const
-{
-    if (TF_GetCode(status_.get()) != TF_OK)
-    {
-        NEUROPOD_ERROR("Tensorflow error: " << TF_Message(status_.get()));
-    }
-}
-
-// Load a TensorFlow graph
-bool TensorflowNeuropodBackend::load_graph(std::istream &ifs)
-{
-    if (ifs.good())
-    {
-        ifs.seekg(0, ifs.end);
-        std::streamsize   length = ifs.tellg();
-        std::vector<char> buffer(length);
-
-        ifs.seekg(0, ifs.beg);
-        ifs.read(buffer.data(), length);
-        if (ifs.fail())
-        {
-            return false;
-        }
-
-        status_.reset(TF_NewStatus());
-        graph_.reset(TF_NewGraph());
-        TF_BufferPtr                graph_def(TF_NewBufferFromString(buffer.data(), length));
-        TF_ImportGraphDefOptionsPtr graph_opts(TF_NewImportGraphDefOptions());
-        TF_ImportGraphDefOptionsSetPrefix(graph_opts.get(), "");
-        TF_GraphImportGraphDef(graph_.get(), graph_def.get(), graph_opts.get(), status_.get());
-        check_status();
-
-        session_opts_.reset(TF_NewSessionOptions());
-
-        // TODO(vip): Don't reserve the whole GPU (set allow_growth to True)
-
-        session_.reset(TF_NewSession(graph_.get(), session_opts_.get(), status_.get()));
-        check_status();
-    }
-    else
-    {
-        return false;
-    }
-
-    return true;
-}
-
-// Run target ops
-void TensorflowNeuropodBackend::run_target_ops(const std::vector<std::string> &target_op_names)
-{
-    // Loop through all the specified names and setup the outputs
-    std::vector<const TF_Operation *> target_ops;
-    for (const auto &node_name : target_op_names)
-    {
-        TF_Operation *oper = TF_GraphOperationByName(graph_.get(), node_name.c_str());
-        if (!oper)
-        {
-            NEUROPOD_ERROR("Operation '" << node_name << "' is not found");
-        }
-
-        target_ops.emplace_back(oper);
-    }
-
-    // Run the operation
-    TF_SessionRun(session_.get(),
-                  nullptr, // ignore run options
-                  // Input tensors
-                  nullptr, // list of handlers on input tensors
-                  nullptr, // list of pointers on input tensors
-                  0,       // number of inputs
-                  // Output tensors
-                  nullptr, // list of handlers on output tensors
-                  nullptr, // list of pointers on output tensors
-                  0,       // number of outputs
-                  // Default target operations and run meta-data
-                  &target_ops[0],    // target operations are outputs
-                  target_ops.size(), // no target operations are provided
-                  nullptr,           // ignore run meta-data
-                  status_.get());
-    check_status();
-}
-
-// Run inference
 std::unique_ptr<NeuropodValueMap> TensorflowNeuropodBackend::infer(const NeuropodValueMap &inputs)
 {
     return infer(inputs, {});
@@ -245,66 +159,52 @@ std::unique_ptr<NeuropodValueMap> TensorflowNeuropodBackend::infer(const Neuropo
     std::vector<std::string> output_node_names;
     for (const auto &name : output_names)
     {
-        output_node_names.emplace_back(node_name_mapping_[name]);
-    }
+        const auto node_name = node_name_mapping_.find(name);
+        if (node_name == node_name_mapping_.end())
+        {
+            NEUROPOD_ERROR("Node " << name
+                                   << " not found in node_name_mapping. "
+                                      "Ensure that all items in the input/output spec have a corresponding item "
+                                      "in the node_name_mapping.");
+        }
 
-    // List of TF input operations
-    // TF use TF_Output for both inputs and outputs
-    std::vector<TF_Output> input_ops;
-    // List of pointers to TF input tensors
-    std::vector<TF_Tensor *> input_values;
+        output_node_names.emplace_back(node_name->second);
+    }
 
     // Loop through all the input tensors and setup the inputs
+    std::vector<std::pair<std::string, tensorflow::Tensor>> tf_inputs;
     for (const auto &entry : inputs)
     {
-        const auto  input_name = node_name_mapping_.at(entry.first);
+        const auto node_name = node_name_mapping_.find(entry.first);
+        if (node_name == node_name_mapping_.end())
+        {
+            NEUROPOD_ERROR("Node " << entry.first
+                                   << " not found in node_name_mapping. "
+                                      "Ensure that all items in the input/output spec have a corresponding item "
+                                      "in the node_name_mapping.");
+        }
+
         const auto &input_data =
-            std::dynamic_pointer_cast<NativeDataContainer<TF_Tensor *>>(entry.second)->get_native_data();
+            std::dynamic_pointer_cast<NativeDataContainer<tensorflow::Tensor &>>(entry.second)->get_native_data();
 
-        input_ops.emplace_back(get_graph_node_from_name(input_name, graph_));
-        input_values.emplace_back(input_data);
+        tf_inputs.emplace_back(std::make_pair(node_name->second, input_data));
     }
 
-    // List of TF output operations
-    std::vector<TF_Output> outputs;
-    // List of pointers to TF output tensors
-    std::vector<TF_Tensor *> output_values;
-
-    // Loop through all the specified names and setup the outputs
-    for (const auto &node_name : output_node_names)
+    std::vector<tensorflow::Tensor> outputs;
+    auto                            status = session_->Run(tf_inputs, output_node_names, {}, &outputs);
+    if (!status.ok())
     {
-        outputs.emplace_back(get_graph_node_from_name(node_name, graph_));
+        NEUROPOD_ERROR("TensorFlow error: " << status.error_message())
     }
-
-    // Resize the output vector
-    output_values.resize(outputs.size(), nullptr);
-
-    // Run inference
-    TF_SessionRun(session_.get(),
-                  nullptr, // ignore run options
-                  // Input tensors
-                  &input_ops[0],    // list of handlers on input tensors
-                  &input_values[0], // list of pointers on input tensors
-                  input_ops.size(), // number of inputs
-                  // Output tensors
-                  &outputs[0],       // list of handlers on output tensors
-                  &output_values[0], // list of pointers on output tensors
-                  outputs.size(),    // number of outputs
-                  // Default target operations and run meta-data
-                  nullptr, // target operations are outputs
-                  0,       // no target operations are provided
-                  nullptr, // ignore run meta-data
-                  status_.get());
-    check_status();
 
     // Read the outputs
     auto to_return = stdx::make_unique<NeuropodValueMap>();
     for (size_t i = 0; i < output_names.size(); ++i)
     {
         const auto &output_name   = output_names[i];
-        const auto &output_tensor = output_values[i];
-        const auto  tensor_type   = get_neuropod_type_from_tf_type(TF_TensorType(output_tensor));
-        (*to_return)[output_name] = make_tensor<TensorflowNeuropodTensor>(tensor_type, output_tensor);
+        auto &      output_tensor = outputs[i];
+        const auto  tensor_type   = get_neuropod_type_from_tf_type(output_tensor.dtype());
+        (*to_return)[output_name] = make_tensor<TensorflowNeuropodTensor>(tensor_type, std::move(output_tensor));
     }
 
     return to_return;

@@ -7,13 +7,6 @@ package(
 )
 
 cc_library(
-    name = "tensorflow_c_hdrs",
-    srcs = [],
-    hdrs = glob(["include/tensorflow/c/*.h"]),
-    strip_include_prefix = "include",
-)
-
-cc_library(
     name = "libtensorflow",
     srcs = select({
         "@bazel_tools//src/conditions:darwin": glob(["lib/libtensorflow.so", "lib/libtensorflow.1.dylib"]),

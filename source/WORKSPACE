@@ -1,6 +1,7 @@
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 load("//bazel:python.bzl", "python_repository")
 load("//bazel:tensorflow.bzl", "tensorflow_repository")
+load("//bazel:tensorflow_hdrs.bzl", "tensorflow_hdrs_repository")
 load("//bazel:libtorch.bzl", "libtorch_repository")
 
 # Use an internal LLVM toolchain instead of the system one
@@ -27,6 +28,11 @@ libtorch_repository(
 tensorflow_repository(
     name = "tensorflow_repo",
     build_file = "@//deps:BUILD.tensorflow",
+)
+
+tensorflow_hdrs_repository(
+    name = "tensorflow_hdrs_repo",
+    build_file_template = "@//deps:BUILD.tensorflow_hdrs",
 )
 
 http_archive(

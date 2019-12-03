@@ -1,18 +1,23 @@
 //
-// Uber, Inc. (c) 2018
+// Uber, Inc. (c) 2019
 //
 
 #pragma once
 
 #include "neuropods/backends/neuropod_backend.hh"
 #include "neuropods/backends/tensorflow/tf_tensor.hh"
-#include "neuropods/backends/tensorflow/tf_wrappers.hh"
-
-#include <tensorflow/c/c_api.h>
 
 #include <string>
 #include <unordered_map>
 #include <vector>
+
+namespace tensorflow
+{
+
+// Forward declare tensorflow::Session
+class Session;
+
+} // namespace tensorflow
 
 namespace neuropods
 {
@@ -21,24 +26,7 @@ namespace neuropods
 class TensorflowNeuropodBackend : public NeuropodBackendWithDefaultAllocator<TensorflowNeuropodTensor>
 {
 private:
-    // Check the status of the last TF API call and throw an exception if
-    // there was an error
-    void check_status() const;
-
-    // Loads a frozen graph from a protobuf file
-    bool load_graph(std::istream &graph_stream);
-
-    // Run target ops in the graph
-    void run_target_ops(const std::vector<std::string> &target_op_names);
-
-    // Pointer to the status of a TF call
-    TF_StatusPtr status_;
-    // Pointer to the TF graph
-    TF_GraphPtr graph_;
-    // Pointer to TF session options
-    TF_SessionOptionsPtr session_opts_;
-    // Pointer to the TF session
-    TF_SessionPtr session_;
+    std::unique_ptr<tensorflow::Session> session_;
 
     // Map from a neuropod node name to the appropriate node in the TF graph
     std::unordered_map<std::string, std::string> node_name_mapping_;

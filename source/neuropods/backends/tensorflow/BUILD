@@ -10,8 +10,8 @@ cc_binary(
     srcs = [
         "tf_backend.cc",
         "tf_backend.hh",
+        "tf_tensor.cc",
         "tf_tensor.hh",
-        "tf_wrappers.hh",
         "type_utils.cc",
         "type_utils.hh",
         "//neuropods:libneuropods.so",
@@ -25,7 +25,8 @@ cc_binary(
     deps = [
         "//neuropods/backends:neuropod_backend",
         "//neuropods/internal:deleter",
-        "@tensorflow_repo//:tensorflow_c_hdrs",
+        "//neuropods/internal:logging",
+        "@tensorflow_hdrs_repo//:tensorflow_hdrs",
         "@tensorflow_repo//:libtensorflow",
     ],
     data = [
