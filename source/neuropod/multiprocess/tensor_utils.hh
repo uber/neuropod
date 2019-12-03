@@ -28,7 +28,14 @@ std::shared_ptr<NeuropodTensor> wrap_existing_tensor(Neuropod &neuropod, std::sh
     const auto &tensor_type = tensor->get_tensor_type();
     if (tensor_type == STRING_TENSOR)
     {
-        NEUROPOD_ERROR("It is not currently possible to wrap string tensors.");
+        auto out = neuropod.allocate_tensor<std::string>(tensor->get_dims());
+
+        // We need to make a copy because it's not possible to generically wrap string tensors
+        // (each backend has its own in-memory representation)
+        // TODO(vip): optimize
+        out->set(tensor->as_typed_tensor<std::string>()->get_data_as_vector());
+
+        return out;
     }
     else
     {
@@ -59,7 +66,14 @@ std::shared_ptr<NeuropodTensor> wrap_existing_tensor(std::shared_ptr<NeuropodTen
     const auto &tensor_type = tensor->get_tensor_type();
     if (tensor_type == STRING_TENSOR)
     {
-        NEUROPOD_ERROR("It is not currently possible to wrap string tensors.");
+        auto out = make_tensor<TensorClass>(STRING_TENSOR, tensor->get_dims());
+
+        // We need to make a copy because it's not possible to generically wrap string tensors
+        // (each backend has its own in-memory representation)
+        // TODO(vip): optimize
+        out->template as_typed_tensor<std::string>()->set(tensor->as_typed_tensor<std::string>()->get_data_as_vector());
+
+        return out;
     }
     else
     {
