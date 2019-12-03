@@ -375,9 +375,39 @@ public:
     virtual void set(const std::vector<std::string> &data) = 0;
 
     // Get the data in the string tensor
-    virtual std::vector<std::string> get_data_as_vector() const = 0;
+    std::vector<std::string> get_data_as_vector() const
+    {
+        // Setup the output vector
+        const auto               numel = get_num_elements();
+        std::vector<std::string> out(numel);
+
+        // Copy the data in
+        for (int i = 0; i < numel; i++)
+        {
+            out[i] = (*this)[i];
+        }
+
+        return out;
+    }
+
+    template <size_t N>
+    TensorAccessor<const TypedNeuropodTensor<std::string> &, N> accessor() const
+    {
+        static_assert(N > 0, "`accessor()` is used for indexing tensors, for scalars use `as_scalar()`");
+        this->assure_rank(N);
+        return TensorAccessor<const TypedNeuropodTensor<std::string> &, N>(
+            *this, get_dims().data(), get_strides().data());
+    }
 
 protected:
+    template <typename Container, size_t N>
+    friend class TensorAccessor;
+    friend class NeuropodTensor;
+
+    // Get a particular element
+    // TODO(vip): Can we use absl::string_view instead?
+    virtual const std::string operator[](size_t index) const = 0;
+
     // We can't get a raw pointer from a string tensor
     void *get_untyped_data_ptr() { NEUROPOD_ERROR("`get_untyped_data_ptr` is not supported for string tensors"); };
 

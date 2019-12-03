@@ -83,9 +83,18 @@ bool NeuropodTensor::operator==(const NeuropodTensor &other) const
     // String tensor equality is different than numeric equality
     if (get_tensor_type() == STRING_TENSOR)
     {
-        // TODO(vip): optimize
-        return as_typed_tensor<std::string>()->get_data_as_vector() ==
-               other.as_typed_tensor<std::string>()->get_data_as_vector();
+        const auto numel = get_num_elements();
+        const auto t1    = as_typed_tensor<std::string>();
+        const auto t2    = other.as_typed_tensor<std::string>();
+        for (int i = 0; i < numel; i++)
+        {
+            if ((*t1)[i] != (*t2)[i])
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     // Compare the contents of the tensor

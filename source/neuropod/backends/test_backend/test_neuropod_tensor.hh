@@ -65,7 +65,8 @@ public:
 
     void set(const std::vector<std::string> &data) { data_ = data; }
 
-    std::vector<std::string> get_data_as_vector() const { return data_; }
+protected:
+    const std::string operator[](size_t index) const { return data_[index]; }
 };
 
 } // namespace neuropod

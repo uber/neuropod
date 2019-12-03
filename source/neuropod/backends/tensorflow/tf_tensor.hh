@@ -140,19 +140,10 @@ public:
         }
     }
 
-    std::vector<std::string> get_data_as_vector() const
-    {
-        auto                     flat = tensor_.flat<std::string>();
-        std::vector<std::string> out(flat.size());
-        for (int i = 0; i < out.size(); i++)
-        {
-            out[i] = flat(i);
-        }
-
-        return out;
-    }
-
     tensorflow::Tensor &get_native_data() { return tensor_; }
+
+protected:
+    const std::string operator[](size_t index) const { return tensor_.flat<std::string>()(index); }
 };
 
 } // namespace neuropod

@@ -177,32 +177,6 @@ public:
         }
     }
 
-    std::vector<std::string> get_data_as_vector() const
-    {
-        std::vector<std::string> out;
-
-        // Reserve space for all the items in the tensor
-        out.reserve(get_num_elements());
-
-        // Sanity check sizes
-        auto &tensor_data = ELEMENTS(list);
-        if (tensor_data.size() != get_num_elements())
-        {
-            NEUROPOD_ERROR("Error converting TorchScript list into vector of strings. "
-                           "Make sure that the dimensions of the returned list are correct. "
-                           "Expected size "
-                           << get_num_elements() << " but got " << tensor_data.size());
-        }
-
-        for (const auto &item : tensor_data)
-        {
-            out.emplace_back(GET_STRING_FROM_LIST(item));
-        }
-
-        // Return the filled vector
-        return out;
-    }
-
 #if CAFFE2_NIGHTLY_VERSION >= 20190717
     // Store a typed list
     torch::jit::IValue     get_native_data() { return c10::impl::toGenericList(list); }
@@ -212,6 +186,13 @@ public:
     torch::jit::IValue                          get_native_data() { return list; }
     c10::intrusive_ptr<at::ivalue::GenericList> list;
 #endif
+
+protected:
+    const std::string operator[](size_t index) const
+    {
+        auto &tensor_data = ELEMENTS(list);
+        return GET_STRING_FROM_LIST(tensor_data[index]);
+    }
 };
 
 // Utility function to get an IValue from a torch tensor
