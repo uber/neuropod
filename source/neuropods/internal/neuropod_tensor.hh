@@ -265,7 +265,7 @@ public:
     {
         static_assert(N > 0, "`accessor()` is used for indexing a tensors, for scalars use `as_scalar()`");
         this->assure_rank(N);
-        return TensorAccessor<T, N>(get_raw_data_ptr(), get_strides().data());
+        return TensorAccessor<T, N>(get_raw_data_ptr(), get_dims().data(), get_strides().data());
     }
 
     template <size_t N>
@@ -273,31 +273,7 @@ public:
     {
         static_assert(N > 0, "`accessor()` is used for indexing tensors, for scalars use `as_scalar()`");
         this->assure_rank(N);
-        return TensorAccessor<const T, N>(get_raw_data_ptr(), get_strides().data());
-    }
-
-    const T *begin() const
-    {
-        assure_rank(1);
-        return &get_raw_data_ptr()[0];
-    }
-
-    T *begin()
-    {
-        assure_rank(1);
-        return &get_raw_data_ptr()[0];
-    }
-
-    const T *end() const
-    {
-        assure_rank(1);
-        return &get_raw_data_ptr()[get_dims()[0]];
-    }
-
-    T *end()
-    {
-        assure_rank(1);
-        return &get_raw_data_ptr()[get_dims()[0]];
+        return TensorAccessor<const T, N>(get_raw_data_ptr(), get_dims().data(), get_strides().data());
     }
 
     T &as_scalar() { return NeuropodTensor::as_scalar<T>(); }

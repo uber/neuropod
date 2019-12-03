@@ -118,8 +118,9 @@ TEST(test_typed_neuropod_tensor, downcast_failulre)
 
 TEST_F(uint8_tensor_fixture, forloop)
 {
-    uint8_t i = 0;
-    for (auto element : *tensor)
+    uint8_t i        = 0;
+    auto    accessor = tensor->accessor<1>();
+    for (auto element : accessor)
     {
         EXPECT_EQ(element, i);
         ++i;
@@ -129,8 +130,9 @@ TEST_F(uint8_tensor_fixture, forloop)
 
 TEST_F(uint8_tensor_fixture, forloop_const_tensor)
 {
-    uint8_t i = 0;
-    for (const auto &element : *const_tensor)
+    uint8_t    i        = 0;
+    const auto accessor = const_tensor->accessor<1>();
+    for (const auto &element : accessor)
     {
         EXPECT_EQ(element, i);
         ++i;
@@ -140,8 +142,9 @@ TEST_F(uint8_tensor_fixture, forloop_const_tensor)
 
 TEST_F(uint8_tensor_fixture, forloop_const_reference)
 {
-    uint8_t i = 0;
-    for (const auto &element : *tensor)
+    uint8_t i        = 0;
+    auto    accessor = tensor->accessor<1>();
+    for (const auto &element : accessor)
     {
         EXPECT_EQ(element, i);
         ++i;

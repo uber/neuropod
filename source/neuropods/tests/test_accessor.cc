@@ -44,6 +44,50 @@ TEST(test_accessor, test_accessor)
     EXPECT_EQ(*tensor1, *tensor2);
 }
 
+TEST(test_accessor, test_range_loop)
+{
+    neuropods::TestNeuropodBackend backend;
+    auto                           allocator = backend.get_tensor_allocator();
+
+    auto tensor1 = allocator->allocate_tensor<float>({3, 5});
+
+    auto accessor = tensor1->accessor<2>();
+
+    // Set data
+    {
+        for (int i = 0; i < 3; i++)
+        {
+            for (int j = 0; j < 5; j++)
+            {
+                accessor[i][j] = i * 5 + j;
+            }
+        }
+    };
+
+    // Validate range based loops
+    float expected_val = 0;
+    for (const auto &row : accessor)
+    {
+        for (const auto &item : row)
+        {
+            EXPECT_EQ(item, expected_val++);
+        }
+    }
+    EXPECT_EQ(expected_val, 15);
+
+    // Validate range based loops for const accessors
+    const auto &const_accessor = accessor;
+    expected_val               = 0;
+    for (const auto &row : const_accessor)
+    {
+        for (const auto &item : row)
+        {
+            EXPECT_EQ(item, expected_val++);
+        }
+    }
+    EXPECT_EQ(expected_val, 15);
+}
+
 TEST(test_accessor, valid_dims)
 {
     neuropods::TestNeuropodBackend backend;
