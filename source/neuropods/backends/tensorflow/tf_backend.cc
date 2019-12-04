@@ -68,12 +68,24 @@ void setup_node_mapping_and_init_ops(std::istream &                             
     }
 }
 
+// Get TF session options given Neuropod RuntimeOptions
+tensorflow::SessionOptions get_tf_opts(const RuntimeOptions & /*unused*/)
+{
+    tensorflow::SessionOptions opts;
+
+    // Don't preallocate the entire GPU
+    auto gpu_opts = opts.config.mutable_gpu_options();
+    gpu_opts->set_allow_growth(true);
+    return opts;
+}
+
 } // namespace
 
 TensorflowNeuropodBackend::TensorflowNeuropodBackend(const std::string &           neuropod_path,
                                                      std::unique_ptr<ModelConfig> &model_config,
                                                      const RuntimeOptions &        options)
-    : NeuropodBackendWithDefaultAllocator<TensorflowNeuropodTensor>(neuropod_path), session_(tensorflow::NewSession({}))
+    : NeuropodBackendWithDefaultAllocator<TensorflowNeuropodTensor>(neuropod_path),
+      session_(tensorflow::NewSession(get_tf_opts(options)))
 {
 #ifndef __APPLE__
     // We need to do this so the custom ops can see the symbols from TF
