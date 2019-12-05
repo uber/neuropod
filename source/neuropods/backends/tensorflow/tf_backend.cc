@@ -11,8 +11,10 @@
 
 #include <fstream>
 #include <iostream>
+#include <mutex>
 #include <sstream>
 #include <stdexcept>
+#include <unordered_set>
 
 #include <dlfcn.h>
 
@@ -79,6 +81,10 @@ tensorflow::SessionOptions get_tf_opts(const RuntimeOptions & /*unused*/)
     return opts;
 }
 
+// Used to avoid loading the same custom op multiple times
+std::unordered_set<std::string> loaded_op_hashes;
+std::mutex                      loaded_op_mutex;
+
 } // namespace
 
 TensorflowNeuropodBackend::TensorflowNeuropodBackend(const std::string &           neuropod_path,
@@ -99,9 +105,19 @@ TensorflowNeuropodBackend::TensorflowNeuropodBackend(const std::string &        
     // Load custom ops (if any)
     for (const auto &item : model_config->custom_ops)
     {
-        if (dlopen(loader_->get_file_path("0/ops/" + item).c_str(), RTLD_NOW) == nullptr)
+        const auto path = "0/ops/" + item;
+        const auto hash = loader_->get_hash_for_file(path);
+
+        // Don't load a custom op if we've already loaded it
+        std::lock_guard<std::mutex> lock(loaded_op_mutex);
+        if (loaded_op_hashes.count(hash) == 0)
         {
-            NEUROPOD_ERROR("Failed to load custom op. Error from dlopen: " << dlerror());
+            if (dlopen(loader_->get_file_path(path).c_str(), RTLD_NOW) == nullptr)
+            {
+                NEUROPOD_ERROR("Failed to load custom op. Error from dlopen: " << dlerror());
+            }
+
+            loaded_op_hashes.insert(hash);
         }
     }
 

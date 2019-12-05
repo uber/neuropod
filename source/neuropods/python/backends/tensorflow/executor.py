@@ -10,6 +10,10 @@ import tensorflow as tf
 
 from neuropods.backends.neuropod_executor import NeuropodExecutor
 from neuropods.utils.dtype_utils import get_dtype
+from neuropods.utils.hash_utils import sha256sum
+
+# Avoid loading the same custom op twice
+loaded_op_hashes = set()
 
 
 class TensorflowNeuropodExecutor(NeuropodExecutor):
@@ -28,7 +32,11 @@ class TensorflowNeuropodExecutor(NeuropodExecutor):
         # Load custom ops (if any)
         if load_custom_ops and "custom_ops" in self.neuropod_config:
             for op in self.neuropod_config["custom_ops"]:
-                tf.load_op_library(str(os.path.join(neuropod_path, "0", "ops", op)))
+                lib_path = os.path.join(neuropod_path, "0", "ops", op)
+                lib_hash = sha256sum(lib_path)
+                if lib_hash not in loaded_op_hashes:
+                    tf.load_op_library(str(lib_path))
+                    loaded_op_hashes.add(lib_hash)
 
         # Load the model
         with tf.gfile.GFile(

@@ -14,6 +14,7 @@ import json
 import numpy as np
 
 from neuropods.backends.neuropod_executor import NeuropodExecutor
+from neuropods.utils.hash_utils import sha256sum
 
 # Create the neuropod package symlink directory
 SYMLINKS_DIR = tempfile.mkdtemp(suffix=".neuropod_python_symlinks")
@@ -34,6 +35,9 @@ def cleanup_symlink():
 
 # Make sure we clean up this directory at exit
 atexit.register(cleanup_symlink)
+
+# Avoid loading the same custom op twice
+loaded_op_hashes = set()
 
 
 class PythonNeuropodExecutor(NeuropodExecutor):
@@ -72,7 +76,17 @@ class PythonNeuropodExecutor(NeuropodExecutor):
             if os.path.isdir(custom_op_path):
                 # Try to avoid silently using the incorrect op
                 for item in os.listdir(custom_op_path):
-                    # Make sure there isn't something already loadable with the
+                    lib_path = os.path.join(custom_op_path, item)
+                    lib_hash = sha256sum(lib_path)
+                    if lib_hash in loaded_op_hashes:
+                        # We already loaded this op so it's fine if this is added to the path again
+                        # because the op is identical
+                        # TODO(vip): This might not be entirely true because of transitive dependencies
+                        continue
+
+                    loaded_op_hashes.add(lib_hash)
+
+                    # If we haven't already loaded the op, make sure there isn't something already loadable with the
                     # same name as this op
                     op_name = os.path.splitext(item)[0]
                     try:

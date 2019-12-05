@@ -8,11 +8,16 @@ from six import string_types
 import torch
 
 from neuropods.backends.neuropod_executor import NeuropodExecutor
+from neuropods.utils.hash_utils import sha256sum
 
 SINGLE_OUTPUT_ERROR_MSG = (
     "Please either return a dictionary from your model or provide an `output_spec` "
     "of size 1"
 )
+
+
+# Avoid loading the same custom op twice
+loaded_op_hashes = set()
 
 
 class TorchScriptNeuropodExecutor(NeuropodExecutor):
@@ -36,7 +41,11 @@ class TorchScriptNeuropodExecutor(NeuropodExecutor):
         # Load custom ops (if any)
         if load_custom_ops and "custom_ops" in self.neuropod_config:
             for op in self.neuropod_config["custom_ops"]:
-                torch.ops.load_library(os.path.join(neuropod_path, "0", "ops", op))
+                lib_path = os.path.join(neuropod_path, "0", "ops", op)
+                lib_hash = sha256sum(lib_path)
+                if lib_hash not in loaded_op_hashes:
+                    torch.ops.load_library(lib_path)
+                    loaded_op_hashes.add(lib_hash)
 
         # Load the model onto the appropriate device (ideally a GPU if we have one available)
         self.model = torch.jit.load(

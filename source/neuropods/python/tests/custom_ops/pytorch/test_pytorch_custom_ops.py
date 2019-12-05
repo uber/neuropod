@@ -4,6 +4,7 @@
 
 import glob
 import os
+import shutil
 import subprocess
 import sys
 import unittest
@@ -42,11 +43,15 @@ class TestPytorchPackaging(unittest.TestCase):
 
         cls.custom_op_path = build_op(os.path.join(current_dir, "addition_op_1"))
 
+        # For testing loading of a custom op multiple times
+        cls.second_custom_op = os.path.join(current_dir, "addition_op_copy.so")
+        shutil.copyfile(cls.custom_op_path, cls.second_custom_op)
+
         # This op is named the same thing as the above op, but has a different
         # implementation
         cls.other_op_path = build_op(os.path.join(current_dir, "addition_op_2"))
 
-    def package_simple_addition_model(self, test_dir, custom_op_path, do_fail=False):
+    def package_simple_addition_model(self, test_dir, custom_ops, do_fail=False):
         neuropod_path = os.path.join(test_dir, "test_neuropod")
         model_code_dir = os.path.join(test_dir, "model_code")
         os.makedirs(model_code_dir)
@@ -69,7 +74,7 @@ class TestPytorchPackaging(unittest.TestCase):
             ],
             entrypoint_package="addition_model",
             entrypoint="get_model",
-            custom_ops=[custom_op_path],
+            custom_ops=custom_ops,
             # Get the input/output spec along with test data
             **get_addition_model_spec(do_fail=do_fail)
         )
@@ -81,7 +86,7 @@ class TestPytorchPackaging(unittest.TestCase):
         # the model output matches the expected output
         with TemporaryDirectory() as test_dir:
             self.package_simple_addition_model(
-                test_dir, custom_op_path=self.custom_op_path
+                test_dir, custom_ops=[self.custom_op_path, self.second_custom_op]
             )
 
     def test_simple_addition_model_failure(self):
@@ -89,7 +94,7 @@ class TestPytorchPackaging(unittest.TestCase):
         with TemporaryDirectory() as test_dir:
             with self.assertRaises(ValueError):
                 self.package_simple_addition_model(
-                    test_dir, do_fail=True, custom_op_path=self.custom_op_path
+                    test_dir, do_fail=True, custom_ops=[self.custom_op_path]
                 )
 
     def test_custom_op_conflict(self):
@@ -97,10 +102,10 @@ class TestPytorchPackaging(unittest.TestCase):
         with TemporaryDirectory() as test_dir1:
             with TemporaryDirectory() as test_dir2:
                 path1 = self.package_simple_addition_model(
-                    test_dir1, custom_op_path=self.custom_op_path
+                    test_dir1, custom_ops=[self.custom_op_path]
                 )
                 path2 = self.package_simple_addition_model(
-                    test_dir2, custom_op_path=self.other_op_path
+                    test_dir2, custom_ops=[self.other_op_path]
                 )
 
                 with load_neuropod(path1):

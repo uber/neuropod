@@ -3,6 +3,7 @@
 #
 
 import os
+import shutil
 import subprocess
 import sys
 import tensorflow as tf
@@ -60,6 +61,10 @@ class TestTensorflowCustomOps(unittest.TestCase):
         )
         cls.custom_op_path = os.path.join(current_dir, "addition_op.so")
 
+        # For testing loading of a custom op multiple times
+        cls.second_custom_op = os.path.join(current_dir, "addition_op_copy.so")
+        shutil.copyfile(cls.custom_op_path, cls.second_custom_op)
+
     def package_simple_addition_model(self, do_fail=False):
         with TemporaryDirectory() as test_dir:
             neuropod_path = os.path.join(test_dir, "test_neuropod")
@@ -76,7 +81,7 @@ class TestTensorflowCustomOps(unittest.TestCase):
                     "y": "some_namespace/in_y:0",
                     "out": "some_namespace/out:0",
                 },
-                custom_ops=[self.custom_op_path],
+                custom_ops=[self.custom_op_path, self.second_custom_op],
                 # Get the input/output spec along with test data
                 **get_addition_model_spec(do_fail=do_fail)
             )
