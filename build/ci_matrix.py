@@ -154,6 +154,7 @@ for platform, py_version, framework_version in itertools.product(PLATFORMS, PY_V
         "            - BUILDKITE_TAG\n",
         "            - CI\n",
         "            - CODECOV_TOKEN\n",
+        "            - FOSSA_API_KEY\n",
         "            - GH_STATUS_TOKEN\n",
         "            - GH_UPLOAD_TOKEN\n",
         "    retry:\n",

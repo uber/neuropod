@@ -25,3 +25,8 @@ bazels3cache --bucket=neuropods-build-cache
 
 # Shutdown the cache
 curl http://localhost:7777/shutdown
+
+# Install and run fossa
+curl -H 'Cache-Control: no-cache' https://raw.githubusercontent.com/fossas/fossa-cli/master/install.sh | bash
+pip freeze > source/python/requirements.txt
+fossa

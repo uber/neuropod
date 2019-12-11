@@ -36,6 +36,7 @@ steps:
             - BUILDKITE_TAG
             - CI
             - CODECOV_TOKEN
+            - FOSSA_API_KEY
             - GH_STATUS_TOKEN
             - GH_UPLOAD_TOKEN
     retry:
@@ -72,6 +73,7 @@ steps:
             - BUILDKITE_TAG
             - CI
             - CODECOV_TOKEN
+            - FOSSA_API_KEY
             - GH_STATUS_TOKEN
             - GH_UPLOAD_TOKEN
     retry:
@@ -108,6 +110,7 @@ steps:
             - BUILDKITE_TAG
             - CI
             - CODECOV_TOKEN
+            - FOSSA_API_KEY
             - GH_STATUS_TOKEN
             - GH_UPLOAD_TOKEN
     retry:
@@ -144,6 +147,7 @@ steps:
             - BUILDKITE_TAG
             - CI
             - CODECOV_TOKEN
+            - FOSSA_API_KEY
             - GH_STATUS_TOKEN
             - GH_UPLOAD_TOKEN
     retry:
@@ -180,6 +184,7 @@ steps:
             - BUILDKITE_TAG
             - CI
             - CODECOV_TOKEN
+            - FOSSA_API_KEY
             - GH_STATUS_TOKEN
             - GH_UPLOAD_TOKEN
     retry:
@@ -216,6 +221,7 @@ steps:
             - BUILDKITE_TAG
             - CI
             - CODECOV_TOKEN
+            - FOSSA_API_KEY
             - GH_STATUS_TOKEN
             - GH_UPLOAD_TOKEN
     retry:
@@ -252,6 +258,7 @@ steps:
             - BUILDKITE_TAG
             - CI
             - CODECOV_TOKEN
+            - FOSSA_API_KEY
             - GH_STATUS_TOKEN
             - GH_UPLOAD_TOKEN
     retry:
@@ -288,6 +295,7 @@ steps:
             - BUILDKITE_TAG
             - CI
             - CODECOV_TOKEN
+            - FOSSA_API_KEY
             - GH_STATUS_TOKEN
             - GH_UPLOAD_TOKEN
     retry:
@@ -324,6 +332,7 @@ steps:
             - BUILDKITE_TAG
             - CI
             - CODECOV_TOKEN
+            - FOSSA_API_KEY
             - GH_STATUS_TOKEN
             - GH_UPLOAD_TOKEN
     retry:
@@ -360,6 +369,7 @@ steps:
             - BUILDKITE_TAG
             - CI
             - CODECOV_TOKEN
+            - FOSSA_API_KEY
             - GH_STATUS_TOKEN
             - GH_UPLOAD_TOKEN
     retry:
@@ -396,6 +406,7 @@ steps:
             - BUILDKITE_TAG
             - CI
             - CODECOV_TOKEN
+            - FOSSA_API_KEY
             - GH_STATUS_TOKEN
             - GH_UPLOAD_TOKEN
     retry:
@@ -432,6 +443,7 @@ steps:
             - BUILDKITE_TAG
             - CI
             - CODECOV_TOKEN
+            - FOSSA_API_KEY
             - GH_STATUS_TOKEN
             - GH_UPLOAD_TOKEN
     retry:
@@ -468,6 +480,7 @@ steps:
             - BUILDKITE_TAG
             - CI
             - CODECOV_TOKEN
+            - FOSSA_API_KEY
             - GH_STATUS_TOKEN
             - GH_UPLOAD_TOKEN
     retry:
@@ -504,6 +517,7 @@ steps:
             - BUILDKITE_TAG
             - CI
             - CODECOV_TOKEN
+            - FOSSA_API_KEY
             - GH_STATUS_TOKEN
             - GH_UPLOAD_TOKEN
     retry:
@@ -540,6 +554,7 @@ steps:
             - BUILDKITE_TAG
             - CI
             - CODECOV_TOKEN
+            - FOSSA_API_KEY
             - GH_STATUS_TOKEN
             - GH_UPLOAD_TOKEN
     retry:
@@ -576,6 +591,7 @@ steps:
             - BUILDKITE_TAG
             - CI
             - CODECOV_TOKEN
+            - FOSSA_API_KEY
             - GH_STATUS_TOKEN
             - GH_UPLOAD_TOKEN
     retry:
@@ -612,6 +628,7 @@ steps:
             - BUILDKITE_TAG
             - CI
             - CODECOV_TOKEN
+            - FOSSA_API_KEY
             - GH_STATUS_TOKEN
             - GH_UPLOAD_TOKEN
     retry:
