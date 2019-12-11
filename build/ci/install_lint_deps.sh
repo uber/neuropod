@@ -5,9 +5,9 @@ set -e
 # We also need python3.6 for black to run
 apt-get install -y --no-install-recommends software-properties-common
 add-apt-repository -y ppa:ubuntu-toolchain-r/test
-add-apt-repository -y ppa:jonathonf/python-3.6
+add-apt-repository -y ppa:deadsnakes/ppa
 apt-get update
-apt-get install -y --no-install-recommends libstdc++6 python3.6 tzdata jq
+apt-get install -y --no-install-recommends libstdc++6 python3.6 python3.6-dev tzdata jq
 
 # Install bazel-compdb
 INSTALL_DIR="/usr/local/bin"
