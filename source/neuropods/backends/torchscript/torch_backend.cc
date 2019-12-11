@@ -10,8 +10,10 @@
 #include <caffe2/core/macros.h>
 
 #include <iostream>
+#include <mutex>
 #include <sstream>
 #include <stdexcept>
+#include <unordered_set>
 
 #include <dlfcn.h>
 
@@ -147,6 +149,10 @@ torch::jit::IValue maybe_set_device(const torch::jit::IValue &item, const torch:
     return item;
 }
 
+// Used to avoid loading the same custom op multiple times
+std::unordered_set<std::string> loaded_op_hashes;
+std::mutex                      loaded_op_mutex;
+
 } // namespace
 
 TorchNeuropodBackend::TorchNeuropodBackend(const std::string &           neuropod_path,
@@ -160,10 +166,20 @@ TorchNeuropodBackend::TorchNeuropodBackend(const std::string &           neuropo
     auto graph_stream = loader_->get_istream_for_file("0/data/model.pt");
 
     // Custom ops
+    // Make sure we don't load a custom op twice
     std::vector<std::string> custom_ops;
     for (const auto &item : model_config->custom_ops)
     {
-        custom_ops.emplace_back(loader_->get_file_path("0/ops/" + item));
+        const auto path = "0/ops/" + item;
+        const auto hash = loader_->get_hash_for_file(path);
+
+        // Don't load a custom op if we've already loaded it
+        std::lock_guard<std::mutex> lock(loaded_op_mutex);
+        if (loaded_op_hashes.count(hash) == 0)
+        {
+            custom_ops.emplace_back(loader_->get_file_path(path));
+            loaded_op_hashes.insert(hash);
+        }
     }
 
     model_ = load_model_from_path(*graph_stream,

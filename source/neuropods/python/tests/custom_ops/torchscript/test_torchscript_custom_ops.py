@@ -4,6 +4,7 @@
 
 import glob
 import os
+import shutil
 import subprocess
 import sys
 import torch
@@ -34,6 +35,10 @@ class TestTorchScriptCustomOps(unittest.TestCase):
             os.path.join(current_dir, "build", "lib*", "addition_op.so")
         )[0]
 
+        # For testing loading of a custom op multiple times
+        cls.second_custom_op = os.path.join(current_dir, "addition_op_copy.so")
+        shutil.copyfile(cls.custom_op_path, cls.second_custom_op)
+
         # Load the op
         torch.ops.load_library(cls.custom_op_path)
 
@@ -49,7 +54,7 @@ class TestTorchScriptCustomOps(unittest.TestCase):
                     neuropod_path=neuropod_path,
                     model_name="addition_model",
                     module=model(),
-                    custom_ops=[self.custom_op_path],
+                    custom_ops=[self.custom_op_path, self.second_custom_op],
                     # Get the input/output spec along with test data
                     **get_addition_model_spec(do_fail=do_fail)
                 )
