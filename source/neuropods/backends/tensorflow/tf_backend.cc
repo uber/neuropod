@@ -70,6 +70,15 @@ void setup_node_mapping_and_init_ops(std::istream &                             
     }
 }
 
+// Throws an error if `status` is not ok
+void check_tf_status(const tensorflow::Status &status)
+{
+    if (!status.ok())
+    {
+        NEUROPOD_ERROR("TensorFlow error: " << status.error_message())
+    }
+}
+
 // Get TF session options given Neuropod RuntimeOptions
 tensorflow::SessionOptions get_tf_opts(const RuntimeOptions & /*unused*/)
 {
@@ -161,11 +170,7 @@ TensorflowNeuropodBackend::TensorflowNeuropodBackend(const std::string &        
 
     for (const auto &op_name : init_ops)
     {
-        auto status = session_->Run({}, {}, {op_name}, nullptr);
-        if (!status.ok())
-        {
-            NEUROPOD_ERROR("Error running TensorFlow init op: " << op_name);
-        }
+        check_tf_status(session_->Run({}, {}, {op_name}, nullptr));
     }
 }
 
@@ -180,11 +185,18 @@ std::unique_ptr<NeuropodValueMap> TensorflowNeuropodBackend::infer(const Neuropo
 std::unique_ptr<NeuropodValueMap> TensorflowNeuropodBackend::infer(const NeuropodValueMap &        inputs,
                                                                    const std::vector<std::string> &requested_outputs)
 {
+    // In TensorFlow, a callable is a way of running a subgraph given a set of inputs and
+    // outputs. It's very similar to `session_->Run` except it has support for more fine-grained
+    // control over tensor devices. See https://github.com/tensorflow/tensorflow/issues/5902
+    // for more details.
+
+    // Used for setting the inputs and outputs of the subgraph we want to run
+    tensorflow::CallableOptions opts;
+
     // Get the set of outputs we want to compute
     const auto &output_names = requested_outputs.size() > 0 ? requested_outputs : output_names_;
 
     // Transform neuropod output names to node names in the graph
-    std::vector<std::string> output_node_names;
     for (const auto &name : output_names)
     {
         const auto node_name = node_name_mapping_.find(name);
@@ -196,11 +208,12 @@ std::unique_ptr<NeuropodValueMap> TensorflowNeuropodBackend::infer(const Neuropo
                                       "in the node_name_mapping.");
         }
 
-        output_node_names.emplace_back(node_name->second);
+        // Add this node name as an output of the subgraph we want to run
+        opts.add_fetch(node_name->second);
     }
 
     // Loop through all the input tensors and setup the inputs
-    std::vector<std::pair<std::string, tensorflow::Tensor>> tf_inputs;
+    std::vector<tensorflow::Tensor> tf_inputs;
     for (const auto &entry : inputs)
     {
         const auto node_name = node_name_mapping_.find(entry.first);
@@ -212,20 +225,34 @@ std::unique_ptr<NeuropodValueMap> TensorflowNeuropodBackend::infer(const Neuropo
                                       "in the node_name_mapping.");
         }
 
+        // Get the TensorFlow tensor from the Neuropod tensor
         const auto &input_data =
             std::dynamic_pointer_cast<NativeDataContainer<tensorflow::Tensor &>>(entry.second)->get_native_data();
 
-        tf_inputs.emplace_back(std::make_pair(node_name->second, input_data));
+        // Add this node name as an input to the subgraph we want to run
+        opts.add_feed(node_name->second);
+
+        // TODO(vip): Once we explicitly control devices, do something like this:
+        // opts.mutable_feed_devices()->insert({node_name->second, device_name});
+
+        // Add the tensor to our vector of inputs
+        tf_inputs.emplace_back(input_data);
     }
 
-    std::vector<tensorflow::Tensor> outputs;
-    auto                            status = session_->Run(tf_inputs, output_node_names, {}, &outputs);
-    if (!status.ok())
-    {
-        NEUROPOD_ERROR("TensorFlow error: " << status.error_message())
-    }
+    // Create a callable handle and a vector to store our outputs
+    tensorflow::Session::CallableHandle handle;
+    std::vector<tensorflow::Tensor>     outputs;
 
-    // Read the outputs
+    // Make the callable using the options we set above
+    check_tf_status(session_->MakeCallable(opts, &handle));
+
+    // Run the callable with the vector of inputs we created above
+    check_tf_status(session_->RunCallable(handle, tf_inputs, &outputs, nullptr));
+
+    // Release the callable
+    check_tf_status(session_->ReleaseCallable(handle));
+
+    // Read the outputs and wrap them in `NeuropodTensor`s
     auto to_return = stdx::make_unique<NeuropodValueMap>();
     for (size_t i = 0; i < output_names.size(); ++i)
     {
