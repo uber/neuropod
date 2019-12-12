@@ -17,10 +17,10 @@ class AccessorIterator
 {
 private:
     TensorAccessor<T, N> *accessor_;
-    size_t                index_;
+    int64_t               index_;
 
 public:
-    AccessorIterator(TensorAccessor<T, N> *accessor, size_t index = 0) : accessor_(accessor), index_(index) {}
+    AccessorIterator(TensorAccessor<T, N> *accessor, int64_t index = 0) : accessor_(accessor), index_(index) {}
 
     AccessorIterator<T, N> &operator++()
     {
@@ -42,10 +42,10 @@ class AccessorConstIterator
 {
 private:
     const TensorAccessor<T, N> *accessor_;
-    size_t                      index_;
+    int64_t                     index_;
 
 public:
-    AccessorConstIterator(const TensorAccessor<T, N> *accessor, size_t index = 0) : accessor_(accessor), index_(index)
+    AccessorConstIterator(const TensorAccessor<T, N> *accessor, int64_t index = 0) : accessor_(accessor), index_(index)
     {
     }
 
@@ -77,12 +77,12 @@ public:
     {
     }
 
-    TensorAccessor<T, N - 1> operator[](size_t i)
+    TensorAccessor<T, N - 1> operator[](int64_t i)
     {
         return TensorAccessor<T, N - 1>(this->data_ + this->strides_[0] * i, this->dims_ + 1, this->strides_ + 1);
     }
 
-    const TensorAccessor<T, N - 1> operator[](size_t i) const
+    const TensorAccessor<T, N - 1> operator[](int64_t i) const
     {
         return TensorAccessor<T, N - 1>(this->data_ + this->strides_[0] * i, this->dims_ + 1, this->strides_ + 1);
     }
@@ -110,9 +110,9 @@ public:
     {
     }
 
-    T &operator[](size_t i) { return this->data_[i]; }
+    T &operator[](int64_t i) { return this->data_[i]; }
 
-    const T &operator[](size_t i) const { return this->data_[i]; }
+    const T &operator[](int64_t i) const { return this->data_[i]; }
 
     const T *begin() const { return &this->data_[0]; }
 
