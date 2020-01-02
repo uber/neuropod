@@ -100,7 +100,7 @@ std::unique_ptr<Neuropod> make_neuropod(py::kwargs kwargs, Params &&... params)
 
 } // namespace
 
-PYBIND11_MODULE(neuropods_native, m)
+PYBIND11_MODULE(neuropod_native, m)
 {
     py::class_<Neuropod>(m, "Neuropod")
         .def(py::init([](const std::string &path, py::kwargs kwargs) { return make_neuropod(kwargs, path); }))

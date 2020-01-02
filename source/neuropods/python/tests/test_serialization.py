@@ -3,7 +3,7 @@
 #
 
 import numpy as np
-import neuropods_native
+import neuropod_native
 import six
 import unittest
 
@@ -36,8 +36,8 @@ class TestSerialization(unittest.TestCase):
         for dtype in _TESTED_DTYPES:
             for shape in _TESTED_SHAPES:
                 expected = np.random.random(size=shape).astype(dtype=dtype)
-                buffer = neuropods_native.serialize(expected)
-                actual = neuropods_native.deserialize(buffer)
+                buffer = neuropod_native.serialize(expected)
+                actual = neuropod_native.deserialize(buffer)
 
                 # Unicode vs ascii for python 3
                 # TODO(vip): Add unicode support to the native bindings and fix this
@@ -51,8 +51,8 @@ class TestSerialization(unittest.TestCase):
                 counter += 1
 
         # Test serializing and deserializing a dict of numpy arrays
-        buffer = neuropods_native.serialize(expected_valuemap)
-        actual_valuemap = neuropods_native.deserialize_dict(buffer)
+        buffer = neuropod_native.serialize(expected_valuemap)
+        actual_valuemap = neuropod_native.deserialize_dict(buffer)
 
         # Make sure they're the same size
         self.assertEqual(len(expected_valuemap), len(actual_valuemap))
@@ -70,7 +70,7 @@ class TestSerialization(unittest.TestCase):
 
     def test_invalid_stream_deserialization(self):
         with self.assertRaises(RuntimeError if six.PY2 else TypeError):
-            neuropods_native.deserialize("bogus")
+            neuropod_native.deserialize("bogus")
 
 
 if __name__ == "__main__":

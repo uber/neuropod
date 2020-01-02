@@ -3,9 +3,9 @@
 #
 
 cc_binary(
-    name = "neuropods_native.so",
+    name = "neuropod_native.so",
     srcs = [
-        "neuropods_native.cc",
+        "neuropod_native.cc",
         "//neuropods:libneuropods.so",
     ],
     deps = [

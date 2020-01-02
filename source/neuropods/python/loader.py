@@ -90,7 +90,7 @@ if __name__ == "__main__":
         load_neuropod_kwargs = pickle.load(pkl)
 
     if args.use_native:
-        from neuropods_native import Neuropod as NeuropodNative
+        from neuropod_native import Neuropod as NeuropodNative
 
         model = NeuropodNative(args.neuropod_path, **load_neuropod_kwargs)
         run_model(model)
