@@ -72,7 +72,7 @@ with load_neuropod(ADDITION_MODEL_PATH) as neuropod:
 
 ## Bindings
 
-To use the C++ Neuropods library from Python, you can use the native bindings
+To use the C++ Neuropod library from Python, you can use the native bindings
 
 ```py
 from neuropod_native import Neuropod

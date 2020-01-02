@@ -1,8 +1,8 @@
-# Neuropods Tutorial
+# Neuropod Tutorial
 
 In this tutorial, we’re going to build a simple Neuropod model for addition in TensorFlow, PyTorch, and TorchScript. We'll also show how to run inference from Python and C++.
 
-Almost all of the examples/code in this tutorial come from the Neuropods unit and integration tests. Please read through them for complete working examples.
+Almost all of the examples/code in this tutorial come from the Neuropod unit and integration tests. Please read through them for complete working examples.
 
 The Neuropod packaging and inference interfaces also have comprehensive docstrings and provide a more detailed usage of the API than this tutorial.
 
@@ -17,9 +17,9 @@ A “problem” is composed of 4 things:
 - an `output_spec`
     - A list of dicts specifying the name, datatype, and shape of an output tensor
 - `test_input_data` *(optional)*
-    - If provided, Neuropods will run inference immediately after packaging to verify that the model was packaged correctly. Must be provided if `test_output_data` is provided
+    - If provided, Neuropod will run inference immediately after packaging to verify that the model was packaged correctly. Must be provided if `test_output_data` is provided
 - `test_output_data` *(optional)*
-    - If provided, Neuropods will test that the output of inference with `test_input_data` matches `test_output_data`
+    - If provided, Neuropod will test that the output of inference with `test_input_data` matches `test_output_data`
 
 The shape of a tensor can include `None` in which case any value is acceptable. You can also use “symbols” in these shape definitions. Every instance of that symbol must resolve to the same value at runtime.
 
@@ -272,7 +272,7 @@ with load_neuropod(ADDITION_MODEL_PATH) as neuropod:
 ### From C++
 
 ```cpp
-#include "neuropods/neuropods.hh"
+#include "neuropod/neuropod.hh"
 
 int main()
 {

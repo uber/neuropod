@@ -1,4 +1,4 @@
-site_name: Neuropods
+site_name: Neuropod
 theme:
   name: 'material'
 markdown_extensions:
@@ -30,4 +30,4 @@ nav:
   - Advanced:
       - Efficient Tensor Creation: advanced/efficient_tensor_creation.md
       - Out-of-process Execution: advanced/ope.md
-  - Developing Neuropods: developing.md
+  - Developing Neuropod: developing.md
