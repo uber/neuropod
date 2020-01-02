@@ -114,7 +114,7 @@ def load_and_test_neuropod(
 
 def save_test_data(neuropod_path, test_input_data, test_expected_out):
     """
-    Saves the neuropods model's test data to a pickle file in the neuropod data directory
+    Saves the model's test data to a pickle file in the neuropod's data directory
 
     :param neuropod_path: the path of the neuropod model
     :param test_input_data: a dictionary of expected input feature values
@@ -128,7 +128,7 @@ def save_test_data(neuropod_path, test_input_data, test_expected_out):
 
 def load_test_data(neuropod_path):
     """
-    Loads the neuropods model's test data from the data directory
+    Loads test data from the data directory
 
     :param neuropod_path: the path of the neuropod model
     :return: dict or None

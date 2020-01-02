@@ -1,5 +1,5 @@
 [run]
-include = neuropods/*
+include = neuropod/*
 omit = *tests*
 concurrency = multiprocessing
 

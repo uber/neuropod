@@ -26,7 +26,7 @@ class PackagerLoader(object):
         packager_name = packaging_function.replace("create_", "").replace(
             "_neuropod", ""
         )
-        packager_module = "neuropods.backends." + packager_name + ".packager"
+        packager_module = "neuropod.backends." + packager_name + ".packager"
 
         if packager_name not in [
             "keras",
@@ -36,7 +36,7 @@ class PackagerLoader(object):
             "torchscript",
         ]:
             raise RuntimeError(
-                "Tried to get an invalid attribute on neuropods.packagers ({})".format(
+                "Tried to get an invalid attribute on neuropod.packagers ({})".format(
                     packaging_function
                 )
             )

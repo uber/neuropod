@@ -93,11 +93,11 @@ PythonBridge::PythonBridge(const std::string &             neuropod_path,
     py::gil_scoped_acquire gil;
 
     // Get the neuropod loader
-    py::object load_neuropod = py::module::import("neuropods.loader").attr("load_neuropod");
+    py::object load_neuropod = py::module::import("neuropod.loader").attr("load_neuropod");
 
     // Converts from unicode to ascii for python 3 string arrays
     maybe_convert_bindings_types_ = stdx::make_unique<py::object>(
-        py::module::import("neuropods.utils.dtype_utils").attr("maybe_convert_bindings_types"));
+        py::module::import("neuropod.utils.dtype_utils").attr("maybe_convert_bindings_types"));
 
     // Make sure that the model is local
     // Note: we could also delegate this to the python implementation

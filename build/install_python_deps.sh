@@ -6,7 +6,7 @@ set -e
 pushd source/python
 pip install -U pip setuptools numpy coverage requests mkdocs mkdocs-material
 python setup.py egg_info
-cat neuropods.egg-info/requires.txt | sed '/^\[/ d' | paste -sd " " - | xargs pip install
+cat neuropod.egg-info/requires.txt | sed '/^\[/ d' | paste -sd " " - | xargs pip install
 popd
 
 # Install the appropriate versions of torch and TF

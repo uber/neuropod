@@ -67,7 +67,7 @@ if __name__ == "__main__":
         help=(
             "Use the native bindings to run the model. This option can currently "
             "only be used when running from the `source/python` directory within "
-            "the Neuropods source tree."
+            "the Neuropod source tree."
         ),
         default=False,
         action="store_true",

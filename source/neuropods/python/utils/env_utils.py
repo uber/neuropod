@@ -44,7 +44,7 @@ def eval_in_new_process(
             [
                 binary_path,
                 "-m",
-                "neuropods.loader",
+                "neuropod.loader",
                 "--neuropod-path",
                 neuropod_path,
                 "--input-pkl-path",

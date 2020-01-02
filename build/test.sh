@@ -7,10 +7,10 @@ source ../build/set_build_env.sh
 
 # Run python tests
 pushd python
-python -m unittest discover --verbose neuropods/tests
+python -m unittest discover --verbose neuropod/tests
 
 # Test the native bindings
-NEUROPOD_RUN_NATIVE_TESTS=true python -m unittest discover --verbose neuropods/tests
+NEUROPOD_RUN_NATIVE_TESTS=true python -m unittest discover --verbose neuropod/tests
 popd
 
 # Run native tests

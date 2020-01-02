@@ -187,7 +187,7 @@ def write_neuropod_config(
                                     not specified in this mapping will use the
                                     `default_input_tensor_device` specified below.
 
-                                    If a GPU is selected at inference time, Neuropods
+                                    If a GPU is selected at inference time, Neuropod
                                     will move tensors to the appropriate devices before
                                     running the model. Otherwise, it will attempt to run
                                     the model on CPU and move all tensors (and the model)

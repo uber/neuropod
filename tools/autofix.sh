@@ -11,10 +11,10 @@ find . -name "*.hh" -o -name "*.cc" | xargs -L1 clang-format -style=file -i
 pushd python
 
 # Run black
-black -t py27 -t py35 -t py36 neuropods
+black -t py27 -t py35 -t py36 neuropod
 
 # Run autopep8 to fix errors for flake8
-autopep8 -r --in-place neuropods
+autopep8 -r --in-place neuropod
 
 popd
 popd
