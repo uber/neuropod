@@ -20,5 +20,5 @@ int main(int argc, char *argv[])
     std::string control_queue_name(argv[1]);
 
     // Start the main loop
-    neuropods::multiprocess_worker_loop(control_queue_name);
+    neuropod::multiprocess_worker_loop(control_queue_name);
 }

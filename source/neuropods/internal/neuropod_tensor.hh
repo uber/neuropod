@@ -18,7 +18,7 @@
 #include <string>
 #include <vector>
 
-namespace neuropods
+namespace neuropod
 {
 
 namespace
@@ -436,4 +436,4 @@ public:
     virtual T get_native_data() = 0;
 };
 
-} // namespace neuropods
+} // namespace neuropod

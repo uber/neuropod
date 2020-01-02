@@ -4,7 +4,7 @@
 
 #include "neuropods/multiprocess/shm_tensor.hh"
 
-namespace neuropods
+namespace neuropod
 {
 
 // The SHMAllocator used by all SHMNeuropodTensors
@@ -25,4 +25,4 @@ std::shared_ptr<NeuropodTensor> tensor_from_id(const SHMBlockID &block_id)
         data->tensor_type, dims, std::move(block), std::move(data), block_id);
 }
 
-} // namespace neuropods
+} // namespace neuropod

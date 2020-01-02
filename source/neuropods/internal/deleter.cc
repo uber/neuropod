@@ -4,7 +4,7 @@
 
 #include "neuropods/internal/deleter.hh"
 
-namespace neuropods
+namespace neuropod
 {
 namespace
 {
@@ -40,4 +40,4 @@ void *register_deleter(const Deleter &deleter, void *data)
     return new deleter_wrapper({deleter, data});
 }
 
-} // namespace neuropods
+} // namespace neuropod

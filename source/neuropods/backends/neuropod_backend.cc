@@ -6,7 +6,7 @@
 
 #include "neuropods/internal/neuropod_loader.hh"
 
-namespace neuropods
+namespace neuropod
 {
 
 NeuropodBackend::NeuropodBackend()  = default;
@@ -45,4 +45,4 @@ std::unique_ptr<NeuropodValueMap> NeuropodBackend::infer(const NeuropodValueMap 
     return out;
 }
 
-} // namespace neuropods
+} // namespace neuropod

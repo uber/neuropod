@@ -5,7 +5,7 @@
 #include <array>
 #include <memory>
 
-namespace neuropods
+namespace neuropod
 {
 
 // This shared memory allocator is based on a simple hypothesis:
@@ -51,4 +51,4 @@ public:
     void free_unused_shm_blocks();
 };
 
-} // namespace neuropods
+} // namespace neuropod

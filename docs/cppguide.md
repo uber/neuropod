@@ -20,7 +20,7 @@ where `PATH_TO_MY_MODEL` is the path to a model exported using one of the packag
 You can also provide runtime options when loading a model. Currently, the only option is `visible_device`.
 
 ```cpp
-neuropods::RuntimeOptions opts;
+neuropod::RuntimeOptions opts;
 
 // Set the visible device to the first GPU
 opts.visible_device = Device::GPU0;
@@ -103,7 +103,7 @@ auto tensor = allocator->allocate_tensor<float>({1, 2, 3});
 You can also manually specify the type without using a templated function
 
 ```cpp
-auto tensor = allocator->allocate_tensor({1, 2, 3}, neuropods::FLOAT_TENSOR);
+auto tensor = allocator->allocate_tensor({1, 2, 3}, neuropod::FLOAT_TENSOR);
 ```
 
 To do something useful with these tensors, see the Interacting with Tensors section below.
@@ -439,14 +439,14 @@ All built-in `NeuropodValue` types are serializable. Furthermore, `NeuropodValue
 // stringstream in this example
 std::stringstream ss;
 
-neuropods::NeuropodValueMap data = ...;
-neuropods::serialize(my_stream, data);
+neuropod::NeuropodValueMap data = ...;
+neuropod::serialize(my_stream, data);
 ```
 
 Similarly, deserializing is just as easy.
 
 ```cpp
-auto deserialized = neuropods::deserialize<neuropods::NeuropodValueMap>(ss, allocator);
+auto deserialized = neuropod::deserialize<neuropod::NeuropodValueMap>(ss, allocator);
 ```
 
 !!! note

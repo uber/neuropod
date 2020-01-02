@@ -8,12 +8,12 @@
 TEST(test_shm_tensor, simple)
 {
     // A tensor allocator that allocates tensors in shared memory
-    std::unique_ptr<neuropods::NeuropodTensorAllocator> allocator =
-        neuropods::stdx::make_unique<neuropods::DefaultTensorAllocator<neuropods::SHMNeuropodTensor>>();
+    std::unique_ptr<neuropod::NeuropodTensorAllocator> allocator =
+        neuropod::stdx::make_unique<neuropod::DefaultTensorAllocator<neuropod::SHMNeuropodTensor>>();
 
     // Store tensors we allocate so they don't go out of scope
-    std::vector<std::shared_ptr<neuropods::NeuropodTensor>> items;
-    std::vector<neuropods::SHMBlockID>                      block_ids;
+    std::vector<std::shared_ptr<neuropod::NeuropodTensor>> items;
+    std::vector<neuropod::SHMBlockID>                      block_ids;
 
     // Sample data
     constexpr size_t           num_items = 1024;
@@ -27,7 +27,7 @@ TEST(test_shm_tensor, simple)
 
         // Store the block ID
         const auto &block_id =
-            std::dynamic_pointer_cast<neuropods::NativeDataContainer<neuropods::SHMBlockID>>(tensor)->get_native_data();
+            std::dynamic_pointer_cast<neuropod::NativeDataContainer<neuropod::SHMBlockID>>(tensor)->get_native_data();
 
         block_ids.emplace_back(block_id);
 
@@ -40,7 +40,7 @@ TEST(test_shm_tensor, simple)
     {
         // Load the block of memory and ensure the data
         // is what we expect
-        auto tensor = neuropods::tensor_from_id(block_ids.at(i));
+        auto tensor = neuropod::tensor_from_id(block_ids.at(i));
 
         // Make sure dims match
         auto actual_dims = tensor->get_dims();

@@ -7,7 +7,7 @@
 #include <iostream>
 #include <sstream>
 
-namespace neuropods
+namespace neuropod
 {
 
 // A helper macro that lets us do things like
@@ -20,4 +20,4 @@ namespace neuropods
         throw std::runtime_error(err.str()); \
     }
 
-} // namespace neuropods
+} // namespace neuropod

@@ -14,7 +14,7 @@
 #include <string>
 #include <vector>
 
-namespace neuropods
+namespace neuropod
 {
 
 // An base class used to allocate tensors
@@ -176,4 +176,4 @@ public:
     }
 };
 
-} // namespace neuropods
+} // namespace neuropod

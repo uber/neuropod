@@ -14,7 +14,7 @@
 
 #include <dlfcn.h>
 
-namespace neuropods
+namespace neuropod
 {
 
 namespace
@@ -136,4 +136,4 @@ BackendFactoryFunction get_backend_by_name(const std::string &name)
     }
 }
 
-} // namespace neuropods
+} // namespace neuropod

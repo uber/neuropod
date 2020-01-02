@@ -23,7 +23,7 @@
 
 extern char **environ;
 
-namespace neuropods
+namespace neuropod
 {
 
 namespace
@@ -180,7 +180,7 @@ public:
             for (int i = 0; i < received.num_tensors; i++)
             {
                 // Get the ID and create a tensor
-                neuropods::SHMBlockID block_id;
+                neuropod::SHMBlockID block_id;
                 std::copy_n(received.tensor_id[i], block_id.size(), block_id.begin());
                 (*to_return)[received.tensor_name[i]] = tensor_from_id(block_id);
             }
@@ -212,4 +212,4 @@ std::unique_ptr<Neuropod> load_neuropod_in_worker(const std::string &neuropod_pa
     return stdx::make_unique<Neuropod>(neuropod_path, backend);
 }
 
-} // namespace neuropods
+} // namespace neuropod

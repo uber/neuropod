@@ -8,7 +8,7 @@
 #include <pybind11/numpy.h>
 #include <pybind11/pybind11.h>
 
-namespace neuropods
+namespace neuropod
 {
 
 namespace py = pybind11;
@@ -25,4 +25,4 @@ NeuropodValueMap from_numpy_dict(NeuropodTensorAllocator &allocator, py::dict &i
 // Convert the items to a python dict of numpy arrays
 py::dict to_numpy_dict(NeuropodValueMap &items);
 
-} // namespace neuropods
+} // namespace neuropod

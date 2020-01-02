@@ -17,7 +17,7 @@
 #include <string>
 #include <vector>
 
-namespace neuropods
+namespace neuropod
 {
 
 namespace
@@ -147,4 +147,4 @@ public:
     std::vector<std::string> get_data_as_vector() const { return data_; }
 };
 
-} // namespace neuropods
+} // namespace neuropod

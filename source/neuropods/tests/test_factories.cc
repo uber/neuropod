@@ -9,7 +9,7 @@ namespace
 {
 
 template <typename T>
-bool is_full(neuropods::TypedNeuropodTensor<T> &tensor, T value, size_t num_items)
+bool is_full(neuropod::TypedNeuropodTensor<T> &tensor, T value, size_t num_items)
 {
     // Make sure our size is correct
     auto actual_numel = tensor.get_num_elements();
@@ -25,7 +25,7 @@ bool is_full(neuropods::TypedNeuropodTensor<T> &tensor, T value, size_t num_item
 }
 
 template <typename T>
-bool matches_expected(neuropods::TypedNeuropodTensor<T> &tensor, const std::vector<T> expected)
+bool matches_expected(neuropod::TypedNeuropodTensor<T> &tensor, const std::vector<T> expected)
 {
     return tensor.get_data_as_vector() == expected;
 }
@@ -34,7 +34,7 @@ bool matches_expected(neuropods::TypedNeuropodTensor<T> &tensor, const std::vect
 
 TEST(test_factories, test_factories)
 {
-    neuropods::TestNeuropodBackend backend;
+    neuropod::TestNeuropodBackend backend;
 
     auto allocator = backend.get_tensor_allocator();
 

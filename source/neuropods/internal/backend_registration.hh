@@ -12,7 +12,7 @@
 #include <unordered_map>
 #include <vector>
 
-namespace neuropods
+namespace neuropod
 {
 
 class NeuropodBackend;
@@ -55,4 +55,4 @@ BackendFactoryFunction get_backend_by_name(const std::string &name);
 #define REGISTER_NEUROPOD_BACKEND(CLS, ... /* supported types */) \
     bool is_registered_##CLS = register_backend(#CLS, {__VA_ARGS__}, createNeuropodBackend<CLS>);
 
-} // namespace neuropods
+} // namespace neuropod

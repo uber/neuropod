@@ -14,7 +14,7 @@
 #include <string>
 #include <unordered_map>
 
-namespace neuropods
+namespace neuropod
 {
 
 // Forward declarations
@@ -110,4 +110,4 @@ ReturnType deserialize(std::istream &in, Params &&... params)
 #define MAKE_SERIALIZABLE(CLS, serialize_fn, deserialize_fn) \
     bool is_registered_##CLS = detail::register_serializable<CLS>(serialize_fn, deserialize_fn);
 
-} // namespace neuropods
+} // namespace neuropod

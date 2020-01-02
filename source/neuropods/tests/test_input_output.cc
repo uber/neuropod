@@ -30,7 +30,7 @@ void check_ptrs_eq(const T *data, size_t size, const T *target_data, size_t targ
 }
 
 template <typename T>
-void check_tensor_eq_ptr(const std::shared_ptr<neuropods::NeuropodTensor> &tensor, const T *target_data, size_t size)
+void check_tensor_eq_ptr(const std::shared_ptr<neuropod::NeuropodTensor> &tensor, const T *target_data, size_t size)
 {
     // Downcast to a TypedNeuropodTensor so we can get the data pointer
     const auto typed_tensor = tensor->as_typed_tensor<T>();
@@ -58,40 +58,40 @@ void check_vectors_eq(const std::vector<T> &a, const std::vector<T> &b)
     EXPECT_EQ(memcmp(&a[0], &b[0], a.size() * sizeof(T)), 0);
 }
 
-std::shared_ptr<neuropods::NeuropodTensor> serialize_deserialize(
-    neuropods::NeuropodTensorAllocator &allocator, const std::shared_ptr<neuropods::NeuropodTensor> &tensor)
+std::shared_ptr<neuropod::NeuropodTensor> serialize_deserialize(
+    neuropod::NeuropodTensorAllocator &allocator, const std::shared_ptr<neuropod::NeuropodTensor> &tensor)
 {
     // Serialize the tensor
     std::stringstream ss;
-    neuropods::serialize(ss, *tensor);
+    neuropod::serialize(ss, *tensor);
 
     // Deserialize the tensor
-    auto value = neuropods::deserialize<std::shared_ptr<neuropods::NeuropodValue>>(ss, allocator);
-    return std::dynamic_pointer_cast<neuropods::NeuropodTensor>(value);
+    auto value = neuropod::deserialize<std::shared_ptr<neuropod::NeuropodValue>>(ss, allocator);
+    return std::dynamic_pointer_cast<neuropod::NeuropodTensor>(value);
 }
 
 // Creates tensors using various input methods
 // and validates the output
 TEST(test_allocate_tensor, add_tensors_and_validate)
 {
-    neuropods::TestNeuropodBackend backend;
+    neuropod::TestNeuropodBackend backend;
     auto                           allocator = backend.get_tensor_allocator();
 
     // Allocate tensors
-    std::shared_ptr<neuropods::NeuropodTensor> a_ten = allocator->allocate_tensor(a_shape, neuropods::INT32_TENSOR);
+    std::shared_ptr<neuropod::NeuropodTensor> a_ten = allocator->allocate_tensor(a_shape, neuropod::INT32_TENSOR);
     a_ten->as_typed_tensor<int32_t>()->copy_from(a_data);
 
-    std::shared_ptr<neuropods::NeuropodTensor> b_ten = allocator->allocate_tensor(b_shape, neuropods::INT64_TENSOR);
+    std::shared_ptr<neuropod::NeuropodTensor> b_ten = allocator->allocate_tensor(b_shape, neuropod::INT64_TENSOR);
     b_ten->as_typed_tensor<int64_t>()->copy_from(b_data);
 
-    std::shared_ptr<neuropods::NeuropodTensor> c_ten = allocator->allocate_tensor(c_shape, neuropods::FLOAT_TENSOR);
+    std::shared_ptr<neuropod::NeuropodTensor> c_ten = allocator->allocate_tensor(c_shape, neuropod::FLOAT_TENSOR);
     c_ten->as_typed_tensor<float>()->copy_from(c_data, 4);
 
     // Wrap existing data
     // TODO(vip): Refactor this test. It's bad practice to have an empty deleter
     // The created tensor should be responsible for deallocating the memory
-    std::shared_ptr<neuropods::NeuropodTensor> d_ten = allocator->tensor_from_memory(
-        d_shape, neuropods::DOUBLE_TENSOR, const_cast<double *>(d_data), [](void *unused) {});
+    std::shared_ptr<neuropod::NeuropodTensor> d_ten = allocator->tensor_from_memory(
+        d_shape, neuropod::DOUBLE_TENSOR, const_cast<double *>(d_data), [](void *unused) {});
 
     // Validate the internal state for a
     {
@@ -129,7 +129,7 @@ TEST(test_allocate_tensor, add_tensors_and_validate)
 // TODO(vip): reenable once the same validation is added to `Neuropod`
 // TEST(test_input_builder, adding_tensor_with_the_same_name_should_fail)
 // {
-//     neuropods::NeuropodInputBuilder builder(std::make_shared<neuropods::TestNeuropodBackend>());
+//     neuropod::NeuropodInputBuilder builder(std::make_shared<neuropod::TestNeuropodBackend>());
 //
 //     builder.allocate_tensor<int8_t>({10});
 //     EXPECT_THROW(builder.allocate_tensor<int8_t>({10}), std::runtime_error);

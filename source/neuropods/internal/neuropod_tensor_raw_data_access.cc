@@ -6,7 +6,7 @@
 
 #include "neuropods/internal/neuropod_tensor.hh"
 
-namespace neuropods
+namespace neuropod
 {
 
 namespace internal
@@ -28,4 +28,4 @@ size_t NeuropodTensorRawDataAccess::get_bytes_per_element(const NeuropodTensor &
 }
 
 } // namespace internal
-} // namespace neuropods
+} // namespace neuropod

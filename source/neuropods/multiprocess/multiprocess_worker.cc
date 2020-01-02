@@ -14,7 +14,7 @@
 #include <thread>
 #include <vector>
 
-namespace neuropods
+namespace neuropod
 {
 
 namespace
@@ -90,7 +90,7 @@ void multiprocess_worker_loop(const std::string &control_queue_name)
             for (int i = 0; i < received.num_tensors; i++)
             {
                 // Get the ID and create a tensor
-                neuropods::SHMBlockID block_id;
+                neuropod::SHMBlockID block_id;
                 std::copy_n(received.tensor_id[i], block_id.size(), block_id.begin());
                 auto shm_tensor = tensor_from_id(block_id);
 
@@ -143,4 +143,4 @@ void multiprocess_worker_loop(const std::string &control_queue_name)
     }
 }
 
-} // namespace neuropods
+} // namespace neuropod

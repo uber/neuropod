@@ -4,10 +4,10 @@
 
 #include <string>
 
-namespace neuropods
+namespace neuropod
 {
 
 // The main loop for a worker that runs a neuropod
 void multiprocess_worker_loop(const std::string &control_queue_name);
 
-} // namespace neuropods
+} // namespace neuropod

@@ -12,7 +12,7 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 
-namespace neuropods
+namespace neuropod
 {
 
 namespace py = pybind11;
@@ -172,4 +172,4 @@ py::dict to_numpy_dict(NeuropodValueMap &items)
     return out;
 }
 
-} // namespace neuropods
+} // namespace neuropod

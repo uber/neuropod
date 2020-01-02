@@ -4,7 +4,7 @@
 
 #pragma once
 
-namespace neuropods
+namespace neuropod
 {
 
 // Forward declare TensorAccessor
@@ -123,4 +123,4 @@ public:
     T *end() { return &this->data_[this->dims_[0]]; }
 };
 
-} // namespace neuropods
+} // namespace neuropod

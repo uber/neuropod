@@ -6,7 +6,7 @@
 
 #include <functional>
 
-namespace neuropods
+namespace neuropod
 {
 
 // Used to deallocate user provided memory
@@ -19,4 +19,4 @@ void run_deleter(void *handle);
 // handle
 void *register_deleter(const Deleter &deleter, void *data);
 
-} // namespace neuropods
+} // namespace neuropod

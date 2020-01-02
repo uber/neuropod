@@ -10,7 +10,7 @@
 #include <string>
 #include <vector>
 
-namespace neuropods
+namespace neuropod
 {
 
 // A NeuropodBackend used in tests
@@ -26,4 +26,4 @@ public:
     // Run inference
     std::unique_ptr<NeuropodValueMap> infer(const NeuropodValueMap &inputs);
 };
-} // namespace neuropods
+} // namespace neuropod

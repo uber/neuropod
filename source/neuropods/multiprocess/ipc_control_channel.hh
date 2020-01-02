@@ -13,7 +13,7 @@
 
 namespace ipc = boost::interprocess;
 
-namespace neuropods
+namespace neuropod
 {
 
 // Validates that state machine transitions are happening correctly
@@ -74,4 +74,4 @@ public:
     void cleanup();
 };
 
-} // namespace neuropods
+} // namespace neuropod

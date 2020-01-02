@@ -40,12 +40,12 @@ TEST(test_config_utils, valid_config)
 {
     // Test that the config is valid
     std::istringstream config(VALID_SPEC);
-    auto               model_config = neuropods::load_model_config(config);
+    auto               model_config = neuropod::load_model_config(config);
     EXPECT_EQ("x", model_config->inputs[0].name);
-    EXPECT_EQ(neuropods::TensorType::FLOAT_TENSOR, model_config->inputs[0].type);
+    EXPECT_EQ(neuropod::TensorType::FLOAT_TENSOR, model_config->inputs[0].type);
     EXPECT_EQ(std::vector<int64_t>({-1, 2, -2}), model_config->inputs[0].dims);
     EXPECT_EQ("y", model_config->outputs[0].name);
-    EXPECT_EQ(neuropods::TensorType::FLOAT_TENSOR, model_config->outputs[0].type);
+    EXPECT_EQ(neuropod::TensorType::FLOAT_TENSOR, model_config->outputs[0].type);
     EXPECT_EQ(std::vector<int64_t>({-1, 2, -2}), model_config->outputs[0].dims);
 }
 
@@ -53,52 +53,52 @@ TEST(test_config_utils, invalid_name)
 {
     // Name must be a string
     std::istringstream config(replace("\"addition_model\"", "true"));
-    EXPECT_THROW(neuropods::load_model_config(config), std::runtime_error);
+    EXPECT_THROW(neuropod::load_model_config(config), std::runtime_error);
 }
 
 TEST(test_config_utils, invalid_platform)
 {
     // Platform must be a string
     std::istringstream config(replace("\"tensorflow\"", "5"));
-    EXPECT_THROW(neuropods::load_model_config(config), std::runtime_error);
+    EXPECT_THROW(neuropod::load_model_config(config), std::runtime_error);
 }
 
 TEST(test_config_utils, invalid_spec_dtype)
 {
     // complex128 is not a supported type
     std::istringstream config(replace("float32", "complex128"));
-    EXPECT_THROW(neuropods::load_model_config(config), std::runtime_error);
+    EXPECT_THROW(neuropod::load_model_config(config), std::runtime_error);
 }
 
 TEST(test_config_utils, invalid_spec_name)
 {
     // The name of a tensor must be a string
     std::istringstream config(replace("\"x\"", "true"));
-    EXPECT_THROW(neuropods::load_model_config(config), std::runtime_error);
+    EXPECT_THROW(neuropod::load_model_config(config), std::runtime_error);
 }
 
 TEST(test_config_utils, invalid_spec_shape)
 {
     // "123" is not a valid shape. Must be an array
     std::istringstream config(replace("[null, 2, \"some_symbol\"]", "\"123\""));
-    EXPECT_THROW(neuropods::load_model_config(config), std::runtime_error);
+    EXPECT_THROW(neuropod::load_model_config(config), std::runtime_error);
 }
 
 TEST(test_config_utils, invalid_spec_shape_element)
 {
     // true is not valid in a shape
     std::istringstream config(replace("[null, 2, \"some_symbol\"]", "[null, 2, \"some_symbol\", true]"));
-    EXPECT_THROW(neuropods::load_model_config(config), std::runtime_error);
+    EXPECT_THROW(neuropod::load_model_config(config), std::runtime_error);
 }
 
 TEST(test_config_utils, invalid_device)
 {
     std::istringstream config(replace("\"x\": \"GPU\"", "\"x\": \"TPU\""));
-    EXPECT_THROW(neuropods::load_model_config(config), std::runtime_error);
+    EXPECT_THROW(neuropod::load_model_config(config), std::runtime_error);
 }
 
 TEST(test_config_utils, device_cpu)
 {
     std::istringstream config(replace("\"x\": \"GPU\"", "\"x\": \"CPU\""));
-    neuropods::load_model_config(config);
+    neuropod::load_model_config(config);
 }

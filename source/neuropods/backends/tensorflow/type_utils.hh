@@ -7,10 +7,10 @@
 #include "neuropods/internal/tensor_types.hh"
 #include "tensorflow/core/framework/types.pb.h"
 
-namespace neuropods
+namespace neuropod
 {
 
 TensorType           get_neuropod_type_from_tf_type(tensorflow::DataType type);
 tensorflow::DataType get_tf_type_from_neuropod_type(TensorType type);
 
-} // namespace neuropods
+} // namespace neuropod

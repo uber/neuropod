@@ -8,7 +8,7 @@
 
 #include <string>
 
-namespace neuropods
+namespace neuropod
 {
 
 // Start a worker process and run the neuropod in the worker
@@ -31,7 +31,7 @@ std::unique_ptr<Neuropod> load_neuropod_in_new_process(const std::string &neurop
 // be desirable.
 //
 // If free_memory_every_cycle is false, the user is responsible for periodically calling
-// neuropods::free_unused_shm_blocks()
+// neuropod::free_unused_shm_blocks()
 //
 // This function loads a neuropod in an existing worker process.
 // The above function starts a new worker process and loads a neuropod in it.
@@ -39,4 +39,4 @@ std::unique_ptr<Neuropod> load_neuropod_in_worker(const std::string &neuropod_pa
                                                   const std::string &control_queue_name,
                                                   bool               free_memory_every_cycle = true);
 
-} // namespace neuropods
+} // namespace neuropod

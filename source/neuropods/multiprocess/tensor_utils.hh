@@ -9,7 +9,7 @@
 #include <string>
 #include <vector>
 
-namespace neuropods
+namespace neuropod
 {
 
 // Given a NeuropodTensor, wrap the underlying data with a newly created tensor
@@ -72,4 +72,4 @@ std::shared_ptr<NeuropodTensor> wrap_existing_tensor(std::shared_ptr<NeuropodTen
     }
 }
 
-} // namespace neuropods
+} // namespace neuropod

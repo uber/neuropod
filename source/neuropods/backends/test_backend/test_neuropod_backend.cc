@@ -4,7 +4,7 @@
 
 #include "test_neuropod_backend.hh"
 
-namespace neuropods
+namespace neuropod
 {
 
 TestNeuropodBackend::TestNeuropodBackend() {}
@@ -23,4 +23,4 @@ std::unique_ptr<NeuropodValueMap> TestNeuropodBackend::infer(const NeuropodValue
 
 REGISTER_NEUROPOD_BACKEND(TestNeuropodBackend, "noop")
 
-} // namespace neuropods
+} // namespace neuropod

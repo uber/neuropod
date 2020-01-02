@@ -9,7 +9,7 @@
 #include <mutex>
 #include <unordered_map>
 
-namespace neuropods
+namespace neuropod
 {
 
 namespace
@@ -107,4 +107,4 @@ NeuropodValueMap deserialize(boost::archive::binary_iarchive &ar, NeuropodTensor
 
 } // namespace detail
 
-} // namespace neuropods
+} // namespace neuropod

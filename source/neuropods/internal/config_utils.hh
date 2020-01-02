@@ -12,7 +12,7 @@
 #include <unordered_map>
 #include <vector>
 
-namespace neuropods
+namespace neuropod
 {
 
 // Device types that are supported in the Neuropod configuration
@@ -51,4 +51,4 @@ struct ModelConfig
 std::unique_ptr<ModelConfig> load_model_config(const std::string &neuropod_path);
 std::unique_ptr<ModelConfig> load_model_config(std::istream &input_stream);
 
-} // namespace neuropods
+} // namespace neuropod

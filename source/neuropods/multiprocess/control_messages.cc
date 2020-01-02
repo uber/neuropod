@@ -4,7 +4,7 @@
 
 #include "neuropods/multiprocess/control_messages.hh"
 
-namespace neuropods
+namespace neuropod
 {
 
 // Used to print out the enum names rather than just a number
@@ -31,4 +31,4 @@ std::ostream &operator<<(std::ostream &out, const MessageType value)
     return out << s;
 }
 
-} // namespace neuropods
+} // namespace neuropod

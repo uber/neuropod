@@ -4,7 +4,7 @@
 
 #include "neuropods/internal/neuropod_tensor.hh"
 
-namespace neuropods
+namespace neuropod
 {
 
 namespace
@@ -133,4 +133,4 @@ const TypedNeuropodTensor<T> *NeuropodValue::as_typed_tensor() const
 
 FOR_EACH_TYPE_MAPPING_INCLUDING_STRING(INIT_TEMPLATES_FOR_TYPE);
 
-} // namespace neuropods
+} // namespace neuropod

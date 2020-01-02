@@ -14,7 +14,7 @@
 
 #include <stdlib.h>
 
-void test_addition_model(neuropods::Neuropod &neuropod, bool copy_mem)
+void test_addition_model(neuropod::Neuropod &neuropod, bool copy_mem)
 {
     std::atomic_int free_counter{0};
     {
@@ -22,13 +22,13 @@ void test_addition_model(neuropods::Neuropod &neuropod, bool copy_mem)
         auto input_specs  = neuropod.get_inputs();
         auto output_specs = neuropod.get_outputs();
         EXPECT_EQ(input_specs.at(0).name, "x");
-        EXPECT_EQ(input_specs.at(0).type, neuropods::FLOAT_TENSOR);
+        EXPECT_EQ(input_specs.at(0).type, neuropod::FLOAT_TENSOR);
 
         EXPECT_EQ(input_specs.at(1).name, "y");
-        EXPECT_EQ(input_specs.at(1).type, neuropods::FLOAT_TENSOR);
+        EXPECT_EQ(input_specs.at(1).type, neuropod::FLOAT_TENSOR);
 
         EXPECT_EQ(output_specs.at(0).name, "out");
-        EXPECT_EQ(output_specs.at(0).type, neuropods::FLOAT_TENSOR);
+        EXPECT_EQ(output_specs.at(0).type, neuropod::FLOAT_TENSOR);
 
         // Some sample input data
         std::vector<int64_t> shape    = {2, 2};
@@ -36,7 +36,7 @@ void test_addition_model(neuropods::Neuropod &neuropod, bool copy_mem)
         const float          y_data[] = {7, 8, 9, 10};
         const float          target[] = {8, 10, 12, 14};
 
-        neuropods::NeuropodValueMap input_data;
+        neuropod::NeuropodValueMap input_data;
 
         if (copy_mem)
         {
@@ -97,7 +97,7 @@ void test_addition_model(neuropods::Neuropod &neuropod, bool copy_mem)
     }
 }
 
-void test_addition_model(neuropods::Neuropod &neuropod)
+void test_addition_model(neuropod::Neuropod &neuropod)
 {
     // Run the test with and without copying the input data
     test_addition_model(neuropod, true);
@@ -107,7 +107,7 @@ void test_addition_model(neuropods::Neuropod &neuropod)
 void test_addition_model(const std::string &neuropod_path, const std::string &backend)
 {
     // Load the neuropod
-    neuropods::Neuropod neuropod(neuropod_path, backend);
+    neuropod::Neuropod neuropod(neuropod_path, backend);
     test_addition_model(neuropod);
 }
 
@@ -115,18 +115,18 @@ void test_addition_model(const std::string &                                 neu
                          const std::unordered_map<std::string, std::string> &default_backend_overrides)
 {
     // Load the neuropod
-    neuropods::Neuropod neuropod(neuropod_path, default_backend_overrides);
+    neuropod::Neuropod neuropod(neuropod_path, default_backend_overrides);
     test_addition_model(neuropod);
 }
 
 void test_addition_model(const std::string &neuropod_path)
 {
     // Load the neuropod
-    neuropods::Neuropod neuropod(neuropod_path);
+    neuropod::Neuropod neuropod(neuropod_path);
     test_addition_model(neuropod);
 }
 
-void test_strings_model(neuropods::Neuropod &neuropod)
+void test_strings_model(neuropod::Neuropod &neuropod)
 {
     // Tests a model that concatenates string tensors
     // Some sample input data
@@ -165,7 +165,7 @@ void test_strings_model(neuropods::Neuropod &neuropod)
 void test_strings_model(const std::string &neuropod_path, const std::string &backend)
 {
     // Load the neuropod
-    neuropods::Neuropod neuropod(neuropod_path, backend);
+    neuropod::Neuropod neuropod(neuropod_path, backend);
     test_strings_model(neuropod);
 }
 
@@ -173,13 +173,13 @@ void test_strings_model(const std::string &                                 neur
                         const std::unordered_map<std::string, std::string> &default_backend_overrides)
 {
     // Load the neuropod
-    neuropods::Neuropod neuropod(neuropod_path, default_backend_overrides);
+    neuropod::Neuropod neuropod(neuropod_path, default_backend_overrides);
     test_strings_model(neuropod);
 }
 
 void test_strings_model(const std::string &neuropod_path)
 {
     // Load the neuropod
-    neuropods::Neuropod neuropod(neuropod_path);
+    neuropod::Neuropod neuropod(neuropod_path);
     test_strings_model(neuropod);
 }

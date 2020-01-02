@@ -12,7 +12,7 @@
 #include <string>
 #include <vector>
 
-namespace neuropods
+namespace neuropod
 {
 
 namespace py = pybind11;
@@ -49,4 +49,4 @@ public:
     std::unique_ptr<NeuropodValueMap> infer(const NeuropodValueMap &inputs);
 };
 
-} // namespace neuropods
+} // namespace neuropod

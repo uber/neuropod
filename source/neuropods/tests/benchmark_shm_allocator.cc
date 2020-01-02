@@ -21,7 +21,7 @@ constexpr size_t num_bytes                        = 1200 * 1920 * 3 * sizeof(uin
 
 static void benchmark_shm_force_new(benchmark::State &state)
 {
-    neuropods::SHMAllocator allocator;
+    neuropod::SHMAllocator allocator;
 
     for (auto _ : state)
     {
@@ -29,7 +29,7 @@ static void benchmark_shm_force_new(benchmark::State &state)
         allocator.free_unused_shm_blocks();
 
         // Allocate some memory
-        neuropods::SHMBlockID block_id;
+        neuropod::SHMBlockID block_id;
         auto                  data = allocator.allocate_shm(num_bytes, block_id);
 
         // Copy in data
@@ -40,13 +40,13 @@ BENCHMARK(benchmark_shm_force_new);
 
 static void benchmark_shm(benchmark::State &state)
 {
-    neuropods::SHMAllocator allocator;
+    neuropod::SHMAllocator allocator;
 
     for (auto _ : state)
     {
         // Allocate some memory
         // This should reuse bocks of memory from previous allocations
-        neuropods::SHMBlockID block_id;
+        neuropod::SHMBlockID block_id;
         auto                  data = allocator.allocate_shm(num_bytes, block_id);
 
         // Copy in data
@@ -57,7 +57,7 @@ BENCHMARK(benchmark_shm);
 
 static void benchmark_malloc(benchmark::State &state)
 {
-    neuropods::SHMAllocator allocator;
+    neuropod::SHMAllocator allocator;
 
     for (auto _ : state)
     {

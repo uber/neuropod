@@ -9,7 +9,7 @@
 #include <sstream>
 #include <stdexcept>
 
-namespace neuropods
+namespace neuropod
 {
 
 #define FOR_TF_NEUROPOD_MAPPING(FN)          \
@@ -57,4 +57,4 @@ tensorflow::DataType get_tf_type_from_neuropod_type(TensorType type)
     NEUROPOD_ERROR("TensorFlow does not support type: " << type);
 }
 
-} // namespace neuropods
+} // namespace neuropod

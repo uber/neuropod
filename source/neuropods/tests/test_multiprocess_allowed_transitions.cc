@@ -7,88 +7,88 @@
 
 TEST(test_multiprocess_allowed_transitions, simple)
 {
-    neuropods::TransitionVerifier verifier;
+    neuropod::TransitionVerifier verifier;
 
-    verifier.assert_transition_allowed(neuropods::LOAD_NEUROPOD);
-    verifier.assert_transition_allowed(neuropods::ADD_INPUT);
-    verifier.assert_transition_allowed(neuropods::ADD_INPUT);
-
-    // A heartbeat is allowed at any time
-    verifier.assert_transition_allowed(neuropods::HEARTBEAT);
-
-    verifier.assert_transition_allowed(neuropods::ADD_INPUT);
-    verifier.assert_transition_allowed(neuropods::INFER);
-    verifier.assert_transition_allowed(neuropods::RETURN_OUTPUT);
-    verifier.assert_transition_allowed(neuropods::RETURN_OUTPUT);
+    verifier.assert_transition_allowed(neuropod::LOAD_NEUROPOD);
+    verifier.assert_transition_allowed(neuropod::ADD_INPUT);
+    verifier.assert_transition_allowed(neuropod::ADD_INPUT);
 
     // A heartbeat is allowed at any time
-    verifier.assert_transition_allowed(neuropods::HEARTBEAT);
+    verifier.assert_transition_allowed(neuropod::HEARTBEAT);
 
-    verifier.assert_transition_allowed(neuropods::RETURN_OUTPUT);
-    verifier.assert_transition_allowed(neuropods::END_OUTPUT);
-    verifier.assert_transition_allowed(neuropods::INFER_COMPLETE);
+    verifier.assert_transition_allowed(neuropod::ADD_INPUT);
+    verifier.assert_transition_allowed(neuropod::INFER);
+    verifier.assert_transition_allowed(neuropod::RETURN_OUTPUT);
+    verifier.assert_transition_allowed(neuropod::RETURN_OUTPUT);
+
+    // A heartbeat is allowed at any time
+    verifier.assert_transition_allowed(neuropod::HEARTBEAT);
+
+    verifier.assert_transition_allowed(neuropod::RETURN_OUTPUT);
+    verifier.assert_transition_allowed(neuropod::END_OUTPUT);
+    verifier.assert_transition_allowed(neuropod::INFER_COMPLETE);
 }
 
 TEST(test_multiprocess_allowed_transitions, shutdown)
 {
-    neuropods::TransitionVerifier verifier;
+    neuropod::TransitionVerifier verifier;
 
-    verifier.assert_transition_allowed(neuropods::LOAD_NEUROPOD);
-    verifier.assert_transition_allowed(neuropods::ADD_INPUT);
-    verifier.assert_transition_allowed(neuropods::ADD_INPUT);
+    verifier.assert_transition_allowed(neuropod::LOAD_NEUROPOD);
+    verifier.assert_transition_allowed(neuropod::ADD_INPUT);
+    verifier.assert_transition_allowed(neuropod::ADD_INPUT);
 
     // Shutdown is allowed at any time
-    verifier.assert_transition_allowed(neuropods::SHUTDOWN);
+    verifier.assert_transition_allowed(neuropod::SHUTDOWN);
 }
 
 TEST(test_multiprocess_allowed_transitions, invalid_start)
 {
-    neuropods::TransitionVerifier verifier;
+    neuropod::TransitionVerifier verifier;
 
     // Infer is not allowed here
-    EXPECT_ANY_THROW(verifier.assert_transition_allowed(neuropods::INFER));
+    EXPECT_ANY_THROW(verifier.assert_transition_allowed(neuropod::INFER));
 }
 
 TEST(test_multiprocess_allowed_transitions, invalid)
 {
-    neuropods::TransitionVerifier verifier;
+    neuropod::TransitionVerifier verifier;
 
-    verifier.assert_transition_allowed(neuropods::LOAD_NEUROPOD);
-    verifier.assert_transition_allowed(neuropods::ADD_INPUT);
-    verifier.assert_transition_allowed(neuropods::ADD_INPUT);
+    verifier.assert_transition_allowed(neuropod::LOAD_NEUROPOD);
+    verifier.assert_transition_allowed(neuropod::ADD_INPUT);
+    verifier.assert_transition_allowed(neuropod::ADD_INPUT);
 
     // This is invalid
-    EXPECT_ANY_THROW(verifier.assert_transition_allowed(neuropods::INFER_COMPLETE));
+    EXPECT_ANY_THROW(verifier.assert_transition_allowed(neuropod::INFER_COMPLETE));
 }
 
 TEST(test_multiprocess_allowed_transitions, new_infer)
 {
-    neuropods::TransitionVerifier verifier;
+    neuropod::TransitionVerifier verifier;
 
     // Load a neuropod and run inference
-    verifier.assert_transition_allowed(neuropods::LOAD_NEUROPOD);
-    verifier.assert_transition_allowed(neuropods::ADD_INPUT);
-    verifier.assert_transition_allowed(neuropods::INFER);
-    verifier.assert_transition_allowed(neuropods::RETURN_OUTPUT);
-    verifier.assert_transition_allowed(neuropods::END_OUTPUT);
-    verifier.assert_transition_allowed(neuropods::INFER_COMPLETE);
+    verifier.assert_transition_allowed(neuropod::LOAD_NEUROPOD);
+    verifier.assert_transition_allowed(neuropod::ADD_INPUT);
+    verifier.assert_transition_allowed(neuropod::INFER);
+    verifier.assert_transition_allowed(neuropod::RETURN_OUTPUT);
+    verifier.assert_transition_allowed(neuropod::END_OUTPUT);
+    verifier.assert_transition_allowed(neuropod::INFER_COMPLETE);
 
     // Running inference again is valid
-    verifier.assert_transition_allowed(neuropods::ADD_INPUT);
+    verifier.assert_transition_allowed(neuropod::ADD_INPUT);
 }
 
 TEST(test_multiprocess_allowed_transitions, load_neuropod)
 {
-    neuropods::TransitionVerifier verifier;
+    neuropod::TransitionVerifier verifier;
 
     // Load a neuropod and run inference
-    verifier.assert_transition_allowed(neuropods::LOAD_NEUROPOD);
-    verifier.assert_transition_allowed(neuropods::ADD_INPUT);
-    verifier.assert_transition_allowed(neuropods::INFER);
-    verifier.assert_transition_allowed(neuropods::RETURN_OUTPUT);
-    verifier.assert_transition_allowed(neuropods::END_OUTPUT);
-    verifier.assert_transition_allowed(neuropods::INFER_COMPLETE);
+    verifier.assert_transition_allowed(neuropod::LOAD_NEUROPOD);
+    verifier.assert_transition_allowed(neuropod::ADD_INPUT);
+    verifier.assert_transition_allowed(neuropod::INFER);
+    verifier.assert_transition_allowed(neuropod::RETURN_OUTPUT);
+    verifier.assert_transition_allowed(neuropod::END_OUTPUT);
+    verifier.assert_transition_allowed(neuropod::INFER_COMPLETE);
 
     // Loading another neuropod is valid
-    verifier.assert_transition_allowed(neuropods::LOAD_NEUROPOD);
+    verifier.assert_transition_allowed(neuropod::LOAD_NEUROPOD);
 }

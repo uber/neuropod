@@ -14,17 +14,17 @@ namespace
 
 struct load_in_process
 {
-    std::unique_ptr<neuropods::Neuropod> operator()(const std::string &path)
+    std::unique_ptr<neuropod::Neuropod> operator()(const std::string &path)
     {
-        return neuropods::stdx::make_unique<neuropods::Neuropod>(path);
+        return neuropod::stdx::make_unique<neuropod::Neuropod>(path);
     }
 };
 
 struct load_out_of_process
 {
-    std::unique_ptr<neuropods::Neuropod> operator()(const std::string &path)
+    std::unique_ptr<neuropod::Neuropod> operator()(const std::string &path)
     {
-        return neuropods::load_neuropod_in_new_process(path);
+        return neuropod::load_neuropod_in_new_process(path);
     }
 };
 
@@ -39,7 +39,7 @@ void benchmark_object_detection(benchmark::State &state)
 
     for (auto _ : state)
     {
-        neuropods::NeuropodValueMap input_data;
+        neuropod::NeuropodValueMap input_data;
 
         // Add an input "image"
         auto image_tensor = neuropod->template allocate_tensor<uint8_t>({1200, 1920, 3});
@@ -66,7 +66,7 @@ void benchmark_small_inputs(benchmark::State &state)
 
     for (auto _ : state)
     {
-        neuropods::NeuropodValueMap input_data;
+        neuropod::NeuropodValueMap input_data;
 
         for (int i = 0; i < 100; i++)
         {

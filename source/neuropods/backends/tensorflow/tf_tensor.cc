@@ -26,7 +26,7 @@ public:
 
 } // namespace tensorflow
 
-namespace neuropods
+namespace neuropod
 {
 
 namespace detail
@@ -150,4 +150,4 @@ void create_tensor_from_existing_memory(const std::vector<int64_t> &dims,
 
 } // namespace detail
 
-} // namespace neuropods
+} // namespace neuropod

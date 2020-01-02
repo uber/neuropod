@@ -28,7 +28,7 @@
 #endif
 #endif
 
-namespace neuropods
+namespace neuropod
 {
 
 namespace
@@ -220,4 +220,4 @@ torch::jit::IValue get_ivalue_from_torch_tensor(const std::shared_ptr<NeuropodVa
     return std::dynamic_pointer_cast<NativeDataContainer<torch::jit::IValue>>(tensor)->get_native_data();
 }
 
-} // namespace neuropods
+} // namespace neuropod

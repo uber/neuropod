@@ -15,7 +15,7 @@
 #include <string>
 #include <vector>
 
-namespace neuropods
+namespace neuropod
 {
 
 // This backend can execute TorchScript models using the
@@ -37,7 +37,7 @@ private:
 
     // Get a torch device given a target neuropod device
     // (this also depends on the visible device in the options above)
-    torch::Device get_torch_device(neuropods::DeviceType target_device);
+    torch::Device get_torch_device(neuropod::DeviceType target_device);
 
 public:
     TorchNeuropodBackend(const std::string &           neuropod_path,
@@ -57,4 +57,4 @@ public:
     std::unique_ptr<NeuropodValueMap> infer(const NeuropodValueMap &inputs);
 };
 
-} // namespace neuropods
+} // namespace neuropod

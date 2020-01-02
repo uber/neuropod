@@ -18,7 +18,7 @@
 
 #include <dlfcn.h>
 
-namespace neuropods
+namespace neuropod
 {
 namespace
 {
@@ -267,4 +267,4 @@ std::unique_ptr<NeuropodValueMap> TensorflowNeuropodBackend::infer(const Neuropo
 
 REGISTER_NEUROPOD_BACKEND(TensorflowNeuropodBackend, "tensorflow")
 
-} // namespace neuropods
+} // namespace neuropod

@@ -7,14 +7,14 @@
 
 TEST(test_shm_allocator, simple)
 {
-    neuropods::SHMAllocator allocator;
+    neuropod::SHMAllocator allocator;
     for (uint8_t i = 0; i < 16; i++)
     {
         const uint8_t    some_image_data[1200 * 1920 * 3] = {i};
         constexpr size_t num_bytes                        = 1200 * 1920 * 3 * sizeof(uint8_t);
 
         // Allocate some memory and copy in data
-        neuropods::SHMBlockID block_id;
+        neuropod::SHMBlockID block_id;
         auto                  data = allocator.allocate_shm(num_bytes, block_id);
         memcpy(data.get(), some_image_data, num_bytes);
 
@@ -27,25 +27,25 @@ TEST(test_shm_allocator, simple)
 
 TEST(test_shm_allocator, out_of_scope)
 {
-    neuropods::SHMBlockID block_id;
+    neuropod::SHMBlockID block_id;
 
     // Allocate some shared memory and let everything go out of scope
     {
-        neuropods::SHMAllocator allocator;
+        neuropod::SHMAllocator allocator;
         auto                    data = allocator.allocate_shm(1024, block_id);
     }
 
     // Try loading the block we previously allocated
     {
-        neuropods::SHMAllocator allocator;
+        neuropod::SHMAllocator allocator;
         EXPECT_ANY_THROW(allocator.load_shm(block_id));
     }
 }
 
 TEST(test_shm_allocator, stale)
 {
-    neuropods::SHMBlockID   block_id;
-    neuropods::SHMAllocator allocator;
+    neuropod::SHMBlockID   block_id;
+    neuropod::SHMAllocator allocator;
 
     // Allocate some shared memory and let it go out of scope
     {
@@ -53,7 +53,7 @@ TEST(test_shm_allocator, stale)
     }
 
     // This allocation should reuse the previously allocated block of memory
-    neuropods::SHMBlockID other_id;
+    neuropod::SHMBlockID other_id;
     auto                  data = allocator.allocate_shm(1024, other_id);
 
     // Try loading a block with the original ID (which is now stale)

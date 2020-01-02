@@ -8,7 +8,7 @@
 #include <memory>
 #include <string>
 
-namespace neuropods
+namespace neuropod
 {
 
 class NeuropodLoader
@@ -37,4 +37,4 @@ public:
 // If this is a file, it is assumed to be a zipfile containing a neuropod
 std::unique_ptr<NeuropodLoader> get_loader(const std::string &neuropod_path);
 
-} // namespace neuropods
+} // namespace neuropod

@@ -18,7 +18,7 @@
 #include <mutex>
 #include <unordered_map>
 
-namespace neuropods
+namespace neuropod
 {
 
 namespace
@@ -319,4 +319,4 @@ void SHMAllocator::free_unused_shm_blocks()
     unused_pool_->clear();
 }
 
-} // namespace neuropods
+} // namespace neuropod

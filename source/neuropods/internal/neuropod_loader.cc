@@ -16,7 +16,7 @@
 #include <picosha2.h>
 #include <unzipper.h>
 
-namespace neuropods
+namespace neuropod
 {
 
 namespace
@@ -164,4 +164,4 @@ std::unique_ptr<NeuropodLoader> get_loader(const std::string &neuropod_path)
     }
 }
 
-} // namespace neuropods
+} // namespace neuropod

@@ -12,7 +12,7 @@
 #include <string>
 #include <vector>
 
-namespace neuropods
+namespace neuropod
 {
 
 // This is used along with the TestNeuropodBackend in tests
@@ -68,4 +68,4 @@ public:
     std::vector<std::string> get_data_as_vector() const { return data_; }
 };
 
-} // namespace neuropods
+} // namespace neuropod

@@ -17,7 +17,7 @@
 
 #include <dlfcn.h>
 
-namespace neuropods
+namespace neuropod
 {
 
 namespace
@@ -213,7 +213,7 @@ TorchNeuropodBackend::TorchNeuropodBackend(const std::string &             torch
 
 TorchNeuropodBackend::~TorchNeuropodBackend() = default;
 
-torch::Device TorchNeuropodBackend::get_torch_device(neuropods::DeviceType target_device)
+torch::Device TorchNeuropodBackend::get_torch_device(neuropod::DeviceType target_device)
 {
     if (options_.visible_device == Device::CPU || !torch::cuda::is_available())
     {
@@ -369,4 +369,4 @@ std::unique_ptr<NeuropodValueMap> TorchNeuropodBackend::infer(const NeuropodValu
 
 REGISTER_NEUROPOD_BACKEND(TorchNeuropodBackend, "torchscript")
 
-} // namespace neuropods
+} // namespace neuropod

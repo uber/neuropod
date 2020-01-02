@@ -17,7 +17,7 @@
 #include <unordered_set>
 #include <vector>
 
-namespace neuropods
+namespace neuropod
 {
 
 // A map from a tensor name to a pointer to a NeuropodValue
@@ -72,4 +72,4 @@ public:
     }
 };
 
-} // namespace neuropods
+} // namespace neuropod

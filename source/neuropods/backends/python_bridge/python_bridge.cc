@@ -13,7 +13,7 @@
 #include <dlfcn.h>
 #include <stdlib.h>
 
-namespace neuropods
+namespace neuropod
 {
 
 namespace
@@ -141,4 +141,4 @@ std::unique_ptr<NeuropodValueMap> PythonBridge::infer(const NeuropodValueMap &in
 
 REGISTER_NEUROPOD_BACKEND(PythonBridge, "python", "pytorch")
 
-} // namespace neuropods
+} // namespace neuropod

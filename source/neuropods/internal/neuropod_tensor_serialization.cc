@@ -10,7 +10,7 @@
 #include <boost/serialization/array.hpp>
 #include <boost/serialization/vector.hpp>
 
-namespace neuropods
+namespace neuropod
 {
 
 namespace
@@ -64,4 +64,4 @@ std::shared_ptr<NeuropodTensor> deserialize_tensor(boost::archive::binary_iarchi
 
 MAKE_SERIALIZABLE(NeuropodTensor, serialize_tensor, deserialize_tensor);
 
-} // namespace neuropods
+} // namespace neuropod

@@ -4,7 +4,7 @@
 
 #pragma once
 
-namespace neuropods
+namespace neuropod
 {
 
 // All the tensor types that Neuropods supports
@@ -25,4 +25,4 @@ enum TensorType
     UINT64_TENSOR,
 };
 
-} // namespace neuropods
+} // namespace neuropod

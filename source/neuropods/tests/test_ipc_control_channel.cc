@@ -9,11 +9,11 @@
 TEST(test_ipc_control_channel, simple)
 {
     // A tensor allocator that allocates tensors in shared memory
-    std::unique_ptr<neuropods::NeuropodTensorAllocator> allocator =
-        neuropods::stdx::make_unique<neuropods::DefaultTensorAllocator<neuropods::SHMNeuropodTensor>>();
+    std::unique_ptr<neuropod::NeuropodTensorAllocator> allocator =
+        neuropod::stdx::make_unique<neuropod::DefaultTensorAllocator<neuropod::SHMNeuropodTensor>>();
 
     // Store tensors we allocate so they don't go out of scope
-    neuropods::NeuropodValueMap sender_map;
+    neuropod::NeuropodValueMap sender_map;
 
     // Sample data
     constexpr size_t           num_items = 1024;
@@ -21,8 +21,8 @@ TEST(test_ipc_control_channel, simple)
 
     // TODO(vip): maybe dynamically generate a queue name?
     constexpr auto               queue_name = "neuropod_test_message_queue_simple";
-    neuropods::IPCControlChannel main_control_channel(queue_name, neuropods::MAIN_PROCESS);
-    neuropods::IPCControlChannel worker_control_channel(queue_name, neuropods::WORKER_PROCESS);
+    neuropod::IPCControlChannel main_control_channel(queue_name, neuropod::MAIN_PROCESS);
+    neuropod::IPCControlChannel worker_control_channel(queue_name, neuropod::WORKER_PROCESS);
 
     // Allocate some tensors
     for (uint8_t i = 0; i < 16; i++)
@@ -37,37 +37,37 @@ TEST(test_ipc_control_channel, simple)
     }
 
     // Send the tensors
-    main_control_channel.send_message(neuropods::LOAD_NEUROPOD);
-    main_control_channel.send_message(neuropods::ADD_INPUT, sender_map);
-    main_control_channel.send_message(neuropods::INFER);
+    main_control_channel.send_message(neuropod::LOAD_NEUROPOD);
+    main_control_channel.send_message(neuropod::ADD_INPUT, sender_map);
+    main_control_channel.send_message(neuropod::INFER);
 
     // Receive the tensors
-    neuropods::NeuropodValueMap recvd_map;
+    neuropod::NeuropodValueMap recvd_map;
     for (int i = 0; i < 2; i++)
     {
         // Get a message
-        neuropods::control_message received;
+        neuropod::control_message received;
         worker_control_channel.recv_message(received);
 
         switch (i)
         {
         case 0:
-            EXPECT_EQ(received.type, neuropods::LOAD_NEUROPOD);
+            EXPECT_EQ(received.type, neuropod::LOAD_NEUROPOD);
             break;
         case 1:
-            EXPECT_EQ(received.type, neuropods::ADD_INPUT);
+            EXPECT_EQ(received.type, neuropod::ADD_INPUT);
             for (int i = 0; i < received.num_tensors; i++)
             {
                 // Get the ID and create a tensor
-                neuropods::SHMBlockID block_id;
+                neuropod::SHMBlockID block_id;
                 std::copy_n(received.tensor_id[i], block_id.size(), block_id.begin());
-                auto shm_tensor = neuropods::tensor_from_id(block_id);
+                auto shm_tensor = neuropod::tensor_from_id(block_id);
 
                 recvd_map[received.tensor_name[i]] = shm_tensor;
             }
             break;
         default:
-            EXPECT_EQ(received.type, neuropods::INFER);
+            EXPECT_EQ(received.type, neuropod::INFER);
             break;
         }
     }
@@ -96,36 +96,36 @@ TEST(test_ipc_control_channel, simple)
 TEST(test_ipc_control_channel, no_tensors)
 {
     // An empty map to send
-    neuropods::NeuropodValueMap sender_map;
+    neuropod::NeuropodValueMap sender_map;
 
     // TODO(vip): maybe dynamically generate a queue name?
     constexpr auto               queue_name = "neuropod_test_message_queue_no_tensors";
-    neuropods::IPCControlChannel main_control_channel(queue_name, neuropods::MAIN_PROCESS);
-    neuropods::IPCControlChannel worker_control_channel(queue_name, neuropods::WORKER_PROCESS);
+    neuropod::IPCControlChannel main_control_channel(queue_name, neuropod::MAIN_PROCESS);
+    neuropod::IPCControlChannel worker_control_channel(queue_name, neuropod::WORKER_PROCESS);
 
     // Send an empty map of tensors
-    main_control_channel.send_message(neuropods::LOAD_NEUROPOD);
-    main_control_channel.send_message(neuropods::ADD_INPUT, sender_map);
-    main_control_channel.send_message(neuropods::INFER);
+    main_control_channel.send_message(neuropod::LOAD_NEUROPOD);
+    main_control_channel.send_message(neuropod::ADD_INPUT, sender_map);
+    main_control_channel.send_message(neuropod::INFER);
 
     // Receive the tensors
     for (int i = 0; i < 2; i++)
     {
         // Get a message
-        neuropods::control_message received;
+        neuropod::control_message received;
         worker_control_channel.recv_message(received);
 
         switch (i)
         {
         case 0:
-            EXPECT_EQ(received.type, neuropods::LOAD_NEUROPOD);
+            EXPECT_EQ(received.type, neuropod::LOAD_NEUROPOD);
             break;
         case 1:
-            EXPECT_EQ(received.type, neuropods::ADD_INPUT);
+            EXPECT_EQ(received.type, neuropod::ADD_INPUT);
             EXPECT_EQ(received.num_tensors, 0);
             break;
         default:
-            EXPECT_EQ(received.type, neuropods::INFER);
+            EXPECT_EQ(received.type, neuropod::INFER);
             break;
         }
     }
@@ -139,11 +139,11 @@ TEST(test_ipc_control_channel, invalid_transition)
     // TODO(vip): maybe dynamically generate a queue name?
     // Open the control channels
     const std::string            control_queue_name = "test_multiprocess_worker_invalid_transition";
-    neuropods::IPCControlChannel control_channel(control_queue_name, neuropods::MAIN_PROCESS);
+    neuropod::IPCControlChannel control_channel(control_queue_name, neuropod::MAIN_PROCESS);
 
     // Send a message (that is invalid as the first message)
     // We should get a failure here
-    EXPECT_ANY_THROW(control_channel.send_message(neuropods::INFER));
+    EXPECT_ANY_THROW(control_channel.send_message(neuropod::INFER));
 
     // Cleanup
     control_channel.cleanup();

@@ -13,7 +13,7 @@
 #include <string>
 #include <vector>
 
-namespace neuropods
+namespace neuropod
 {
 
 namespace detail
@@ -155,4 +155,4 @@ public:
     tensorflow::Tensor &get_native_data() { return tensor_; }
 };
 
-} // namespace neuropods
+} // namespace neuropod

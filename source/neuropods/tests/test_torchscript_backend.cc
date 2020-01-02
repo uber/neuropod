@@ -24,7 +24,7 @@ TEST(test_torchscript_backend, test_torchscript_strings_model)
 
 TEST(test_torchscript_backend, invalid_dtype)
 {
-    neuropods::Neuropod model("neuropods/tests/test_data/torchscript_strings_model/", "TorchNeuropodBackend");
+    neuropod::Neuropod model("neuropods/tests/test_data/torchscript_strings_model/", "TorchNeuropodBackend");
 
     // These should work
     model.allocate_tensor<float>({2});
@@ -40,5 +40,5 @@ TEST(test_torchscript_backend, invalid_dtype)
 // TEST(test_torchscript_backend, load_model_from_path)
 // {
 //     // Load a TorchScript model directly
-//     neuropods::TorchNeuropodBackend model("neuropods/tests/test_data/torchscript_strings_model/0/data/model.pt");
+//     neuropod::TorchNeuropodBackend model("neuropods/tests/test_data/torchscript_strings_model/0/data/model.pt");
 // }

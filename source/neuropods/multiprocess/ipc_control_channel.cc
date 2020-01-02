@@ -9,7 +9,7 @@
 #include "neuropods/multiprocess/control_messages.hh"
 #include "neuropods/multiprocess/shm_tensor.hh"
 
-namespace neuropods
+namespace neuropod
 {
 
 namespace
@@ -192,4 +192,4 @@ void IPCControlChannel::cleanup()
     ipc::message_queue::remove(("neuropod_" + control_queue_name_ + "_fw").c_str());
 }
 
-} // namespace neuropods
+} // namespace neuropod

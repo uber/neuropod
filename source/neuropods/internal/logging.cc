@@ -6,7 +6,7 @@
 
 #include <iostream>
 
-namespace neuropods
+namespace neuropod
 {
 
 namespace
@@ -58,4 +58,4 @@ bool current_log_level = set_initial_log_level();
 
 } // namespace
 
-} // namespace neuropods
+} // namespace neuropod

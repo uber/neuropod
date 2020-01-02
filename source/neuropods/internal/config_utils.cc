@@ -14,7 +14,7 @@
 #include <stdexcept>
 #include <unordered_map>
 
-namespace neuropods
+namespace neuropod
 {
 
 namespace
@@ -230,4 +230,4 @@ std::unique_ptr<ModelConfig> load_model_config(std::istream &input_stream)
         ModelConfig{name, platform, inputs, outputs, custom_ops, input_tensor_device});
 }
 
-} // namespace neuropods
+} // namespace neuropod

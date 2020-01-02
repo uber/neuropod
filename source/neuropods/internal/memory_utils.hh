@@ -7,7 +7,7 @@
 #include <memory>
 #include <utility>
 
-namespace neuropods
+namespace neuropod
 {
 namespace stdx
 {
@@ -51,4 +51,4 @@ template <typename T, typename... Args>
 typename detail::unique_if<T>::unique_ptr_array_known_bound make_unique(Args &&...) = delete;
 
 } // namespace stdx
-} // namespace neuropods
+} // namespace neuropod

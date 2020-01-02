@@ -9,7 +9,7 @@
 #include "neuropods/internal/config_utils.hh"
 #include "neuropods/internal/neuropod_tensor.hh"
 
-namespace neuropods
+namespace neuropod
 {
 
 Neuropod::Neuropod(const std::string &neuropod_path, const RuntimeOptions &options)
@@ -91,4 +91,4 @@ std::shared_ptr<TypedNeuropodTensor<T>> Neuropod::tensor_from_memory(const std::
 FOR_EACH_TYPE_MAPPING_EXCEPT_STRING(INIT_TEMPLATES_FOR_TYPE);
 FOR_EACH_TYPE_MAPPING_INCLUDING_STRING(INIT_STRING_TEMPLATES_FOR_TYPE);
 
-} // namespace neuropods
+} // namespace neuropod

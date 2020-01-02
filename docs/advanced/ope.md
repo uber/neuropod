@@ -10,7 +10,7 @@ To run a model in another process, modify your loading code as follows:
 
 ...
 
-auto neuropod = neuropods::load_neuropod_in_new_process(neuropod_path);
+auto neuropod = neuropod::load_neuropod_in_new_process(neuropod_path);
 ```
 
 Nothing else should need to change.

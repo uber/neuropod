@@ -9,7 +9,7 @@
 #include <sstream>
 #include <stdexcept>
 
-namespace neuropods
+namespace neuropod
 {
 
 #define FOR_TORCH_NEUROPOD_MAPPING(FN) \
@@ -62,4 +62,4 @@ torch::Dtype get_torch_type_from_neuropod_type(TensorType type)
     NEUROPOD_ERROR("TorchScript does not support type: " << type);
 }
 
-} // namespace neuropods
+} // namespace neuropod

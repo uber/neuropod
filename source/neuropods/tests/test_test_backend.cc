@@ -10,9 +10,9 @@
 TEST(test_test_backend, init)
 {
     // Make sure we can load a neuropod with garbage data and run inference without crashing
-    auto config = neuropods::stdx::make_unique<neuropods::ModelConfig>(
-        neuropods::ModelConfig{"name", "platform", {}, {}, {}, {}});
-    neuropods::TestNeuropodBackend backend("somepath", config, {});
-    neuropods::NeuropodValueMap    inputs;
+    auto config = neuropod::stdx::make_unique<neuropod::ModelConfig>(
+        neuropod::ModelConfig{"name", "platform", {}, {}, {}, {}});
+    neuropod::TestNeuropodBackend backend("somepath", config, {});
+    neuropod::NeuropodValueMap    inputs;
     backend.infer(inputs);
 }

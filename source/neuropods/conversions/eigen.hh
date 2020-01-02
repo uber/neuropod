@@ -10,13 +10,13 @@
 
 #include <Eigen/Dense>
 
-namespace neuropods
+namespace neuropod
 {
 
 // Wraps neuropod tensor memory with Eigen matrix
 template <typename _Scalar>
 Eigen::Map<const Eigen::Matrix<_Scalar, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>> as_eigen(
-    const neuropods::TypedNeuropodTensor<_Scalar> &tensor)
+    const neuropod::TypedNeuropodTensor<_Scalar> &tensor)
 {
     const auto &dims = tensor.get_dims();
 
@@ -37,7 +37,7 @@ Eigen::Map<const Eigen::Matrix<_Scalar, Eigen::Dynamic, Eigen::Dynamic, Eigen::R
 // Wraps neuropod tensor memory with Eigen matrix
 template <typename _Scalar>
 Eigen::Map<Eigen::Matrix<_Scalar, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>> as_eigen(
-    neuropods::TypedNeuropodTensor<_Scalar> &tensor)
+    neuropod::TypedNeuropodTensor<_Scalar> &tensor)
 {
     const auto &dims = tensor.get_dims();
 
@@ -58,7 +58,7 @@ Eigen::Map<Eigen::Matrix<_Scalar, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajo
 // Wraps neuropod tensor memory with Eigen matrix
 template <typename _Scalar>
 Eigen::Map<const Eigen::Matrix<_Scalar, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>> as_eigen(
-    const neuropods::NeuropodTensor &tensor)
+    const neuropod::NeuropodTensor &tensor)
 {
     return as_eigen<_Scalar>(*tensor.as_typed_tensor<_Scalar>());
 }
@@ -66,9 +66,9 @@ Eigen::Map<const Eigen::Matrix<_Scalar, Eigen::Dynamic, Eigen::Dynamic, Eigen::R
 // Wraps neuropod tensor memory with Eigen matrix
 template <typename _Scalar>
 Eigen::Map<Eigen::Matrix<_Scalar, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>> as_eigen(
-    neuropods::NeuropodTensor &tensor)
+    neuropod::NeuropodTensor &tensor)
 {
     return as_eigen<_Scalar>(*tensor.as_typed_tensor<_Scalar>());
 }
 
-} // namespace neuropods
+} // namespace neuropod

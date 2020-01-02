@@ -19,7 +19,7 @@ class Session;
 
 } // namespace tensorflow
 
-namespace neuropods
+namespace neuropod
 {
 
 // This backend can execute TensorFlow models
@@ -49,4 +49,4 @@ public:
                                             const std::vector<std::string> &requested_outputs);
 };
 
-} // namespace neuropods
+} // namespace neuropod

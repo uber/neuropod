@@ -8,7 +8,7 @@
 
 #include <set>
 
-namespace neuropods
+namespace neuropod
 {
 
 // Messages used in the control channel between the main process and the worker
@@ -89,4 +89,4 @@ struct __attribute__((__packed__)) control_message
     char neuropod_path[4096];
 };
 
-} // namespace neuropods
+} // namespace neuropod

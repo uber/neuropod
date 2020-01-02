@@ -13,7 +13,7 @@
 
 #include <sstream>
 
-namespace neuropods
+namespace neuropod
 {
 
 namespace
@@ -46,7 +46,7 @@ py::array deserialize_tensor_binding(py::bytes buffer)
 py::bytes serialize_tensor_binding(py::array numpy_array)
 {
     // Wrap the numpy array in a NeuropodTensor
-    auto allocator = DefaultTensorAllocator<neuropods::TestNeuropodTensor>();
+    auto allocator = DefaultTensorAllocator<neuropod::TestNeuropodTensor>();
     auto tensor    = tensor_from_numpy(allocator, numpy_array);
 
     // Serialize the tensor
@@ -69,7 +69,7 @@ py::dict deserialize_valuemap_binding(py::bytes buffer)
 py::bytes serialize_valuemap_binding(py::dict items)
 {
     // Wrap the numpy array in a NeuropodTensor
-    auto allocator = DefaultTensorAllocator<neuropods::TestNeuropodTensor>();
+    auto allocator = DefaultTensorAllocator<neuropod::TestNeuropodTensor>();
     auto valuemap  = from_numpy_dict(allocator, items);
 
     // Serialize the tensor
@@ -125,4 +125,4 @@ PYBIND11_MODULE(neuropods_native, m)
           "Deserialize a string of bytes to a NeuropodValueMap (and return it as a dict of numpy arrays)");
 }
 
-} // namespace neuropods
+} // namespace neuropod

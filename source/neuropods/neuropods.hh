@@ -13,7 +13,7 @@
 #include <unordered_map>
 #include <vector>
 
-namespace neuropods
+namespace neuropod
 {
 
 typedef int NeuropodDevice;
@@ -117,4 +117,4 @@ public:
                                                                const Deleter &             deleter);
 };
 
-} // namespace neuropods
+} // namespace neuropod

@@ -6,7 +6,7 @@
 
 #include <cstdlib>
 
-namespace neuropods
+namespace neuropod
 {
 
 class NeuropodTensor;
@@ -28,4 +28,4 @@ struct NeuropodTensorRawDataAccess
 };
 
 } // namespace internal
-} // namespace neuropods
+} // namespace neuropod

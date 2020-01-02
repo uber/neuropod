@@ -5,7 +5,7 @@
 #include "gtest/gtest.h"
 #include "neuropods/internal/backend_registration.hh"
 
-namespace neuropods
+namespace neuropod
 {
 
 TEST(test_backend_registration, invalid_name)
@@ -18,4 +18,4 @@ TEST(test_backend_registration, invalid_type)
     EXPECT_THROW(get_backend_for_type({}, "InvalidType"), std::runtime_error);
 }
 
-} // namespace neuropods
+} // namespace neuropod
