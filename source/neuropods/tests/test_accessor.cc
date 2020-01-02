@@ -9,7 +9,7 @@
 TEST(test_accessor, test_accessor)
 {
     neuropod::TestNeuropodBackend backend;
-    auto                           allocator = backend.get_tensor_allocator();
+    auto                          allocator = backend.get_tensor_allocator();
 
     auto tensor1 = allocator->allocate_tensor<float>({3, 5});
     auto tensor2 = allocator->allocate_tensor<float>({3, 5});
@@ -47,7 +47,7 @@ TEST(test_accessor, test_accessor)
 TEST(test_accessor, test_range_loop)
 {
     neuropod::TestNeuropodBackend backend;
-    auto                           allocator = backend.get_tensor_allocator();
+    auto                          allocator = backend.get_tensor_allocator();
 
     auto tensor1 = allocator->allocate_tensor<float>({3, 5});
 
@@ -91,7 +91,7 @@ TEST(test_accessor, test_range_loop)
 TEST(test_accessor, valid_dims)
 {
     neuropod::TestNeuropodBackend backend;
-    auto                           allocator = backend.get_tensor_allocator();
+    auto                          allocator = backend.get_tensor_allocator();
 
     auto tensor1 = allocator->allocate_tensor<float>({3, 5});
 

@@ -20,7 +20,7 @@ TEST(test_ipc_control_channel, simple)
     const std::vector<int64_t> dims      = {2, 4, 8, 16};
 
     // TODO(vip): maybe dynamically generate a queue name?
-    constexpr auto               queue_name = "neuropod_test_message_queue_simple";
+    constexpr auto              queue_name = "neuropod_test_message_queue_simple";
     neuropod::IPCControlChannel main_control_channel(queue_name, neuropod::MAIN_PROCESS);
     neuropod::IPCControlChannel worker_control_channel(queue_name, neuropod::WORKER_PROCESS);
 
@@ -99,7 +99,7 @@ TEST(test_ipc_control_channel, no_tensors)
     neuropod::NeuropodValueMap sender_map;
 
     // TODO(vip): maybe dynamically generate a queue name?
-    constexpr auto               queue_name = "neuropod_test_message_queue_no_tensors";
+    constexpr auto              queue_name = "neuropod_test_message_queue_no_tensors";
     neuropod::IPCControlChannel main_control_channel(queue_name, neuropod::MAIN_PROCESS);
     neuropod::IPCControlChannel worker_control_channel(queue_name, neuropod::WORKER_PROCESS);
 
@@ -138,7 +138,7 @@ TEST(test_ipc_control_channel, invalid_transition)
 {
     // TODO(vip): maybe dynamically generate a queue name?
     // Open the control channels
-    const std::string            control_queue_name = "test_multiprocess_worker_invalid_transition";
+    const std::string           control_queue_name = "test_multiprocess_worker_invalid_transition";
     neuropod::IPCControlChannel control_channel(control_queue_name, neuropod::MAIN_PROCESS);
 
     // Send a message (that is invalid as the first message)

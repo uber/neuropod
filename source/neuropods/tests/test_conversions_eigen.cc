@@ -29,13 +29,13 @@ public:
     }
 
 protected:
-    static constexpr int                           ROWS = 4;
+    static constexpr int                          ROWS = 4;
     neuropod::TestNeuropodBackend                 test_backend_;
     std::unique_ptr<neuropod::NeuropodTensor>     untyped_tensor;
     const neuropod::NeuropodTensor *              const_untyped_tensor;
     neuropod::TypedNeuropodTensor<int32_t> *      tensor;
     const neuropod::TypedNeuropodTensor<int32_t> *const_tensor;
-    Eigen::Vector4i                                expected_vector;
+    Eigen::Vector4i                               expected_vector;
 };
 
 class int32_matrix_fixture : public ::testing::Test
@@ -63,14 +63,14 @@ public:
     }
 
 protected:
-    static constexpr int                           ROWS = 5;
-    static constexpr int                           COLS = 3;
+    static constexpr int                          ROWS = 5;
+    static constexpr int                          COLS = 3;
     neuropod::TestNeuropodBackend                 test_backend_;
     std::unique_ptr<neuropod::NeuropodTensor>     untyped_tensor;
     const neuropod::NeuropodTensor *              const_untyped_tensor;
     neuropod::TypedNeuropodTensor<int32_t> *      tensor;
     const neuropod::TypedNeuropodTensor<int32_t> *const_tensor;
-    Eigen::Matrix<int32_t, ROWS, COLS>             expected_matrix;
+    Eigen::Matrix<int32_t, ROWS, COLS>            expected_matrix;
 };
 
 TEST_F(int32_tensor_fixture, untyped_vector_as_eigen)

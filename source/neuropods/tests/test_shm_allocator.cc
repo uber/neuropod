@@ -15,7 +15,7 @@ TEST(test_shm_allocator, simple)
 
         // Allocate some memory and copy in data
         neuropod::SHMBlockID block_id;
-        auto                  data = allocator.allocate_shm(num_bytes, block_id);
+        auto                 data = allocator.allocate_shm(num_bytes, block_id);
         memcpy(data.get(), some_image_data, num_bytes);
 
         // Load the block of memory and ensure the data
@@ -32,7 +32,7 @@ TEST(test_shm_allocator, out_of_scope)
     // Allocate some shared memory and let everything go out of scope
     {
         neuropod::SHMAllocator allocator;
-        auto                    data = allocator.allocate_shm(1024, block_id);
+        auto                   data = allocator.allocate_shm(1024, block_id);
     }
 
     // Try loading the block we previously allocated
@@ -54,7 +54,7 @@ TEST(test_shm_allocator, stale)
 
     // This allocation should reuse the previously allocated block of memory
     neuropod::SHMBlockID other_id;
-    auto                  data = allocator.allocate_shm(1024, other_id);
+    auto                 data = allocator.allocate_shm(1024, other_id);
 
     // Try loading a block with the original ID (which is now stale)
     // This should throw an error because the block of memory has been reused

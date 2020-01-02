@@ -8,7 +8,7 @@
 #include "neuropods/serialization/serialization.hh"
 
 std::shared_ptr<neuropod::NeuropodTensor> serialize_deserialize(neuropod::NeuropodTensorAllocator &allocator,
-                                                                 const neuropod::NeuropodTensor &   tensor)
+                                                                const neuropod::NeuropodTensor &   tensor)
 {
     // Serialize the tensor
     std::stringstream ss;

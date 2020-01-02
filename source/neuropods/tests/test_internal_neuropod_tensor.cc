@@ -15,8 +15,7 @@ class uint8_tensor_fixture : public ::testing::Test
 public:
     uint8_tensor_fixture()
     {
-        untyped_tensor =
-            test_backend_.get_tensor_allocator()->allocate_tensor({EXPECTED_SIZE}, neuropod::UINT8_TENSOR);
+        untyped_tensor = test_backend_.get_tensor_allocator()->allocate_tensor({EXPECTED_SIZE}, neuropod::UINT8_TENSOR);
         const_untyped_tensor = untyped_tensor.get();
 
         tensor       = untyped_tensor->as_typed_tensor<uint8_t>();
@@ -30,7 +29,7 @@ public:
     }
 
 protected:
-    static int                                     EXPECTED_SIZE;
+    static int                                    EXPECTED_SIZE;
     neuropod::TestNeuropodBackend                 test_backend_;
     std::unique_ptr<neuropod::NeuropodTensor>     untyped_tensor;
     const neuropod::NeuropodTensor *              const_untyped_tensor;
@@ -61,7 +60,7 @@ protected:
 
 TEST(test_stream_operator, untyped_tensor)
 {
-    std::stringstream              ss;
+    std::stringstream             ss;
     neuropod::TestNeuropodBackend test_backend;
     const auto untyped_tensor = test_backend.get_tensor_allocator()->allocate_tensor({3}, neuropod::UINT8_TENSOR);
     ss << *untyped_tensor;
@@ -71,7 +70,7 @@ TEST(test_stream_operator, untyped_tensor)
 
 TEST(test_stream_operator, typed_tensor)
 {
-    std::stringstream              ss;
+    std::stringstream             ss;
     neuropod::TestNeuropodBackend test_backend;
     auto untyped_tensor = test_backend.get_tensor_allocator()->allocate_tensor({3}, neuropod::UINT8_TENSOR);
 
@@ -89,9 +88,9 @@ TEST(test_stream_operator, typed_tensor)
 
 TEST(test_stream_operator, typed_float_tensor)
 {
-    std::stringstream              ss;
+    std::stringstream             ss;
     neuropod::TestNeuropodBackend test_backend;
-    constexpr int                  TENSOR_SIZE = 8;
+    constexpr int                 TENSOR_SIZE = 8;
     auto untyped_tensor = test_backend.get_tensor_allocator()->allocate_tensor({TENSOR_SIZE}, neuropod::FLOAT_TENSOR);
 
     auto &typed_tensor = *untyped_tensor->as_typed_tensor<float>();
@@ -110,7 +109,7 @@ TEST(test_stream_operator, typed_float_tensor)
 TEST(test_typed_neuropod_tensor, downcast_failulre)
 {
     neuropod::TestNeuropodBackend test_backend;
-    constexpr int                  TENSOR_SIZE = 8;
+    constexpr int                 TENSOR_SIZE = 8;
     auto untyped_tensor = test_backend.get_tensor_allocator()->allocate_tensor({TENSOR_SIZE}, neuropod::FLOAT_TENSOR);
 
     EXPECT_THROW(untyped_tensor->as_typed_tensor<int8_t>(), std::runtime_error);
@@ -210,7 +209,7 @@ TEST(test_value_equality, non_tensor_error)
     };
 
     neuropod::TestNeuropodBackend backend;
-    auto                           allocator = backend.get_tensor_allocator();
+    auto                          allocator = backend.get_tensor_allocator();
 
     // Create a tensor
     auto val1 = allocator->allocate_tensor<float>({5});
@@ -230,7 +229,7 @@ TEST(test_value_equality, non_tensor_error)
 TEST(test_tensor_equality, basic_equality)
 {
     neuropod::TestNeuropodBackend backend;
-    auto                           allocator = backend.get_tensor_allocator();
+    auto                          allocator = backend.get_tensor_allocator();
 
     auto t1 = allocator->ones<float>({5});
     auto t2 = allocator->ones<float>({5});
@@ -245,7 +244,7 @@ TEST(test_tensor_equality, basic_equality)
 TEST(test_tensor_equality, different_types)
 {
     neuropod::TestNeuropodBackend backend;
-    auto                           allocator = backend.get_tensor_allocator();
+    auto                          allocator = backend.get_tensor_allocator();
 
     auto t1 = allocator->ones<float>({5});
     auto t2 = allocator->ones<double>({5});
@@ -256,7 +255,7 @@ TEST(test_tensor_equality, different_types)
 TEST(test_tensor_equality, different_dims)
 {
     neuropod::TestNeuropodBackend backend;
-    auto                           allocator = backend.get_tensor_allocator();
+    auto                          allocator = backend.get_tensor_allocator();
 
     auto t1 = allocator->ones<float>({5});
     auto t2 = allocator->ones<float>({6});
@@ -267,7 +266,7 @@ TEST(test_tensor_equality, different_dims)
 TEST(test_tensor_equality, different_ranks)
 {
     neuropod::TestNeuropodBackend backend;
-    auto                           allocator = backend.get_tensor_allocator();
+    auto                          allocator = backend.get_tensor_allocator();
 
     auto t1 = allocator->ones<float>({30});
     auto t2 = allocator->ones<float>({5, 6});
@@ -278,7 +277,7 @@ TEST(test_tensor_equality, different_ranks)
 TEST(test_copy_from, different_numel)
 {
     neuropod::TestNeuropodBackend backend;
-    std::vector<float>             data(4);
+    std::vector<float>            data(4);
 
     auto allocator = backend.get_tensor_allocator();
     auto t1        = allocator->allocate_tensor<float>({5});

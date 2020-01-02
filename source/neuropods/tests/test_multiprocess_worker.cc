@@ -10,7 +10,7 @@ TEST(test_multiprocess_worker, shutdown)
 {
     // TODO(vip): maybe dynamically generate a queue name?
     // Open the control channels
-    const std::string            control_queue_name = "test_multiprocess_worker_shutdown";
+    const std::string           control_queue_name = "test_multiprocess_worker_shutdown";
     neuropod::IPCControlChannel control_channel(control_queue_name, neuropod::MAIN_PROCESS);
 
     // Send a shutdown message

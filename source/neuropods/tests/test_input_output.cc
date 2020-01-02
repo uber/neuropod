@@ -58,8 +58,8 @@ void check_vectors_eq(const std::vector<T> &a, const std::vector<T> &b)
     EXPECT_EQ(memcmp(&a[0], &b[0], a.size() * sizeof(T)), 0);
 }
 
-std::shared_ptr<neuropod::NeuropodTensor> serialize_deserialize(
-    neuropod::NeuropodTensorAllocator &allocator, const std::shared_ptr<neuropod::NeuropodTensor> &tensor)
+std::shared_ptr<neuropod::NeuropodTensor> serialize_deserialize(neuropod::NeuropodTensorAllocator &allocator,
+                                                                const std::shared_ptr<neuropod::NeuropodTensor> &tensor)
 {
     // Serialize the tensor
     std::stringstream ss;
@@ -75,7 +75,7 @@ std::shared_ptr<neuropod::NeuropodTensor> serialize_deserialize(
 TEST(test_allocate_tensor, add_tensors_and_validate)
 {
     neuropod::TestNeuropodBackend backend;
-    auto                           allocator = backend.get_tensor_allocator();
+    auto                          allocator = backend.get_tensor_allocator();
 
     // Allocate tensors
     std::shared_ptr<neuropod::NeuropodTensor> a_ten = allocator->allocate_tensor(a_shape, neuropod::INT32_TENSOR);

@@ -30,7 +30,7 @@ static void benchmark_shm_force_new(benchmark::State &state)
 
         // Allocate some memory
         neuropod::SHMBlockID block_id;
-        auto                  data = allocator.allocate_shm(num_bytes, block_id);
+        auto                 data = allocator.allocate_shm(num_bytes, block_id);
 
         // Copy in data
         memcpy(data.get(), some_image_data, num_bytes);
@@ -47,7 +47,7 @@ static void benchmark_shm(benchmark::State &state)
         // Allocate some memory
         // This should reuse bocks of memory from previous allocations
         neuropod::SHMBlockID block_id;
-        auto                  data = allocator.allocate_shm(num_bytes, block_id);
+        auto                 data = allocator.allocate_shm(num_bytes, block_id);
 
         // Copy in data
         memcpy(data.get(), some_image_data, num_bytes);
