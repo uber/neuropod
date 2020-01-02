@@ -11,7 +11,7 @@ coverage report
 # Generate an xml report and fix paths
 coverage xml
 sed -i "s+$BASE_PATH/++g" coverage.xml
-sed -i 's+name="\..*neuropods\.python+name="neuropods+g' coverage.xml
+sed -i 's+name="\..*neuropod\.python+name="neuropod+g' coverage.xml
 
 popd
 

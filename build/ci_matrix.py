@@ -45,7 +45,7 @@ services:
   test-base:
     build:
       context: .
-      dockerfile: build/neuropods.dockerfile
+      dockerfile: build/neuropod.dockerfile
       target: neuropod-base
     privileged: true
 

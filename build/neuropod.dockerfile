@@ -1,4 +1,4 @@
-# This image builds Neuropods and runs the Python and C++ tests
+# This image builds Neuropod and runs the Python and C++ tests
 
 # To only install deps (and skip build and tests), pass `--target neuropod-base` to docker build
 # FROM ubuntu:16.04 as neuropod-base
@@ -33,7 +33,7 @@ RUN ${NEUROPOD_PYTHON_BINARY} -m pip install virtualenv && \
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
 # Copy the python code into the image
-RUN mkdir -p /usr/src/source/python /usr/src/source/neuropods/python
+RUN mkdir -p /usr/src/source/python /usr/src/source/neuropod/python
 COPY build/install_python_deps.sh /usr/src/build/install_python_deps.sh
 COPY build/install_frameworks.py /usr/src/build/install_frameworks.py
 COPY source/python /usr/src/source/python
