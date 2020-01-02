@@ -4,7 +4,7 @@
 
 import unittest
 
-from neuropods.backends.config_utils import (
+from neuropod.backends.config_utils import (
     canonicalize_tensor_spec,
     validate_neuropod_config,
 )

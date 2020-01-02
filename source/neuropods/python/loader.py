@@ -2,8 +2,8 @@
 # Uber, Inc. (c) 2018
 #
 
-from neuropods.backends import config_utils
-from neuropods.utils import zip_loader
+from neuropod.backends import config_utils
+from neuropod.utils import zip_loader
 
 
 def load_neuropod(neuropod_path, **kwargs):
@@ -24,15 +24,15 @@ def load_neuropod(neuropod_path, **kwargs):
     platform = neuropod_config["platform"]
 
     if platform == "python":
-        from neuropods.backends.python.executor import PythonNeuropodExecutor
+        from neuropod.backends.python.executor import PythonNeuropodExecutor
 
         return PythonNeuropodExecutor(neuropod_path, **kwargs)
     elif platform == "torchscript":
-        from neuropods.backends.torchscript.executor import TorchScriptNeuropodExecutor
+        from neuropod.backends.torchscript.executor import TorchScriptNeuropodExecutor
 
         return TorchScriptNeuropodExecutor(neuropod_path, **kwargs)
     elif platform == "tensorflow":
-        from neuropods.backends.tensorflow.executor import TensorflowNeuropodExecutor
+        from neuropod.backends.tensorflow.executor import TensorflowNeuropodExecutor
 
         return TensorflowNeuropodExecutor(neuropod_path, **kwargs)
     else:

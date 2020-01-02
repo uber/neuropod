@@ -84,7 +84,7 @@ def create_tf_addition_model():
 we can package the model as follows:
 
 ```py
-from neuropods.packagers import create_tensorflow_neuropod
+from neuropod.packagers import create_tensorflow_neuropod
 
 create_tensorflow_neuropod(
     neuropod_path=neuropod_path,
@@ -112,7 +112,7 @@ create_tensorflow_neuropod(
 If you already have a frozen graph, you can package the model like this:
 
 ```py
-from neuropods.packagers import create_tensorflow_neuropod
+from neuropod.packagers import create_tensorflow_neuropod
 
 create_tensorflow_neuropod(
     neuropod_path=neuropod_path,
@@ -180,7 +180,7 @@ For our model:
 This translates to the following:
 
 ```py
-from neuropods.packagers import create_pytorch_neuropod
+from neuropod.packagers import create_pytorch_neuropod
 
 create_pytorch_neuropod(
     neuropod_path=neuropod_path,
@@ -228,7 +228,7 @@ class AdditionModel(torch.jit.ScriptModule):
 We can package it by running:
 
 ```py
-from neuropods.packagers import create_torchscript_neuropod
+from neuropod.packagers import create_torchscript_neuropod
 
 create_torchscript_neuropod(
     neuropod_path=neuropod_path,

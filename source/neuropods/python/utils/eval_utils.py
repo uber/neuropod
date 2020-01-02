@@ -8,8 +8,8 @@ import pickle
 
 import numpy as np
 
-from neuropods.utils.env_utils import eval_in_new_process
-from neuropods.utils.dtype_utils import maybe_convert_bindings_types
+from neuropod.utils.env_utils import eval_in_new_process
+from neuropod.utils.dtype_utils import maybe_convert_bindings_types
 
 RUN_NATIVE_TESTS = os.getenv("NEUROPOD_RUN_NATIVE_TESTS") is not None
 TEST_DATA_FILENAME = "test_data.pkl"

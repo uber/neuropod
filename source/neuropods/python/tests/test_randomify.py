@@ -7,8 +7,8 @@ import shutil
 import unittest
 from tempfile import mkdtemp
 
-from neuropods.loader import load_neuropod
-from neuropods.utils.randomify import randomify_neuropod
+from neuropod.loader import load_neuropod
+from neuropod.utils.randomify import randomify_neuropod
 
 input_spec = [
     {"name": "in_string_vector", "dtype": "string", "shape": ("N",)},

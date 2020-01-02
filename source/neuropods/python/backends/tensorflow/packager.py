@@ -7,7 +7,7 @@ import os
 import shutil
 import tensorflow as tf
 
-from neuropods.utils.packaging_utils import packager
+from neuropod.utils.packaging_utils import packager
 
 
 @packager(platform="tensorflow")

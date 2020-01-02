@@ -11,8 +11,8 @@ import torch
 import unittest
 from testpath.tempdir import TemporaryDirectory
 
-from neuropods.packagers import create_torchscript_neuropod
-from neuropods.tests.utils import get_addition_model_spec, check_addition_model
+from neuropod.packagers import create_torchscript_neuropod
+from neuropod.tests.utils import get_addition_model_spec, check_addition_model
 
 
 class CustomOpModel(torch.jit.ScriptModule):

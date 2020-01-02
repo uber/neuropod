@@ -8,8 +8,8 @@ import unittest
 from testpath.tempdir import TemporaryDirectory
 from typing import Dict, List
 
-from neuropods.packagers import create_torchscript_neuropod
-from neuropods.tests.utils import get_string_concat_model_spec, check_strings_model
+from neuropod.packagers import create_torchscript_neuropod
+from neuropod.tests.utils import get_string_concat_model_spec, check_strings_model
 
 
 class StringsModel(torch.jit.ScriptModule):

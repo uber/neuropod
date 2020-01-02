@@ -10,8 +10,8 @@ from testpath.tempdir import TemporaryDirectory
 from torch import Tensor
 from typing import Dict
 
-from neuropods.packagers import create_torchscript_neuropod
-from neuropods.utils.eval_utils import load_and_test_neuropod
+from neuropod.packagers import create_torchscript_neuropod
+from neuropod.utils.eval_utils import load_and_test_neuropod
 
 
 class DevicesModel(torch.jit.ScriptModule):

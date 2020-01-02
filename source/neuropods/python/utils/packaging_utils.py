@@ -8,8 +8,8 @@ import tempfile
 import shutil
 import zipfile
 
-from neuropods.backends import config_utils
-from neuropods.utils.eval_utils import save_test_data, load_and_test_neuropod
+from neuropod.backends import config_utils
+from neuropod.utils.eval_utils import save_test_data, load_and_test_neuropod
 
 
 def _zipdir(path, zf):

@@ -6,7 +6,7 @@ import os
 import shutil
 import torch
 
-from neuropods.utils.packaging_utils import packager
+from neuropod.utils.packaging_utils import packager
 
 
 @packager(platform="torchscript")

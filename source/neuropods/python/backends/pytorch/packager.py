@@ -2,7 +2,7 @@
 # Uber, Inc. (c) 2018
 #
 
-from neuropods.backends.python.packager import create_python_neuropod
+from neuropod.backends.python.packager import create_python_neuropod
 
 # Since we can package a pytorch model by just treating it as python code,
 # create an alias

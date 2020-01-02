@@ -5,7 +5,7 @@
 import numpy as np
 import unittest
 
-from neuropods.backends.neuropod_executor import validate_tensors_against_specs
+from neuropod.backends.neuropod_executor import validate_tensors_against_specs
 
 TEST_SPEC = [
     {"name": "x", "dtype": "float32", "shape": (None, 2)},

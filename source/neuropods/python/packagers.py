@@ -8,11 +8,11 @@ class PackagerLoader(object):
     """
     Create aliases for packagers so they can be used as
 
-        `from neuropods.packagers import create_*_neuropod`
+        `from neuropod.packagers import create_*_neuropod`
 
     instead of
 
-        `from neuropods.backends.*.packager import create_*_neuropod`
+        `from neuropod.backends.*.packager import create_*_neuropod`
 
     In order to make sure we don't load all the backends unnecessarily, we need to lazy-load
     them when the packaging function is called

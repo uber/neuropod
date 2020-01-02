@@ -7,8 +7,8 @@ import os
 from six import string_types
 import torch
 
-from neuropods.backends.neuropod_executor import NeuropodExecutor
-from neuropods.utils.hash_utils import sha256sum
+from neuropod.backends.neuropod_executor import NeuropodExecutor
+from neuropod.utils.hash_utils import sha256sum
 
 SINGLE_OUTPUT_ERROR_MSG = (
     "Please either return a dictionary from your model or provide an `output_spec` "

@@ -10,9 +10,9 @@ import sys
 import unittest
 from testpath.tempdir import TemporaryDirectory
 
-from neuropods.loader import load_neuropod
-from neuropods.packagers import create_pytorch_neuropod
-from neuropods.tests.utils import get_addition_model_spec
+from neuropod.loader import load_neuropod
+from neuropod.packagers import create_pytorch_neuropod
+from neuropod.tests.utils import get_addition_model_spec
 
 ADDITION_MODEL_SOURCE = """
 import torch

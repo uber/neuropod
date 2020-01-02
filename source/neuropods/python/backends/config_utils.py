@@ -6,7 +6,7 @@ import json
 import os
 from six import string_types, integer_types
 
-from neuropods.utils.dtype_utils import get_dtype_name
+from neuropod.utils.dtype_utils import get_dtype_name
 
 ALLOWED_DTYPES = [
     "float32",

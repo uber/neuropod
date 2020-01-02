@@ -13,8 +13,8 @@ import json
 
 import numpy as np
 
-from neuropods.backends.neuropod_executor import NeuropodExecutor
-from neuropods.utils.hash_utils import sha256sum
+from neuropod.backends.neuropod_executor import NeuropodExecutor
+from neuropod.utils.hash_utils import sha256sum
 
 # Create the neuropod package symlink directory
 SYMLINKS_DIR = tempfile.mkdtemp(suffix=".neuropod_python_symlinks")

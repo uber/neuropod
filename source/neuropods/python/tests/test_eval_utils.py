@@ -2,7 +2,7 @@ import os
 import unittest
 from testpath.tempdir import TemporaryDirectory
 
-from neuropods.utils.eval_utils import save_test_data, load_test_data
+from neuropod.utils.eval_utils import save_test_data, load_test_data
 
 
 class TestEvalUtil(unittest.TestCase):

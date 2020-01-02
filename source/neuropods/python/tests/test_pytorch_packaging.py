@@ -6,8 +6,8 @@ import os
 import unittest
 from testpath.tempdir import TemporaryDirectory
 
-from neuropods.packagers import create_pytorch_neuropod
-from neuropods.tests.utils import get_addition_model_spec, check_addition_model
+from neuropod.packagers import create_pytorch_neuropod
+from neuropod.tests.utils import get_addition_model_spec, check_addition_model
 
 ADDITION_MODEL_SOURCE = """
 import torch

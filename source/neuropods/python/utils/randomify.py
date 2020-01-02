@@ -7,8 +7,8 @@ import tensorflow as tf
 from collections import defaultdict
 from six import string_types
 
-from neuropods.packagers import create_tensorflow_neuropod
-from neuropods.utils.dtype_utils import get_dtype
+from neuropod.packagers import create_tensorflow_neuropod
+from neuropod.utils.dtype_utils import get_dtype
 
 
 def _placeholdes_from_input_spec(input_spec, input_prefix="INPUT_API"):

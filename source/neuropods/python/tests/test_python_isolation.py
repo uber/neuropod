@@ -7,8 +7,8 @@ import os
 import unittest
 from testpath.tempdir import TemporaryDirectory
 
-from neuropods.loader import load_neuropod
-from neuropods.packagers import create_python_neuropod
+from neuropod.loader import load_neuropod
+from neuropod.packagers import create_python_neuropod
 
 DUMMY_MODEL_SOURCE = """
 import numpy as np

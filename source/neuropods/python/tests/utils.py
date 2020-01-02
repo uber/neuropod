@@ -4,7 +4,7 @@
 
 import numpy as np
 
-from neuropods.loader import load_neuropod
+from neuropod.loader import load_neuropod
 
 
 def get_addition_model_spec(do_fail=False):

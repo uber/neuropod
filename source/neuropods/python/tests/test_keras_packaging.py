@@ -9,12 +9,12 @@ from tensorflow.keras.layers import Input, Add
 from tensorflow.keras.models import Model
 from testpath.tempdir import TemporaryDirectory
 
-from neuropods.backends.keras.packager import (
+from neuropod.backends.keras.packager import (
     create_keras_neuropod,
     infer_keras_input_spec,
     infer_keras_output_spec,
 )
-from neuropods.tests.utils import get_addition_model_spec, check_addition_model
+from neuropod.tests.utils import get_addition_model_spec, check_addition_model
 
 
 def create_keras_addition_model(node_name_mapping=None):

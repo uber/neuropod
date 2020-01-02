@@ -8,9 +8,9 @@ import os
 import six
 import tensorflow as tf
 
-from neuropods.backends.neuropod_executor import NeuropodExecutor
-from neuropods.utils.dtype_utils import get_dtype
-from neuropods.utils.hash_utils import sha256sum
+from neuropod.backends.neuropod_executor import NeuropodExecutor
+from neuropod.utils.dtype_utils import get_dtype
+from neuropod.utils.hash_utils import sha256sum
 
 # Avoid loading the same custom op twice
 loaded_op_hashes = set()

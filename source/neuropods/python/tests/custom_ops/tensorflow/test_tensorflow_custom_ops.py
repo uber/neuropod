@@ -10,8 +10,8 @@ import tensorflow as tf
 import unittest
 from testpath.tempdir import TemporaryDirectory
 
-from neuropods.packagers import create_tensorflow_neuropod
-from neuropods.tests.utils import get_addition_model_spec
+from neuropod.packagers import create_tensorflow_neuropod
+from neuropod.tests.utils import get_addition_model_spec
 
 
 def create_tf_addition_model(custom_op_path):

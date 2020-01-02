@@ -138,7 +138,7 @@ if __name__ == '__main__':
     import argparse
     import os
 
-    from neuropods.packagers import create_tensorflow_neuropod, \
+    from neuropod.packagers import create_tensorflow_neuropod, \
                                     create_pytorch_neuropod, \
                                     create_keras_neuropod, \
                                     create_torchscript_neuropod

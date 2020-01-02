@@ -8,7 +8,7 @@ This guide walks through loading a Neuropod and running inference from Python
 ## Loading a Neuropod
 
 ```py
-from neuropods.loader import load_neuropod
+from neuropod.loader import load_neuropod
 
 neuropod = load_neuropod(PATH_TO_MY_MODEL)
 ```
@@ -16,7 +16,7 @@ neuropod = load_neuropod(PATH_TO_MY_MODEL)
 You can also use `load_neuropod` as a context manager:
 
 ```py
-from neuropods.loader import load_neuropod
+from neuropod.loader import load_neuropod
 
 with load_neuropod(PATH_TO_MY_MODEL) as neuropod:
     # Do something here

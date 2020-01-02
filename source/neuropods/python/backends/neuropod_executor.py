@@ -7,8 +7,8 @@ import six
 
 import numpy as np
 
-from neuropods.backends import config_utils
-from neuropods.utils.dtype_utils import get_dtype
+from neuropod.backends import config_utils
+from neuropod.utils.dtype_utils import get_dtype
 
 
 def validate_tensors_against_specs(tensors, tensor_specs):

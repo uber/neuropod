@@ -4,8 +4,8 @@
 
 import tensorflow as tf
 
-from neuropods.backends.tensorflow.packager import create_tensorflow_neuropod
-from neuropods.utils.packaging_utils import (
+from neuropod.backends.tensorflow.packager import create_tensorflow_neuropod
+from neuropod.utils.packaging_utils import (
     set_packager_docstring,
     expand_default_kwargs,
 )
