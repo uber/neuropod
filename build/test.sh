@@ -10,7 +10,7 @@ pushd python
 python -m unittest discover --verbose neuropods/tests
 
 # Test the native bindings
-NEUROPODS_RUN_NATIVE_TESTS=true python -m unittest discover --verbose neuropods/tests
+NEUROPOD_RUN_NATIVE_TESTS=true python -m unittest discover --verbose neuropods/tests
 popd
 
 # Run native tests

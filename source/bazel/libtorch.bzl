@@ -2,10 +2,10 @@
 def _impl(repository_ctx):
     # The `or` pattern below handles empty strings and unset env variables
     # Using a default value only handles unset env variables
-    version = repository_ctx.os.environ.get("NEUROPODS_TORCH_VERSION") or "1.1.0"
+    version = repository_ctx.os.environ.get("NEUROPOD_TORCH_VERSION") or "1.1.0"
     IS_MAC  = repository_ctx.os.name.startswith("mac")
-    IS_GPU  = (repository_ctx.os.environ.get("NEUROPODS_IS_GPU") or None) != None
-    CUDA_VERSION = repository_ctx.os.environ.get("NEUROPODS_CUDA_VERSION") or "10.0"
+    IS_GPU  = (repository_ctx.os.environ.get("NEUROPOD_IS_GPU") or None) != None
+    CUDA_VERSION = repository_ctx.os.environ.get("NEUROPOD_CUDA_VERSION") or "10.0"
 
     # Get the torch cuda string (e.g. cpu, cu90, cu92, cu100)
     torch_cuda_string = "cu" + CUDA_VERSION.replace(".", "") if IS_GPU else "cpu"

@@ -1,3 +1,3 @@
 {
-  "report-blacklist-files-containing":["NEUROPODS_CI_SKIP_INFER"]
+  "report-blacklist-files-containing":["NEUROPOD_CI_SKIP_INFER"]
 }

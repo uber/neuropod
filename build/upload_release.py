@@ -12,10 +12,10 @@ import requests
 # The `or` pattern below handles empty strings and unset env variables
 # Using a default value only handles unset env variables
 # TODO(vip): Don't duplicate this between install_frameworks.py and upload_release.py
-REQUESTED_TF_VERSION = os.getenv("NEUROPODS_TENSORFLOW_VERSION") or "1.12.0"
-REQUESTED_TORCH_VERSION = os.getenv("NEUROPODS_TORCH_VERSION") or "1.1.0"
-IS_GPU = (os.getenv("NEUROPODS_IS_GPU") or None) is not None
-CUDA_VERSION = os.getenv("NEUROPODS_CUDA_VERSION") or "10.0"
+REQUESTED_TF_VERSION = os.getenv("NEUROPOD_TENSORFLOW_VERSION") or "1.12.0"
+REQUESTED_TORCH_VERSION = os.getenv("NEUROPOD_TORCH_VERSION") or "1.1.0"
+IS_GPU = (os.getenv("NEUROPOD_IS_GPU") or None) is not None
+CUDA_VERSION = os.getenv("NEUROPOD_CUDA_VERSION") or "10.0"
 IS_MAC = platform.system() == "Darwin"
 
 GIT_TAG = os.getenv("TRAVIS_TAG", os.getenv("BUILDKITE_TAG"))

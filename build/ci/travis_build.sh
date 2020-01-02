@@ -2,7 +2,7 @@
 set -e
 
 # Default to python 2 if not set
-NEUROPODS_PYTHON_BINARY="${NEUROPODS_PYTHON_BINARY:-python}"
+NEUROPOD_PYTHON_BINARY="${NEUROPOD_PYTHON_BINARY:-python}"
 
 # Install system dependencies
 ./build/install_system_deps.sh
@@ -21,8 +21,8 @@ if [[ $(uname -s) == 'Darwin' ]]; then
 fi
 
 # Do everything in a virtualenv
-sudo ${NEUROPODS_PYTHON_BINARY} -m pip install virtualenv
-${NEUROPODS_PYTHON_BINARY} -m virtualenv /tmp/neuropod_venv
+sudo ${NEUROPOD_PYTHON_BINARY} -m pip install virtualenv
+${NEUROPOD_PYTHON_BINARY} -m virtualenv /tmp/neuropod_venv
 source /tmp/neuropod_venv/bin/activate
 
 # Install python dependencies
@@ -43,8 +43,8 @@ fi
 sudo npm install -g bazels3cache
 
 # Start the S3 build cache
-export AWS_ACCESS_KEY_ID=$NEUROPODS_CACHE_ACCESS_KEY
-export AWS_SECRET_ACCESS_KEY=$NEUROPODS_CACHE_ACCESS_SECRET
+export AWS_ACCESS_KEY_ID=$NEUROPOD_CACHE_ACCESS_KEY
+export AWS_SECRET_ACCESS_KEY=$NEUROPOD_CACHE_ACCESS_SECRET
 bazels3cache --bucket=neuropods-build-cache
 
 # Build with the remote cache

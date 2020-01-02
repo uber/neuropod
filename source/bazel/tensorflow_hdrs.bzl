@@ -2,9 +2,9 @@
 def _impl(repository_ctx):
     # The `or` pattern below handles empty strings and unset env variables
     # Using a default value only handles unset env variables
-    version = repository_ctx.os.environ.get("NEUROPODS_TENSORFLOW_VERSION") or "1.12.0"
+    version = repository_ctx.os.environ.get("NEUROPOD_TENSORFLOW_VERSION") or "1.12.0"
     IS_MAC  = repository_ctx.os.name.startswith("mac")
-    IS_GPU  = (repository_ctx.os.environ.get("NEUROPODS_IS_GPU") or None) != None
+    IS_GPU  = (repository_ctx.os.environ.get("NEUROPOD_IS_GPU") or None) != None
 
     MAPPING = {
         # Linux CPU

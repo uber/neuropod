@@ -14,7 +14,7 @@ popd
 bazel build "$@" //...:all
 
 # Build the packages if we need to (at least one of these are not empty)
-if [[ ! -z "${NEUROPODS_DO_PACKAGE}${BUILDKITE_TAG}${TRAVIS_TAG}" ]]; then
+if [[ ! -z "${NEUROPOD_DO_PACKAGE}${BUILDKITE_TAG}${TRAVIS_TAG}" ]]; then
     bazel build "$@" //neuropods:packages
 fi
 
