@@ -9,16 +9,16 @@ cc_library(
         "shm_allocator.cc",
     ],
     visibility = [
-        "//neuropods:__subpackages__",
+        "//neuropod:__subpackages__",
     ],
     linkopts = select({
         "@bazel_tools//src/conditions:darwin": [],
         "//conditions:default": ["-lrt"],
     }),
     deps = [
-        "//neuropods/internal:error_utils",
-        "//neuropods/internal:logging",
-        "//neuropods/internal:memory_utils",
+        "//neuropod/internal:error_utils",
+        "//neuropod/internal:logging",
+        "//neuropod/internal:memory_utils",
         "@boost_repo//:boost",
     ],
 )
@@ -30,11 +30,11 @@ cc_library(
         "shm_tensor.hh",
     ],
     visibility = [
-        "//neuropods:__subpackages__",
+        "//neuropod:__subpackages__",
     ],
     deps = [
-        "//neuropods/backends:neuropod_backend",
-        "//neuropods/internal:deleter",
+        "//neuropod/backends:neuropod_backend",
+        "//neuropod/internal:deleter",
         ":shm_allocator",
     ],
 )
@@ -50,7 +50,7 @@ cc_library(
         "control_messages.cc",
     ],
     visibility = [
-        "//neuropods:__subpackages__",
+        "//neuropod:__subpackages__",
     ],
     deps = [
         ":shm_tensor",
@@ -67,12 +67,12 @@ cc_library(
         "tensor_utils.hh",
     ],
     visibility = [
-        "//neuropods:__subpackages__",
+        "//neuropod:__subpackages__",
     ],
     deps = [
         ":ipc_control_channel",
-        "//neuropods:neuropods_hdrs",
-        "//neuropods/internal:neuropod_tensor_raw_data_access",
+        "//neuropod:neuropod_hdrs",
+        "//neuropod/internal:neuropod_tensor_raw_data_access",
     ],
 )
 
@@ -80,12 +80,12 @@ cc_binary(
     name = "neuropod_multiprocess_worker",
     srcs = [
         "multiprocess_worker_main.cc",
-        "//neuropods:libneuropods.so",
+        "//neuropod:libneuropod.so",
     ],
     linkstatic = True,
     linkopts = ["-Wl,-rpath,$$ORIGIN"],
     visibility = [
-        "//neuropods:__subpackages__",
+        "//neuropod:__subpackages__",
     ],
     deps = [
         ":multiprocess_worker",
@@ -98,10 +98,10 @@ cc_library(
         "multiprocess.hh",
     ],
     visibility = [
-        "//neuropods:__subpackages__",
+        "//neuropod:__subpackages__",
     ],
     deps = [
-        "//neuropods:neuropods_hdrs",
+        "//neuropod:neuropod_hdrs",
     ],
     data = [
         ":neuropod_multiprocess_worker",
@@ -117,13 +117,13 @@ cc_library(
         "multiprocess.hh",
     ],
     visibility = [
-        "//neuropods:__subpackages__",
+        "//neuropod:__subpackages__",
     ],
     deps = [
         ":ipc_control_channel",
-        "//neuropods:neuropods_hdrs",
-        "//neuropods/backends:neuropod_backend",
-        "//neuropods/internal:deleter",
+        "//neuropod:neuropod_hdrs",
+        "//neuropod/backends:neuropod_backend",
+        "//neuropod/internal:deleter",
         "@boost_repo//:boost",
     ],
 )

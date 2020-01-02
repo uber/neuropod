@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "neuropods/internal/tensor_types.hh"
+#include "neuropod/internal/tensor_types.hh"
 #include "tensorflow/core/framework/types.pb.h"
 
 namespace neuropod

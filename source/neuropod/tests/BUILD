@@ -6,13 +6,13 @@ cc_test(
     name = "benchmark_accessor",
     srcs = [
         "benchmark_accessor.cc",
-        "//neuropods:libneuropods.so",
-        "//neuropods/backends/test_backend:libneuropod_test_backend.so",
+        "//neuropod:libneuropod.so",
+        "//neuropod/backends/test_backend:libneuropod_test_backend.so",
     ],
     deps = [
         "@benchmark//:benchmark_main",
-        "//neuropods/backends/test_backend:test_backend_hdrs",
-        "//neuropods:neuropods_hdrs",
+        "//neuropod/backends/test_backend:test_backend_hdrs",
+        "//neuropod:neuropod_hdrs",
     ],
 )
 
@@ -20,18 +20,18 @@ cc_test(
     name = "benchmark_multiprocess",
     srcs = [
         "benchmark_multiprocess.cc",
-        "//neuropods:libneuropods.so",
+        "//neuropod:libneuropod.so",
     ],
     deps = [
         "@benchmark//:benchmark_main",
-        "//neuropods:neuropods_hdrs",
-        "//neuropods/multiprocess:multiprocess_hdrs",
+        "//neuropod:neuropod_hdrs",
+        "//neuropod/multiprocess:multiprocess_hdrs",
     ],
     data = [
-        "//neuropods/tests/test_data",
-        "//neuropods/backends/python_bridge:libneuropod_pythonbridge_backend.so",
-        "//neuropods/backends/torchscript:libneuropod_torchscript_backend.so",
-        "//neuropods/backends/tensorflow:libneuropod_tensorflow_backend.so",
+        "//neuropod/tests/test_data",
+        "//neuropod/backends/python_bridge:libneuropod_pythonbridge_backend.so",
+        "//neuropod/backends/torchscript:libneuropod_torchscript_backend.so",
+        "//neuropod/backends/tensorflow:libneuropod_tensorflow_backend.so",
     ],
 )
 
@@ -42,7 +42,7 @@ cc_test(
     ],
     deps = [
         "@benchmark//:benchmark_main",
-        "//neuropods/multiprocess:shm_allocator",
+        "//neuropod/multiprocess:shm_allocator",
     ],
 )
 
@@ -50,14 +50,14 @@ cc_test(
     name = "test_input_output",
     srcs = [
         "test_input_output.cc",
-        "//neuropods:libneuropods.so",
-        "//neuropods/backends/test_backend:libneuropod_test_backend.so",
+        "//neuropod:libneuropod.so",
+        "//neuropod/backends/test_backend:libneuropod_test_backend.so",
     ],
     deps = [
         "@gtest//:main",
-        "//neuropods:neuropods_hdrs",
-        "//neuropods/backends/test_backend:test_backend_hdrs",
-        "//neuropods/serialization:serialization_hdrs",
+        "//neuropod:neuropod_hdrs",
+        "//neuropod/backends/test_backend:test_backend_hdrs",
+        "//neuropod/serialization:serialization_hdrs",
     ],
 )
 
@@ -65,14 +65,14 @@ cc_test(
     name = "test_serialization",
     srcs = [
         "test_serialization.cc",
-        "//neuropods:libneuropods.so",
-        "//neuropods/backends/test_backend:libneuropod_test_backend.so",
+        "//neuropod:libneuropod.so",
+        "//neuropod/backends/test_backend:libneuropod_test_backend.so",
     ],
     deps = [
         "@gtest//:main",
-        "//neuropods:neuropods_hdrs",
-        "//neuropods/backends/test_backend:test_backend_hdrs",
-        "//neuropods/serialization:serialization_hdrs",
+        "//neuropod:neuropod_hdrs",
+        "//neuropod/backends/test_backend:test_backend_hdrs",
+        "//neuropod/serialization:serialization_hdrs",
     ],
 )
 
@@ -80,11 +80,11 @@ cc_test(
     name = "test_python_bridge",
     srcs = [
         "test_python_bridge.cc",
-        "//neuropods:libneuropods.so",
-        "//neuropods/backends/python_bridge:libneuropod_pythonbridge_backend.so",
+        "//neuropod:libneuropod.so",
+        "//neuropod/backends/python_bridge:libneuropod_pythonbridge_backend.so",
     ],
     deps = [
-        ":neuropods_test_utils",
+        ":neuropod_test_utils",
     ],
 )
 
@@ -92,11 +92,11 @@ cc_test(
     name = "gpu_test_python_bridge",
     srcs = [
         "gpu_test_python_bridge.cc",
-        "//neuropods:libneuropods.so",
-        "//neuropods/backends/python_bridge:libneuropod_pythonbridge_backend.so",
+        "//neuropod:libneuropod.so",
+        "//neuropod/backends/python_bridge:libneuropod_pythonbridge_backend.so",
     ],
     deps = [
-        ":neuropods_test_utils",
+        ":neuropod_test_utils",
     ],
 )
 
@@ -104,12 +104,12 @@ cc_test(
     name = "test_torchscript_backend",
     srcs = [
         "test_torchscript_backend.cc",
-        "//neuropods:libneuropods.so",
-        "//neuropods/backends/torchscript:libneuropod_torchscript_backend.so",
+        "//neuropod:libneuropod.so",
+        "//neuropod/backends/torchscript:libneuropod_torchscript_backend.so",
     ],
     deps = [
-        ":neuropods_test_utils",
-        "//neuropods/backends/torchscript:neuropod_torchscript_backend_hdrs",
+        ":neuropod_test_utils",
+        "//neuropod/backends/torchscript:neuropod_torchscript_backend_hdrs",
     ],
 )
 
@@ -117,11 +117,11 @@ cc_test(
     name = "test_tensorflow_backend",
     srcs = [
         "test_tensorflow_backend.cc",
-        "//neuropods:libneuropods.so",
-        "//neuropods/backends/tensorflow:libneuropod_tensorflow_backend.so",
+        "//neuropod:libneuropod.so",
+        "//neuropod/backends/tensorflow:libneuropod_tensorflow_backend.so",
     ],
     deps = [
-        ":neuropods_test_utils",
+        ":neuropod_test_utils",
     ],
 )
 
@@ -129,32 +129,32 @@ cc_test(
     name = "test_default_backend",
     srcs = [
         "test_default_backend.cc",
-        "//neuropods:libneuropods.so",
+        "//neuropod:libneuropod.so",
     ],
     deps = [
-        ":neuropods_test_utils",
+        ":neuropod_test_utils",
     ],
     data = [
-        "//neuropods/backends/python_bridge:libneuropod_pythonbridge_backend.so",
-        "//neuropods/backends/torchscript:libneuropod_torchscript_backend.so",
-        "//neuropods/backends/tensorflow:libneuropod_tensorflow_backend.so",
+        "//neuropod/backends/python_bridge:libneuropod_pythonbridge_backend.so",
+        "//neuropod/backends/torchscript:libneuropod_torchscript_backend.so",
+        "//neuropod/backends/tensorflow:libneuropod_tensorflow_backend.so",
     ],
     linkstatic = True,
 )
 
 cc_library(
-    name = "neuropods_test_utils",
+    name = "neuropod_test_utils",
     hdrs = ["test_utils.hh"],
-    srcs = ["//neuropods:libneuropods.so"],
+    srcs = ["//neuropod:libneuropod.so"],
     visibility = [
         "//visibility:public",
     ],
     deps = [
         "@gtest//:main",
-        "//neuropods:neuropods_hdrs",
+        "//neuropod:neuropod_hdrs",
     ],
     data = [
-        "//neuropods/tests/test_data"
+        "//neuropod/tests/test_data"
     ],
 )
 
@@ -162,12 +162,12 @@ cc_test(
     name = "test_config_utils",
     srcs = [
         "test_config_utils.cc",
-        "//neuropods:libneuropods.so",
+        "//neuropod:libneuropod.so",
     ],
     deps = [
         "@gtest//:main",
-        "//neuropods:neuropods_hdrs",
-        "//neuropods/internal:neuropod_config_utils",
+        "//neuropod:neuropod_hdrs",
+        "//neuropod/internal:neuropod_config_utils",
     ],
 )
 
@@ -175,13 +175,13 @@ cc_test(
     name = "test_accessor",
     srcs = [
         "test_accessor.cc",
-        "//neuropods:libneuropods.so",
-        "//neuropods/backends/test_backend:libneuropod_test_backend.so",
+        "//neuropod:libneuropod.so",
+        "//neuropod/backends/test_backend:libneuropod_test_backend.so",
     ],
     deps = [
         "@gtest//:main",
-        "//neuropods/backends/test_backend:test_backend_hdrs",
-        "//neuropods:neuropods_hdrs",
+        "//neuropod/backends/test_backend:test_backend_hdrs",
+        "//neuropod:neuropod_hdrs",
     ],
 )
 
@@ -192,7 +192,7 @@ cc_test(
     ],
     deps = [
         "@gtest//:main",
-        "//neuropods/multiprocess:shm_allocator",
+        "//neuropod/multiprocess:shm_allocator",
     ],
 )
 
@@ -203,7 +203,7 @@ cc_test(
     ],
     deps = [
         "@gtest//:main",
-        "//neuropods/multiprocess:shm_tensor",
+        "//neuropod/multiprocess:shm_tensor",
     ],
 )
 
@@ -214,7 +214,7 @@ cc_test(
     ],
     deps = [
         "@gtest//:main",
-        "//neuropods/multiprocess:ipc_control_channel",
+        "//neuropod/multiprocess:ipc_control_channel",
     ],
 )
 
@@ -222,11 +222,11 @@ cc_test(
     name = "test_multiprocess_worker",
     srcs = [
         "test_multiprocess_worker.cc",
-        "//neuropods:libneuropods.so",
+        "//neuropod:libneuropod.so",
     ],
     deps = [
         "@gtest//:main",
-        "//neuropods/multiprocess:multiprocess_worker",
+        "//neuropod/multiprocess:multiprocess_worker",
     ],
 )
 
@@ -237,7 +237,7 @@ cc_test(
     ],
     deps = [
         "@gtest//:main",
-        "//neuropods/multiprocess:ipc_control_channel",
+        "//neuropod/multiprocess:ipc_control_channel",
     ],
 )
 
@@ -245,16 +245,16 @@ cc_test(
     name = "test_multiprocess",
     srcs = [
         "test_multiprocess.cc",
-        "//neuropods:libneuropods.so",
+        "//neuropod:libneuropod.so",
     ],
     deps = [
-        ":neuropods_test_utils",
-        "//neuropods/multiprocess:multiprocess_hdrs",
+        ":neuropod_test_utils",
+        "//neuropod/multiprocess:multiprocess_hdrs",
     ],
     data = [
-        "//neuropods/backends/python_bridge:libneuropod_pythonbridge_backend.so",
-        "//neuropods/backends/torchscript:libneuropod_torchscript_backend.so",
-        "//neuropods/backends/tensorflow:libneuropod_tensorflow_backend.so",
+        "//neuropod/backends/python_bridge:libneuropod_pythonbridge_backend.so",
+        "//neuropod/backends/torchscript:libneuropod_torchscript_backend.so",
+        "//neuropod/backends/tensorflow:libneuropod_tensorflow_backend.so",
     ],
 )
 
@@ -262,13 +262,13 @@ cc_test(
     name = "test_internal_neuropod_tensor",
     srcs = [
         "test_internal_neuropod_tensor.cc",
-        "//neuropods:libneuropods.so",
-        "//neuropods/backends/test_backend:libneuropod_test_backend.so",
+        "//neuropod:libneuropod.so",
+        "//neuropod/backends/test_backend:libneuropod_test_backend.so",
     ],
     deps = [
         "@gtest//:main",
-        "//neuropods/backends/test_backend:test_backend_hdrs",
-        "//neuropods/internal:neuropod_tensor",
+        "//neuropod/backends/test_backend:test_backend_hdrs",
+        "//neuropod/internal:neuropod_tensor",
     ],
 )
 
@@ -276,14 +276,14 @@ cc_test(
     name = "test_conversions_eigen",
     srcs = [
         "test_conversions_eigen.cc",
-        "//neuropods:libneuropods.so",
-        "//neuropods/backends/test_backend:libneuropod_test_backend.so",
+        "//neuropod:libneuropod.so",
+        "//neuropod/backends/test_backend:libneuropod_test_backend.so",
     ],
     deps = [
         "@gtest//:main",
-        "//neuropods:neuropods_hdrs",
-        "//neuropods/backends/test_backend:test_backend_hdrs",
-        "//neuropods/conversions:eigen",
+        "//neuropod:neuropod_hdrs",
+        "//neuropod/backends/test_backend:test_backend_hdrs",
+        "//neuropod/conversions:eigen",
         "@eigen3_repo//:eigen3",
     ],
 )
@@ -292,13 +292,13 @@ cc_test(
     name = "test_test_backend",
     srcs = [
         "test_test_backend.cc",
-        "//neuropods:libneuropods.so",
-        "//neuropods/backends/test_backend:libneuropod_test_backend.so",
+        "//neuropod:libneuropod.so",
+        "//neuropod/backends/test_backend:libneuropod_test_backend.so",
     ],
     deps = [
         "@gtest//:main",
-        "//neuropods:neuropods_hdrs",
-        "//neuropods/backends/test_backend:test_backend_hdrs",
+        "//neuropod:neuropod_hdrs",
+        "//neuropod/backends/test_backend:test_backend_hdrs",
     ],
 )
 
@@ -306,12 +306,12 @@ cc_test(
     name = "test_backend_registration",
     srcs = [
         "test_backend_registration.cc",
-        "//neuropods:libneuropods.so",
+        "//neuropod:libneuropod.so",
     ],
     deps = [
         "@gtest//:main",
-        "//neuropods:neuropods_hdrs",
-        "//neuropods/internal:backend_registration",
+        "//neuropod:neuropod_hdrs",
+        "//neuropod/internal:backend_registration",
     ],
 )
 
@@ -319,12 +319,12 @@ cc_test(
     name = "test_factories",
     srcs = [
         "test_factories.cc",
-        "//neuropods:libneuropods.so",
-        "//neuropods/backends/test_backend:libneuropod_test_backend.so",
+        "//neuropod:libneuropod.so",
+        "//neuropod/backends/test_backend:libneuropod_test_backend.so",
     ],
     deps = [
         "@gtest//:main",
-        "//neuropods/backends/test_backend:test_backend_hdrs",
+        "//neuropod/backends/test_backend:test_backend_hdrs",
     ],
 )
 
@@ -332,14 +332,14 @@ cc_test(
     name = "test_loader",
     srcs = [
         "test_loader.cc",
-        "//neuropods:libneuropods.so",
+        "//neuropod:libneuropod.so",
     ],
     deps = [
         "@gtest//:main",
-        "//neuropods:neuropods_hdrs",
-        "//neuropods/internal:neuropod_loader",
+        "//neuropod:neuropod_hdrs",
+        "//neuropod/internal:neuropod_loader",
     ],
     data = [
-        "//neuropods/tests/test_data"
+        "//neuropod/tests/test_data"
     ],
 )

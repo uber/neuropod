@@ -3,8 +3,8 @@
 //
 
 #include "gtest/gtest.h"
-#include "neuropods/multiprocess/ipc_control_channel.hh"
-#include "neuropods/multiprocess/shm_tensor.hh"
+#include "neuropod/multiprocess/ipc_control_channel.hh"
+#include "neuropod/multiprocess/shm_tensor.hh"
 
 TEST(test_ipc_control_channel, simple)
 {

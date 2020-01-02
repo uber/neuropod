@@ -6,8 +6,8 @@
 // NEUROPOD_CI_SKIP_INFER
 
 #include "benchmark/benchmark.h"
-#include "neuropods/backends/test_backend/test_neuropod_backend.hh"
-#include "neuropods/neuropods.hh"
+#include "neuropod/backends/test_backend/test_neuropod_backend.hh"
+#include "neuropod/neuropod.hh"
 
 static void benchmark_raw(benchmark::State &state)
 {

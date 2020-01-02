@@ -3,7 +3,7 @@
 //
 
 #include "gtest/gtest.h"
-#include "neuropods/multiprocess/ipc_control_channel.hh"
+#include "neuropod/multiprocess/ipc_control_channel.hh"
 
 TEST(test_multiprocess_allowed_transitions, simple)
 {

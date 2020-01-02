@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "neuropods/internal/error_utils.hh"
+#include "neuropod/internal/error_utils.hh"
 
 #include <set>
 

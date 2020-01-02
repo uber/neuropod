@@ -6,8 +6,8 @@
 // NEUROPOD_CI_SKIP_INFER
 
 #include "benchmark/benchmark.h"
-#include "neuropods/multiprocess/multiprocess.hh"
-#include "neuropods/neuropods.hh"
+#include "neuropod/multiprocess/multiprocess.hh"
+#include "neuropod/neuropod.hh"
 
 namespace
 {
@@ -35,7 +35,7 @@ void benchmark_object_detection(benchmark::State &state)
 {
     const uint8_t some_image_data[1200 * 1920 * 3] = {0};
 
-    auto neuropod = Loader()("neuropods/tests/test_data/dummy_object_detection/");
+    auto neuropod = Loader()("neuropod/tests/test_data/dummy_object_detection/");
 
     for (auto _ : state)
     {
@@ -62,7 +62,7 @@ void benchmark_small_inputs(benchmark::State &state)
 {
     const float some_data[10 * 5] = {0};
 
-    auto neuropod = Loader()("neuropods/tests/test_data/dummy_small_input_model/");
+    auto neuropod = Loader()("neuropod/tests/test_data/dummy_small_input_model/");
 
     for (auto _ : state)
     {

@@ -2,10 +2,10 @@
 // Uber, Inc. (c) 2019
 //
 
-#include "neuropods/multiprocess/shm_allocator.hh"
+#include "neuropod/multiprocess/shm_allocator.hh"
 
-#include "neuropods/internal/error_utils.hh"
-#include "neuropods/internal/memory_utils.hh"
+#include "neuropod/internal/error_utils.hh"
+#include "neuropod/internal/memory_utils.hh"
 
 #include <boost/interprocess/mapped_region.hpp>
 #include <boost/interprocess/shared_memory_object.hpp>

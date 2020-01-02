@@ -4,8 +4,8 @@
 
 #pragma once
 
-#include "neuropods/internal/deleter.hh"
-#include "neuropods/internal/neuropod_tensor.hh"
+#include "neuropod/internal/deleter.hh"
+#include "neuropod/internal/neuropod_tensor.hh"
 
 #include <iostream>
 #include <memory>

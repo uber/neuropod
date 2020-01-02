@@ -2,9 +2,9 @@
 // Uber, Inc. (c) 2019
 //
 
-#include "neuropods/backends/neuropod_backend.hh"
+#include "neuropod/backends/neuropod_backend.hh"
 
-#include "neuropods/internal/neuropod_loader.hh"
+#include "neuropod/internal/neuropod_loader.hh"
 
 namespace neuropod
 {

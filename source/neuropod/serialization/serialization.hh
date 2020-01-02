@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "neuropods/internal/error_utils.hh"
+#include "neuropod/internal/error_utils.hh"
 
 #include <boost/archive/binary_iarchive.hpp>
 #include <boost/archive/binary_oarchive.hpp>

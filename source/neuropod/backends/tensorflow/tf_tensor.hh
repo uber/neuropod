@@ -4,10 +4,10 @@
 
 #pragma once
 
-#include "neuropods/backends/tensorflow/type_utils.hh"
-#include "neuropods/internal/deleter.hh"
-#include "neuropods/internal/logging.hh"
-#include "neuropods/internal/neuropod_tensor.hh"
+#include "neuropod/backends/tensorflow/type_utils.hh"
+#include "neuropod/internal/deleter.hh"
+#include "neuropod/internal/logging.hh"
+#include "neuropod/internal/neuropod_tensor.hh"
 #include "tensorflow/core/framework/tensor.h"
 
 #include <string>

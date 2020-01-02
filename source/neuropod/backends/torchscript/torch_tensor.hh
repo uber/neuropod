@@ -4,8 +4,8 @@
 
 #pragma once
 
-#include "neuropods/internal/deleter.hh"
-#include "neuropods/internal/neuropod_tensor.hh"
+#include "neuropod/internal/deleter.hh"
+#include "neuropod/internal/neuropod_tensor.hh"
 
 #include <caffe2/core/macros.h>
 #include <torch/script.h>
@@ -70,7 +70,7 @@ torch::Deleter get_torch_deleter(const Deleter &deleter, void *data)
 
 } // namespace
 
-// This class is internal to neuropods and should not be exposed
+// This class is internal to neuropod and should not be exposed
 // to users
 template <typename T>
 class TorchNeuropodTensor : public TypedNeuropodTensor<T>, public NativeDataContainer<torch::jit::IValue>

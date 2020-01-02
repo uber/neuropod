@@ -13,7 +13,7 @@ cc_library(
         "config_utils.hh",
     ],
     visibility = [
-        "//neuropods:__subpackages__",
+        "//neuropod:__subpackages__",
     ],
     deps = [
         ":error_utils",
@@ -30,7 +30,7 @@ cc_library(
         "memory_utils.hh",
     ],
     visibility = [
-        "//neuropods:__subpackages__",
+        "//neuropod:__subpackages__",
     ],
 )
 
@@ -43,7 +43,7 @@ cc_library(
         "logging.cc"
     ],
     visibility = [
-        "//neuropods:__subpackages__",
+        "//neuropod:__subpackages__",
     ],
     deps = [
         "@spdlog_repo//:spdlog",
@@ -62,7 +62,7 @@ cc_library(
         "type_macros.hh",
     ],
     visibility = [
-        "//neuropods:__subpackages__",
+        "//neuropod:__subpackages__",
     ],
     deps = [
         ":error_utils",
@@ -76,13 +76,13 @@ cc_library(
         "neuropod_tensor_serialization.cc",
     ],
     visibility = [
-        "//neuropods:__subpackages__",
+        "//neuropod:__subpackages__",
     ],
     deps = [
         ":neuropod_tensor_raw_data_access",
         "@boost_repo//:boost",
-        "//neuropods/backends:neuropod_backend",
-        "//neuropods/serialization:serialization_hdrs",
+        "//neuropod/backends:neuropod_backend",
+        "//neuropod/serialization:serialization_hdrs",
     ],
 )
 
@@ -92,7 +92,7 @@ cc_library(
         "backend_registration.hh",
     ],
     visibility = [
-        "//neuropods:__subpackages__",
+        "//neuropod:__subpackages__",
     ],
     deps = [
         ":error_utils",
@@ -107,7 +107,7 @@ cc_library(
         "backend_registration.cc",
     ],
     visibility = [
-        "//neuropods:__subpackages__",
+        "//neuropod:__subpackages__",
     ],
     deps = [
         ":backend_registration",
@@ -124,7 +124,7 @@ cc_library(
         "deleter.cc",
     ],
     visibility = [
-        "//neuropods:__subpackages__",
+        "//neuropod:__subpackages__",
     ],
 )
 
@@ -134,7 +134,7 @@ cc_library(
         "error_utils.hh",
     ],
     visibility = [
-        "//neuropods:__subpackages__",
+        "//neuropod:__subpackages__",
     ],
 )
 
@@ -144,7 +144,7 @@ cc_library(
         "neuropod_loader.hh",
     ],
     visibility = [
-        "//neuropods:__subpackages__",
+        "//neuropod:__subpackages__",
     ],
 )
 
@@ -162,7 +162,7 @@ cc_library(
         "@zipper_repo//:zipper",
     ],
     visibility = [
-        "//neuropods:__subpackages__",
+        "//neuropod:__subpackages__",
     ],
     linkopts = ["-lz"],
 )
@@ -173,7 +173,7 @@ cc_library(
         "neuropod_tensor_raw_data_access.hh",
     ],
     visibility = [
-        "//neuropods:__subpackages__",
+        "//neuropod:__subpackages__",
     ],
 )
 
@@ -187,13 +187,13 @@ cc_library(
         ":neuropod_tensor_raw_data_access",
     ],
     visibility = [
-        "//neuropods:__subpackages__",
+        "//neuropod:__subpackages__",
     ],
 )
 
 # Package all the header files
 pkg_tar(
-    name = "libneuropods_internal_hdrs",
+    name = "libneuropod_internal_hdrs",
     package_dir = "internal/",
     srcs = glob(["*.hh"]),
     visibility = [

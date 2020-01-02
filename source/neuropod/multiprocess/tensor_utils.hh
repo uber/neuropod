@@ -2,8 +2,8 @@
 // Uber, Inc. (c) 2019
 //
 
-#include "neuropods/internal/neuropod_tensor_raw_data_access.hh"
-#include "neuropods/neuropods.hh"
+#include "neuropod/internal/neuropod_tensor_raw_data_access.hh"
+#include "neuropod/neuropod.hh"
 
 #include <iostream>
 #include <string>

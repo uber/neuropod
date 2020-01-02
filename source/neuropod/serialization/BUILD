@@ -10,7 +10,7 @@ cc_library(
         "serialization.hh",
     ],
     visibility = [
-        "//neuropods:__subpackages__",
+        "//neuropod:__subpackages__",
     ],
     deps = [
         "@boost_repo//:boost",
@@ -23,17 +23,17 @@ cc_library(
         "serialization.cc",
     ],
     visibility = [
-        "//neuropods:__subpackages__",
+        "//neuropod:__subpackages__",
     ],
     deps = [
         ":serialization_hdrs",
-        "//neuropods/backends:neuropod_backend",
+        "//neuropod/backends:neuropod_backend",
     ],
 )
 
 # Package all the header files
 pkg_tar(
-    name = "libneuropods_serialization_hdrs",
+    name = "libneuropod_serialization_hdrs",
     package_dir = "serialization/",
     srcs = glob(["*.hh"]),
     visibility = [

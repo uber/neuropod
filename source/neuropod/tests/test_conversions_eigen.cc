@@ -3,9 +3,9 @@
 //
 
 #include "gtest/gtest.h"
-#include "neuropods/backends/test_backend/test_neuropod_backend.hh"
-#include "neuropods/conversions/eigen.hh"
-#include "neuropods/internal/neuropod_tensor.hh"
+#include "neuropod/backends/test_backend/test_neuropod_backend.hh"
+#include "neuropod/conversions/eigen.hh"
+#include "neuropod/internal/neuropod_tensor.hh"
 
 #include <gmock/gmock.h>
 

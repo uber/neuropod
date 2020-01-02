@@ -3,8 +3,8 @@
 //
 
 #include "gtest/gtest.h"
-#include "neuropods/backends/test_backend/test_neuropod_backend.hh"
-#include "neuropods/serialization/serialization.hh"
+#include "neuropod/backends/test_backend/test_neuropod_backend.hh"
+#include "neuropod/serialization/serialization.hh"
 
 namespace
 {

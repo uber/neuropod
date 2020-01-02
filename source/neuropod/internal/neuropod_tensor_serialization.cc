@@ -2,10 +2,10 @@
 // Uber, Inc. (c) 2019
 //
 
-#include "neuropods/backends/tensor_allocator.hh"
-#include "neuropods/internal/neuropod_tensor.hh"
-#include "neuropods/internal/neuropod_tensor_raw_data_access.hh"
-#include "neuropods/serialization/serialization.hh"
+#include "neuropod/backends/tensor_allocator.hh"
+#include "neuropod/internal/neuropod_tensor.hh"
+#include "neuropod/internal/neuropod_tensor_raw_data_access.hh"
+#include "neuropod/serialization/serialization.hh"
 
 #include <boost/serialization/array.hpp>
 #include <boost/serialization/vector.hpp>

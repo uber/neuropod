@@ -4,10 +4,10 @@
 
 #pragma once
 
-#include "neuropods/backends/neuropod_backend.hh"
-#include "neuropods/backends/torchscript/torch_tensor.hh"
-#include "neuropods/internal/tensor_types.hh"
-#include "neuropods/neuropods.hh"
+#include "neuropod/backends/neuropod_backend.hh"
+#include "neuropod/backends/torchscript/torch_tensor.hh"
+#include "neuropod/internal/tensor_types.hh"
+#include "neuropod/neuropod.hh"
 
 #include <torch/script.h>
 #include <torch/torch.h>

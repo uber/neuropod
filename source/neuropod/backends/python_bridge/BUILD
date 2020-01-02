@@ -9,7 +9,7 @@ cc_binary(
     srcs = [
         "python_bridge.cc",
         "python_bridge.hh",
-        "//neuropods:libneuropods.so",
+        "//neuropod:libneuropod.so",
     ],
     linkshared = True,
     linkstatic = True,
@@ -18,13 +18,13 @@ cc_binary(
         "-ldl",
     ],
     visibility = [
-        "//neuropods:__subpackages__",
+        "//neuropod:__subpackages__",
     ],
     deps = [
-        "//neuropods/backends:neuropod_backend",
-        "//neuropods/backends/test_backend:test_backend_hdrs",
-        "//neuropods/bindings:bindings",
-        "//neuropods/internal:deleter",
+        "//neuropod/backends:neuropod_backend",
+        "//neuropod/backends/test_backend:test_backend_hdrs",
+        "//neuropod/bindings:bindings",
+        "//neuropod/internal:deleter",
     ],
 )
 

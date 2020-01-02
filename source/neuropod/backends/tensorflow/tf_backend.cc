@@ -2,7 +2,7 @@
 // Uber, Inc. (c) 2019
 //
 
-#include "neuropods/backends/tensorflow/tf_backend.hh"
+#include "neuropod/backends/tensorflow/tf_backend.hh"
 
 #include "tensorflow/core/framework/graph.pb.h"
 #include "tensorflow/core/public/session.h"

@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "neuropods/internal/tensor_types.hh"
+#include "neuropod/internal/tensor_types.hh"
 
 #include <torch/torch.h>
 

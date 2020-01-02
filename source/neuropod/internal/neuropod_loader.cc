@@ -2,10 +2,10 @@
 // Uber, Inc. (c) 2019
 //
 
-#include "neuropods/internal/neuropod_loader.hh"
+#include "neuropod/internal/neuropod_loader.hh"
 
-#include "neuropods/internal/error_utils.hh"
-#include "neuropods/internal/memory_utils.hh"
+#include "neuropod/internal/error_utils.hh"
+#include "neuropod/internal/memory_utils.hh"
 
 #include <ghc/filesystem.hpp>
 

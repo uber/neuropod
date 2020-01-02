@@ -4,9 +4,9 @@
 
 #pragma once
 
-#include "neuropods/backends/neuropod_backend.hh"
-#include "neuropods/internal/config_utils.hh"
-#include "neuropods/version.hh"
+#include "neuropod/backends/neuropod_backend.hh"
+#include "neuropod/internal/config_utils.hh"
+#include "neuropod/version.hh"
 
 #include <memory>
 #include <string>

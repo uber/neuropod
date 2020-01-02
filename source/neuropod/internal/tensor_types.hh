@@ -7,7 +7,7 @@
 namespace neuropod
 {
 
-// All the tensor types that Neuropods supports
+// All the tensor types that Neuropod supports
 enum TensorType
 {
     FLOAT_TENSOR,

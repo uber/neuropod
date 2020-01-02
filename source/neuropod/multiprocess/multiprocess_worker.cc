@@ -2,11 +2,11 @@
 // Uber, Inc. (c) 2019
 //
 
-#include "neuropods/multiprocess/control_messages.hh"
-#include "neuropods/multiprocess/ipc_control_channel.hh"
-#include "neuropods/multiprocess/shm_tensor.hh"
-#include "neuropods/multiprocess/tensor_utils.hh"
-#include "neuropods/neuropods.hh"
+#include "neuropod/multiprocess/control_messages.hh"
+#include "neuropod/multiprocess/ipc_control_channel.hh"
+#include "neuropod/multiprocess/shm_tensor.hh"
+#include "neuropod/multiprocess/tensor_utils.hh"
+#include "neuropod/neuropod.hh"
 
 #include <atomic>
 #include <iostream>

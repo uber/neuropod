@@ -6,7 +6,7 @@
 
 // Utilities used to access data in neuropod tensor objects as Eigen library Matrices and Vectors
 
-#include "neuropods/internal/neuropod_tensor.hh"
+#include "neuropod/internal/neuropod_tensor.hh"
 
 #include <Eigen/Dense>
 

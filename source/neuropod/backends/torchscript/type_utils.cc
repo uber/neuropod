@@ -4,7 +4,7 @@
 
 #include "type_utils.hh"
 
-#include "neuropods/internal/error_utils.hh"
+#include "neuropod/internal/error_utils.hh"
 
 #include <sstream>
 #include <stdexcept>
@@ -43,7 +43,7 @@ TensorType get_neuropod_type_from_torch_type(torch::Dtype type)
         break;
     }
 
-    NEUROPOD_ERROR("Neuropods does not support type: " << type);
+    NEUROPOD_ERROR("Neuropod does not support type: " << type);
 }
 
 torch::Dtype get_torch_type_from_neuropod_type(TensorType type)

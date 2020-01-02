@@ -2,9 +2,9 @@
 // Uber, Inc. (c) 2019
 //
 
-#include "neuropods/serialization/serialization.hh"
+#include "neuropod/serialization/serialization.hh"
 
-#include "neuropods/internal/neuropod_tensor.hh"
+#include "neuropod/internal/neuropod_tensor.hh"
 
 #include <mutex>
 #include <unordered_map>

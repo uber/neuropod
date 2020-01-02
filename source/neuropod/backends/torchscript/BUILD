@@ -10,17 +10,17 @@ cc_binary(
     srcs = [
         "torch_backend.cc",
         "type_utils.cc",
-        "//neuropods:libneuropods.so",
+        "//neuropod:libneuropod.so",
     ],
     linkshared = True,
     linkstatic = True,
     linkopts = ["-Wl,-rpath,$$ORIGIN"],
     visibility = [
-        "//neuropods:__subpackages__",
+        "//neuropod:__subpackages__",
     ],
     deps = [
         ":neuropod_torchscript_backend_hdrs",
-        "//neuropods/internal:deleter",
+        "//neuropod/internal:deleter",
         "@libtorch_repo//:libtorch",
     ],
     data = [
@@ -36,11 +36,11 @@ cc_library(
         "type_utils.hh",
     ],
     visibility = [
-        "//neuropods:__subpackages__",
+        "//neuropod:__subpackages__",
     ],
     deps = [
-        "//neuropods:neuropods_hdrs",
-        "//neuropods/backends:neuropod_backend",
+        "//neuropod:neuropod_hdrs",
+        "//neuropod/backends:neuropod_backend",
         "@libtorch_repo//:libtorch_hdrs",
     ]
 )

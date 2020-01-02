@@ -4,8 +4,8 @@
 
 #pragma once
 
-#include "neuropods/backends/neuropod_backend.hh"
-#include "neuropods/backends/tensorflow/tf_tensor.hh"
+#include "neuropod/backends/neuropod_backend.hh"
+#include "neuropod/backends/tensorflow/tf_tensor.hh"
 
 #include <string>
 #include <unordered_map>

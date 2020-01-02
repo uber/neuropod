@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "neuropods/neuropods.hh"
+#include "neuropod/neuropod.hh"
 
 #include <string>
 

@@ -4,10 +4,10 @@
 
 #pragma once
 
-#include "neuropods/internal/error_utils.hh"
-#include "neuropods/internal/memory_utils.hh"
-#include "neuropods/internal/tensor_accessor.hh"
-#include "neuropods/internal/type_macros.hh"
+#include "neuropod/internal/error_utils.hh"
+#include "neuropod/internal/memory_utils.hh"
+#include "neuropod/internal/tensor_accessor.hh"
+#include "neuropod/internal/type_macros.hh"
 
 #include <cstring>
 #include <functional>

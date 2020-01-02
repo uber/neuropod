@@ -2,10 +2,10 @@
 // Uber, Inc. (c) 2019
 //
 
-#include "neuropods/backends/test_backend/test_neuropod_tensor.hh"
-#include "neuropods/bindings/python_bindings.hh"
-#include "neuropods/neuropods.hh"
-#include "neuropods/serialization/serialization.hh"
+#include "neuropod/backends/test_backend/test_neuropod_tensor.hh"
+#include "neuropod/bindings/python_bindings.hh"
+#include "neuropod/neuropod.hh"
+#include "neuropod/serialization/serialization.hh"
 
 #include <pybind11/numpy.h>
 #include <pybind11/pybind11.h>

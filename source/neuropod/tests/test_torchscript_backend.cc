@@ -7,24 +7,24 @@
 TEST(test_torchscript_backend, test_torchscript_addition_model)
 {
     // Test the TorchScript addition model using the native torchscript backend
-    test_addition_model("neuropods/tests/test_data/torchscript_addition_model/", "TorchNeuropodBackend");
+    test_addition_model("neuropod/tests/test_data/torchscript_addition_model/", "TorchNeuropodBackend");
 }
 
 TEST(test_torchscript_backend, test_torchscript_addition_tensor_output_model)
 {
     // Test the TorchScript addition model using the native torchscript backend
-    test_addition_model("neuropods/tests/test_data/torchscript_addition_model_single_output/", "TorchNeuropodBackend");
+    test_addition_model("neuropod/tests/test_data/torchscript_addition_model_single_output/", "TorchNeuropodBackend");
 }
 
 TEST(test_torchscript_backend, test_torchscript_strings_model)
 {
     // Test the TorchScript strings model using the native torchscript backend
-    test_strings_model("neuropods/tests/test_data/torchscript_strings_model/", "TorchNeuropodBackend");
+    test_strings_model("neuropod/tests/test_data/torchscript_strings_model/", "TorchNeuropodBackend");
 }
 
 TEST(test_torchscript_backend, invalid_dtype)
 {
-    neuropod::Neuropod model("neuropods/tests/test_data/torchscript_strings_model/", "TorchNeuropodBackend");
+    neuropod::Neuropod model("neuropod/tests/test_data/torchscript_strings_model/", "TorchNeuropodBackend");
 
     // These should work
     model.allocate_tensor<float>({2});
@@ -40,5 +40,5 @@ TEST(test_torchscript_backend, invalid_dtype)
 // TEST(test_torchscript_backend, load_model_from_path)
 // {
 //     // Load a TorchScript model directly
-//     neuropod::TorchNeuropodBackend model("neuropods/tests/test_data/torchscript_strings_model/0/data/model.pt");
+//     neuropod::TorchNeuropodBackend model("neuropod/tests/test_data/torchscript_strings_model/0/data/model.pt");
 // }

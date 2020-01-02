@@ -4,8 +4,8 @@
 
 #pragma once
 
-#include "neuropods/backends/neuropod_backend.hh"
-#include "neuropods/multiprocess/control_messages.hh"
+#include "neuropod/backends/neuropod_backend.hh"
+#include "neuropod/multiprocess/control_messages.hh"
 
 #include <boost/interprocess/ipc/message_queue.hpp>
 

@@ -4,8 +4,8 @@
 
 #pragma once
 
-#include "neuropods/internal/memory_utils.hh"
-#include "neuropods/internal/tensor_types.hh"
+#include "neuropod/internal/memory_utils.hh"
+#include "neuropod/internal/tensor_types.hh"
 
 #include <memory>
 #include <string>

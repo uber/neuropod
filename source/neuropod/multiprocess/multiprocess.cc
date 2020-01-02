@@ -2,12 +2,12 @@
 // Uber, Inc. (c) 2019
 //
 
-#include "neuropods/multiprocess/multiprocess.hh"
+#include "neuropod/multiprocess/multiprocess.hh"
 
-#include "neuropods/backends/neuropod_backend.hh"
-#include "neuropods/multiprocess/control_messages.hh"
-#include "neuropods/multiprocess/ipc_control_channel.hh"
-#include "neuropods/multiprocess/shm_tensor.hh"
+#include "neuropod/backends/neuropod_backend.hh"
+#include "neuropod/multiprocess/control_messages.hh"
+#include "neuropod/multiprocess/ipc_control_channel.hh"
+#include "neuropod/multiprocess/shm_tensor.hh"
 
 #include <boost/date_time/microsec_time_clock.hpp>
 #include <boost/date_time/posix_time/posix_time_types.hpp>

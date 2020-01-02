@@ -2,7 +2,7 @@
 // Uber, Inc. (c) 2019
 //
 
-#include "neuropods/internal/deleter.hh"
+#include "neuropod/internal/deleter.hh"
 
 namespace neuropod
 {

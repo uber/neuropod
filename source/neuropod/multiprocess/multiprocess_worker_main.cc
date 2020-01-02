@@ -2,7 +2,7 @@
 // Uber, Inc. (c) 2019
 //
 
-#include "neuropods/multiprocess/multiprocess_worker.hh"
+#include "neuropod/multiprocess/multiprocess_worker.hh"
 
 #include <iostream>
 #include <string>

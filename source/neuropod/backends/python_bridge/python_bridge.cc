@@ -4,7 +4,7 @@
 
 #include "python_bridge.hh"
 
-#include "neuropods/bindings/python_bindings.hh"
+#include "neuropod/bindings/python_bindings.hh"
 
 #include <exception>
 #include <sstream>

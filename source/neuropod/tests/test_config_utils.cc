@@ -3,7 +3,7 @@
 //
 
 #include "gtest/gtest.h"
-#include "neuropods/internal/config_utils.hh"
+#include "neuropod/internal/config_utils.hh"
 
 namespace
 {

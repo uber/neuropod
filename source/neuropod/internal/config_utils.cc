@@ -4,8 +4,8 @@
 
 #include "config_utils.hh"
 
-#include "neuropods/internal/error_utils.hh"
-#include "neuropods/internal/neuropod_loader.hh"
+#include "neuropod/internal/error_utils.hh"
+#include "neuropod/internal/neuropod_loader.hh"
 
 #include <json/json.h>
 

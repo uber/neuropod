@@ -5,81 +5,81 @@
 load("@bazel_tools//tools/build_defs/pkg:pkg.bzl", "pkg_tar")
 
 cc_library(
-    name = "neuropods_hdrs",
+    name = "neuropod_hdrs",
     hdrs = [
-        "neuropods.hh",
+        "neuropod.hh",
         "version.hh",
     ],
     visibility = [
         "//visibility:public",
     ],
     deps = [
-        "//neuropods/backends:neuropod_backend",
-        "//neuropods/internal:neuropod_config_utils",
-        "//neuropods/internal:neuropod_tensor",
+        "//neuropod/backends:neuropod_backend",
+        "//neuropod/internal:neuropod_config_utils",
+        "//neuropod/internal:neuropod_tensor",
     ],
 )
 
 cc_binary(
-    name = "libneuropods.so",
+    name = "libneuropod.so",
     linkshared = True,
     linkstatic = True,
     linkopts = ["-Wl,-rpath,$$ORIGIN"],
     srcs = [
-        "neuropods.cc",
+        "neuropod.cc",
     ],
     visibility = [
         "//visibility:public",
     ],
     deps = [
-        ":neuropods_hdrs",
-        "//neuropods/internal:backend_registration_impl",
-        "//neuropods/internal:neuropod_loader_impl",
-        "//neuropods/internal:neuropod_tensor_raw_data_access_impl",
-        "//neuropods/internal:tensor_serialization_impl",
-        "//neuropods/multiprocess:multiprocess_impl",
-        "//neuropods/serialization:serialization_impl",
+        ":neuropod_hdrs",
+        "//neuropod/internal:backend_registration_impl",
+        "//neuropod/internal:neuropod_loader_impl",
+        "//neuropod/internal:neuropod_tensor_raw_data_access_impl",
+        "//neuropod/internal:tensor_serialization_impl",
+        "//neuropod/multiprocess:multiprocess_impl",
+        "//neuropod/serialization:serialization_impl",
     ]
 )
 
 pkg_tar(
-    name = "libneuropods_hdrs",
-    package_dir = "include/neuropods/",
+    name = "libneuropod_hdrs",
+    package_dir = "include/neuropod/",
     srcs = [
         # Headers
-        ":neuropods.hh",
+        ":neuropod.hh",
         ":version.hh",
     ],
     deps = [
-        "//neuropods/internal:libneuropods_internal_hdrs",
-        "//neuropods/backends:libneuropods_backends_hdrs",
-        "//neuropods/serialization:libneuropods_serialization_hdrs",
+        "//neuropod/internal:libneuropod_internal_hdrs",
+        "//neuropod/backends:libneuropod_backends_hdrs",
+        "//neuropod/serialization:libneuropod_serialization_hdrs",
     ],
 )
 
 pkg_tar(
-    name = "libneuropods_libs",
+    name = "libneuropod_libs",
     package_dir = "lib/",
     srcs = [
-        ":libneuropods.so",
+        ":libneuropod.so",
     ]
 )
 
 pkg_tar(
-    name = "libneuropods_bins",
+    name = "libneuropod_bins",
     package_dir = "bin/",
     srcs = [
-        "//neuropods/multiprocess:neuropod_multiprocess_worker"
+        "//neuropod/multiprocess:neuropod_multiprocess_worker"
     ]
 )
 
 pkg_tar(
-    name = "libneuropods",
+    name = "libneuropod",
     extension = "tar.gz",
     deps = [
-        ":libneuropods_hdrs",
-        ":libneuropods_libs",
-        ":libneuropods_bins",
+        ":libneuropod_hdrs",
+        ":libneuropod_libs",
+        ":libneuropod_bins",
     ]
 )
 
@@ -87,8 +87,8 @@ filegroup(
     name = "packages",
     tags = ["manual"],
     srcs = [
-        "//neuropods/backends/python_bridge:neuropod_pythonbridge_backend",
-        "//neuropods/backends/torchscript:neuropod_torchscript_backend",
-        "//neuropods/backends/tensorflow:neuropod_tensorflow_backend",
+        "//neuropod/backends/python_bridge:neuropod_pythonbridge_backend",
+        "//neuropod/backends/torchscript:neuropod_torchscript_backend",
+        "//neuropod/backends/tensorflow:neuropod_tensorflow_backend",
     ],
 )

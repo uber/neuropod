@@ -3,7 +3,7 @@
 //
 
 #include "gtest/gtest.h"
-#include "neuropods/multiprocess/shm_tensor.hh"
+#include "neuropod/multiprocess/shm_tensor.hh"
 
 TEST(test_shm_tensor, simple)
 {

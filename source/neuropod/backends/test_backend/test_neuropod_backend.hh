@@ -4,8 +4,8 @@
 
 #pragma once
 
-#include "neuropods/backends/neuropod_backend.hh"
-#include "neuropods/backends/test_backend/test_neuropod_tensor.hh"
+#include "neuropod/backends/neuropod_backend.hh"
+#include "neuropod/backends/test_backend/test_neuropod_tensor.hh"
 
 #include <string>
 #include <vector>

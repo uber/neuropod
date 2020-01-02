@@ -4,8 +4,8 @@
 
 #pragma once
 
-#include "neuropods/internal/config_utils.hh"
-#include "neuropods/internal/memory_utils.hh"
+#include "neuropod/internal/config_utils.hh"
+#include "neuropod/internal/memory_utils.hh"
 
 #include <memory>
 #include <string>

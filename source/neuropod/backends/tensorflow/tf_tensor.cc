@@ -2,7 +2,7 @@
 // Uber, Inc. (c) 2019
 //
 
-#include "neuropods/backends/tensorflow/tf_tensor.hh"
+#include "neuropod/backends/tensorflow/tf_tensor.hh"
 
 #include "tensorflow/core/framework/allocation_description.pb.h"
 #include "tensorflow/core/public/version.h"

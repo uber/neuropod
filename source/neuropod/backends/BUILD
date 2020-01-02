@@ -17,16 +17,16 @@ cc_library(
         "//visibility:public",
     ],
     deps = [
-        "//neuropods/internal:backend_registration",
-        "//neuropods/internal:deleter",
-        "//neuropods/internal:neuropod_tensor",
-        "//neuropods/internal:neuropod_loader",
+        "//neuropod/internal:backend_registration",
+        "//neuropod/internal:deleter",
+        "//neuropod/internal:neuropod_tensor",
+        "//neuropod/internal:neuropod_loader",
     ],
 )
 
 # Package all the header files
 pkg_tar(
-    name = "libneuropods_backends_hdrs",
+    name = "libneuropod_backends_hdrs",
     package_dir = "backends/",
     srcs = glob(["*.hh"]),
     visibility = [

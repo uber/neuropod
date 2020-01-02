@@ -6,12 +6,12 @@ cc_binary(
     name = "neuropod_native.so",
     srcs = [
         "neuropod_native.cc",
-        "//neuropods:libneuropods.so",
+        "//neuropod:libneuropod.so",
     ],
     deps = [
         ":bindings",
-        "//neuropods/serialization:serialization_hdrs",
-        "//neuropods/backends/test_backend:test_backend_hdrs",
+        "//neuropod/serialization:serialization_hdrs",
+        "//neuropod/backends/test_backend:test_backend_hdrs",
     ],
     linkshared = True,
 )
@@ -25,12 +25,12 @@ cc_library(
         "python_bindings.hh",
     ],
     visibility = [
-        "//neuropods:__subpackages__",
+        "//neuropod:__subpackages__",
     ],
     deps = [
-        "//neuropods/internal:neuropod_tensor",
-        "//neuropods/internal:neuropod_tensor_raw_data_access",
-        "//neuropods:neuropods_hdrs",
+        "//neuropod/internal:neuropod_tensor",
+        "//neuropod/internal:neuropod_tensor_raw_data_access",
+        "//neuropod:neuropod_hdrs",
         "@pybind11_repo//:pybind11",
     ],
 )

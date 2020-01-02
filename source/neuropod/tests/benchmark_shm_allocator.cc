@@ -6,7 +6,7 @@
 // NEUROPOD_CI_SKIP_INFER
 
 #include "benchmark/benchmark.h"
-#include "neuropods/multiprocess/shm_allocator.hh"
+#include "neuropod/multiprocess/shm_allocator.hh"
 
 #include <string.h>
 

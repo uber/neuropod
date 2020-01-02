@@ -4,12 +4,12 @@
 
 #pragma once
 
-#include "neuropods/backends/tensor_allocator.hh"
-#include "neuropods/internal/backend_registration.hh"
-#include "neuropods/internal/deleter.hh"
-#include "neuropods/internal/neuropod_loader.hh"
-#include "neuropods/internal/neuropod_tensor.hh"
-#include "neuropods/internal/tensor_types.hh"
+#include "neuropod/backends/tensor_allocator.hh"
+#include "neuropod/internal/backend_registration.hh"
+#include "neuropod/internal/deleter.hh"
+#include "neuropod/internal/neuropod_loader.hh"
+#include "neuropod/internal/neuropod_tensor.hh"
+#include "neuropod/internal/tensor_types.hh"
 
 #include <memory>
 #include <mutex>

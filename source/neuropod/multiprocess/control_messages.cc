@@ -2,7 +2,7 @@
 // Uber, Inc. (c) 2019
 //
 
-#include "neuropods/multiprocess/control_messages.hh"
+#include "neuropod/multiprocess/control_messages.hh"
 
 namespace neuropod
 {

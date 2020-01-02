@@ -4,10 +4,10 @@
 
 #pragma once
 
-#include "neuropods/backends/tensor_allocator.hh"
-#include "neuropods/internal/deleter.hh"
-#include "neuropods/internal/neuropod_tensor.hh"
-#include "neuropods/multiprocess/shm_allocator.hh"
+#include "neuropod/backends/tensor_allocator.hh"
+#include "neuropod/internal/deleter.hh"
+#include "neuropod/internal/neuropod_tensor.hh"
+#include "neuropod/multiprocess/shm_allocator.hh"
 
 #include <cassert>
 #include <chrono>

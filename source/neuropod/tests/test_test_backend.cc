@@ -3,9 +3,9 @@
 //
 
 #include "gtest/gtest.h"
-#include "neuropods/backends/test_backend/test_neuropod_backend.hh"
-#include "neuropods/internal/memory_utils.hh"
-#include "neuropods/neuropods.hh"
+#include "neuropod/backends/test_backend/test_neuropod_backend.hh"
+#include "neuropod/internal/memory_utils.hh"
+#include "neuropod/neuropod.hh"
 
 TEST(test_test_backend, init)
 {

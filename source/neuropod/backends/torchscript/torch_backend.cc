@@ -4,8 +4,8 @@
 
 #include "torch_backend.hh"
 
-#include "neuropods/backends/torchscript/type_utils.hh"
-#include "neuropods/internal/tensor_types.hh"
+#include "neuropod/backends/torchscript/type_utils.hh"
+#include "neuropod/internal/tensor_types.hh"
 
 #include <caffe2/core/macros.h>
 
