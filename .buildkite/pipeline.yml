@@ -23,8 +23,8 @@ steps:
           run: test-cpu-variant-tf-1_12_0-torch-1_1_0-py2_7
           config: docker-compose.test.yml
           env:
-            - NEUROPODS_CACHE_ACCESS_KEY
-            - NEUROPODS_CACHE_ACCESS_SECRET
+            - NEUROPOD_CACHE_ACCESS_KEY
+            - NEUROPOD_CACHE_ACCESS_SECRET
             - BUILDKITE
             - BUILDKITE_BRANCH
             - BUILDKITE_BUILD_NUMBER
@@ -59,8 +59,8 @@ steps:
           run: test-cpu-variant-tf-1_12_0-torch-1_1_0-py2_7
           config: docker-compose.test.yml
           env:
-            - NEUROPODS_CACHE_ACCESS_KEY
-            - NEUROPODS_CACHE_ACCESS_SECRET
+            - NEUROPOD_CACHE_ACCESS_KEY
+            - NEUROPOD_CACHE_ACCESS_SECRET
             - BUILDKITE
             - BUILDKITE_BRANCH
             - BUILDKITE_BUILD_NUMBER
@@ -95,8 +95,8 @@ steps:
           run: test-cpu-variant-tf-1_13_1-torch-1_2_0-py2_7
           config: docker-compose.test.yml
           env:
-            - NEUROPODS_CACHE_ACCESS_KEY
-            - NEUROPODS_CACHE_ACCESS_SECRET
+            - NEUROPOD_CACHE_ACCESS_KEY
+            - NEUROPOD_CACHE_ACCESS_SECRET
             - BUILDKITE
             - BUILDKITE_BRANCH
             - BUILDKITE_BUILD_NUMBER
@@ -131,8 +131,8 @@ steps:
           run: test-cpu-variant-tf-1_14_0-torch-1_3_0_dev20190820-py2_7
           config: docker-compose.test.yml
           env:
-            - NEUROPODS_CACHE_ACCESS_KEY
-            - NEUROPODS_CACHE_ACCESS_SECRET
+            - NEUROPOD_CACHE_ACCESS_KEY
+            - NEUROPOD_CACHE_ACCESS_SECRET
             - BUILDKITE
             - BUILDKITE_BRANCH
             - BUILDKITE_BUILD_NUMBER
@@ -167,8 +167,8 @@ steps:
           run: test-cpu-variant-tf-1_15_0-torch-1_3_0-py2_7
           config: docker-compose.test.yml
           env:
-            - NEUROPODS_CACHE_ACCESS_KEY
-            - NEUROPODS_CACHE_ACCESS_SECRET
+            - NEUROPOD_CACHE_ACCESS_KEY
+            - NEUROPOD_CACHE_ACCESS_SECRET
             - BUILDKITE
             - BUILDKITE_BRANCH
             - BUILDKITE_BUILD_NUMBER
@@ -203,8 +203,8 @@ steps:
           run: test-cpu-variant-tf-1_12_0-torch-1_1_0-py3
           config: docker-compose.test.yml
           env:
-            - NEUROPODS_CACHE_ACCESS_KEY
-            - NEUROPODS_CACHE_ACCESS_SECRET
+            - NEUROPOD_CACHE_ACCESS_KEY
+            - NEUROPOD_CACHE_ACCESS_SECRET
             - BUILDKITE
             - BUILDKITE_BRANCH
             - BUILDKITE_BUILD_NUMBER
@@ -239,8 +239,8 @@ steps:
           run: test-cpu-variant-tf-1_13_1-torch-1_2_0-py3
           config: docker-compose.test.yml
           env:
-            - NEUROPODS_CACHE_ACCESS_KEY
-            - NEUROPODS_CACHE_ACCESS_SECRET
+            - NEUROPOD_CACHE_ACCESS_KEY
+            - NEUROPOD_CACHE_ACCESS_SECRET
             - BUILDKITE
             - BUILDKITE_BRANCH
             - BUILDKITE_BUILD_NUMBER
@@ -275,8 +275,8 @@ steps:
           run: test-cpu-variant-tf-1_14_0-torch-1_3_0_dev20190820-py3
           config: docker-compose.test.yml
           env:
-            - NEUROPODS_CACHE_ACCESS_KEY
-            - NEUROPODS_CACHE_ACCESS_SECRET
+            - NEUROPOD_CACHE_ACCESS_KEY
+            - NEUROPOD_CACHE_ACCESS_SECRET
             - BUILDKITE
             - BUILDKITE_BRANCH
             - BUILDKITE_BUILD_NUMBER
@@ -311,8 +311,8 @@ steps:
           run: test-cpu-variant-tf-1_15_0-torch-1_3_0-py3
           config: docker-compose.test.yml
           env:
-            - NEUROPODS_CACHE_ACCESS_KEY
-            - NEUROPODS_CACHE_ACCESS_SECRET
+            - NEUROPOD_CACHE_ACCESS_KEY
+            - NEUROPOD_CACHE_ACCESS_SECRET
             - BUILDKITE
             - BUILDKITE_BRANCH
             - BUILDKITE_BUILD_NUMBER
@@ -347,8 +347,8 @@ steps:
           run: test-gpu-variant-tf-1_12_0-torch-1_1_0-py2_7
           config: docker-compose.test.yml
           env:
-            - NEUROPODS_CACHE_ACCESS_KEY
-            - NEUROPODS_CACHE_ACCESS_SECRET
+            - NEUROPOD_CACHE_ACCESS_KEY
+            - NEUROPOD_CACHE_ACCESS_SECRET
             - BUILDKITE
             - BUILDKITE_BRANCH
             - BUILDKITE_BUILD_NUMBER
@@ -383,8 +383,8 @@ steps:
           run: test-gpu-variant-tf-1_13_1-torch-1_2_0-py2_7
           config: docker-compose.test.yml
           env:
-            - NEUROPODS_CACHE_ACCESS_KEY
-            - NEUROPODS_CACHE_ACCESS_SECRET
+            - NEUROPOD_CACHE_ACCESS_KEY
+            - NEUROPOD_CACHE_ACCESS_SECRET
             - BUILDKITE
             - BUILDKITE_BRANCH
             - BUILDKITE_BUILD_NUMBER
@@ -419,8 +419,8 @@ steps:
           run: test-gpu-variant-tf-1_14_0-torch-1_3_0_dev20190820-py2_7
           config: docker-compose.test.yml
           env:
-            - NEUROPODS_CACHE_ACCESS_KEY
-            - NEUROPODS_CACHE_ACCESS_SECRET
+            - NEUROPOD_CACHE_ACCESS_KEY
+            - NEUROPOD_CACHE_ACCESS_SECRET
             - BUILDKITE
             - BUILDKITE_BRANCH
             - BUILDKITE_BUILD_NUMBER
@@ -455,8 +455,8 @@ steps:
           run: test-gpu-variant-tf-1_15_0-torch-1_3_0-py2_7
           config: docker-compose.test.yml
           env:
-            - NEUROPODS_CACHE_ACCESS_KEY
-            - NEUROPODS_CACHE_ACCESS_SECRET
+            - NEUROPOD_CACHE_ACCESS_KEY
+            - NEUROPOD_CACHE_ACCESS_SECRET
             - BUILDKITE
             - BUILDKITE_BRANCH
             - BUILDKITE_BUILD_NUMBER
@@ -491,8 +491,8 @@ steps:
           run: test-gpu-variant-tf-1_12_0-torch-1_1_0-py3
           config: docker-compose.test.yml
           env:
-            - NEUROPODS_CACHE_ACCESS_KEY
-            - NEUROPODS_CACHE_ACCESS_SECRET
+            - NEUROPOD_CACHE_ACCESS_KEY
+            - NEUROPOD_CACHE_ACCESS_SECRET
             - BUILDKITE
             - BUILDKITE_BRANCH
             - BUILDKITE_BUILD_NUMBER
@@ -527,8 +527,8 @@ steps:
           run: test-gpu-variant-tf-1_13_1-torch-1_2_0-py3
           config: docker-compose.test.yml
           env:
-            - NEUROPODS_CACHE_ACCESS_KEY
-            - NEUROPODS_CACHE_ACCESS_SECRET
+            - NEUROPOD_CACHE_ACCESS_KEY
+            - NEUROPOD_CACHE_ACCESS_SECRET
             - BUILDKITE
             - BUILDKITE_BRANCH
             - BUILDKITE_BUILD_NUMBER
@@ -563,8 +563,8 @@ steps:
           run: test-gpu-variant-tf-1_14_0-torch-1_3_0_dev20190820-py3
           config: docker-compose.test.yml
           env:
-            - NEUROPODS_CACHE_ACCESS_KEY
-            - NEUROPODS_CACHE_ACCESS_SECRET
+            - NEUROPOD_CACHE_ACCESS_KEY
+            - NEUROPOD_CACHE_ACCESS_SECRET
             - BUILDKITE
             - BUILDKITE_BRANCH
             - BUILDKITE_BUILD_NUMBER
@@ -599,8 +599,8 @@ steps:
           run: test-gpu-variant-tf-1_15_0-torch-1_3_0-py3
           config: docker-compose.test.yml
           env:
-            - NEUROPODS_CACHE_ACCESS_KEY
-            - NEUROPODS_CACHE_ACCESS_SECRET
+            - NEUROPOD_CACHE_ACCESS_KEY
+            - NEUROPOD_CACHE_ACCESS_SECRET
             - BUILDKITE
             - BUILDKITE_BRANCH
             - BUILDKITE_BUILD_NUMBER

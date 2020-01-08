@@ -25,11 +25,11 @@ pushd python
 
 # Run black
 python ../../build/ci/set_status.py --context "lint/black" --description "Black Python Formatting Checks" \
-    black --check -t py27 -t py35 -t py36 --diff neuropods
+    black --check -t py27 -t py35 -t py36 --diff neuropod
 
 # Run flake8
 python ../../build/ci/set_status.py --context "lint/flake8" --description "flake8 Python Style Checks" \
-    flake8 neuropods
+    flake8 neuropod
 
 popd
 popd

@@ -1,6 +1,6 @@
-# Building Neuropods
+# Building Neuropod
 
-Neuropods uses [Bazel](https://bazel.build/) as a build system.
+Neuropod uses [Bazel](https://bazel.build/) as a build system.
 
 There are a few ways to build the project:
 
@@ -64,13 +64,13 @@ In order to debug and/or experiment, it may be useful to build interactively wit
 
 ## Tests
 
-Neuropods has a set of tests implemented in C++ and a set of tests implemented in Python. Test coverage is described below:
+Neuropod has a set of tests implemented in C++ and a set of tests implemented in Python. Test coverage is described below:
 
 | | Location | Covers C++ Library | Covers Python Library |
 | --- | --- | :---: | :---: |
-| C++ Tests | `source/neuropods/tests/*` | x |  |
-| Python Tests | `source/neuropods/python/tests/test_*` | x | x |
-| GPU-only Python Tests | `source/neuropods/python/tests/gpu_test_*` | x | x |
+| C++ Tests | `source/neuropod/tests/*` | x |  |
+| Python Tests | `source/neuropod/python/tests/test_*` | x | x |
+| GPU-only Python Tests | `source/neuropod/python/tests/gpu_test_*` | x | x |
 
 The Python tests run against both the Python and C++ libraries by using python bindings. This means that many tests only need to be written in Python.
 

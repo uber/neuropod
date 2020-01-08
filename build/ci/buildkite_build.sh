@@ -7,9 +7,9 @@ sudo apt-get install -y nodejs
 npm install -g bazels3cache
 
 # Start the S3 build cache
-export AWS_ACCESS_KEY_ID=$NEUROPODS_CACHE_ACCESS_KEY
-export AWS_SECRET_ACCESS_KEY=$NEUROPODS_CACHE_ACCESS_SECRET
-bazels3cache --bucket=neuropods-build-cache
+export AWS_ACCESS_KEY_ID=$NEUROPOD_CACHE_ACCESS_KEY
+export AWS_SECRET_ACCESS_KEY=$NEUROPOD_CACHE_ACCESS_SECRET
+bazels3cache --bucket=neuropod-build-cache
 
 # Build with the remote cache
 ./build/build.sh --remote_http_cache=http://localhost:7777

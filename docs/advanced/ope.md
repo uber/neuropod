@@ -1,16 +1,16 @@
 # Out-of-Process Execution
 
-Neuropods can run models in different processes using an optimized shared memory implementation with extremely low overhead (~100 to 500 microseconds).
+Neuropod can run models in different processes using an optimized shared memory implementation with extremely low overhead (~100 to 500 microseconds).
 
 
 To run a model in another process, modify your loading code as follows:
 
 ```cpp
-#include <neuropods/multiprocess/multiprocess.hh>
+#include <neuropod/multiprocess/multiprocess.hh>
 
 ...
 
-auto neuropod = neuropods::load_neuropod_in_new_process(neuropod_path);
+auto neuropod = neuropod::load_neuropod_in_new_process(neuropod_path);
 ```
 
 Nothing else should need to change.

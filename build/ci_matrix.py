@@ -45,7 +45,7 @@ services:
   test-base:
     build:
       context: .
-      dockerfile: build/neuropods.dockerfile
+      dockerfile: build/neuropod.dockerfile
       target: neuropod-base
     privileged: true
 
@@ -53,7 +53,7 @@ services:
     extends: test-base
     build:
       args:
-        NEUROPODS_IS_GPU: "true"
+        NEUROPOD_IS_GPU: "true"
     runtime: nvidia
 
 {}
@@ -106,7 +106,7 @@ for platform, py_version, framework_version in itertools.product(PLATFORMS, PY_V
         # This is a Travis CI build
         travis_matrix.extend([
         "    - os: osx\n",
-        "      env: NEUROPODS_TENSORFLOW_VERSION={} NEUROPODS_TORCH_VERSION={} NEUROPODS_PYTHON_BINARY={}\n".format(tf_version, torch_version, py_binary),
+        "      env: NEUROPOD_TENSORFLOW_VERSION={} NEUROPOD_TORCH_VERSION={} NEUROPOD_PYTHON_BINARY={}\n".format(tf_version, torch_version, py_binary),
         "\n",
         ])
 
@@ -119,10 +119,10 @@ for platform, py_version, framework_version in itertools.product(PLATFORMS, PY_V
         "    extends: test-{}\n".format("gpu" if is_gpu else "base"),
         "    build:\n",
         "      args:\n",
-        "        NEUROPODS_CUDA_VERSION: {}\n".format(framework_version["cuda"]) if is_gpu else "",
-        "        NEUROPODS_TENSORFLOW_VERSION: {}\n".format(tf_version),
-        "        NEUROPODS_TORCH_VERSION: {}\n".format(torch_version),
-        "        NEUROPODS_PYTHON_BINARY: {}\n".format(py_binary),
+        "        NEUROPOD_CUDA_VERSION: {}\n".format(framework_version["cuda"]) if is_gpu else "",
+        "        NEUROPOD_TENSORFLOW_VERSION: {}\n".format(tf_version),
+        "        NEUROPOD_TORCH_VERSION: {}\n".format(torch_version),
+        "        NEUROPOD_PYTHON_BINARY: {}\n".format(py_binary),
         "\n",
         ])
 
@@ -141,8 +141,8 @@ for platform, py_version, framework_version in itertools.product(PLATFORMS, PY_V
         "          run: {}\n".format(variant_name),
         "          config: docker-compose.test.yml\n",
         "          env:\n",
-        "            - NEUROPODS_CACHE_ACCESS_KEY\n",
-        "            - NEUROPODS_CACHE_ACCESS_SECRET\n",
+        "            - NEUROPOD_CACHE_ACCESS_KEY\n",
+        "            - NEUROPOD_CACHE_ACCESS_SECRET\n",
         "            - BUILDKITE\n",
         "            - BUILDKITE_BRANCH\n",
         "            - BUILDKITE_BUILD_NUMBER\n",

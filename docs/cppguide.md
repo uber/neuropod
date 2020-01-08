@@ -20,7 +20,7 @@ where `PATH_TO_MY_MODEL` is the path to a model exported using one of the packag
 You can also provide runtime options when loading a model. Currently, the only option is `visible_device`.
 
 ```cpp
-neuropods::RuntimeOptions opts;
+neuropod::RuntimeOptions opts;
 
 // Set the visible device to the first GPU
 opts.visible_device = Device::GPU0;
@@ -28,7 +28,7 @@ opts.visible_device = Device::GPU0;
 Neuropod neuropod(PATH_TO_MY_MODEL, opts);
 ```
 
-For more details, see [`RuntimeOptions`](https://github.com/uber/neuropods/blob/master/source/neuropods/neuropods.hh#L33)
+For more details, see [`RuntimeOptions`](https://github.com/uber/neuropods/blob/master/source/neuropod/neuropod.hh#L33)
 
 TODO(vip): Go into more detail on devices and usage
 
@@ -50,7 +50,7 @@ for (const auto &item : inputs)
 }
 ```
 
-For more details, see [`TensorSpec`](https://github.com/uber/neuropods/blob/master/source/neuropods/internal/config_utils.hh#L25)
+For more details, see [`TensorSpec`](https://github.com/uber/neuropods/blob/master/source/neuropod/internal/config_utils.hh#L25)
 
 ## Tensor Types
 
@@ -103,7 +103,7 @@ auto tensor = allocator->allocate_tensor<float>({1, 2, 3});
 You can also manually specify the type without using a templated function
 
 ```cpp
-auto tensor = allocator->allocate_tensor({1, 2, 3}, neuropods::FLOAT_TENSOR);
+auto tensor = allocator->allocate_tensor({1, 2, 3}, neuropod::FLOAT_TENSOR);
 ```
 
 To do something useful with these tensors, see the Interacting with Tensors section below.
@@ -112,7 +112,7 @@ TODO(vip): link
 
 ### From existing memory
 
-Neuropods provides a way to wrap existing memory and use it in a zero-copy way.
+Neuropod provides a way to wrap existing memory and use it in a zero-copy way.
 
 To do this, it needs four things:
 
@@ -122,7 +122,7 @@ To do this, it needs four things:
     - Note: this should be 64 byte aligned
 - A deleter function
 
-This deleter function is called once Neuropods (and the underlying libraries) are done using this data. Until this function is called, it is not safe to deallocate the data.
+This deleter function is called once Neuropod (and the underlying libraries) are done using this data. Until this function is called, it is not safe to deallocate the data.
 
 It is very important to pass in a correct deleter to make sure the memory doesn't get prematurely deallocated. Some examples are below.
 
@@ -337,7 +337,7 @@ auto accessor = tensor->accessor<2>();
 accessor[5][3] = 1.0;
 ```
 
-Accessors are very efficient and are [comparable to raw pointer](https://github.com/uber/neuropods/blob/master/source/neuropods/tests/benchmark_accessor.cc) operations during an optimized build.
+Accessors are very efficient and are [comparable to raw pointer](https://github.com/uber/neuropods/blob/master/source/neuropod/tests/benchmark_accessor.cc) operations during an optimized build.
 
 
 #### Get the dimensions of a tensor
@@ -439,14 +439,14 @@ All built-in `NeuropodValue` types are serializable. Furthermore, `NeuropodValue
 // stringstream in this example
 std::stringstream ss;
 
-neuropods::NeuropodValueMap data = ...;
-neuropods::serialize(my_stream, data);
+neuropod::NeuropodValueMap data = ...;
+neuropod::serialize(my_stream, data);
 ```
 
 Similarly, deserializing is just as easy.
 
 ```cpp
-auto deserialized = neuropods::deserialize<neuropods::NeuropodValueMap>(ss, allocator);
+auto deserialized = neuropod::deserialize<neuropod::NeuropodValueMap>(ss, allocator);
 ```
 
 !!! note

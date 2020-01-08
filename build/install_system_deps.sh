@@ -2,7 +2,7 @@
 set -e
 
 # Default to python 2 if not set
-NEUROPODS_PYTHON_BINARY="${NEUROPODS_PYTHON_BINARY:-python}"
+NEUROPOD_PYTHON_BINARY="${NEUROPOD_PYTHON_BINARY:-python}"
 
 if [[ $(uname -s) == 'Darwin' ]]; then
     # Install bazel
@@ -21,7 +21,7 @@ else
     # Install bazel deps, pip, and python dev
     # Install g++-4.8 for TensorFlow custom op builds
     sudo apt-get update
-    sudo apt-get install -y pkg-config zip g++ zlib1g-dev unzip python3 curl wget ${NEUROPODS_PYTHON_BINARY}-dev ${NEUROPODS_PYTHON_BINARY}-pip g++-4.8
+    sudo apt-get install -y pkg-config zip g++ zlib1g-dev unzip python3 curl wget ${NEUROPOD_PYTHON_BINARY}-dev ${NEUROPOD_PYTHON_BINARY}-pip g++-4.8
 
     # Install bazel
     tmpdir=$(mktemp -d)

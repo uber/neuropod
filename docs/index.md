@@ -1,12 +1,12 @@
-# Neuropods
+# Neuropod
 
-## What is Neuropods?
+## What is Neuropod?
 
-Neuropods is a library that provides a uniform interface to run deep learning models from multiple frameworks in C++ and Python.
+Neuropod is a library that provides a uniform interface to run deep learning models from multiple frameworks in C++ and Python.
 
 It currently supports TensorFlow, PyTorch, TorchScript, and Keras.
 
-## Why use Neuropods?
+## Why use Neuropod?
 
 #### Run models from any supported framework using one API
 
@@ -83,7 +83,7 @@ If you have several models that take in a similar set of inputs, you can build a
 - Fully self-contained models (including custom ops)
 - Efficient zero-copy implementation
 - Well-tested primitives
-    - Neuropods is automatically tested on 24 different platforms
+    - Neuropod is automatically tested on 24 different platforms
 
 - Model isolation with out-of-process execution
     - Use multiple different versions of frameworks in the same application
