@@ -11,9 +11,9 @@ GH_STATUS_TOKEN = os.getenv("GH_STATUS_TOKEN")
 GIT_COMMIT = os.getenv("TRAVIS_COMMIT", os.getenv("BUILDKITE_COMMIT"))
 
 def set_status(sha, status):
-    # https://api.github.com/repos/uber/neuropods/statuses/{sha}
+    # https://api.github.com/repos/uber/neuropod/statuses/{sha}
     status_id = requests.post(
-        'https://api.github.com/repos/uber/neuropods/statuses/{}'.format(sha),
+        'https://api.github.com/repos/uber/neuropod/statuses/{}'.format(sha),
         headers = {"Authorization": "token {}".format(GH_STATUS_TOKEN)},
         json = status
     ).json()["id"]
