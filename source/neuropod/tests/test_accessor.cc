@@ -98,3 +98,37 @@ TEST(test_accessor, valid_dims)
     // tensor1 has 2 dims, not 3
     EXPECT_THROW(tensor1->accessor<3>(), std::runtime_error);
 }
+
+TEST(test_accessor, test_string_read)
+{
+    neuropod::TestNeuropodBackend backend;
+    auto                          allocator = backend.get_tensor_allocator();
+
+    auto tensor = allocator->allocate_tensor<std::string>({3, 5});
+
+    // Manually set data
+    {
+        std::vector<std::string> to_set;
+        for (int i = 0; i < 3; i++)
+        {
+            for (int j = 0; j < 5; j++)
+            {
+                to_set.emplace_back(std::to_string(i * 5 + j));
+            }
+        }
+
+        tensor->set(to_set);
+    };
+
+    // Read with an accessor
+    const auto accessor = tensor->accessor<2>();
+    {
+        for (int i = 0; i < 3; i++)
+        {
+            for (int j = 0; j < 5; j++)
+            {
+                EXPECT_EQ(accessor[i][j], std::to_string(i * 5 + j));
+            }
+        }
+    };
+}
