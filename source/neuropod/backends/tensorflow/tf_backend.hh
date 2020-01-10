@@ -28,11 +28,18 @@ class TensorflowNeuropodBackend : public NeuropodBackendWithDefaultAllocator<Ten
 private:
     std::unique_ptr<tensorflow::Session> session_;
 
+    // Cached access to callable handles
+    std::unordered_map<std::string, int64_t> callable_handle_cache_;
+
     // Map from a neuropod node name to the appropriate node in the TF graph
     std::unordered_map<std::string, std::string> node_name_mapping_;
 
     // The outputs of the model. This is from the neuropod model config
     std::vector<std::string> output_names_;
+
+    // Get a callable given feeds and fetches
+    // This will try to use a cached one if possible
+    int64_t get_callable(const std::vector<std::string> &tensor_feeds, const std::vector<std::string> &tensor_fetches);
 
 public:
     explicit TensorflowNeuropodBackend(const std::string &           neuropod_path,
