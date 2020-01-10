@@ -7,120 +7,150 @@
 namespace neuropod
 {
 
-// Forward declare TensorAccessor
-template <typename T, size_t N>
-class TensorAccessor;
-
 // An iterator type used by the accessors
-template <typename T, size_t N>
+// This is a simple utility class that acts as an iterator for any subscriptable class
+template <typename Accessor>
 class AccessorIterator
 {
 private:
-    TensorAccessor<T, N> *accessor_;
-    int64_t               index_;
+    Accessor *accessor_;
+    int64_t   index_;
 
 public:
-    AccessorIterator(TensorAccessor<T, N> *accessor, int64_t index = 0) : accessor_(accessor), index_(index) {}
+    AccessorIterator(Accessor *accessor, int64_t index = 0) : accessor_(accessor), index_(index) {}
 
-    AccessorIterator<T, N> &operator++()
+    AccessorIterator<Accessor> &operator++()
     {
         index_++;
         return *this;
     }
 
-    TensorAccessor<T, N - 1> operator*() { return (*accessor_)[index_]; }
+    // * returns the same type as indexing using the accessor directly
+    // We're using `auto` and `decltype` here so we can support multiple accessor types
+    // in a generic way.
+    auto operator*() const -> decltype((*accessor_)[index_]) { return (*accessor_)[index_]; }
 
-    bool operator!=(const AccessorIterator<T, N> &other)
+    bool operator!=(const AccessorIterator<Accessor> &other) const
     {
         return index_ != other.index_ || accessor_ != other.accessor_;
     }
 };
 
-// A const iterator type used by the const accessors
-template <typename T, size_t N>
-class AccessorConstIterator
+// Utility function to create an iterator
+template <typename T>
+inline AccessorIterator<T> get_iterator(T *accessor, size_t index = 0)
 {
-private:
-    const TensorAccessor<T, N> *accessor_;
-    int64_t                     index_;
+    return AccessorIterator<T>(accessor, index);
+}
 
-public:
-    AccessorConstIterator(const TensorAccessor<T, N> *accessor, int64_t index = 0) : accessor_(accessor), index_(index)
-    {
-    }
-
-    AccessorConstIterator<T, N> &operator++()
-    {
-        index_++;
-        return *this;
-    }
-
-    const TensorAccessor<T, N - 1> operator*() { return (*accessor_)[index_]; }
-
-    bool operator!=(const AccessorConstIterator<T, N> &other)
-    {
-        return index_ != other.index_ || accessor_ != other.accessor_;
-    }
-};
-
-// Inspired by https://github.com/pytorch/pytorch/blob/master/aten/src/ATen/core/TensorAccessor.h
-template <typename T, size_t N>
+// `TensorAccessor`s are used to access data in a NeuropodTensor. They are very efficient and are comparable
+// to raw pointer operations during an optimized build (see `benchmark_accessor.cc`). They can be used as follows:
+//
+//     auto tensor = allocator->allocate_tensor<float>({6, 6});
+//
+//     // 2 is the number of dimensions of this tensor
+//     auto accessor = tensor->accessor<2>();
+//     accessor[5][3] = 1.0;
+//
+// Accessors are implemented using recursive templates and work by computing the correct offsets into the
+// tensor's underlying buffer. To do this, they keep track of 4 things: the dimensions of the tensor, the strides
+// of the tensor, the current accessor's starting offset into the tensor's buffer, and a pointer to the tensor's
+// underlying buffer.
+//
+// Note that TensorAccessors are only valid as long as the accessed NeuropodTensor is still in scope
+template <typename Container, size_t N>
 class TensorAccessor
 {
 private:
-    T *            data_;
+    // `data_` is a container that supports the subscript operator ([]) to access data.
+    // For numeric tensor types, this is usually a pointer to a tensor's underlying buffer
+    Container data_;
+
+    // `dims_` points to an array containing the dimensions of the tensor
     const int64_t *dims_;
+
+    // `strides_` points to an array containing the strides of a tensor
     const int64_t *strides_;
 
+    // `offset_` is the offset into `data_` where this accessor starts
+    const int64_t offset_;
+
 public:
-    TensorAccessor(T *data, const int64_t *dims, const int64_t *strides) : data_(data), dims_(dims), strides_(strides)
+    TensorAccessor(Container data, const int64_t *dims, const int64_t *strides, int64_t offset = 0)
+        : data_(data), dims_(dims), strides_(strides), offset_(offset)
     {
     }
 
-    TensorAccessor<T, N - 1> operator[](int64_t i)
+    // Indexing into a N dimensional accessor returns an N - 1 dimensional accessor
+    const TensorAccessor<Container, N - 1> operator[](int64_t i) const
     {
-        return TensorAccessor<T, N - 1>(this->data_ + this->strides_[0] * i, this->dims_ + 1, this->strides_ + 1);
+        // This operator returns a TensorAccessor that accesses an `N - 1` dimensional tensor at index `i`
+        // of this TensorAccessor. To do this, we compute the correct offsets into `data_` and pass along the last
+        // `N - 1` elements in `dims_` and `strides_` to the new accessor. For example:
+        //
+        //     auto tensor = allocator->allocate_tensor<float>({3, 5});
+        //
+        //     // Not using `auto` for clarity on types
+        //     TensorAccessor<float *, 2> accessor = tensor->accessor();
+        //
+        //     // In this accessor:
+        //     // `data_` points to the tensor's underlying buffer
+        //     // `dims_` points to an array containing 3, 5
+        //     // `strides_` points to an array containing 5, 1
+        //     // `offset_` is 0
+        //     // This means that any indexing into this accessor indexes into the underlying buffer
+        //     // starting at `0` with a stride of `5`
+        //
+        //     // Since `N` (in the template args) is > 1, this accessor returns another accessor when indexed into
+        //     TensorAccessor<float *, 1> subaccessor = accessor[2];
+        //
+        //     // In this accessor:
+        //     // `data_` points to the tensor's underlying buffer
+        //     // `dims_` points to an array containing 5
+        //     // `strides_` points to an array containing 1
+        //     // `offset_` is 10
+        //     // This means that any indexing into this accessor indexes into the underlying buffer
+        //     // starting at `10` with a stride of `1`
+        //
+        //     // This is equivalent to an index of 11 in the underlying buffer (or the 12th item)
+        //     float item = subaccessor[1];
+        //
+        //     // Same as this
+        //     float same_item = accessor[2][1];
+        //
+        //     // Same as this
+        //     float also_same = *(tensor->get_raw_data_ptr() + 11);
+        //
+        return TensorAccessor<Container, N - 1>(data_, dims_ + 1, strides_ + 1, offset_ + strides_[0] * i);
     }
 
-    const TensorAccessor<T, N - 1> operator[](int64_t i) const
-    {
-        return TensorAccessor<T, N - 1>(this->data_ + this->strides_[0] * i, this->dims_ + 1, this->strides_ + 1);
-    }
-
-    AccessorIterator<T, N> begin() { return AccessorIterator<T, N>(this); }
-
-    AccessorConstIterator<T, N> begin() const { return AccessorConstIterator<T, N>(this); }
-
-    AccessorIterator<T, N> end() { return AccessorIterator<T, N>(this, dims_[0]); }
-
-    AccessorConstIterator<T, N> end() const { return AccessorConstIterator<T, N>(this, dims_[0]); }
+    // begin and end (to support range-based for loops)
+    auto begin() const -> decltype(get_iterator(this)) { return get_iterator(this); }
+    auto end() const -> decltype(get_iterator(this, dims_[0])) { return get_iterator(this, dims_[0]); }
 };
 
 // Specialization for base case
-template <typename T>
-class TensorAccessor<T, 1>
+template <typename Container>
+class TensorAccessor<Container, 1>
 {
 private:
-    T *            data_;
+    Container      data_;
     const int64_t *dims_;
     const int64_t *strides_;
+    const int64_t  offset_;
 
 public:
-    TensorAccessor(T *data, const int64_t *dims, const int64_t *strides) : data_(data), dims_(dims), strides_(strides)
+    TensorAccessor(Container data, const int64_t *dims, const int64_t *strides, int64_t offset = 0)
+        : data_(data), dims_(dims), strides_(strides), offset_(offset)
     {
     }
 
-    T &operator[](int64_t i) { return this->data_[i]; }
+    // Data access
+    auto operator[](size_t i) const -> decltype(data_[offset_ + i]) { return data_[offset_ + i]; }
 
-    const T &operator[](int64_t i) const { return this->data_[i]; }
-
-    const T *begin() const { return &this->data_[0]; }
-
-    T *begin() { return &this->data_[0]; }
-
-    const T *end() const { return &this->data_[this->dims_[0]]; }
-
-    T *end() { return &this->data_[this->dims_[0]]; }
+    // begin and end (to support range-based for loops)
+    auto begin() const -> decltype(get_iterator(this)) { return get_iterator(this); }
+    auto end() const -> decltype(get_iterator(this, dims_[0])) { return get_iterator(this, dims_[0]); }
 };
 
 } // namespace neuropod

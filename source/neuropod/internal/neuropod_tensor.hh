@@ -261,19 +261,19 @@ public:
     const T *get_raw_data_ptr() const { return static_cast<const T *>(get_untyped_data_ptr()); }
 
     template <size_t N>
-    TensorAccessor<T, N> accessor()
+    TensorAccessor<T *, N> accessor()
     {
         static_assert(N > 0, "`accessor()` is used for indexing a tensors, for scalars use `as_scalar()`");
         this->assure_rank(N);
-        return TensorAccessor<T, N>(get_raw_data_ptr(), get_dims().data(), get_strides().data());
+        return TensorAccessor<T *, N>(get_raw_data_ptr(), get_dims().data(), get_strides().data());
     }
 
     template <size_t N>
-    TensorAccessor<const T, N> accessor() const
+    TensorAccessor<const T *, N> accessor() const
     {
         static_assert(N > 0, "`accessor()` is used for indexing tensors, for scalars use `as_scalar()`");
         this->assure_rank(N);
-        return TensorAccessor<const T, N>(get_raw_data_ptr(), get_dims().data(), get_strides().data());
+        return TensorAccessor<const T *, N>(get_raw_data_ptr(), get_dims().data(), get_strides().data());
     }
 
     T &as_scalar() { return NeuropodTensor::as_scalar<T>(); }
