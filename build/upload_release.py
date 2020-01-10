@@ -52,20 +52,20 @@ def upload():
         upload_package(whl_path, release_id, fname, content_type="application/zip")
 
 def get_release_id(tag_name):
-    # https://api.github.com/repos/uber/neuropods/releases/tags/{tag_name}
+    # https://api.github.com/repos/uber/neuropod/releases/tags/{tag_name}
     release_id = requests.get(
-        'https://api.github.com/repos/uber/neuropods/releases/tags/{}'.format(tag_name),
+        'https://api.github.com/repos/uber/neuropod/releases/tags/{}'.format(tag_name),
         headers={"Authorization": "token {}".format(GH_UPLOAD_TOKEN)},
     ).json()["id"]
     print("Release ID: {}".format(release_id))
     return release_id
 
 def upload_package(local_path, release_id, asset_filename, content_type="application/gzip"):
-    # POST https://uploads.github.com/repos/uber/neuropods/releases/{release_id}/assets?name={asset_filename}
+    # POST https://uploads.github.com/repos/uber/neuropod/releases/{release_id}/assets?name={asset_filename}
     print("Uploading {}...".format(asset_filename))
     with open(local_path, 'rb') as f:
         r = requests.post(
-            "https://uploads.github.com/repos/uber/neuropods/releases/{}/assets?name={}".format(release_id, asset_filename),
+            "https://uploads.github.com/repos/uber/neuropod/releases/{}/assets?name={}".format(release_id, asset_filename),
             headers={
                 "Authorization": "token {}".format(GH_UPLOAD_TOKEN),
                 "Content-Type": content_type,

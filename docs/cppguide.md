@@ -28,7 +28,7 @@ opts.visible_device = Device::GPU0;
 Neuropod neuropod(PATH_TO_MY_MODEL, opts);
 ```
 
-For more details, see [`RuntimeOptions`](https://github.com/uber/neuropods/blob/master/source/neuropod/neuropod.hh#L33)
+For more details, see [`RuntimeOptions`](https://github.com/uber/neuropod/blob/master/source/neuropod/neuropod.hh#L33)
 
 TODO(vip): Go into more detail on devices and usage
 
@@ -50,7 +50,7 @@ for (const auto &item : inputs)
 }
 ```
 
-For more details, see [`TensorSpec`](https://github.com/uber/neuropods/blob/master/source/neuropod/internal/config_utils.hh#L25)
+For more details, see [`TensorSpec`](https://github.com/uber/neuropod/blob/master/source/neuropod/internal/config_utils.hh#L25)
 
 ## Tensor Types
 
@@ -337,7 +337,7 @@ auto accessor = tensor->accessor<2>();
 accessor[5][3] = 1.0;
 ```
 
-Accessors are very efficient and are [comparable to raw pointer](https://github.com/uber/neuropods/blob/master/source/neuropod/tests/benchmark_accessor.cc) operations during an optimized build.
+Accessors are very efficient and are [comparable to raw pointer](https://github.com/uber/neuropod/blob/master/source/neuropod/tests/benchmark_accessor.cc) operations during an optimized build.
 
 
 #### Get the dimensions of a tensor

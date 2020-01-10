@@ -105,7 +105,7 @@ to make sure that we don't accidentally break workflows of users not using docke
 
 This is a total of 25 builds (4 * 2 * 3 + 1) running in CI
 
-The current build matrix is defined in [build/ci_matrix.py](https://github.com/uber/neuropods/blob/master/build/ci_matrix.py#L73-L91)
+The current build matrix is defined in [build/ci_matrix.py](https://github.com/uber/neuropod/blob/master/build/ci_matrix.py#L73-L91)
 
 ### Future additions
 
