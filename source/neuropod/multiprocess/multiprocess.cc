@@ -15,6 +15,7 @@
 #include <boost/uuid/uuid_generators.hpp>
 #include <boost/uuid/uuid_io.hpp>
 #include <sys/wait.h>
+#include <tbb/task_group.h>
 
 #include <vector>
 
@@ -46,10 +47,55 @@ pid_t start_worker_process(const std::string &control_queue_name)
     return child_pid;
 }
 
+// This is used to asynchronously cleanup control channels
+// and lets us avoid synchronously waiting for worker processes to terminate
+class WorkerProcessCleanupManager
+{
+private:
+    tbb::task_group async_cleanup_group_;
+
+public:
+    WorkerProcessCleanupManager() = default;
+    ~WorkerProcessCleanupManager() { async_cleanup_group_.wait(); }
+
+    void cleanup(const std::string &control_queue_name, pid_t child_pid)
+    {
+        async_cleanup_group_.run([control_queue_name, child_pid] {
+            // Wait for it and make sure it exited properly
+            int status;
+            waitpid(child_pid, &status, 0);
+            if (WIFEXITED(status))
+            {
+                const auto exit_code = WEXITSTATUS(status);
+                if (exit_code != 0)
+                {
+                    // We don't want to throw an error here so we'll just log for now
+                    std::cerr << "Worker process exited abnormally. Exit code: " << exit_code << std::endl;
+                }
+            }
+            else if (WIFSIGNALED(status))
+            {
+                // We don't want to throw an error here so we'll just log for now
+                std::cerr << "Worker process exited abnormally. Was terminated by signal: " << WTERMSIG(status)
+                          << std::endl;
+            }
+            else
+            {
+                // We don't want to throw an error here so we'll just log for now
+                std::cerr << "Worker process exited abnormally." << std::endl;
+            }
+
+            // Delete the control channels
+            IPCControlChannel::cleanup(control_queue_name);
+        });
+    }
+};
+
+WorkerProcessCleanupManager worker_process_cleanup_manager;
+
 // Note: we don't register this with the library as a backend because it is not
 // a backend in the normal sense. It is only used here for out of process
 // execution
-
 class MultiprocessNeuropodBackend : public NeuropodBackendWithDefaultAllocator<SHMNeuropodTensor>
 {
 private:
@@ -100,32 +146,8 @@ public:
             // Ask the child process to shutdown
             control_channel_.send_message(SHUTDOWN);
 
-            // Wait for it and make sure it exited properly
-            int status;
-            waitpid(child_pid_, &status, 0);
-            if (WIFEXITED(status))
-            {
-                const auto exit_code = WEXITSTATUS(status);
-                if (exit_code != 0)
-                {
-                    // We don't want to throw an error in the destructor so we'll just log for now
-                    std::cerr << "Worker process exited abnormally. Exit code: " << exit_code << std::endl;
-                }
-            }
-            else if (WIFSIGNALED(status))
-            {
-                // We don't want to throw an error in the destructor so we'll just log for now
-                std::cerr << "Worker process exited abnormally. Was terminated by signal: " << WTERMSIG(status)
-                          << std::endl;
-            }
-            else
-            {
-                // We don't want to throw an error in the destructor so we'll just log for now
-                std::cerr << "Worker process exited abnormally." << std::endl;
-            }
-
-            // Delete the control channels
-            control_channel_.cleanup();
+            // Asynchronously cleanup the control queues after the worker process shuts down
+            worker_process_cleanup_manager.cleanup(control_channel_.get_control_queue_name(), child_pid_);
         }
     }
 

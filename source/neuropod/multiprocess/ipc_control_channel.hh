@@ -72,6 +72,12 @@ public:
 
     // Cleanup the message queues
     void cleanup();
+
+    // Get the control queue name
+    std::string get_control_queue_name();
+
+    // Cleanup the message queues
+    static void cleanup(const std::string &control_queue_name);
 };
 
 } // namespace neuropod

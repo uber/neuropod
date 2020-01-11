@@ -5,6 +5,7 @@ set -e
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:`pwd`/bazel-bin/neuropod/backends/python_bridge/
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:`pwd`/bazel-bin/neuropod/backends/torchscript/
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:`pwd`/bazel-bin/neuropod/backends/tensorflow/
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:`pwd`/bazel-bin/neuropod/
 
 # The worker process for the multiprocess backend needs to be on the path
 export PATH=$PATH:`pwd`/bazel-bin/neuropod/multiprocess/

@@ -185,11 +185,21 @@ bool IPCControlChannel::recv_message(control_message &received, size_t timeout_m
     return successful_read;
 }
 
+std::string IPCControlChannel::get_control_queue_name()
+{
+    return control_queue_name_;
+}
+
 void IPCControlChannel::cleanup()
 {
+    IPCControlChannel::cleanup(control_queue_name_);
+}
+
+void IPCControlChannel::cleanup(const std::string &control_queue_name)
+{
     // Delete the control channels
-    ipc::message_queue::remove(("neuropod_" + control_queue_name_ + "_tw").c_str());
-    ipc::message_queue::remove(("neuropod_" + control_queue_name_ + "_fw").c_str());
+    ipc::message_queue::remove(("neuropod_" + control_queue_name + "_tw").c_str());
+    ipc::message_queue::remove(("neuropod_" + control_queue_name + "_fw").c_str());
 }
 
 } // namespace neuropod

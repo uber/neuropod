@@ -125,5 +125,8 @@ cc_library(
         "//neuropod/backends:neuropod_backend",
         "//neuropod/internal:deleter",
         "@boost_repo//:boost",
-    ],
+    ] + select({
+        "@bazel_tools//src/conditions:darwin": ["@tbb_mac_repo//:tbb"],
+        "//conditions:default": ["@tbb_linux_repo//:tbb"],
+    }),
 )

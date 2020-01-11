@@ -138,3 +138,19 @@ http_archive(
     url = "https://github.com/gabime/spdlog/archive/v1.4.2.zip",
     strip_prefix = "spdlog-1.4.2",
 )
+
+http_archive(
+    name = "tbb_linux_repo",
+    build_file = "@//deps:BUILD.tbb",
+    sha256 = "3b23e3ed546c76dbd371295afc6811dd150fab7ee7a63b0a21c89ffb5a1dd452",
+    url = "https://github.com/intel/tbb/releases/download/v2020.0/tbb-2020.0-lin.tgz",
+    strip_prefix = "tbb",
+)
+
+http_archive(
+    name = "tbb_mac_repo",
+    build_file = "@//deps:BUILD.tbb",
+    sha256 = "7133827638806a5eaf977c08999e861a9a6ad44ebc595c8c0d83198a7652b664",
+    url = "https://github.com/intel/tbb/releases/download/v2020.0/tbb-2020.0-mac.tgz",
+    strip_prefix = "tbb",
+)

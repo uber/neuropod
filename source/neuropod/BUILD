@@ -3,6 +3,7 @@
 #
 
 load("@bazel_tools//tools/build_defs/pkg:pkg.bzl", "pkg_tar")
+load("//bazel:copy_libs.bzl", "copy_libs")
 
 cc_library(
     name = "neuropod_hdrs",
@@ -39,7 +40,18 @@ cc_binary(
         "//neuropod/internal:tensor_serialization_impl",
         "//neuropod/multiprocess:multiprocess_impl",
         "//neuropod/serialization:serialization_impl",
-    ]
+    ],
+    data = [
+        ":copy_tbb"
+    ],
+)
+
+copy_libs(
+    name = "copy_tbb",
+    libs = select({
+        "@bazel_tools//src/conditions:darwin": "@tbb_mac_repo//:tbb_libs",
+        "//conditions:default": "@tbb_linux_repo//:tbb_libs",
+    }),
 )
 
 pkg_tar(
@@ -62,7 +74,10 @@ pkg_tar(
     package_dir = "lib/",
     srcs = [
         ":libneuropod.so",
-    ]
+    ] + select({
+        "@bazel_tools//src/conditions:darwin": ["@tbb_mac_repo//:tbb_libs"],
+        "//conditions:default": ["@tbb_linux_repo//:tbb_libs"],
+    }),
 )
 
 pkg_tar(
