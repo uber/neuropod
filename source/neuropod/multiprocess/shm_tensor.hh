@@ -115,6 +115,8 @@ public:
 
     ~SHMNeuropodTensor() = default;
 
+    void overwrite_type(TensorType type) { data_->tensor_type = type; }
+
     // Get a pointer to the underlying data
     void *get_untyped_data_ptr() { return data_->data; }
 
@@ -125,27 +127,106 @@ public:
 
 std::shared_ptr<NeuropodTensor> tensor_from_id(const SHMBlockID &block_id);
 
+inline std::vector<int64_t> copy_and_strip_last_dim(std::vector<int64_t> vec)
+{
+    vec.pop_back();
+    return vec;
+}
+
 // Specialization for strings
-// TODO(vip): implement
+namespace
+{
+
+// A struct that is used to represent elements in string tensors
+// See below for more detail
+struct __attribute__((__packed__)) string_wrapper
+{
+    // The length of the string (in bytes)
+    int64_t length;
+
+    // The string data
+    uint8_t data[];
+};
+
+} // namespace
+
+// TODO(vip): Optimize
 template <>
-class SHMNeuropodTensor<std::string> : public TypedNeuropodTensor<std::string>
+class SHMNeuropodTensor<std::string> : public TypedNeuropodTensor<std::string>, public NativeDataContainer<SHMBlockID>
 {
 private:
-    // The data contained in the tensor
-    std::vector<std::string> data_;
+    // We store N dimensional string tensors as N + 1 dimensional char tensors
+    // where the last dimension is the size of the max length string + 8 bytes
+    // The first 8 bytes are used to store the size of the string.
+    std::unique_ptr<SHMNeuropodTensor<uint8_t>> data_;
+
+    // The length of the longest string in this tensor
+    size_t max_len_;
 
 public:
-    SHMNeuropodTensor(const std::vector<int64_t> &dims) : TypedNeuropodTensor<std::string>(dims)
+    SHMNeuropodTensor(const std::vector<int64_t> &dims) : TypedNeuropodTensor<std::string>(dims), max_len_(0) {}
+
+    // Load an existing tensor
+    // See tensor_from_id
+    SHMNeuropodTensor(const std::vector<int64_t> &dims,
+                      std::shared_ptr<void>       block,
+                      shm_tensor *                data,
+                      const SHMBlockID &          block_id)
+        : TypedNeuropodTensor<std::string>(copy_and_strip_last_dim(dims))
     {
-        NEUROPOD_ERROR("String tensors are not yet supported for multiprocess execution")
+        data_    = stdx::make_unique<SHMNeuropodTensor<uint8_t>>(dims, std::move(block), data, block_id);
+        max_len_ = dims[dims.size() - 1];
     }
 
     ~SHMNeuropodTensor() = default;
 
-    void set(const std::vector<std::string> &data) { data_ = data; }
+    void set(const std::vector<std::string> &data)
+    {
+        // Compute the last dim size
+        max_len_ = 0;
+        for (const auto &item : data)
+        {
+            max_len_ = std::max(max_len_, item.size());
+        }
+
+        // Space for the metadata in the wrapper struct
+        max_len_ += sizeof(string_wrapper);
+
+        // Add it to dims
+        auto dims_copy = get_dims();
+        dims_copy.push_back(max_len_);
+
+        // TODO(vip): We can optimize this
+        data_ = stdx::make_unique<SHMNeuropodTensor<uint8_t>>(dims_copy);
+        data_->overwrite_type(STRING_TENSOR);
+
+        // Copy data in
+        auto pos = data_->get_raw_data_ptr();
+        for (const auto &item : data)
+        {
+            auto wrapper = reinterpret_cast<string_wrapper *>(pos);
+
+            // Set the item size
+            wrapper->length = item.size();
+
+            // Copy in the data
+            std::copy(item.begin(), item.end(), wrapper->data);
+
+            // Move the pointer
+            pos += max_len_;
+        }
+    }
+
+    SHMBlockID get_native_data() { return data_->get_native_data(); };
 
 protected:
-    const std::string operator[](size_t index) const { return data_[index]; }
+    const std::string operator[](size_t index) const
+    {
+        auto pos     = data_->get_raw_data_ptr() + index * max_len_;
+        auto wrapper = reinterpret_cast<string_wrapper *>(pos);
+
+        return std::string(wrapper->data, wrapper->data + wrapper->length);
+    }
 };
 
 } // namespace neuropod

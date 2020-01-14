@@ -21,8 +21,7 @@ std::shared_ptr<NeuropodTensor> tensor_from_id(const SHMBlockID &block_id)
     // Get the number of dims
     std::vector<int64_t> dims(data->dims, data->dims + data->ndims);
 
-    return make_tensor_no_string<SHMNeuropodTensor>(
-        data->tensor_type, dims, std::move(block), std::move(data), block_id);
+    return make_tensor<SHMNeuropodTensor>(data->tensor_type, dims, std::move(block), data, block_id);
 }
 
 } // namespace neuropod
