@@ -146,7 +146,7 @@ public:
     }
 
     // Data access
-    auto operator[](size_t i) const -> decltype(data_[offset_ + i]) { return data_[offset_ + i]; }
+    auto operator[](int64_t i) const -> decltype(data_[offset_ + i]) { return data_[offset_ + i]; }
 
     // begin and end (to support range-based for loops)
     auto begin() const -> decltype(get_iterator(this)) { return get_iterator(this); }
