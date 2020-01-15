@@ -7,6 +7,7 @@
 #include "neuropod/backends/neuropod_backend.hh"
 #include "neuropod/backends/tensorflow/tf_tensor.hh"
 
+#include <map>
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -14,8 +15,9 @@
 namespace tensorflow
 {
 
-// Forward declare tensorflow::Session
+// Forward declare tensorflow::Session and tensorflow::Tensor
 class Session;
+class Tensor;
 
 } // namespace tensorflow
 
@@ -39,7 +41,8 @@ private:
 
     // Get a callable given feeds and fetches
     // This will try to use a cached one if possible
-    int64_t get_callable(const std::vector<std::string> &tensor_feeds, const std::vector<std::string> &tensor_fetches);
+    int64_t get_callable(const std::map<std::string, tensorflow::Tensor> &tensor_feeds,
+                         const std::map<std::string, std::string> &       tensor_fetches);
 
 public:
     explicit TensorflowNeuropodBackend(const std::string &           neuropod_path,
