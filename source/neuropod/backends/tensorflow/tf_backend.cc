@@ -95,25 +95,22 @@ tensorflow::SessionOptions get_tf_opts(const RuntimeOptions & /*unused*/)
 std::unordered_set<std::string> loaded_op_hashes;
 std::mutex                      loaded_op_mutex;
 
-// Note: this is intentionally not using references here because we're sorting the vectors
-std::string get_handle_cache_key(std::vector<std::string> tensor_feeds, std::vector<std::string> tensor_fetches)
+std::string get_handle_cache_key(const std::map<std::string, tensorflow::Tensor> &tensor_feeds,
+                                 const std::map<std::string, std::string> &       tensor_fetches)
 {
-    // TODO(vip): Do an unsorted check before doing a sorted one
-    // Check if we have an existing callable for our set of inputs and outputs
-    std::sort(tensor_feeds.begin(), tensor_feeds.end());
-    std::sort(tensor_fetches.begin(), tensor_fetches.end());
-
     std::string cache_key;
-    for (const auto &piece : tensor_feeds)
+    for (const auto &item : tensor_feeds)
     {
-        cache_key += piece + ",";
+        // item.first is the node name in the TF graph
+        cache_key += item.first + ",";
     }
 
     cache_key += "->";
 
-    for (const auto &piece : tensor_fetches)
+    for (const auto &item : tensor_fetches)
     {
-        cache_key += piece + ",";
+        // item.first is the node name in the TF graph
+        cache_key += item.first + ",";
     }
 
     return cache_key;
@@ -208,8 +205,8 @@ TensorflowNeuropodBackend::~TensorflowNeuropodBackend()
     }
 }
 
-int64_t TensorflowNeuropodBackend::get_callable(const std::vector<std::string> &tensor_feeds,
-                                                const std::vector<std::string> &tensor_fetches)
+int64_t TensorflowNeuropodBackend::get_callable(const std::map<std::string, tensorflow::Tensor> &tensor_feeds,
+                                                const std::map<std::string, std::string> &       tensor_fetches)
 {
     tensorflow::Session::CallableHandle handle;
 
@@ -230,7 +227,8 @@ int64_t TensorflowNeuropodBackend::get_callable(const std::vector<std::string> &
 
         for (const auto &item : tensor_feeds)
         {
-            opts.add_feed(item);
+            // item.first is the node name in the TF graph
+            opts.add_feed(item.first);
 
             // TODO(vip): Once we explicitly control devices, do something like this:
             // opts.mutable_feed_devices()->insert({item, device_name});
@@ -238,7 +236,8 @@ int64_t TensorflowNeuropodBackend::get_callable(const std::vector<std::string> &
 
         for (const auto &item : tensor_fetches)
         {
-            opts.add_fetch(item);
+            // item.first is the node name in the TF graph
+            opts.add_fetch(item.first);
         }
 
         // Make the callable using the options we set above
@@ -267,8 +266,12 @@ std::unique_ptr<NeuropodValueMap> TensorflowNeuropodBackend::infer(const Neuropo
     // for more details.
 
     // Fetches and feeds for our callable
-    std::vector<std::string> tensor_fetches;
-    std::vector<std::string> tensor_feeds;
+    // Note: these are ordered maps to make it easy to cache callables
+    // Map from an output node_name to an output_name
+    std::map<std::string, std::string> tensor_fetches;
+
+    // Map from an input node_name to a Tensor
+    std::map<std::string, tensorflow::Tensor> tensor_feeds;
 
     // Get the set of outputs we want to compute
     const auto &output_names = requested_outputs.size() > 0 ? requested_outputs : output_names_;
@@ -286,11 +289,10 @@ std::unique_ptr<NeuropodValueMap> TensorflowNeuropodBackend::infer(const Neuropo
         }
 
         // Add this node name as an output of the subgraph we want to run
-        tensor_fetches.emplace_back(node_name->second);
+        tensor_fetches.emplace(std::make_pair(node_name->second, name));
     }
 
     // Loop through all the input tensors and setup the inputs
-    std::vector<tensorflow::Tensor> tf_inputs;
     for (const auto &entry : inputs)
     {
         const auto node_name = node_name_mapping_.find(entry.first);
@@ -307,25 +309,31 @@ std::unique_ptr<NeuropodValueMap> TensorflowNeuropodBackend::infer(const Neuropo
             std::dynamic_pointer_cast<NativeDataContainer<tensorflow::Tensor &>>(entry.second)->get_native_data();
 
         // Add this node name as an input to the subgraph we want to run
-        tensor_feeds.emplace_back(node_name->second);
-
-        // Add the tensor to our vector of inputs
-        tf_inputs.emplace_back(input_data);
+        tensor_feeds.emplace(std::make_pair(node_name->second, input_data));
     }
 
     // Create a callable handle and a vector to store our outputs
     tensorflow::Session::CallableHandle handle = get_callable(tensor_feeds, tensor_fetches);
     std::vector<tensorflow::Tensor>     outputs;
 
-    // Run the callable with the vector of inputs we created above
+    // Setup the inputs
+    std::vector<tensorflow::Tensor> tf_inputs;
+    tf_inputs.reserve(tensor_feeds.size());
+    for (auto &item : tensor_feeds)
+    {
+        tf_inputs.emplace_back(std::move(item.second));
+    }
+
+    // Run the callable
     check_tf_status(session_->RunCallable(handle, tf_inputs, &outputs, nullptr));
 
     // Read the outputs and wrap them in `NeuropodTensor`s
-    auto to_return = stdx::make_unique<NeuropodValueMap>();
-    for (size_t i = 0; i < output_names.size(); ++i)
+    auto   to_return = stdx::make_unique<NeuropodValueMap>();
+    size_t position  = 0;
+    for (const auto &item : tensor_fetches)
     {
-        const auto &output_name   = output_names[i];
-        auto &      output_tensor = outputs[i];
+        const auto &output_name   = item.second;
+        auto &      output_tensor = outputs[position++];
         const auto  tensor_type   = get_neuropod_type_from_tf_type(output_tensor.dtype());
         (*to_return)[output_name] = make_tensor<TensorflowNeuropodTensor>(tensor_type, std::move(output_tensor));
     }
