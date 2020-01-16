@@ -192,12 +192,6 @@ public:
     std::unique_ptr<NeuropodValueMap> infer(const NeuropodValueMap &        inputs,
                                             const std::vector<std::string> &requested_outputs)
     {
-        if (free_memory_every_cycle_)
-        {
-            // Clean up any unused shm tensors that haven't been reused
-            shm_allocator.free_unused_shm_blocks();
-        }
-
         // Add inputs
         control_channel_.send_message(ADD_INPUT, inputs);
 
@@ -254,6 +248,12 @@ public:
         // Let the worker know it no longer needs to keep references to the output
         // tensors
         control_channel_.send_message(INFER_COMPLETE);
+
+        if (free_memory_every_cycle_)
+        {
+            // Clean up any unused shm tensors that haven't been reused
+            shm_allocator.free_unused_shm_blocks();
+        }
 
         return to_return;
     }
