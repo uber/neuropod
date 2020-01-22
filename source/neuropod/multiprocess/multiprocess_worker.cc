@@ -59,7 +59,8 @@ void multiprocess_worker_loop(const std::string &control_queue_name)
     IPCControlChannel control_channel(control_queue_name, WORKER_PROCESS);
 
     // A pointer to a neuropod (that will be loaded)
-    std::unique_ptr<Neuropod> neuropod;
+    std::unique_ptr<Neuropod>                neuropod;
+    std::shared_ptr<NeuropodTensorAllocator> allocator;
 
     // A map to store the inputs
     NeuropodValueMap inputs;
@@ -81,7 +82,8 @@ void multiprocess_worker_loop(const std::string &control_queue_name)
         if (received.type == LOAD_NEUROPOD)
         {
             // Load a neuropod
-            neuropod = stdx::make_unique<Neuropod>(received.neuropod_path);
+            neuropod  = stdx::make_unique<Neuropod>(received.neuropod_path);
+            allocator = neuropod->get_tensor_allocator();
             inputs.clear();
             last_outputs.clear();
         }
@@ -99,7 +101,7 @@ void multiprocess_worker_loop(const std::string &control_queue_name)
                 assert(inputs.find(tensor_name) == inputs.end());
 
                 // Wrap in a tensor type that this neuropod expects
-                inputs[tensor_name] = wrap_existing_tensor(*neuropod, shm_tensor);
+                inputs[tensor_name] = wrap_existing_tensor(*allocator, shm_tensor);
             }
         }
         else if (received.type == INFER)
