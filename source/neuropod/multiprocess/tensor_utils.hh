@@ -15,8 +15,9 @@ namespace neuropod
 // Given a NeuropodTensor, wrap the underlying data with a newly created tensor
 // This is useful for serialization and to wrap and/or copy tensors between backends.
 // For example, if you had a TorchNeuropodTensor and you wanted to get a tensor compatible
-// with `neuropod` without making a copy, you could use this function
-std::shared_ptr<NeuropodTensor> wrap_existing_tensor(Neuropod &neuropod, std::shared_ptr<NeuropodTensor> tensor)
+// with `allocator` without making a copy, you could use this function
+std::shared_ptr<NeuropodTensor> wrap_existing_tensor(NeuropodTensorAllocator &       allocator,
+                                                     std::shared_ptr<NeuropodTensor> tensor)
 {
     // Whenever you're wrapping existing memory, it is very important to make sure that the data
     // being wrapped does not get deleted before the underlying DL framework is done with the
@@ -28,7 +29,7 @@ std::shared_ptr<NeuropodTensor> wrap_existing_tensor(Neuropod &neuropod, std::sh
     const auto &tensor_type = tensor->get_tensor_type();
     if (tensor_type == STRING_TENSOR)
     {
-        auto out = neuropod.allocate_tensor<std::string>(tensor->get_dims());
+        auto out = allocator.allocate_tensor<std::string>(tensor->get_dims());
 
         // We need to make a copy because it's not possible to generically wrap string tensors
         // (each backend has its own in-memory representation)
@@ -45,7 +46,7 @@ std::shared_ptr<NeuropodTensor> wrap_existing_tensor(Neuropod &neuropod, std::sh
         // Create a "native" tensor with the data in the provided tensor
         // This doesn't do a copy; it just wraps the data and passes it to the
         // underlying backend
-        return neuropod.get_tensor_allocator()->tensor_from_memory(tensor->get_dims(), tensor_type, data, deleter);
+        return allocator.tensor_from_memory(tensor->get_dims(), tensor_type, data, deleter);
     }
 }
 
