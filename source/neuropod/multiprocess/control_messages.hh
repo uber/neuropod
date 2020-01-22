@@ -50,6 +50,8 @@ enum MessageType
     // A message sent by the main process to ask the worker to terminate
     // Note: it is valid to send this message at any time.
     SHUTDOWN,
+
+    SPECULATIVE,
 };
 
 // Used to print out the enum names rather than just a number

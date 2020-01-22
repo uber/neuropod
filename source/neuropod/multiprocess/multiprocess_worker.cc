@@ -2,6 +2,9 @@
 // Uber, Inc. (c) 2019
 //
 
+#include "neuropod/internal/double_buffered_queue.hh"
+#include "neuropod/internal/double_buffered_priority_queue.hh"
+
 #include "neuropod/multiprocess/control_messages.hh"
 #include "neuropod/multiprocess/ipc_control_channel.hh"
 #include "neuropod/multiprocess/shm_tensor.hh"
@@ -10,6 +13,7 @@
 
 #include <atomic>
 #include <iostream>
+#include <set>
 #include <string>
 #include <thread>
 #include <vector>
@@ -50,6 +54,136 @@ public:
     }
 };
 
+struct LoadedItem
+{
+    neuropod::SHMBlockID           block_id;
+    std::shared_ptr<NeuropodValue> tensor;
+};
+
+// Responsible for using a worker thread to load tensors given IDs
+class LoadController
+{
+private:
+    DoubleBufferedPriorityQueue<SHMBlockID> input_queue_;
+    DoubleBufferedQueue<LoadedItem>         output_queue_;
+
+    std::atomic_bool                          enable_;
+    std::thread                               worker_thread_;
+
+
+    // Only accessed on the worker thread
+    // TODO(vip): Make this an LRU cache
+    std::map<SHMBlockID, std::shared_ptr<NeuropodValue>> speculative_items_;
+
+    // Items that have been loaded
+    std::set<SHMBlockID> loaded_items_;
+
+public:
+    LoadController(std::unique_ptr<Neuropod> &neuropod)
+        : input_queue_(2), enable_(true), worker_thread_([this, &neuropod]{
+            while (enable_)
+            {
+                LoadedItem item;
+                size_t priority;
+
+                // Get an item and process it; waits if the queue is empty
+                auto success = input_queue_.dequeue(item.block_id, priority);
+                if (!success)
+                {
+                    break;
+                }
+
+                if (priority == 0)
+                {
+                    // A "real" load
+
+                    // Check if we've speculatively loaded this item
+                    auto speculative = speculative_items_.find(item.block_id);
+                    if (speculative != speculative_items_.end())
+                    {
+                        // We loaded this tensor earlier!
+                        item.tensor = std::move(speculative->second);
+                        speculative_items_.erase(speculative);
+                    }
+                    else
+                    {
+                        // Create a tensor
+                        auto shm_tensor = tensor_from_id(item.block_id);
+
+                        // Wrap in a tensor type that this neuropod expects
+                        item.tensor = wrap_existing_tensor(*neuropod, shm_tensor);
+
+                        // Mark that we loaded it for real
+                        loaded_items_.emplace(item.block_id);
+                    }
+
+                    // Add it to the output queue
+                    output_queue_.enqueue(std::move(item));
+                }
+                else
+                {
+                    // A speculative load
+
+                    // Check if we've already loaded this tensor "for real"
+                    auto has_loaded_it = loaded_items_.find(item.block_id);
+                    if (has_loaded_it != loaded_items_.end())
+                    {
+                        // We already loaded this for real - don't load it again
+                        loaded_items_.erase(has_loaded_it);
+                        continue;
+                    }
+
+                    // Create a tensor
+                    auto shm_tensor = tensor_from_id(item.block_id);
+
+                    // Wrap in a tensor type that this neuropod expects
+                    item.tensor = wrap_existing_tensor(*neuropod, shm_tensor);
+
+                    // We'll probably be asked to load this tensor later
+                    speculative_items_[item.block_id] = std::move(item.tensor);
+                }
+            }
+        })
+    {
+    }
+
+    ~LoadController()
+    {
+        // Disable the worker thread and tell the queue to stop blocking
+        enable_ = false;
+        input_queue_.shutdown();
+
+        worker_thread_.join();
+    }
+
+    void enqueue(SHMBlockID item)
+    {
+        input_queue_.enqueue(std::move(item), 0);
+    }
+
+    void enqueue(std::vector<SHMBlockID> &container)
+    {
+        input_queue_.enqueue(container, 0);
+    }
+
+    // These will be loaded when the worker is idle and can be used
+    // to prefetch tensors that will be loaded later
+    void speculative_enqueue(SHMBlockID item)
+    {
+        input_queue_.enqueue(std::move(item), 1);
+    }
+
+    void speculative_enqueue(std::vector<SHMBlockID> &container)
+    {
+        input_queue_.enqueue(container, 1);
+    }
+
+    void dequeue(LoadedItem &item)
+    {
+        output_queue_.dequeue(item);
+    }
+};
+
 } // namespace
 
 // The main loop for a worker that runs a neuropod
@@ -72,6 +206,11 @@ void multiprocess_worker_loop(const std::string &control_queue_name)
     // Send a heartbeat periodically
     HeartbeatController heartbeat_controller(control_channel, HEARTBEAT_INTERVAL_MS);
 
+
+    LoadController load_controller_(neuropod);
+
+    std::map<SHMBlockID, std::string> id_to_name_map_;
+
     while (true)
     {
         // Get a message
@@ -87,23 +226,48 @@ void multiprocess_worker_loop(const std::string &control_queue_name)
         }
         else if (received.type == ADD_INPUT)
         {
+            std::vector<SHMBlockID> block_ids(received.num_tensors);
             for (int i = 0; i < received.num_tensors; i++)
             {
                 // Get the ID and create a tensor
-                neuropod::SHMBlockID block_id;
+                neuropod::SHMBlockID &block_id = block_ids[i];
                 std::copy_n(received.tensor_id[i], block_id.size(), block_id.begin());
-                auto shm_tensor = tensor_from_id(block_id);
 
-                // Make sure we're not overwriting a tensor
                 std::string tensor_name = received.tensor_name[i];
-                assert(inputs.find(tensor_name) == inputs.end());
-
-                // Wrap in a tensor type that this neuropod expects
-                inputs[tensor_name] = wrap_existing_tensor(*neuropod, shm_tensor);
+                id_to_name_map_[block_id] = tensor_name;
             }
+
+            load_controller_.enqueue(block_ids);
+        }
+        else if (received.type == SPECULATIVE)
+        {
+            // Speculatively load tensors
+            std::vector<SHMBlockID> block_ids(received.num_tensors);
+            for (int i = 0; i < received.num_tensors; i++)
+            {
+                // Get the ID and create a tensor
+                neuropod::SHMBlockID &block_id = block_ids[i];
+                std::copy_n(received.tensor_id[i], block_id.size(), block_id.begin());
+            }
+
+            load_controller_.speculative_enqueue(block_ids);
         }
         else if (received.type == INFER)
         {
+            while (!id_to_name_map_.empty())
+            {
+                LoadedItem item;
+                load_controller_.dequeue(item);
+
+                // Make sure we're not overwriting a tensor
+                std::string tensor_name = id_to_name_map_.at(item.block_id);
+                id_to_name_map_.erase(item.block_id);
+                assert(inputs.find(tensor_name) == inputs.end());
+
+                // Wrap in a tensor type that this neuropod expects
+                inputs[tensor_name] = item.tensor;
+            }
+
             // Run inference
             auto outputs = neuropod->infer(inputs);
 

@@ -5,6 +5,7 @@
 #include "neuropod/multiprocess/multiprocess.hh"
 
 #include "neuropod/backends/neuropod_backend.hh"
+#include "neuropod/internal/double_buffered_queue.hh"
 #include "neuropod/multiprocess/control_messages.hh"
 #include "neuropod/multiprocess/ipc_control_channel.hh"
 #include "neuropod/multiprocess/shm_tensor.hh"
@@ -16,6 +17,8 @@
 #include <boost/uuid/uuid_io.hpp>
 #include <sys/wait.h>
 
+#include <atomic>
+#include <thread>
 #include <vector>
 
 #include <signal.h>
@@ -46,11 +49,85 @@ pid_t start_worker_process(const std::string &control_queue_name)
     return child_pid;
 }
 
+// An allocator that speculatively sends tensors to the worker as soon as they're created
+class SpeculativeTensorAllocator : public NeuropodTensorAllocator
+{
+private:
+    IPCControlChannel &control_channel_;
+    DoubleBufferedQueue<SHMBlockID> block_ids_;
+
+    std::atomic_bool enable_;
+    std::thread worker_thread_;
+
+public:
+    SpeculativeTensorAllocator(IPCControlChannel &control_channel)
+        : control_channel_(control_channel), enable_(true), worker_thread_([this](){
+            while (enable_)
+            {
+                SHMBlockID block_id;
+                bool success = block_ids_.dequeue(block_id);
+                if (!success)
+                {
+                    break;
+                }
+
+                control_message msg;
+                msg.type = SPECULATIVE;
+                msg.num_tensors = 1;
+                memcpy(msg.tensor_id[0], block_id.data(), sizeof(msg.tensor_id[0]));
+                control_channel_.send_message(msg);
+            }
+        })
+    {}
+
+    ~SpeculativeTensorAllocator()
+    {
+        shutdown();
+
+        worker_thread_.join();
+    }
+
+    void shutdown()
+    {
+        enable_ = false;
+        block_ids_.shutdown();
+    }
+
+    std::unique_ptr<NeuropodTensor> allocate_tensor(const std::vector<int64_t> &input_dims, TensorType tensor_type)
+    {
+        auto ten = make_tensor<SHMNeuropodTensor>(tensor_type, input_dims);
+
+        if (tensor_type != STRING_TENSOR)
+        {
+            const auto &block_id =
+                dynamic_cast<NativeDataContainer<SHMBlockID> *>(ten.get())->get_native_data();
+
+            // block_ids_.enqueue(block_id);
+        }
+
+        return ten;
+    }
+
+    std::unique_ptr<NeuropodTensor> tensor_from_memory(const std::vector<int64_t> &input_dims,
+                                                       TensorType                  tensor_type,
+                                                       void *                      data,
+                                                       const Deleter &             deleter)
+    {
+        auto ten = make_tensor_no_string<SHMNeuropodTensor>(tensor_type, input_dims, data, deleter);
+        const auto &block_id =
+            dynamic_cast<NativeDataContainer<SHMBlockID> *>(ten.get())->get_native_data();
+
+        // block_ids_.enqueue(block_id);
+
+        return ten;
+    }
+};
+
 // Note: we don't register this with the library as a backend because it is not
 // a backend in the normal sense. It is only used here for out of process
 // execution
 
-class MultiprocessNeuropodBackend : public NeuropodBackendWithDefaultAllocator<SHMNeuropodTensor>
+class MultiprocessNeuropodBackend : public NeuropodBackend
 {
 private:
     pid_t       child_pid_ = -1;
@@ -60,13 +137,17 @@ private:
     // Control channel for interacting with the worker
     IPCControlChannel control_channel_;
 
+    // The speculative allocator we're going to use
+    std::shared_ptr<SpeculativeTensorAllocator> speculative_allocator_;
+
 public:
     MultiprocessNeuropodBackend(const std::string &neuropod_path,
                                 const std::string &control_queue_name,
                                 bool               free_memory_every_cycle)
         : control_queue_name_(control_queue_name),
           free_memory_every_cycle_(free_memory_every_cycle),
-          control_channel_(control_queue_name, MAIN_PROCESS)
+          control_channel_(control_queue_name, MAIN_PROCESS),
+          speculative_allocator_(std::make_shared<SpeculativeTensorAllocator>(control_channel_))
     {
         // Create a message to tell the worker process to load the specified neuropod
         control_message msg;
@@ -94,6 +175,9 @@ public:
 
     ~MultiprocessNeuropodBackend()
     {
+
+        speculative_allocator_->shutdown();
+
         // We only need to clean up all of this if we started the worker process
         if (child_pid_ > 0)
         {
@@ -192,6 +276,11 @@ public:
         }
 
         return to_return;
+    }
+
+    std::shared_ptr<NeuropodTensorAllocator> get_tensor_allocator()
+    {
+        return speculative_allocator_;
     }
 };
 

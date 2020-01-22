@@ -25,6 +25,7 @@ std::ostream &operator<<(std::ostream &out, const MessageType value)
         GENERATE_CASE(INFER_COMPLETE);
         GENERATE_CASE(HEARTBEAT);
         GENERATE_CASE(SHUTDOWN);
+        GENERATE_CASE(SPECULATIVE);
     }
 #undef GENERATE_CASE
 

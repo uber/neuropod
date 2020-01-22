@@ -23,7 +23,7 @@ constexpr auto MAX_QUEUE_SIZE = 20;
 void TransitionVerifier::assert_transition_allowed(MessageType current_type)
 {
     std::lock_guard<std::mutex> lock(mutex_);
-    if (current_type == HEARTBEAT || current_type == SHUTDOWN)
+    if (current_type == HEARTBEAT || current_type == SHUTDOWN || current_type == SPECULATIVE)
     {
         // These messages are allowed at any time
         return;

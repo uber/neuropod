@@ -35,6 +35,20 @@ cc_library(
 )
 
 cc_library(
+    name = "queues",
+    hdrs = [
+        "double_buffered_queue.hh",
+        "double_buffered_priority_queue.hh",
+    ],
+    visibility = [
+        "//neuropod:__subpackages__",
+    ],
+    deps = [
+        ":error_utils",
+    ],
+)
+
+cc_library(
     name = "logging",
     hdrs = [
         "logging.hh",
