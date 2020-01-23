@@ -7,6 +7,7 @@
 #include "neuropod/internal/error_utils.hh"
 #include "neuropod/internal/memory_utils.hh"
 
+#include <boost/functional/hash.hpp>
 #include <boost/interprocess/mapped_region.hpp>
 #include <boost/interprocess/shared_memory_object.hpp>
 #include <boost/interprocess/sync/interprocess_mutex.hpp>
@@ -320,3 +321,18 @@ void SHMAllocator::free_unused_shm_blocks()
 }
 
 } // namespace neuropod
+
+namespace std
+{
+
+std::size_t hash<neuropod::SHMBlockID>::operator()(const neuropod::SHMBlockID &id) const noexcept
+{
+    auto data = reinterpret_cast<const neuropod::shm_block_id *>(id.data());
+
+    size_t seed = 0;
+    boost::hash_combine(seed, data->uuid);
+    boost::hash_combine(seed, data->reuse_count);
+    return seed;
+}
+
+} // namespace std

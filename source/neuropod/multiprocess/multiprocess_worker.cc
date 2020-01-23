@@ -2,6 +2,7 @@
 // Uber, Inc. (c) 2019
 //
 
+#include "neuropod/internal/worker_thread.hh"
 #include "neuropod/multiprocess/control_messages.hh"
 #include "neuropod/multiprocess/ipc_control_channel.hh"
 #include "neuropod/multiprocess/shm_tensor.hh"
@@ -16,41 +17,6 @@
 
 namespace neuropod
 {
-
-namespace
-{
-
-// Starts a new thread to send a heartbeat
-class HeartbeatController
-{
-private:
-    std::atomic_bool send_heartbeat_;
-    std::thread      heartbeat_thread_;
-
-public:
-    HeartbeatController(IPCControlChannel &control_channel, size_t interval_ms)
-        : send_heartbeat_(true), heartbeat_thread_([this, &control_channel, interval_ms]() {
-              // Send a heartbeat every 2 seconds
-              while (send_heartbeat_)
-              {
-                  // send_message is threadsafe so we don't need
-                  // synchronization here
-                  control_channel.send_message(HEARTBEAT);
-                  std::this_thread::sleep_for(std::chrono::milliseconds(interval_ms));
-              }
-          })
-    {
-    }
-
-    ~HeartbeatController()
-    {
-        // Join the heartbeat thread
-        send_heartbeat_ = false;
-        heartbeat_thread_.join();
-    }
-};
-
-} // namespace
 
 // The main loop for a worker that runs a neuropod
 void multiprocess_worker_loop(const std::string &control_queue_name)
@@ -71,7 +37,35 @@ void multiprocess_worker_loop(const std::string &control_queue_name)
     NeuropodValueMap last_outputs;
 
     // Send a heartbeat periodically
-    HeartbeatController heartbeat_controller(control_channel, HEARTBEAT_INTERVAL_MS);
+    WorkerThreadWithLoop heartbeat_controller([&control_channel] {
+        // send_message is threadsafe so we don't need synchronization here
+        control_channel.send_message(HEARTBEAT);
+        std::this_thread::sleep_for(std::chrono::milliseconds(HEARTBEAT_INTERVAL_MS));
+    });
+
+    // A stuct to wrap an id and tensor
+    struct TensorWrapper
+    {
+        SHMBlockID                     id;
+        std::shared_ptr<NeuropodValue> tensor;
+    };
+
+    // A map from an ID to a tensor name
+    std::unordered_map<SHMBlockID, std::string> id_to_name_map;
+
+    WorkerThreadWithInputAndOutputQueue<SHMBlockID, TensorWrapper> tensor_loader(
+        [&allocator](SHMBlockID &block_id, TensorWrapper &output) {
+            output.id = block_id;
+
+            // Load the tensor
+            auto shm_tensor = tensor_from_id(block_id);
+
+            // Wrap in a tensor type that this neuropod expects
+            output.tensor = wrap_existing_tensor(*allocator, shm_tensor);
+
+            // We returned an item so return true
+            return true;
+        });
 
     while (true)
     {
@@ -89,23 +83,37 @@ void multiprocess_worker_loop(const std::string &control_queue_name)
         }
         else if (received.type == ADD_INPUT)
         {
+            std::vector<SHMBlockID> block_ids(received.num_tensors);
             for (int i = 0; i < received.num_tensors; i++)
             {
                 // Get the ID and create a tensor
-                neuropod::SHMBlockID block_id;
+                SHMBlockID &block_id = block_ids[i];
                 std::copy_n(received.tensor_id[i], block_id.size(), block_id.begin());
-                auto shm_tensor = tensor_from_id(block_id);
 
-                // Make sure we're not overwriting a tensor
-                std::string tensor_name = received.tensor_name[i];
-                assert(inputs.find(tensor_name) == inputs.end());
-
-                // Wrap in a tensor type that this neuropod expects
-                inputs[tensor_name] = wrap_existing_tensor(*allocator, shm_tensor);
+                // Store the tensor name
+                std::string tensor_name  = received.tensor_name[i];
+                id_to_name_map[block_id] = tensor_name;
             }
+
+            // Add them to the queue for async loading
+            tensor_loader.enqueue(block_ids);
         }
         else if (received.type == INFER)
         {
+            // Get all the inputs
+            while (!id_to_name_map.empty())
+            {
+                TensorWrapper item;
+                bool          success = tensor_loader.dequeue(item);
+                if (!success)
+                {
+                    break;
+                }
+
+                inputs[id_to_name_map.at(item.id)] = std::move(item.tensor);
+                id_to_name_map.erase(item.id);
+            }
+
             // Run inference
             auto outputs = neuropod->infer(inputs);
 

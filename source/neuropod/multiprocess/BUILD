@@ -73,6 +73,7 @@ cc_library(
         ":ipc_control_channel",
         "//neuropod:neuropod_hdrs",
         "//neuropod/internal:neuropod_tensor_raw_data_access",
+        "//neuropod/internal:worker_thread",
     ],
 )
 

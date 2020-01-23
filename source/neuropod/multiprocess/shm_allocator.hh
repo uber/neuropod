@@ -52,3 +52,15 @@ public:
 };
 
 } // namespace neuropod
+
+namespace std
+{
+
+// Specialization of std::hash for SHMBlockID
+template <>
+struct hash<neuropod::SHMBlockID>
+{
+    std::size_t operator()(const neuropod::SHMBlockID &id) const noexcept;
+};
+
+} // namespace std
