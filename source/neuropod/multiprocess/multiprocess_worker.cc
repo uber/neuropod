@@ -9,6 +9,7 @@
 #include "neuropod/neuropod.hh"
 
 #include <atomic>
+#include <condition_variable>
 #include <iostream>
 #include <string>
 #include <thread>
@@ -27,16 +28,21 @@ private:
     std::atomic_bool send_heartbeat_;
     std::thread      heartbeat_thread_;
 
+    std::condition_variable cv_;
+    std::mutex              mutex_;
+
 public:
     HeartbeatController(IPCControlChannel &control_channel, size_t interval_ms)
         : send_heartbeat_(true), heartbeat_thread_([this, &control_channel, interval_ms]() {
               // Send a heartbeat every 2 seconds
               while (send_heartbeat_)
               {
-                  // send_message is threadsafe so we don't need
-                  // synchronization here
+                  // send_message is threadsafe so we don't need synchronization here
                   control_channel.send_message(HEARTBEAT);
-                  std::this_thread::sleep_for(std::chrono::milliseconds(interval_ms));
+
+                  // This lets us break out of waiting if we're told to shutdown
+                  std::unique_lock<std::mutex> lk(mutex_);
+                  cv_.wait_for(lk, std::chrono::milliseconds(interval_ms), [&] { return send_heartbeat_ != true; });
               }
           })
     {
@@ -46,6 +52,7 @@ public:
     {
         // Join the heartbeat thread
         send_heartbeat_ = false;
+        cv_.notify_all();
         heartbeat_thread_.join();
     }
 };
