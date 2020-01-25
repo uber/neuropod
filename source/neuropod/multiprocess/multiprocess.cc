@@ -129,8 +129,11 @@ public:
         }
     }
 
+    std::unique_ptr<NeuropodValueMap> infer(const NeuropodValueMap &inputs) { return infer(inputs, {}); }
+
     // Run inference
-    std::unique_ptr<NeuropodValueMap> infer(const NeuropodValueMap &inputs)
+    std::unique_ptr<NeuropodValueMap> infer(const NeuropodValueMap &        inputs,
+                                            const std::vector<std::string> &requested_outputs)
     {
         if (free_memory_every_cycle_)
         {
@@ -140,6 +143,10 @@ public:
 
         // Add inputs
         control_channel_.send_message(ADD_INPUT, inputs);
+
+        // Request outputs
+        // TODO(vip): Don't send this message if requested_outputs is empty
+        control_channel_.send_message(REQUEST_OUTPUT, requested_outputs);
 
         // Run inference
         control_channel_.send_message(INFER);

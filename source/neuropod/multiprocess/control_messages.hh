@@ -19,8 +19,13 @@ enum MessageType
     LOAD_NEUROPOD,
 
     // Sent by the main process when passing tensors to the worker process
-    // Valid next messages: ADD_INPUT, INFER
+    // Valid next messages: ADD_INPUT, REQUEST_OUTPUT, INFER
     ADD_INPUT,
+
+    // Sent by the main process to the worker process to request a subset
+    // of the outputs
+    // Valid next messages: REQUEST_OUTPUT, INFER
+    REQUEST_OUTPUT,
 
     // Sent by the main process once all inputs have been added and we're ready
     // to run inference
@@ -81,7 +86,7 @@ struct __attribute__((__packed__)) control_message
     // Only used if the message type is ADD_INPUT or RETURN_OUTPUT
     char tensor_id[MAX_NUM_TENSORS_PER_MESSAGE][24];
 
-    // Only used if the message type is ADD_INPUT or RETURN_OUTPUT
+    // Only used if the message type is ADD_INPUT, REQUEST_OUTPUT, or RETURN_OUTPUT
     char tensor_name[MAX_NUM_TENSORS_PER_MESSAGE][256];
 
     // Linux defines the max path length as 4096 (including a NULL char)
