@@ -40,7 +40,10 @@ void TransitionVerifier::assert_transition_allowed(MessageType current_type)
     static const std::set<std::pair<MessageType, MessageType>> allowed_transitions = {
         std::make_pair(LOAD_NEUROPOD, ADD_INPUT),
         std::make_pair(ADD_INPUT, ADD_INPUT),
+        std::make_pair(ADD_INPUT, REQUEST_OUTPUT),
         std::make_pair(ADD_INPUT, INFER),
+        std::make_pair(REQUEST_OUTPUT, REQUEST_OUTPUT),
+        std::make_pair(REQUEST_OUTPUT, INFER),
         std::make_pair(INFER, RETURN_OUTPUT),
         std::make_pair(RETURN_OUTPUT, RETURN_OUTPUT),
         std::make_pair(RETURN_OUTPUT, END_OUTPUT),
@@ -97,6 +100,47 @@ void IPCControlChannel::send_message(MessageType type)
     control_message msg;
     msg.type = type;
     send_message(msg);
+}
+
+// Utility to send a vector of tensor names to a message queue
+void IPCControlChannel::send_message(MessageType type, const std::vector<std::string> &data)
+{
+    control_message msg;
+    msg.type        = type;
+    msg.num_tensors = 0;
+
+    for (const auto &name : data)
+    {
+        // Get the current index
+        const auto current_index = msg.num_tensors;
+
+        // Increment the number of tensors
+        msg.num_tensors++;
+
+        // Copy in the tensor name
+        if (name.length() >= 256)
+        {
+            NEUROPOD_ERROR("For the multiprocess backend, tensor names must have less than 256 characters. Tried using "
+                           "a tensor with name: "
+                           << name);
+        }
+
+        strncpy(msg.tensor_name[current_index], name.c_str(), 256);
+
+        // Send the message if needed
+        if (msg.num_tensors == MAX_NUM_TENSORS_PER_MESSAGE)
+        {
+            send_message(msg);
+            msg.num_tensors = 0;
+        }
+    }
+
+    if (data.size() == 0 || msg.num_tensors != 0)
+    {
+        // Send the last message
+        // (or the only message if we're attempting to send an empty map)
+        send_message(msg);
+    }
 }
 
 // Utility to send a NeuropodValueMap to a message queue

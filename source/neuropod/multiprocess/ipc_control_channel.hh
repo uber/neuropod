@@ -60,6 +60,10 @@ public:
     // Note: this is threadsafe
     void send_message(MessageType type);
 
+    // Utility to send a vector of tensor names to a message queue
+    // Note: this is threadsafe
+    void send_message(MessageType type, const std::vector<std::string> &data);
+
     // Utility to send a NeuropodValueMap to a message queue
     // Note: this is threadsafe
     void send_message(MessageType type, const NeuropodValueMap &data);
