@@ -193,7 +193,7 @@ std::unique_ptr<ModelConfig> load_model_config(std::istream &input_stream)
     }
 
     // Load the device mapping if any
-    std::unordered_map<std::string, DeviceType> input_tensor_device;
+    std::unordered_map<std::string, NeuropodDeviceType> input_tensor_device;
     if (obj.isMember("input_tensor_device"))
     {
         const Json::Value &device_mapping = obj["input_tensor_device"];
