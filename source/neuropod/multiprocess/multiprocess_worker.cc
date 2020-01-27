@@ -25,11 +25,10 @@ namespace
 class HeartbeatController
 {
 private:
-    std::atomic_bool send_heartbeat_;
-    std::thread      heartbeat_thread_;
-
+    std::atomic_bool        send_heartbeat_;
     std::condition_variable cv_;
     std::mutex              mutex_;
+    std::thread             heartbeat_thread_;
 
 public:
     HeartbeatController(IPCControlChannel &control_channel, size_t interval_ms)
@@ -51,7 +50,11 @@ public:
     ~HeartbeatController()
     {
         // Join the heartbeat thread
-        send_heartbeat_ = false;
+        {
+            std::lock_guard<std::mutex> lk(mutex_);
+            send_heartbeat_ = false;
+        }
+
         cv_.notify_all();
         heartbeat_thread_.join();
     }
