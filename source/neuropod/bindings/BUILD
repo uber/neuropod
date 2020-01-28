@@ -10,6 +10,7 @@ cc_binary(
     ],
     deps = [
         ":bindings",
+        "//neuropod/multiprocess:multiprocess_hdrs",
         "//neuropod/serialization:serialization_hdrs",
         "//neuropod/backends/test_backend:test_backend_hdrs",
     ],

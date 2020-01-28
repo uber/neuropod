@@ -29,15 +29,50 @@ namespace neuropod
 namespace
 {
 
+// A utility to get the environment as a map
+std::unordered_map<std::string, std::string> get_env_map()
+{
+    std::unordered_map<std::string, std::string> env;
+    for (char **current = environ; *current; current++)
+    {
+        std::string item = *current;
+        const auto  pos  = item.find("=");
+        if (pos == std::string::npos)
+        {
+            // No `=` found
+            continue;
+        }
+
+        const auto key = item.substr(0, pos);  // Not including the `=`
+        const auto val = item.substr(pos + 1); // Not including the `=`
+
+        env[key] = val;
+    }
+
+    return env;
+}
+
 // Start a neuropod worker process given a control queue name
-pid_t start_worker_process(const std::string &control_queue_name)
+pid_t start_worker_process(const std::string &control_queue_name, std::vector<std::string> env)
 {
     pid_t child_pid;
     char *argv[] = {
         const_cast<char *>("neuropod_multiprocess_worker"), const_cast<char *>(control_queue_name.c_str()), NULL};
 
+    // Setup the environment
+
+    // Null terminated char * array
+    char *env_arr[env.size() + 1];
+    env_arr[env.size()] = nullptr;
+
+    // Set the env
+    for (int i = 0; i < env.size(); i++)
+    {
+        env_arr[i] = const_cast<char *>(env[i].c_str());
+    }
+
     // Spawn a process
-    const auto status = posix_spawnp(&child_pid, "neuropod_multiprocess_worker", NULL, NULL, argv, environ);
+    const auto status = posix_spawnp(&child_pid, "neuropod_multiprocess_worker", NULL, NULL, argv, env_arr);
     if (status != 0)
     {
         NEUROPOD_ERROR("Failed to start the worker process. Failed with code: " << status << ": " << strerror(status));
@@ -84,12 +119,34 @@ public:
     }
 
     // Generate a control queue name and start a worker
-    MultiprocessNeuropodBackend(const std::string &neuropod_path, bool free_memory_every_cycle)
+    MultiprocessNeuropodBackend(const std::string &   neuropod_path,
+                                const RuntimeOptions &options,
+                                bool                  free_memory_every_cycle)
         : MultiprocessNeuropodBackend(
               neuropod_path, boost::uuids::to_string(boost::uuids::random_generator()()), free_memory_every_cycle)
     {
+        auto env = get_env_map();
+
+        // Set the visible devices correctly when starting the worker process
+        if (options.visible_device == Device::CPU)
+        {
+            env["CUDA_VISIBLE_DEVICES"] = "";
+        }
+        else
+        {
+            env["CUDA_VISIBLE_DEVICES"] = std::to_string(options.visible_device);
+        }
+
+        // Convert to a vector
+        std::vector<std::string> env_vec;
+        env_vec.reserve(env.size());
+        for (const auto &item : env)
+        {
+            env_vec.emplace_back(item.first + "=" + item.second);
+        }
+
         // Start the worker process
-        child_pid_ = start_worker_process(control_queue_name_);
+        child_pid_ = start_worker_process(control_queue_name_, env_vec);
     }
 
     ~MultiprocessNeuropodBackend()
@@ -204,9 +261,11 @@ public:
 
 } // namespace
 
-std::unique_ptr<Neuropod> load_neuropod_in_new_process(const std::string &neuropod_path, bool free_memory_every_cycle)
+std::unique_ptr<Neuropod> load_neuropod_in_new_process(const std::string &   neuropod_path,
+                                                       const RuntimeOptions &options,
+                                                       bool                  free_memory_every_cycle)
 {
-    auto backend = std::make_shared<MultiprocessNeuropodBackend>(neuropod_path, free_memory_every_cycle);
+    auto backend = std::make_shared<MultiprocessNeuropodBackend>(neuropod_path, options, free_memory_every_cycle);
     return stdx::make_unique<Neuropod>(neuropod_path, backend);
 }
 
