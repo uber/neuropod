@@ -4,6 +4,7 @@
 
 #include "neuropod/backends/test_backend/test_neuropod_tensor.hh"
 #include "neuropod/bindings/python_bindings.hh"
+#include "neuropod/multiprocess/multiprocess.hh"
 #include "neuropod/neuropod.hh"
 #include "neuropod/serialization/serialization.hh"
 
@@ -78,8 +79,7 @@ py::bytes serialize_valuemap_binding(py::dict items)
     return py::bytes(buffer_stream.str());
 }
 
-template <typename... Params>
-std::unique_ptr<Neuropod> make_neuropod(py::kwargs kwargs, Params &&... params)
+RuntimeOptions get_options_from_kwargs(py::kwargs &kwargs)
 {
     RuntimeOptions options;
 
@@ -95,7 +95,20 @@ std::unique_ptr<Neuropod> make_neuropod(py::kwargs kwargs, Params &&... params)
         }
     }
 
+    return options;
+}
+
+template <typename... Params>
+std::unique_ptr<Neuropod> make_neuropod(py::kwargs kwargs, Params &&... params)
+{
+    auto options = get_options_from_kwargs(kwargs);
     return stdx::make_unique<Neuropod>(std::forward<Params>(params)..., options);
+}
+
+std::unique_ptr<Neuropod> make_ope_neuropod(const std::string &path, py::kwargs kwargs)
+{
+    auto options = get_options_from_kwargs(kwargs);
+    return load_neuropod_in_new_process(path, options);
 }
 
 } // namespace
@@ -123,6 +136,8 @@ PYBIND11_MODULE(neuropod_native, m)
     m.def("deserialize_dict",
           &deserialize_valuemap_binding,
           "Deserialize a string of bytes to a NeuropodValueMap (and return it as a dict of numpy arrays)");
+
+    m.def("load_neuropod_in_new_process", &make_ope_neuropod, "Load a neuropod in a new process");
 }
 
 } // namespace neuropod

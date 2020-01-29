@@ -9,6 +9,7 @@
 #include "neuropod/neuropod.hh"
 
 #include <atomic>
+#include <condition_variable>
 #include <iostream>
 #include <string>
 #include <thread>
@@ -24,8 +25,10 @@ namespace
 class HeartbeatController
 {
 private:
-    std::atomic_bool send_heartbeat_;
-    std::thread      heartbeat_thread_;
+    std::atomic_bool        send_heartbeat_;
+    std::condition_variable cv_;
+    std::mutex              mutex_;
+    std::thread             heartbeat_thread_;
 
 public:
     HeartbeatController(IPCControlChannel &control_channel, size_t interval_ms)
@@ -33,10 +36,12 @@ public:
               // Send a heartbeat every 2 seconds
               while (send_heartbeat_)
               {
-                  // send_message is threadsafe so we don't need
-                  // synchronization here
+                  // send_message is threadsafe so we don't need synchronization here
                   control_channel.send_message(HEARTBEAT);
-                  std::this_thread::sleep_for(std::chrono::milliseconds(interval_ms));
+
+                  // This lets us break out of waiting if we're told to shutdown
+                  std::unique_lock<std::mutex> lk(mutex_);
+                  cv_.wait_for(lk, std::chrono::milliseconds(interval_ms), [&] { return send_heartbeat_ != true; });
               }
           })
     {
@@ -45,7 +50,12 @@ public:
     ~HeartbeatController()
     {
         // Join the heartbeat thread
-        send_heartbeat_ = false;
+        {
+            std::lock_guard<std::mutex> lk(mutex_);
+            send_heartbeat_ = false;
+        }
+
+        cv_.notify_all();
         heartbeat_thread_.join();
     }
 };
@@ -59,10 +69,14 @@ void multiprocess_worker_loop(const std::string &control_queue_name)
     IPCControlChannel control_channel(control_queue_name, WORKER_PROCESS);
 
     // A pointer to a neuropod (that will be loaded)
-    std::unique_ptr<Neuropod> neuropod;
+    std::unique_ptr<Neuropod>                neuropod;
+    std::shared_ptr<NeuropodTensorAllocator> allocator;
 
     // A map to store the inputs
     NeuropodValueMap inputs;
+
+    // A vector of requested outputs
+    std::vector<std::string> requested_outputs;
 
     // The last outputs
     // We need to keep these around so there isn't a race condition when returning
@@ -81,7 +95,8 @@ void multiprocess_worker_loop(const std::string &control_queue_name)
         if (received.type == LOAD_NEUROPOD)
         {
             // Load a neuropod
-            neuropod = stdx::make_unique<Neuropod>(received.neuropod_path);
+            neuropod  = stdx::make_unique<Neuropod>(received.neuropod_path);
+            allocator = neuropod->get_tensor_allocator();
             inputs.clear();
             last_outputs.clear();
         }
@@ -99,13 +114,21 @@ void multiprocess_worker_loop(const std::string &control_queue_name)
                 assert(inputs.find(tensor_name) == inputs.end());
 
                 // Wrap in a tensor type that this neuropod expects
-                inputs[tensor_name] = wrap_existing_tensor(*neuropod, shm_tensor);
+                inputs[tensor_name] = wrap_existing_tensor(*allocator, shm_tensor);
+            }
+        }
+        else if (received.type == REQUEST_OUTPUT)
+        {
+            for (int i = 0; i < received.num_tensors; i++)
+            {
+                std::string tensor_name = received.tensor_name[i];
+                requested_outputs.emplace_back(tensor_name);
             }
         }
         else if (received.type == INFER)
         {
             // Run inference
-            auto outputs = neuropod->infer(inputs);
+            auto outputs = neuropod->infer(inputs, requested_outputs);
 
             // Turn these "native" tensors into shm tensors
             for (const auto &entry : *outputs)
@@ -125,6 +148,9 @@ void multiprocess_worker_loop(const std::string &control_queue_name)
 
             // Clean up any unused shm tensors that haven't been reused
             shm_allocator.free_unused_shm_blocks();
+
+            // Clear the requested outputs
+            requested_outputs.clear();
 
             // Empty the inputs set. This is done after sending outputs back to the main process
             // because this takes a nontrivial amount of time

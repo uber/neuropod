@@ -213,7 +213,7 @@ TorchNeuropodBackend::TorchNeuropodBackend(const std::string &             torch
 
 TorchNeuropodBackend::~TorchNeuropodBackend() = default;
 
-torch::Device TorchNeuropodBackend::get_torch_device(neuropod::DeviceType target_device)
+torch::Device TorchNeuropodBackend::get_torch_device(NeuropodDeviceType target_device)
 {
     if (options_.visible_device == Device::CPU || !torch::cuda::is_available())
     {

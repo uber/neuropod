@@ -17,8 +17,9 @@ namespace neuropod
 //
 // This function starts a new worker process and loads a neuropod in it.
 // The below function loads a neuropod in an existing worker process.
-std::unique_ptr<Neuropod> load_neuropod_in_new_process(const std::string &neuropod_path,
-                                                       bool               free_memory_every_cycle = true);
+std::unique_ptr<Neuropod> load_neuropod_in_new_process(const std::string &   neuropod_path,
+                                                       const RuntimeOptions &options                 = {},
+                                                       bool                  free_memory_every_cycle = true);
 
 // Run the neuropod in an existing worker
 // (using shared memory to communicate between the processes)
