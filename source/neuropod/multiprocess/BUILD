@@ -5,6 +5,8 @@
 cc_library(
     name = "shm_allocator",
     srcs = [
+        "raw_shm_block_allocator.hh",
+        "raw_shm_block_allocator.cc",
         "shm_allocator.hh",
         "shm_allocator.cc",
     ],
