@@ -40,9 +40,7 @@ private:
     torch::Device get_torch_device(NeuropodDeviceType target_device);
 
 public:
-    TorchNeuropodBackend(const std::string &           neuropod_path,
-                         std::unique_ptr<ModelConfig> &model_config,
-                         const RuntimeOptions &        options);
+    TorchNeuropodBackend(const std::string &neuropod_path, const RuntimeOptions &options);
 
     // Create a TorchNeuropodBackend using the path to a TorchScript model exported using `torch.jit.save`
     TorchNeuropodBackend(const std::string &torchscript_model_path);

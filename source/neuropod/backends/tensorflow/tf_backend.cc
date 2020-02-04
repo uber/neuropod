@@ -118,9 +118,7 @@ std::string get_handle_cache_key(const std::map<std::string, tensorflow::Tensor>
 
 } // namespace
 
-TensorflowNeuropodBackend::TensorflowNeuropodBackend(const std::string &           neuropod_path,
-                                                     std::unique_ptr<ModelConfig> &model_config,
-                                                     const RuntimeOptions &        options)
+TensorflowNeuropodBackend::TensorflowNeuropodBackend(const std::string &neuropod_path, const RuntimeOptions &options)
     : NeuropodBackendWithDefaultAllocator<TensorflowNeuropodTensor>(neuropod_path),
       session_(tensorflow::NewSession(get_tf_opts(options)))
 {
@@ -134,7 +132,7 @@ TensorflowNeuropodBackend::TensorflowNeuropodBackend(const std::string &        
 #endif
 
     // Load custom ops (if any)
-    for (const auto &item : model_config->custom_ops)
+    for (const auto &item : model_config_->custom_ops)
     {
         const auto path = "0/ops/" + item;
         const auto hash = loader_->get_hash_for_file(path);
@@ -185,7 +183,7 @@ TensorflowNeuropodBackend::TensorflowNeuropodBackend(const std::string &        
     setup_node_mapping_and_init_ops(*config_stream, node_name_mapping_, init_ops);
 
     // Get a list of the output nodes
-    for (const auto &output : model_config->outputs)
+    for (const auto &output : model_config_->outputs)
     {
         output_names_.emplace_back(output.name);
     }

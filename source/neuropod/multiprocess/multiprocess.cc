@@ -135,7 +135,8 @@ public:
                                 const std::string &control_queue_name,
                                 bool               free_memory_every_cycle,
                                 bool               wait_for_load = true)
-        : control_queue_name_(control_queue_name),
+        : NeuropodBackendWithDefaultAllocator<SHMNeuropodTensor>(neuropod_path),
+          control_queue_name_(control_queue_name),
           free_memory_every_cycle_(free_memory_every_cycle),
           control_channel_(control_queue_name, MAIN_PROCESS)
     {

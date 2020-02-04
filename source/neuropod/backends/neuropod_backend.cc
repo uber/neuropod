@@ -4,6 +4,7 @@
 
 #include "neuropod/backends/neuropod_backend.hh"
 
+#include "neuropod/internal/config_utils.hh"
 #include "neuropod/internal/neuropod_loader.hh"
 
 namespace neuropod
@@ -12,9 +13,31 @@ namespace neuropod
 NeuropodBackend::NeuropodBackend()  = default;
 NeuropodBackend::~NeuropodBackend() = default;
 
-NeuropodBackend::NeuropodBackend(const std::string &neuropod_path)
+NeuropodBackend::NeuropodBackend(const std::string &neuropod_path) : model_config_(load_model_config(neuropod_path))
 {
     loader_ = get_loader(neuropod_path);
+}
+
+const std::vector<TensorSpec> &NeuropodBackend::get_inputs() const
+{
+    if (model_config_ == nullptr)
+    {
+        static const std::vector<TensorSpec> empty = {};
+        return empty;
+    }
+
+    return model_config_->inputs;
+}
+
+const std::vector<TensorSpec> &NeuropodBackend::get_outputs() const
+{
+    if (model_config_ == nullptr)
+    {
+        static const std::vector<TensorSpec> empty = {};
+        return empty;
+    }
+
+    return model_config_->outputs;
 }
 
 std::unique_ptr<NeuropodValueMap> NeuropodBackend::infer(const NeuropodValueMap &        inputs,

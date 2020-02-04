@@ -155,12 +155,10 @@ std::mutex                      loaded_op_mutex;
 
 } // namespace
 
-TorchNeuropodBackend::TorchNeuropodBackend(const std::string &           neuropod_path,
-                                           std::unique_ptr<ModelConfig> &model_config,
-                                           const RuntimeOptions &        options)
+TorchNeuropodBackend::TorchNeuropodBackend(const std::string &neuropod_path, const RuntimeOptions &options)
     : NeuropodBackendWithDefaultAllocator<TorchNeuropodTensor>(neuropod_path),
       options_(options),
-      input_device_mapping_(model_config->input_tensor_device)
+      input_device_mapping_(model_config_->input_tensor_device)
 {
     // Get the model from the neuropod
     auto graph_stream = loader_->get_istream_for_file("0/data/model.pt");
@@ -168,7 +166,7 @@ TorchNeuropodBackend::TorchNeuropodBackend(const std::string &           neuropo
     // Custom ops
     // Make sure we don't load a custom op twice
     std::vector<std::string> custom_ops;
-    for (const auto &item : model_config->custom_ops)
+    for (const auto &item : model_config_->custom_ops)
     {
         const auto path = "0/ops/" + item;
         const auto hash = loader_->get_hash_for_file(path);
@@ -194,14 +192,14 @@ TorchNeuropodBackend::TorchNeuropodBackend(const std::string &           neuropo
         NEUROPOD_ERROR("Failed to load TorchScript graph for neuropod" << neuropod_path.c_str());
     }
 
-    for (const auto &tensor_spec : model_config->outputs)
+    for (const auto &tensor_spec : model_config_->outputs)
     {
         output_specs_.emplace_back(tensor_spec);
     }
 }
 
 TorchNeuropodBackend::TorchNeuropodBackend(const std::string &torchscript_model_path)
-    : TorchNeuropodBackend(torchscript_model_path, {})
+    : TorchNeuropodBackend(torchscript_model_path, std::vector<std::string>())
 {
 }
 
