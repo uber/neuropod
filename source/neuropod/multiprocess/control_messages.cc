@@ -18,6 +18,7 @@ std::ostream &operator<<(std::ostream &out, const MessageType value)
     switch (value)
     {
         GENERATE_CASE(LOAD_NEUROPOD);
+        GENERATE_CASE(LOAD_SUCCESS);
         GENERATE_CASE(ADD_INPUT);
         GENERATE_CASE(INFER);
         GENERATE_CASE(REQUEST_OUTPUT);

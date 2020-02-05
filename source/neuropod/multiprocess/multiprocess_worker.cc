@@ -99,6 +99,7 @@ void multiprocess_worker_loop(const std::string &control_queue_name)
             allocator = neuropod->get_tensor_allocator();
             inputs.clear();
             last_outputs.clear();
+            control_channel.send_message(LOAD_SUCCESS);
         }
         else if (received.type == ADD_INPUT)
         {

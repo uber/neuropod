@@ -38,7 +38,8 @@ void TransitionVerifier::assert_transition_allowed(MessageType current_type)
     // Using `set` instead of `unordered_set` because it doesn't require the type to be
     // hashable
     static const std::set<std::pair<MessageType, MessageType>> allowed_transitions = {
-        std::make_pair(LOAD_NEUROPOD, ADD_INPUT),
+        std::make_pair(LOAD_NEUROPOD, LOAD_SUCCESS),
+        std::make_pair(LOAD_SUCCESS, ADD_INPUT),
         std::make_pair(ADD_INPUT, ADD_INPUT),
         std::make_pair(ADD_INPUT, REQUEST_OUTPUT),
         std::make_pair(ADD_INPUT, INFER),
