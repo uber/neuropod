@@ -15,8 +15,13 @@ namespace neuropod
 enum MessageType
 {
     // Sent by the main process with the neuropod path
-    // Valid next messages: ADD_INPUT
+    // Valid next messages: LOAD_SUCCESS
     LOAD_NEUROPOD,
+
+    // Sent by the worker process to confirm that the model has been successfully
+    // loaded.
+    // Valid next messages: ADD_INPUT
+    LOAD_SUCCESS,
 
     // Sent by the main process when passing tensors to the worker process
     // Valid next messages: ADD_INPUT, REQUEST_OUTPUT, INFER

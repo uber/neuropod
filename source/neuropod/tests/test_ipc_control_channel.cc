@@ -38,12 +38,13 @@ TEST(test_ipc_control_channel, simple)
 
     // Send the tensors
     main_control_channel.send_message(neuropod::LOAD_NEUROPOD);
+    main_control_channel.send_message(neuropod::LOAD_SUCCESS);
     main_control_channel.send_message(neuropod::ADD_INPUT, sender_map);
     main_control_channel.send_message(neuropod::INFER);
 
     // Receive the tensors
     neuropod::NeuropodValueMap recvd_map;
-    for (int i = 0; i < 2; i++)
+    for (int i = 0; i < 3; i++)
     {
         // Get a message
         neuropod::control_message received;
@@ -55,6 +56,9 @@ TEST(test_ipc_control_channel, simple)
             EXPECT_EQ(received.type, neuropod::LOAD_NEUROPOD);
             break;
         case 1:
+            EXPECT_EQ(received.type, neuropod::LOAD_SUCCESS);
+            break;
+        case 2:
             EXPECT_EQ(received.type, neuropod::ADD_INPUT);
             for (int i = 0; i < received.num_tensors; i++)
             {
@@ -105,11 +109,12 @@ TEST(test_ipc_control_channel, no_tensors)
 
     // Send an empty map of tensors
     main_control_channel.send_message(neuropod::LOAD_NEUROPOD);
+    main_control_channel.send_message(neuropod::LOAD_SUCCESS);
     main_control_channel.send_message(neuropod::ADD_INPUT, sender_map);
     main_control_channel.send_message(neuropod::INFER);
 
     // Receive the tensors
-    for (int i = 0; i < 2; i++)
+    for (int i = 0; i < 3; i++)
     {
         // Get a message
         neuropod::control_message received;
@@ -121,6 +126,9 @@ TEST(test_ipc_control_channel, no_tensors)
             EXPECT_EQ(received.type, neuropod::LOAD_NEUROPOD);
             break;
         case 1:
+            EXPECT_EQ(received.type, neuropod::LOAD_SUCCESS);
+            break;
+        case 2:
             EXPECT_EQ(received.type, neuropod::ADD_INPUT);
             EXPECT_EQ(received.num_tensors, 0);
             break;
