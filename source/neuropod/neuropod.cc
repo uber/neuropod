@@ -50,14 +50,24 @@ std::unique_ptr<NeuropodValueMap> Neuropod::infer(const NeuropodValueMap &      
     return backend_->infer(inputs, requested_outputs);
 }
 
-const std::vector<TensorSpec> &Neuropod::get_inputs() const
+const std::vector<TensorSpec>& Neuropod::get_inputs() const
 {
     return backend_->get_inputs();
 }
 
-const std::vector<TensorSpec> &Neuropod::get_outputs() const
+const std::vector<TensorSpec>& Neuropod::get_outputs() const
 {
     return backend_->get_outputs();
+}
+
+const std::string& Neuropod::get_name() const
+{
+   return model_config_->name;
+}
+
+const std::string& Neuropod::get_platform() const
+{
+   return model_config_->platform;
 }
 
 std::shared_ptr<NeuropodTensorAllocator> Neuropod::get_tensor_allocator()

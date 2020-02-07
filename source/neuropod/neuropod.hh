@@ -103,6 +103,11 @@ public:
     const std::vector<TensorSpec> &get_inputs() const;
     const std::vector<TensorSpec> &get_outputs() const;
 
+    // Get the name of the loaded Neuropod.
+    const std::string& get_name() const;
+    // Get the platform of the loaded Neuropod.
+    const std::string& get_platform() const;
+
     // Returns a tensor allocator that can allocate tensors compatible with this neuropod
     std::shared_ptr<NeuropodTensorAllocator> get_tensor_allocator();
 
