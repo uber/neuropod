@@ -45,9 +45,7 @@ private:
                          const std::map<std::string, std::string> &       tensor_fetches);
 
 public:
-    explicit TensorflowNeuropodBackend(const std::string &           neuropod_path,
-                                       std::unique_ptr<ModelConfig> &model_config,
-                                       const RuntimeOptions &        options);
+    TensorflowNeuropodBackend(const std::string &neuropod_path, const RuntimeOptions &options);
 
     ~TensorflowNeuropodBackend();
 

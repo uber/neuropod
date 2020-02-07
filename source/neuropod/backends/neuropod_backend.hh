@@ -44,9 +44,16 @@ public:
     virtual std::unique_ptr<NeuropodValueMap> infer(const NeuropodValueMap &        inputs,
                                                     const std::vector<std::string> &requested_outputs);
 
+    // Get the inputs and outputs of this model
+    const std::vector<TensorSpec> &get_inputs() const;
+    const std::vector<TensorSpec> &get_outputs() const;
+
 protected:
     // Used to load files in a Neuropod
     std::unique_ptr<NeuropodLoader> loader_;
+
+    // The neuropod model config
+    std::unique_ptr<ModelConfig> model_config_;
 };
 
 template <template <class> class TensorImpl>

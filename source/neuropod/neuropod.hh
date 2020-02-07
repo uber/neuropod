@@ -43,9 +43,6 @@ struct RuntimeOptions
 class Neuropod
 {
 private:
-    // The neuropod model config
-    std::unique_ptr<ModelConfig> model_config_;
-
     // The backend used to load and run the neuropod
     std::shared_ptr<NeuropodBackend> backend_;
 
