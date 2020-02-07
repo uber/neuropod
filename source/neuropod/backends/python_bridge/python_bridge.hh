@@ -44,8 +44,9 @@ public:
 
     ~PythonBridge();
 
+protected:
     // Run inference
-    std::unique_ptr<NeuropodValueMap> infer(const NeuropodValueMap &inputs);
+    std::unique_ptr<NeuropodValueMap> infer_internal(const NeuropodValueMap &inputs);
 };
 
 } // namespace neuropod

@@ -228,7 +228,7 @@ torch::Device TorchNeuropodBackend::get_torch_device(NeuropodDeviceType target_d
 #endif
 
 // Run inference
-std::unique_ptr<NeuropodValueMap> TorchNeuropodBackend::infer(const NeuropodValueMap &inputs)
+std::unique_ptr<NeuropodValueMap> TorchNeuropodBackend::infer_internal(const NeuropodValueMap &inputs)
 {
     torch::NoGradGuard guard;
 

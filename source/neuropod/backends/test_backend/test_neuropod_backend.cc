@@ -12,7 +12,7 @@ TestNeuropodBackend::TestNeuropodBackend(const std::string &neuropod_path, const
 TestNeuropodBackend::~TestNeuropodBackend() = default;
 
 // Run inference
-std::unique_ptr<NeuropodValueMap> TestNeuropodBackend::infer(const NeuropodValueMap &inputs)
+std::unique_ptr<NeuropodValueMap> TestNeuropodBackend::infer_internal(const NeuropodValueMap &inputs)
 {
     return stdx::make_unique<NeuropodValueMap>();
 }

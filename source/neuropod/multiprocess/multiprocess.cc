@@ -234,11 +234,10 @@ public:
         }
     }
 
-    std::unique_ptr<NeuropodValueMap> infer(const NeuropodValueMap &inputs) { return infer(inputs, {}); }
-
+protected:
     // Run inference
-    std::unique_ptr<NeuropodValueMap> infer(const NeuropodValueMap &        inputs,
-                                            const std::vector<std::string> &requested_outputs)
+    std::unique_ptr<NeuropodValueMap> infer_internal(const NeuropodValueMap &        inputs,
+                                                     const std::vector<std::string> &requested_outputs)
     {
         // Add inputs
         control_channel_.send_message(ADD_INPUT, inputs);

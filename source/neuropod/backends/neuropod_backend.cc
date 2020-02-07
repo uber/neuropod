@@ -43,14 +43,21 @@ const std::vector<TensorSpec> &NeuropodBackend::get_outputs() const
 std::unique_ptr<NeuropodValueMap> NeuropodBackend::infer(const NeuropodValueMap &        inputs,
                                                          const std::vector<std::string> &requested_outputs)
 {
+    // Run inference
+    return infer_internal(inputs, requested_outputs);
+}
+
+std::unique_ptr<NeuropodValueMap> NeuropodBackend::infer_internal(const NeuropodValueMap &        inputs,
+                                                                  const std::vector<std::string> &requested_outputs)
+{
     // We're not doing any filtering
     if (requested_outputs.size() == 0)
     {
-        return infer(inputs);
+        return infer_internal(inputs);
     }
 
     // Run inference and get all the outputs
-    auto data = infer(inputs);
+    auto data = infer_internal(inputs);
     auto out  = stdx::make_unique<NeuropodValueMap>();
 
     // Filter to the requested outputs
@@ -66,6 +73,11 @@ std::unique_ptr<NeuropodValueMap> NeuropodBackend::infer(const NeuropodValueMap 
     }
 
     return out;
+}
+
+std::unique_ptr<NeuropodValueMap> NeuropodBackend::infer_internal(const NeuropodValueMap &inputs)
+{
+    NEUROPOD_ERROR("Backend implementations must provide a `infer_internal` implementation");
 }
 
 } // namespace neuropod
