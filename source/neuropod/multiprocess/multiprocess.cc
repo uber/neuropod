@@ -5,6 +5,7 @@
 #include "neuropod/multiprocess/multiprocess.hh"
 
 #include "neuropod/backends/neuropod_backend.hh"
+#include "neuropod/internal/logging.hh"
 #include "neuropod/multiprocess/control_messages.hh"
 #include "neuropod/multiprocess/ipc_control_channel.hh"
 #include "neuropod/multiprocess/shm_tensor.hh"
@@ -95,10 +96,45 @@ private:
     // Control channel for interacting with the worker
     IPCControlChannel control_channel_;
 
+    void wait_for_load_confirmation(const std::string &neuropod_path)
+    {
+        // Wait for confirmation that the model was loaded
+        while (true)
+        {
+            // Get a message from the worker
+            control_message received;
+            bool            successful_read = control_channel_.recv_message(received, MESSAGE_TIMEOUT_MS);
+            if (!successful_read)
+            {
+                // We timed out
+                NEUROPOD_ERROR("Timed out waiting for the worker process to load: "
+                               << neuropod_path << ". Didn't receive a message in " << MESSAGE_TIMEOUT_MS
+                               << "ms, but expected a heartbeat every " << HEARTBEAT_INTERVAL_MS << "ms.");
+            }
+
+            if (received.type == LOAD_SUCCESS)
+            {
+                // The model was successfully loaded
+                break;
+            }
+
+            if (received.type == HEARTBEAT)
+            {
+                // TODO(vip): Also periodically check for a heartbeat
+                continue;
+            }
+
+            // We got an unexpected message
+            NEUROPOD_ERROR(
+                "Expected LOAD_SUCCESS, but got unexpected message from the worker process:" << received.type)
+        }
+    }
+
 public:
     MultiprocessNeuropodBackend(const std::string &neuropod_path,
                                 const std::string &control_queue_name,
-                                bool               free_memory_every_cycle)
+                                bool               free_memory_every_cycle,
+                                bool               wait_for_load = true)
         : control_queue_name_(control_queue_name),
           free_memory_every_cycle_(free_memory_every_cycle),
           control_channel_(control_queue_name, MAIN_PROCESS)
@@ -116,14 +152,22 @@ public:
 
         // Send the message
         control_channel_.send_message(msg);
+
+        if (wait_for_load)
+        {
+            // Wait until the worker process confirms it has loaded the model
+            wait_for_load_confirmation(neuropod_path);
+        }
     }
 
     // Generate a control queue name and start a worker
     MultiprocessNeuropodBackend(const std::string &   neuropod_path,
                                 const RuntimeOptions &options,
                                 bool                  free_memory_every_cycle)
-        : MultiprocessNeuropodBackend(
-              neuropod_path, boost::uuids::to_string(boost::uuids::random_generator()()), free_memory_every_cycle)
+        : MultiprocessNeuropodBackend(neuropod_path,
+                                      boost::uuids::to_string(boost::uuids::random_generator()()),
+                                      free_memory_every_cycle,
+                                      false)
     {
         auto env = get_env_map();
 
@@ -147,6 +191,9 @@ public:
 
         // Start the worker process
         child_pid_ = start_worker_process(control_queue_name_, env_vec);
+
+        // Wait until the worker process confirms it has loaded the model
+        wait_for_load_confirmation(neuropod_path);
     }
 
     ~MultiprocessNeuropodBackend()
@@ -192,12 +239,6 @@ public:
     std::unique_ptr<NeuropodValueMap> infer(const NeuropodValueMap &        inputs,
                                             const std::vector<std::string> &requested_outputs)
     {
-        if (free_memory_every_cycle_)
-        {
-            // Clean up any unused shm tensors that haven't been reused
-            shm_allocator.free_unused_shm_blocks();
-        }
-
         // Add inputs
         control_channel_.send_message(ADD_INPUT, inputs);
 
@@ -213,6 +254,7 @@ public:
         while (true)
         {
             // Get a message from the worker
+            SPDLOG_DEBUG("OPE: Waiting for load confirmation from worker...");
             control_message received;
             bool            successful_read = control_channel_.recv_message(received, MESSAGE_TIMEOUT_MS);
             if (!successful_read)
@@ -254,6 +296,12 @@ public:
         // Let the worker know it no longer needs to keep references to the output
         // tensors
         control_channel_.send_message(INFER_COMPLETE);
+
+        if (free_memory_every_cycle_)
+        {
+            // Clean up any unused shm tensors that haven't been reused
+            shm_allocator.free_unused_shm_blocks();
+        }
 
         return to_return;
     }

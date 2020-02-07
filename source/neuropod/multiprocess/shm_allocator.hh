@@ -1,6 +1,8 @@
 //
-// Uber, Inc. (c) 2019
+// Uber, Inc. (c) 2020
 //
+
+#include "neuropod/multiprocess/raw_shm_block_allocator.hh"
 
 #include <array>
 #include <memory>
@@ -24,17 +26,35 @@ namespace neuropod
 //
 // To free all the currently unused blocks, call `free_unused_shm_blocks`. This should
 // periodically be called to ensure that unused shared memory is freed.
-// Note: the three functions below are all threadsafe
+
+// The allocator also employs a similar approach for loading blocks:
+// If we've loaded a block before, we're likely to load it again.
+//
+// Internally, we maintain a pool of blocks of memory we've loaded in the past.
+// If we are requested to load a block again, we don't need to redo all the work to open
+// the shared memory objects.
+//
+// To free all the currently unused blocks, call `free_unused_shm_blocks`. This should
+// periodically be called to ensure that unused shared memory is freed.
 
 // The block ID is just 24 opaque bytes (from the perspective of users of this allocator)
 using SHMBlockID = std::array<char, 24>;
 
-class UnusedPool;
+// Forward declarations of caches we're using
+class AllocationCache;
+class LoadCache;
+
+// This allocator builds on top of RawSHMBlockAllocator to implement the optimizations
+// described above
+//
+// Note: the methods below are all threadsafe
 class SHMAllocator
 {
 private:
-    // Keeps track of unused blocks of shared memory so we can reuse them
-    std::unique_ptr<UnusedPool> unused_pool_;
+    RawSHMBlockAllocator allocator_;
+
+    std::unique_ptr<AllocationCache> allocation_cache_;
+    std::unique_ptr<LoadCache>       load_cache_;
 
 public:
     SHMAllocator();
