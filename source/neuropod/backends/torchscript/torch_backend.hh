@@ -42,13 +42,6 @@ private:
 public:
     TorchNeuropodBackend(const std::string &neuropod_path, const RuntimeOptions &options);
 
-    // Create a TorchNeuropodBackend using the path to a TorchScript model exported using `torch.jit.save`
-    TorchNeuropodBackend(const std::string &torchscript_model_path);
-
-    // Create a TorchNeuropodBackend using the path to a TorchScript model exported using `torch.jit.save` along
-    // with a list of custom ops to load
-    TorchNeuropodBackend(const std::string &torchscript_model_path, const std::vector<std::string> &custom_op_paths);
-
     ~TorchNeuropodBackend();
 
     // Run inference

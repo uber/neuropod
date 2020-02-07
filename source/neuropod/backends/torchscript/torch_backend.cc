@@ -62,26 +62,6 @@ std::shared_ptr<torch::jit::script::Module> load_model_from_path(std::istream & 
     return model;
 }
 
-std::shared_ptr<torch::jit::script::Module> load_model_from_path(const std::string &             graph_path,
-                                                                 const std::vector<std::string> &custom_op_paths,
-                                                                 const torch::Device &           device)
-{
-    std::ifstream stream(graph_path, std::ios_base::binary);
-    if (!stream.good())
-    {
-        NEUROPOD_ERROR("Failed to load graph from path " << graph_path.c_str());
-    }
-
-    auto model = load_model_from_path(stream, custom_op_paths, device);
-
-    if (!model)
-    {
-        NEUROPOD_ERROR("Failed to deserialize graph from path " << graph_path.c_str());
-    }
-
-    return model;
-}
-
 // insert IValue to the output map at key with some type validation
 void insert_value_in_output(NeuropodValueMap & output,
                             const std::string  name,
@@ -196,17 +176,6 @@ TorchNeuropodBackend::TorchNeuropodBackend(const std::string &neuropod_path, con
     {
         output_specs_.emplace_back(tensor_spec);
     }
-}
-
-TorchNeuropodBackend::TorchNeuropodBackend(const std::string &torchscript_model_path)
-    : TorchNeuropodBackend(torchscript_model_path, std::vector<std::string>())
-{
-}
-
-TorchNeuropodBackend::TorchNeuropodBackend(const std::string &             torchscript_model_path,
-                                           const std::vector<std::string> &custom_op_paths)
-    : model_(load_model_from_path(torchscript_model_path, custom_op_paths, torch::kCUDA))
-{
 }
 
 TorchNeuropodBackend::~TorchNeuropodBackend() = default;
