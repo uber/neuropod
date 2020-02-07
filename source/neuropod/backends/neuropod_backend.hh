@@ -54,22 +54,16 @@ class NeuropodBackendWithDefaultAllocator : public NeuropodBackend
 {
 private:
     std::shared_ptr<NeuropodTensorAllocator> allocator_;
-    std::mutex                               allocator_lock_;
 
 public:
-    NeuropodBackendWithDefaultAllocator() = default;
-    NeuropodBackendWithDefaultAllocator(const std::string &neuropod_path) : NeuropodBackend(neuropod_path) {}
+    NeuropodBackendWithDefaultAllocator() : allocator_(std::make_shared<DefaultTensorAllocator<TensorImpl>>()) {}
 
-    std::shared_ptr<NeuropodTensorAllocator> get_tensor_allocator()
+    NeuropodBackendWithDefaultAllocator(const std::string &neuropod_path)
+        : NeuropodBackend(neuropod_path), allocator_(std::make_shared<DefaultTensorAllocator<TensorImpl>>())
     {
-        std::lock_guard<std::mutex> lock(allocator_lock_);
-        if (!allocator_)
-        {
-            allocator_ = std::make_shared<DefaultTensorAllocator<TensorImpl>>();
-        }
-
-        return allocator_;
     }
+
+    std::shared_ptr<NeuropodTensorAllocator> get_tensor_allocator() { return allocator_; }
 };
 
 } // namespace neuropod
