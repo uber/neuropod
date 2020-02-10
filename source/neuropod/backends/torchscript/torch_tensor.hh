@@ -26,6 +26,11 @@
 // The date of the official torch 1.3.0 release
 #define CAFFE2_NIGHTLY_VERSION 20191010
 #endif
+
+#if CAFFE2_VERSION == 10400
+// The date of the official torch 1.4.0 release
+#define CAFFE2_NIGHTLY_VERSION 20200115
+#endif
 #endif
 
 namespace neuropod

@@ -199,14 +199,16 @@ torch::Device TorchNeuropodBackend::get_torch_device(NeuropodDeviceType target_d
     }
 }
 
-#if CAFFE2_NIGHTLY_VERSION >= 20191010
-#define MAKE_DICT(name) c10::impl::GenericDict name(c10::AnyType::get(), c10::AnyType::get());
+#if CAFFE2_NIGHTLY_VERSION >= 20200115
+#define MAKE_DICT(name, type) torch::Dict<std::string, type> name;
+#elif CAFFE2_NIGHTLY_VERSION >= 20191010
+#define MAKE_DICT(name, type) c10::impl::GenericDict name(c10::AnyType::get(), c10::AnyType::get());
 #elif CAFFE2_NIGHTLY_VERSION >= 20190717
-#define MAKE_DICT(name) c10::impl::GenericDict name((c10::impl::deprecatedUntypedDict()));
+#define MAKE_DICT(name, type) c10::impl::GenericDict name((c10::impl::deprecatedUntypedDict()));
 #elif CAFFE2_NIGHTLY_VERSION >= 20190601
-#define MAKE_DICT(name) auto name = c10::make_dict<torch::jit::IValue, torch::jit::IValue>();
+#define MAKE_DICT(name, type) auto name = c10::make_dict<torch::jit::IValue, torch::jit::IValue>();
 #else
-#define MAKE_DICT(name) torch::ivalue::UnorderedMap name;
+#define MAKE_DICT(name, type) torch::ivalue::UnorderedMap name;
 #endif
 
 #if CAFFE2_NIGHTLY_VERSION >= 20190717
@@ -263,16 +265,40 @@ std::unique_ptr<NeuropodValueMap> TorchNeuropodBackend::infer(const NeuropodValu
     if (is_dict_input)
     {
         // This model expects a dict as input
-        MAKE_DICT(input_dict);
+        MAKE_DICT(tensor_input_dict, torch::Tensor);
+        MAKE_DICT(str_input_dict, torch::List<std::string>);
+
         for (const auto &entry : inputs)
         {
             const auto  device = get_torch_device(input_device_mapping_.at(entry.first));
             const auto &value  = get_ivalue_from_torch_tensor(entry.second);
 
-            DICT_INSERT(input_dict, entry.first, maybe_set_device(value, device));
+            if (value.isTensor())
+            {
+                // .to(device) is a no-op if the tensor is already transferred
+                DICT_INSERT(tensor_input_dict, entry.first, value.toTensor().to(device));
+            }
+            else
+            {
+#if CAFFE2_NIGHTLY_VERSION >= 20190717
+                DICT_INSERT(str_input_dict, entry.first, c10::impl::toTypedList<std::string>(value.toGenericList()));
+#else
+                DICT_INSERT(str_input_dict, entry.first, value);
+#endif
+            }
         }
 
-        torch_inputs.at(0) = input_dict;
+        // TODO(vip): This assumes a model only takes in string "tensors" or tensors, but not both
+        // Refactor to add support for both and add documentation
+        if (*arguments.at(has_class_type ? 1 : 0).type()->cast<torch::DictType>()->getValueType() ==
+            *torch::TensorType::get())
+        {
+            torch_inputs.at(0) = tensor_input_dict;
+        }
+        else
+        {
+            torch_inputs.at(0) = str_input_dict;
+        }
     }
     else
     {

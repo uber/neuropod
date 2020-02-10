@@ -87,8 +87,8 @@ PY_VERSIONS = [
 FRAMEWORK_VERSIONS = [
     {"cuda": "9.0", "tensorflow": "1.12.0", "torch": "1.1.0"},
     {"cuda": "10.0", "tensorflow": "1.13.1", "torch": "1.2.0"},
-    {"cuda": "10.0", "tensorflow": "1.14.0", "torch": "1.3.0.dev20190820"},
-    {"cuda": "10.0", "tensorflow": "1.15.0", "torch": "1.3.0"},
+    {"cuda": "10.0", "tensorflow": "1.14.0", "torch": "1.3.0"},
+    {"cuda": "10.0", "tensorflow": "1.15.0", "torch": "1.4.0"},
 ]
 
 travis_matrix = []
