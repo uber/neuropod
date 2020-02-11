@@ -21,7 +21,7 @@ void test_addition_model(neuropod::Neuropod &neuropod, bool copy_mem)
         // Check name and platform.
         EXPECT_EQ(neuropod.get_name(), "addition_model");
         const auto p = neuropod.get_platform();
-        EXPECT_TRUE(p == "tensorflow" || p ==  "python" || p == "torchscript");
+        EXPECT_TRUE(p == "tensorflow" || p == "python" || p == "torchscript");
 
         // Check the input and output tensor specs
         auto input_specs  = neuropod.get_inputs();
