@@ -35,14 +35,9 @@ public:
     // Returns an allocator that can allocate tensors compatible with this backend
     virtual std::shared_ptr<NeuropodTensorAllocator> get_tensor_allocator() = 0;
 
-    // Run inference
-    virtual std::unique_ptr<NeuropodValueMap> infer(const NeuropodValueMap &inputs) = 0;
-
     // Run inference and get a subset of the outputs
-    // The default implementation runs inference, gets all the outputs, and then filters the outputs
-    // Backends can override this to more efficiently generate only the requested outputs
-    virtual std::unique_ptr<NeuropodValueMap> infer(const NeuropodValueMap &        inputs,
-                                                    const std::vector<std::string> &requested_outputs);
+    std::unique_ptr<NeuropodValueMap> infer(const NeuropodValueMap &        inputs,
+                                            const std::vector<std::string> &requested_outputs = {});
 
     // Get the inputs and outputs of this model
     const std::vector<TensorSpec> &get_inputs() const;
@@ -54,6 +49,16 @@ protected:
 
     // The neuropod model config
     std::unique_ptr<ModelConfig> model_config_;
+
+    // Run inference and get a subset of the outputs
+    // The default implementation runs inference, gets all the outputs, and then filters the outputs
+    // Backends can override this to more efficiently generate only the requested outputs
+    virtual std::unique_ptr<NeuropodValueMap> infer_internal(const NeuropodValueMap &        inputs,
+                                                             const std::vector<std::string> &requested_outputs);
+
+    // Run inference
+    // Backends must provide an implementation of infer_internal (either this signature or the one above)
+    virtual std::unique_ptr<NeuropodValueMap> infer_internal(const NeuropodValueMap &inputs);
 };
 
 template <template <class> class TensorImpl>

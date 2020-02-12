@@ -117,7 +117,7 @@ PythonBridge::~PythonBridge()
 }
 
 // Run inference
-std::unique_ptr<NeuropodValueMap> PythonBridge::infer(const NeuropodValueMap &inputs)
+std::unique_ptr<NeuropodValueMap> PythonBridge::infer_internal(const NeuropodValueMap &inputs)
 {
     // Acquire the GIL
     py::gil_scoped_acquire gil;

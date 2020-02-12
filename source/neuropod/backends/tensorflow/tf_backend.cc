@@ -249,14 +249,9 @@ int64_t TensorflowNeuropodBackend::get_callable(const std::map<std::string, tens
     return handle;
 }
 
-std::unique_ptr<NeuropodValueMap> TensorflowNeuropodBackend::infer(const NeuropodValueMap &inputs)
-{
-    return infer(inputs, {});
-}
-
 // Run inference with a set of requested outputs
-std::unique_ptr<NeuropodValueMap> TensorflowNeuropodBackend::infer(const NeuropodValueMap &        inputs,
-                                                                   const std::vector<std::string> &requested_outputs)
+std::unique_ptr<NeuropodValueMap> TensorflowNeuropodBackend::infer_internal(
+    const NeuropodValueMap &inputs, const std::vector<std::string> &requested_outputs)
 {
     // In TensorFlow, a callable is a way of running a subgraph given a set of inputs and
     // outputs. It's very similar to `session_->Run` except it has support for more fine-grained
