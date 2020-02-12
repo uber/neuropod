@@ -33,7 +33,7 @@ private:
     RuntimeOptions options_;
 
     // The device mapping for the input tensors
-    std::unordered_map<std::string, NeuropodDeviceType> input_device_mapping_;
+    std::unordered_map<std::string, torch::Device> input_device_mapping_;
 
     // Get a torch device given a target neuropod device
     // (this also depends on the visible device in the options above)
@@ -42,11 +42,13 @@ private:
 public:
     TorchNeuropodBackend(const std::string &neuropod_path, const RuntimeOptions &options);
 
+    std::unique_ptr<SealedValueMap> get_sealed_map();
+
     ~TorchNeuropodBackend();
 
 protected:
     // Run inference
-    std::unique_ptr<NeuropodValueMap> infer_internal(const NeuropodValueMap &inputs);
+    std::unique_ptr<NeuropodValueMap> infer_internal(const SealedValueMap &inputs);
 };
 
 } // namespace neuropod

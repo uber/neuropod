@@ -43,11 +43,25 @@ const std::vector<TensorSpec> &NeuropodBackend::get_outputs() const
 std::unique_ptr<NeuropodValueMap> NeuropodBackend::infer(const NeuropodValueMap &        inputs,
                                                          const std::vector<std::string> &requested_outputs)
 {
+    // Seal all the inputs (so they are moved to the right devices, etc.)
+    auto inputs_sealed = get_sealed_map();
+    for (const auto &item : inputs)
+    {
+        inputs_sealed->seal(item.first, item.second);
+    }
+
+    // Run inference
+    return infer(*inputs_sealed, requested_outputs);
+}
+
+std::unique_ptr<NeuropodValueMap> NeuropodBackend::infer(const SealedValueMap &          inputs,
+                                                         const std::vector<std::string> &requested_outputs)
+{
     // Run inference
     return infer_internal(inputs, requested_outputs);
 }
 
-std::unique_ptr<NeuropodValueMap> NeuropodBackend::infer_internal(const NeuropodValueMap &        inputs,
+std::unique_ptr<NeuropodValueMap> NeuropodBackend::infer_internal(const SealedValueMap &          inputs,
                                                                   const std::vector<std::string> &requested_outputs)
 {
     // We're not doing any filtering
@@ -75,9 +89,11 @@ std::unique_ptr<NeuropodValueMap> NeuropodBackend::infer_internal(const Neuropod
     return out;
 }
 
-std::unique_ptr<NeuropodValueMap> NeuropodBackend::infer_internal(const NeuropodValueMap &inputs)
+std::unique_ptr<NeuropodValueMap> NeuropodBackend::infer_internal(const SealedValueMap &inputs)
 {
     NEUROPOD_ERROR("Backend implementations must provide a `infer_internal` implementation");
 }
+
+SealedValueMap ::~SealedValueMap() = default;
 
 } // namespace neuropod

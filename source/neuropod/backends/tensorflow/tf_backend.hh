@@ -49,9 +49,11 @@ public:
 
     ~TensorflowNeuropodBackend();
 
+    std::unique_ptr<SealedValueMap> get_sealed_map();
+
 protected:
     // Run inference with a set of requested outputs
-    std::unique_ptr<NeuropodValueMap> infer_internal(const NeuropodValueMap &        inputs,
+    std::unique_ptr<NeuropodValueMap> infer_internal(const SealedValueMap &          inputs,
                                                      const std::vector<std::string> &requested_outputs);
 };
 

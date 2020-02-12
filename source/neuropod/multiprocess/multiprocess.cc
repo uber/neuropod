@@ -82,6 +82,15 @@ pid_t start_worker_process(const std::string &control_queue_name, std::vector<st
     return child_pid;
 }
 
+struct SealedMultiprocessValueMap : public SealedValueMap
+{
+    NeuropodValueMap data;
+    void             seal(const std::string &name, const std::shared_ptr<NeuropodValue> &item)
+    {
+        data.emplace(std::make_pair(name, item));
+    }
+};
+
 // Note: we don't register this with the library as a backend because it is not
 // a backend in the normal sense. It is only used here for out of process
 // execution
@@ -234,13 +243,18 @@ public:
         }
     }
 
+    std::unique_ptr<SealedValueMap> get_sealed_map() { return stdx::make_unique<SealedMultiprocessValueMap>(); }
+
 protected:
     // Run inference
-    std::unique_ptr<NeuropodValueMap> infer_internal(const NeuropodValueMap &        inputs,
+    std::unique_ptr<NeuropodValueMap> infer_internal(const SealedValueMap &          inputs_orig,
                                                      const std::vector<std::string> &requested_outputs)
     {
+        // Cast to the right type
+        auto &inputs = static_cast<const SealedMultiprocessValueMap &>(inputs_orig);
+
         // Add inputs
-        control_channel_.send_message(ADD_INPUT, inputs);
+        control_channel_.send_message(ADD_INPUT, inputs.data);
 
         // Request outputs
         // TODO(vip): Don't send this message if requested_outputs is empty

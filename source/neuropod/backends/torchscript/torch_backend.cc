@@ -136,10 +136,14 @@ std::mutex                      loaded_op_mutex;
 } // namespace
 
 TorchNeuropodBackend::TorchNeuropodBackend(const std::string &neuropod_path, const RuntimeOptions &options)
-    : NeuropodBackendWithDefaultAllocator<TorchNeuropodTensor>(neuropod_path),
-      options_(options),
-      input_device_mapping_(model_config_->input_tensor_device)
+    : NeuropodBackendWithDefaultAllocator<TorchNeuropodTensor>(neuropod_path), options_(options)
 {
+    // Setup the device mapping
+    for (const auto &item : model_config_->input_tensor_device)
+    {
+        input_device_mapping_.emplace(std::make_pair(item.first, get_torch_device(item.second)));
+    }
+
     // Get the model from the neuropod
     auto graph_stream = loader_->get_istream_for_file("0/data/model.pt");
 
@@ -227,10 +231,41 @@ torch::Device TorchNeuropodBackend::get_torch_device(NeuropodDeviceType target_d
 #define DICT_INSERT(dict, key, value) dict[key] = value;
 #endif
 
+struct SealedTorchValueMap : public SealedValueMap
+{
+private:
+    std::unordered_map<std::string, torch::Device> device_mapping_;
+
+public:
+    std::unordered_map<std::string, torch::IValue> data;
+    SealedTorchValueMap(std::unordered_map<std::string, torch::Device> device_mapping)
+        : device_mapping_(std::move(device_mapping))
+    {
+    }
+
+    ~SealedTorchValueMap() = default;
+
+    void seal(const std::string &name, const std::shared_ptr<NeuropodValue> &item)
+    {
+        const auto  device = device_mapping_.at(name);
+        const auto &value  = get_ivalue_from_torch_tensor(item);
+
+        data.emplace(std::make_pair(name, maybe_set_device(value, device)));
+    }
+};
+
+std::unique_ptr<SealedValueMap> TorchNeuropodBackend::get_sealed_map()
+{
+    return stdx::make_unique<SealedTorchValueMap>(input_device_mapping_);
+}
+
 // Run inference
-std::unique_ptr<NeuropodValueMap> TorchNeuropodBackend::infer_internal(const NeuropodValueMap &inputs)
+std::unique_ptr<NeuropodValueMap> TorchNeuropodBackend::infer_internal(const SealedValueMap &inputs_orig)
 {
     torch::NoGradGuard guard;
+
+    // Cast to the right type
+    auto &inputs = static_cast<const SealedTorchValueMap &>(inputs_orig);
 
     // Get inference schema
     const auto &method    = model_->get_method("forward");
@@ -268,15 +303,14 @@ std::unique_ptr<NeuropodValueMap> TorchNeuropodBackend::infer_internal(const Neu
         MAKE_DICT(tensor_input_dict, torch::Tensor);
         MAKE_DICT(str_input_dict, torch::List<std::string>);
 
-        for (const auto &entry : inputs)
+        for (const auto &entry : inputs.data)
         {
-            const auto  device = get_torch_device(input_device_mapping_.at(entry.first));
-            const auto &value  = get_ivalue_from_torch_tensor(entry.second);
+            const auto &value = entry.second;
 
             if (value.isTensor())
             {
                 // .to(device) is a no-op if the tensor is already transferred
-                DICT_INSERT(tensor_input_dict, entry.first, value.toTensor().to(device));
+                DICT_INSERT(tensor_input_dict, entry.first, value);
             }
             else
             {
@@ -303,10 +337,10 @@ std::unique_ptr<NeuropodValueMap> TorchNeuropodBackend::infer_internal(const Neu
     else
     {
         // Pass inputs normally
-        for (const auto &entry : inputs)
+        for (const auto &entry : inputs.data)
         {
             const auto  input_name = entry.first;
-            const auto &input_data = get_ivalue_from_torch_tensor(entry.second);
+            const auto &input_data = entry.second;
 
             const auto arg_index = schema.argumentIndexWithName(input_name);
             if (!arg_index.has_value())
@@ -314,9 +348,7 @@ std::unique_ptr<NeuropodValueMap> TorchNeuropodBackend::infer_internal(const Neu
                 NEUROPOD_ERROR("Input '" << input_name.c_str() << "' does not exist. Model inputs " << schema);
             }
 
-            const auto device = get_torch_device(input_device_mapping_.at(input_name));
-
-            torch_inputs.at(arg_index.value() - (has_class_type ? 1 : 0)) = maybe_set_device(input_data, device);
+            torch_inputs.at(arg_index.value() - (has_class_type ? 1 : 0)) = input_data;
         }
     }
 

@@ -20,6 +20,14 @@
 namespace neuropod
 {
 
+struct SealedValueMap
+{
+    // Seal a tensor to mark it as ready and move it to the correct devices
+    virtual void seal(const std::string &name, const std::shared_ptr<NeuropodValue> &item) = 0;
+
+    virtual ~SealedValueMap();
+};
+
 // A map from a tensor name to a pointer to a NeuropodValue
 // This is the input and output type of `infer`
 using NeuropodValueMap = std::unordered_map<std::string, std::shared_ptr<NeuropodValue>>;
@@ -39,9 +47,15 @@ public:
     std::unique_ptr<NeuropodValueMap> infer(const NeuropodValueMap &        inputs,
                                             const std::vector<std::string> &requested_outputs = {});
 
+    // Run inference and get a subset of the outputs
+    std::unique_ptr<NeuropodValueMap> infer(const SealedValueMap &          inputs,
+                                            const std::vector<std::string> &requested_outputs = {});
+
     // Get the inputs and outputs of this model
     const std::vector<TensorSpec> &get_inputs() const;
     const std::vector<TensorSpec> &get_outputs() const;
+
+    virtual std::unique_ptr<SealedValueMap> get_sealed_map() = 0;
 
 protected:
     // Used to load files in a Neuropod
@@ -53,12 +67,12 @@ protected:
     // Run inference and get a subset of the outputs
     // The default implementation runs inference, gets all the outputs, and then filters the outputs
     // Backends can override this to more efficiently generate only the requested outputs
-    virtual std::unique_ptr<NeuropodValueMap> infer_internal(const NeuropodValueMap &        inputs,
+    virtual std::unique_ptr<NeuropodValueMap> infer_internal(const SealedValueMap &          inputs,
                                                              const std::vector<std::string> &requested_outputs);
 
     // Run inference
     // Backends must provide an implementation of infer_internal (either this signature or the one above)
-    virtual std::unique_ptr<NeuropodValueMap> infer_internal(const NeuropodValueMap &inputs);
+    virtual std::unique_ptr<NeuropodValueMap> infer_internal(const SealedValueMap &inputs);
 };
 
 template <template <class> class TensorImpl>

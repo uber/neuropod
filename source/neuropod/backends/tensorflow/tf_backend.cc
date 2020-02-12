@@ -249,9 +249,28 @@ int64_t TensorflowNeuropodBackend::get_callable(const std::map<std::string, tens
     return handle;
 }
 
+struct SealedTensorflowValueMap : public SealedValueMap
+{
+public:
+    std::unordered_map<std::string, tensorflow::Tensor> data;
+    SealedTensorflowValueMap()  = default;
+    ~SealedTensorflowValueMap() = default;
+
+    void seal(const std::string &name, const std::shared_ptr<NeuropodValue> &item)
+    {
+        data.emplace(std::make_pair(
+            name, std::dynamic_pointer_cast<NativeDataContainer<tensorflow::Tensor &>>(item)->get_native_data()));
+    }
+};
+
+std::unique_ptr<SealedValueMap> TensorflowNeuropodBackend::get_sealed_map()
+{
+    return stdx::make_unique<SealedTensorflowValueMap>();
+}
+
 // Run inference with a set of requested outputs
 std::unique_ptr<NeuropodValueMap> TensorflowNeuropodBackend::infer_internal(
-    const NeuropodValueMap &inputs, const std::vector<std::string> &requested_outputs)
+    const SealedValueMap &inputs_orig, const std::vector<std::string> &requested_outputs)
 {
     // In TensorFlow, a callable is a way of running a subgraph given a set of inputs and
     // outputs. It's very similar to `session_->Run` except it has support for more fine-grained
@@ -265,6 +284,9 @@ std::unique_ptr<NeuropodValueMap> TensorflowNeuropodBackend::infer_internal(
 
     // Map from an input node_name to a Tensor
     std::map<std::string, tensorflow::Tensor> tensor_feeds;
+
+    // Cast to the right type
+    auto &inputs = static_cast<const SealedTensorflowValueMap &>(inputs_orig);
 
     // Get the set of outputs we want to compute
     const auto &output_names = requested_outputs.size() > 0 ? requested_outputs : output_names_;
@@ -286,7 +308,7 @@ std::unique_ptr<NeuropodValueMap> TensorflowNeuropodBackend::infer_internal(
     }
 
     // Loop through all the input tensors and setup the inputs
-    for (const auto &entry : inputs)
+    for (const auto &entry : inputs.data)
     {
         const auto node_name = node_name_mapping_.find(entry.first);
         if (node_name == node_name_mapping_.end())
@@ -297,12 +319,8 @@ std::unique_ptr<NeuropodValueMap> TensorflowNeuropodBackend::infer_internal(
                                       "in the node_name_mapping.");
         }
 
-        // Get the TensorFlow tensor from the Neuropod tensor
-        const auto &input_data =
-            std::dynamic_pointer_cast<NativeDataContainer<tensorflow::Tensor &>>(entry.second)->get_native_data();
-
         // Add this node name as an input to the subgraph we want to run
-        tensor_feeds.emplace(std::make_pair(node_name->second, input_data));
+        tensor_feeds.emplace(std::make_pair(node_name->second, entry.second));
     }
 
     // Create a callable handle and a vector to store our outputs

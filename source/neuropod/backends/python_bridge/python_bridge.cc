@@ -116,14 +116,44 @@ PythonBridge::~PythonBridge()
     neuropod_.reset();
 }
 
-// Run inference
-std::unique_ptr<NeuropodValueMap> PythonBridge::infer_internal(const NeuropodValueMap &inputs)
+struct SealedPythonValueMap : public SealedValueMap
 {
+    std::unique_ptr<py::dict> out;
+    SealedPythonValueMap() : out(stdx::make_unique<py::dict>()) {}
+    ~SealedPythonValueMap()
+    {
+        // Acquire the GIL
+        py::gil_scoped_acquire gil;
+
+        out.reset();
+    }
+
+    void seal(const std::string &name, const std::shared_ptr<NeuropodValue> &item)
+    {
+        // Acquire the GIL
+        py::gil_scoped_acquire gil;
+
+        // Convert to numpy
+        (*out)[name.c_str()] = tensor_to_numpy(std::dynamic_pointer_cast<NeuropodTensor>(item));
+    }
+};
+
+std::unique_ptr<SealedValueMap> PythonBridge::get_sealed_map()
+{
+    return stdx::make_unique<SealedPythonValueMap>();
+}
+
+// Run inference
+std::unique_ptr<NeuropodValueMap> PythonBridge::infer_internal(const SealedValueMap &inputs_orig)
+{
+    // Cast to the right type
+    auto &inputs = static_cast<const SealedPythonValueMap &>(inputs_orig);
+
     // Acquire the GIL
     py::gil_scoped_acquire gil;
 
     // Convert to a py::dict
-    py::dict model_inputs = to_numpy_dict(const_cast<NeuropodValueMap &>(inputs));
+    auto &model_inputs = *inputs.out;
 
     // Run inference
     py::dict model_outputs_raw = neuropod_->attr("infer")(model_inputs).cast<py::dict>();

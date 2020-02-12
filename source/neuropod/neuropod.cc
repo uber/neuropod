@@ -12,6 +12,26 @@
 namespace neuropod
 {
 
+SealedMapProxy::SealedMapProxy(SealedValueMap &data, std::string name) : data_(data), name_(std::move(name)) {}
+
+void SealedMapProxy::operator=(std::shared_ptr<NeuropodTensor> t)
+{
+    // Seal the tensor
+    data_.seal(name_, t);
+}
+
+SealedNeuropodValueMap::SealedNeuropodValueMap(const Neuropod &neuropod) : data(neuropod.backend_->get_sealed_map()) {}
+
+void SealedNeuropodValueMap::insert(const std::string &name, std::shared_ptr<NeuropodTensor> &t)
+{
+    data->seal(name, t);
+}
+
+SealedMapProxy SealedNeuropodValueMap::operator[](std::string name)
+{
+    return SealedMapProxy(*data, std::move(name));
+}
+
 Neuropod::Neuropod(const std::string &neuropod_path, const RuntimeOptions &options)
     : Neuropod(neuropod_path, std::unordered_map<std::string, std::string>(), options)
 {
@@ -43,6 +63,14 @@ std::unique_ptr<NeuropodValueMap> Neuropod::infer(const NeuropodValueMap &      
     // TODO(vip): make sure that names in `inputs` are not repeated
     // Run inference
     return backend_->infer(inputs, requested_outputs);
+}
+
+std::unique_ptr<NeuropodValueMap> Neuropod::infer(const SealedNeuropodValueMap &  inputs,
+                                                  const std::vector<std::string> &requested_outputs)
+{
+    // TODO(vip): make sure that names in `inputs` are not repeated
+    // Run inference
+    return backend_->infer(*inputs.data, requested_outputs);
 }
 
 const std::vector<TensorSpec> &Neuropod::get_inputs() const

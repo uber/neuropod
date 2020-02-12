@@ -28,9 +28,22 @@ struct load_out_of_process
     }
 };
 
+struct sealed_map_creator
+{
+    neuropod::SealedNeuropodValueMap operator()(neuropod::Neuropod &neuropod)
+    {
+        return neuropod::SealedNeuropodValueMap(neuropod);
+    }
+};
+
+struct regular_map_creator
+{
+    neuropod::NeuropodValueMap operator()(neuropod::Neuropod &neuropod) { return neuropod::NeuropodValueMap(); }
+};
+
 } // namespace
 
-template <typename Loader>
+template <typename Loader, typename MapCreator>
 void benchmark_object_detection(benchmark::State &state)
 {
     const uint8_t some_image_data[1200 * 1920 * 3] = {0};
@@ -39,7 +52,7 @@ void benchmark_object_detection(benchmark::State &state)
 
     for (auto _ : state)
     {
-        neuropod::NeuropodValueMap input_data;
+        auto input_data = MapCreator()(*neuropod);
 
         // Add an input "image"
         auto image_tensor = neuropod->template allocate_tensor<uint8_t>({1200, 1920, 3});
@@ -54,10 +67,12 @@ void benchmark_object_detection(benchmark::State &state)
     }
 }
 
-BENCHMARK_TEMPLATE(benchmark_object_detection, load_in_process);
-BENCHMARK_TEMPLATE(benchmark_object_detection, load_out_of_process);
+BENCHMARK_TEMPLATE(benchmark_object_detection, load_in_process, regular_map_creator);
+BENCHMARK_TEMPLATE(benchmark_object_detection, load_in_process, sealed_map_creator);
+BENCHMARK_TEMPLATE(benchmark_object_detection, load_out_of_process, regular_map_creator);
+BENCHMARK_TEMPLATE(benchmark_object_detection, load_out_of_process, sealed_map_creator);
 
-template <typename Loader>
+template <typename Loader, typename MapCreator>
 void benchmark_small_inputs(benchmark::State &state)
 {
     const float some_data[10 * 5] = {0};
@@ -66,7 +81,7 @@ void benchmark_small_inputs(benchmark::State &state)
 
     for (auto _ : state)
     {
-        neuropod::NeuropodValueMap input_data;
+        auto input_data = MapCreator()(*neuropod);
 
         for (int i = 0; i < 100; i++)
         {
@@ -84,5 +99,7 @@ void benchmark_small_inputs(benchmark::State &state)
     }
 }
 
-BENCHMARK_TEMPLATE(benchmark_small_inputs, load_in_process);
-BENCHMARK_TEMPLATE(benchmark_small_inputs, load_out_of_process);
+BENCHMARK_TEMPLATE(benchmark_small_inputs, load_in_process, regular_map_creator);
+BENCHMARK_TEMPLATE(benchmark_small_inputs, load_in_process, sealed_map_creator);
+BENCHMARK_TEMPLATE(benchmark_small_inputs, load_out_of_process, regular_map_creator);
+BENCHMARK_TEMPLATE(benchmark_small_inputs, load_out_of_process, sealed_map_creator);

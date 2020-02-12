@@ -40,11 +40,43 @@ struct RuntimeOptions
     NeuropodDevice visible_device = Device::GPU0;
 };
 
+// Forward declarations
+class Neuropod;
+
+class SealedMapProxy
+{
+private:
+    SealedValueMap &data_;
+    std::string     name_;
+
+public:
+    SealedMapProxy(SealedValueMap &data, std::string name);
+
+    void operator=(std::shared_ptr<NeuropodTensor> t);
+};
+
+class SealedNeuropodValueMap
+{
+private:
+    std::unique_ptr<SealedValueMap> data;
+
+    friend class Neuropod;
+
+public:
+    SealedNeuropodValueMap(const Neuropod &neuropod);
+
+    void insert(const std::string &name, std::shared_ptr<NeuropodTensor> &t);
+
+    SealedMapProxy operator[](std::string name);
+};
+
 class Neuropod
 {
 private:
     // The backend used to load and run the neuropod
     std::shared_ptr<NeuropodBackend> backend_;
+
+    friend class SealedNeuropodValueMap;
 
 public:
     // Load a neuropod.
@@ -88,6 +120,11 @@ public:
 
     // Run inference
     std::unique_ptr<NeuropodValueMap> infer(const NeuropodValueMap &        inputs,
+                                            const std::vector<std::string> &requested_outputs = {});
+
+    // Run inference
+    // This interface enables things like early GPU copy
+    std::unique_ptr<NeuropodValueMap> infer(const SealedNeuropodValueMap &  inputs,
                                             const std::vector<std::string> &requested_outputs = {});
 
     // Get the inputs and outputs of the loaded Neuropod
