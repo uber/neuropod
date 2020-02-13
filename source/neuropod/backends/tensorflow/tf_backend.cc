@@ -122,15 +122,6 @@ TensorflowNeuropodBackend::TensorflowNeuropodBackend(const std::string &neuropod
     : NeuropodBackendWithDefaultAllocator<TensorflowNeuropodTensor>(neuropod_path),
       session_(tensorflow::NewSession(get_tf_opts(options)))
 {
-#ifndef __APPLE__
-    // We need to do this so the custom ops can see the symbols from TF
-    void *libtensorflow = dlopen("libtensorflow_framework.so", RTLD_NOW | RTLD_GLOBAL | RTLD_NOLOAD);
-    if (libtensorflow == nullptr)
-    {
-        NEUROPOD_ERROR("Failed to promote libtensorflow to RTLD_GLOBAL. Error from dlopen: " << dlerror());
-    }
-#endif
-
     // Load custom ops (if any)
     for (const auto &item : model_config_->custom_ops)
     {
