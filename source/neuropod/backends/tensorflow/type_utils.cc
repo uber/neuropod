@@ -40,7 +40,7 @@ TensorType get_neuropod_type_from_tf_type(tensorflow::DataType type)
         break;
     }
 
-    NEUROPOD_ERROR("Neuropod does not support type: " << type);
+    NEUROPOD_ERROR("Neuropod does not support type: {}", type);
 }
 
 tensorflow::DataType get_tf_type_from_neuropod_type(TensorType type)
@@ -54,7 +54,7 @@ tensorflow::DataType get_tf_type_from_neuropod_type(TensorType type)
         FOR_TF_NEUROPOD_MAPPING(NEUROPOD_TO_TF)
     }
 
-    NEUROPOD_ERROR("TensorFlow does not support type: " << type);
+    NEUROPOD_ERROR("TensorFlow does not support type: {}", type);
 }
 
 } // namespace neuropod

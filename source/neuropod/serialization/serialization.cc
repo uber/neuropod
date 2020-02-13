@@ -50,7 +50,7 @@ void serialize(boost::archive::binary_oarchive &out, const NeuropodValue &item)
     auto it = registered_serializers->find(tag);
     if (it == registered_serializers->end())
     {
-        NEUROPOD_ERROR("Serialization function not found for tag '" << tag << "'! ");
+        NEUROPOD_ERROR("Serialization function not found for tag '{}'", tag);
     }
 
     // Run the serializer function
@@ -68,7 +68,7 @@ std::shared_ptr<NeuropodValue> deserialize(boost::archive::binary_iarchive &ar, 
     auto it = registered_deserializers->find(tag);
     if (it == registered_deserializers->end())
     {
-        NEUROPOD_ERROR("Deserialization function not found for tag '" << tag << "'! ");
+        NEUROPOD_ERROR("Deserialization function not found for tag '{}'", tag);
     }
 
     // Get the function and run it

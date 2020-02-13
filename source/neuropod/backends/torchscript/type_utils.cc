@@ -43,7 +43,7 @@ TensorType get_neuropod_type_from_torch_type(torch::Dtype type)
         break;
     }
 
-    NEUROPOD_ERROR("Neuropod does not support type: " << type);
+    NEUROPOD_ERROR("Neuropod does not support type: {}", type);
 }
 
 torch::Dtype get_torch_type_from_neuropod_type(TensorType type)
@@ -59,7 +59,7 @@ torch::Dtype get_torch_type_from_neuropod_type(TensorType type)
         break;
     }
 
-    NEUROPOD_ERROR("TorchScript does not support type: " << type);
+    NEUROPOD_ERROR("TorchScript does not support type: {}", type);
 }
 
 } // namespace neuropod

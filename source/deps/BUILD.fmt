@@ -1,5 +1,5 @@
 #
-# Uber, Inc. (c) 2019
+# Uber, Inc. (c) 2020
 #
 
 package(
@@ -7,19 +7,15 @@ package(
 )
 
 cc_library(
-    name = "spdlog",
+    name = "fmt",
     hdrs = glob([
-        "include/spdlog/**",
+        "include/fmt/**",
     ]),
     srcs = glob([
         "src/**",
     ]),
-    defines = ["SPDLOG_FMT_EXTERNAL", "SPDLOG_COMPILED_LIB"],
     includes = [
         "include"
-    ],
-    deps = [
-        "@fmt_repo//:fmt",
     ],
     visibility = ["//visibility:public"],
 )

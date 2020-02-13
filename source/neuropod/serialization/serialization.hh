@@ -98,8 +98,9 @@ ReturnType deserialize(std::istream &in, Params &&... params)
     if (version != SERIALIZATION_VERSION)
     {
         NEUROPOD_ERROR("This serialized tensor was created with a different version of Neuropod serialization code."
-                       "Expected version "
-                       << SERIALIZATION_VERSION << " but got " << version);
+                       "Expected version {} but got {}",
+                       SERIALIZATION_VERSION,
+                       version);
     }
 
     return detail::deserialize<ReturnType>(ar, std::forward<Params>(params)...);

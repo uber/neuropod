@@ -145,8 +145,8 @@ public:
         if (dims.size() != 1)
         {
             NEUROPOD_ERROR("Only 1D TorchScript string tensors are supported. "
-                           "Tried to create a tensor with "
-                           << dims.size() << " dimensions.");
+                           "Tried to create a tensor with {} dimensions.",
+                           dims.size());
         }
     }
 
@@ -169,8 +169,9 @@ public:
         {
             NEUROPOD_ERROR("Error setting data for a TorchScript string tensor. "
                            "Make sure that the number of elements in the input vector is correct. "
-                           "Expected size "
-                           << get_num_elements() << " but got " << data.size());
+                           "Expected size {} but got {}",
+                           get_num_elements(),
+                           data.size());
         }
 
         // Get a reference to the tensor data
