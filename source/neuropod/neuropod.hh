@@ -38,6 +38,11 @@ struct RuntimeOptions
     //
     // To attempt to run the model on CPU, set this to `Device::CPU`
     NeuropodDevice visible_device = Device::GPU0;
+
+    // Sometimes, it's important to be able to instantiate a Neuropod without
+    // immediately loading the model. If this is set to `false`, the model will
+    // not be loaded until the `load_model` method is called on the Neuropod.
+    bool load_model_at_construction = true;
 };
 
 class Neuropod
@@ -89,6 +94,10 @@ public:
     // Run inference
     std::unique_ptr<NeuropodValueMap> infer(const NeuropodValueMap &        inputs,
                                             const std::vector<std::string> &requested_outputs = {});
+
+    // If `load_model_at_construction` is false in the RuntimeOptions passed into the constructor,
+    // this method loads the model
+    void load_model();
 
     // Get the inputs and outputs of the loaded Neuropod
     const std::vector<TensorSpec> &get_inputs() const;

@@ -47,6 +47,9 @@ public:
 protected:
     // Run inference
     std::unique_ptr<NeuropodValueMap> infer_internal(const NeuropodValueMap &inputs);
+
+    // A method that loads the underlying model
+    void load_model_internal();
 };
 
 } // namespace neuropod

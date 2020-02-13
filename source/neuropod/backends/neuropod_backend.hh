@@ -27,6 +27,10 @@ using NeuropodValueMap = std::unordered_map<std::string, std::shared_ptr<Neuropo
 // The interface that every neuropod backend implements
 class NeuropodBackend
 {
+private:
+    // Whether or not the underlying model has already been loaded
+    bool is_model_loaded_ = false;
+
 public:
     NeuropodBackend();
     NeuropodBackend(const std::string &neuropod_path);
@@ -43,12 +47,18 @@ public:
     const std::vector<TensorSpec> &get_inputs() const;
     const std::vector<TensorSpec> &get_outputs() const;
 
+    // Load the model if it has not already been loaded
+    void load_model();
+
 protected:
     // Used to load files in a Neuropod
     std::unique_ptr<NeuropodLoader> loader_;
 
     // The neuropod model config
     std::unique_ptr<ModelConfig> model_config_;
+
+    // The neuropod path (if one was provided in the constructor)
+    std::string neuropod_path_;
 
     // Run inference and get a subset of the outputs
     // The default implementation runs inference, gets all the outputs, and then filters the outputs
@@ -59,6 +69,9 @@ protected:
     // Run inference
     // Backends must provide an implementation of infer_internal (either this signature or the one above)
     virtual std::unique_ptr<NeuropodValueMap> infer_internal(const NeuropodValueMap &inputs);
+
+    // A method that loads the underlying model
+    virtual void load_model_internal() = 0;
 };
 
 template <template <class> class TensorImpl>

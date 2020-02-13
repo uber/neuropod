@@ -142,6 +142,14 @@ TorchNeuropodBackend::TorchNeuropodBackend(const std::string &neuropod_path, con
       options_(options),
       input_device_mapping_(model_config_->input_tensor_device)
 {
+    if (options.load_model_at_construction)
+    {
+        load_model();
+    }
+}
+
+void TorchNeuropodBackend::load_model_internal()
+{
     // Get the model from the neuropod
     auto graph_stream = loader_->get_istream_for_file("0/data/model.pt");
 
@@ -171,7 +179,7 @@ TorchNeuropodBackend::TorchNeuropodBackend(const std::string &neuropod_path, con
 
     if (!model_)
     {
-        NEUROPOD_ERROR("Failed to load TorchScript graph for neuropod {}", neuropod_path);
+        NEUROPOD_ERROR("Failed to load TorchScript graph for neuropod {}", neuropod_path_);
     }
 
     for (const auto &tensor_spec : model_config_->outputs)

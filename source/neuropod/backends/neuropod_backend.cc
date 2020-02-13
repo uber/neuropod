@@ -13,9 +13,25 @@ namespace neuropod
 NeuropodBackend::NeuropodBackend()  = default;
 NeuropodBackend::~NeuropodBackend() = default;
 
-NeuropodBackend::NeuropodBackend(const std::string &neuropod_path) : model_config_(load_model_config(neuropod_path))
+NeuropodBackend::NeuropodBackend(const std::string &neuropod_path)
+    : model_config_(load_model_config(neuropod_path)), neuropod_path_(neuropod_path)
 {
     loader_ = get_loader(neuropod_path);
+}
+
+void NeuropodBackend::load_model()
+{
+    if (!is_model_loaded_)
+    {
+        load_model_internal();
+        is_model_loaded_ = true;
+    }
+    else
+    {
+        NEUROPOD_ERROR(
+            "The model has already been loaded. This usually means that "
+            "`load_model_at_construction` was set to true (default) or `load_model()` was already explicitly called");
+    }
 }
 
 const std::vector<TensorSpec> &NeuropodBackend::get_inputs() const
@@ -43,6 +59,13 @@ const std::vector<TensorSpec> &NeuropodBackend::get_outputs() const
 std::unique_ptr<NeuropodValueMap> NeuropodBackend::infer(const NeuropodValueMap &        inputs,
                                                          const std::vector<std::string> &requested_outputs)
 {
+    // Make sure the model is loaded
+    if (!is_model_loaded_)
+    {
+        NEUROPOD_ERROR("The model was not loaded before calling `infer`. This usually means that "
+                       "`load_model_at_construction` was set to false and `load_model()` was not explicitly called");
+    }
+
     // Run inference
     return infer_internal(inputs, requested_outputs);
 }

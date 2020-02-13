@@ -122,6 +122,14 @@ TensorflowNeuropodBackend::TensorflowNeuropodBackend(const std::string &neuropod
     : NeuropodBackendWithDefaultAllocator<TensorflowNeuropodTensor>(neuropod_path),
       session_(tensorflow::NewSession(get_tf_opts(options)))
 {
+    if (options.load_model_at_construction)
+    {
+        load_model();
+    }
+}
+
+void TensorflowNeuropodBackend::load_model_internal()
+{
     // Load custom ops (if any)
     for (const auto &item : model_config_->custom_ops)
     {
@@ -154,7 +162,7 @@ TensorflowNeuropodBackend::TensorflowNeuropodBackend(const std::string &neuropod
     graph_stream->read(buffer.data(), graph_length);
     if (graph_stream->fail())
     {
-        NEUROPOD_ERROR("Error reading TensorFlow GraphDef for neuropod {}", neuropod_path);
+        NEUROPOD_ERROR("Error reading TensorFlow GraphDef for neuropod {}", neuropod_path_);
     }
 
     // Read the GraphDef
