@@ -65,12 +65,13 @@ TensorType convert_to_tensor_type(const Json::Value &dtype)
     }
 }
 
-std::vector<int64_t> get_dims_from_json(const Json::Value &json_shape)
+std::vector<Dimension> get_dims_from_json(const Json::Value &json_shape)
 {
     // Make sure that the shape is an array
     if (json_shape.isArray())
     {
-        std::vector<int64_t> out;
+        // The dims to return
+        std::vector<Dimension> out;
         for (const auto &item : json_shape)
         {
             // Get the number and do some validation
@@ -86,9 +87,8 @@ std::vector<int64_t> get_dims_from_json(const Json::Value &json_shape)
             }
             else if (item.isString())
             {
-                // TODO: In the future, named dimensions will be assigned unique negative values,
-                // but for now we always assign -2
-                out.emplace_back(-2);
+                // It is a symbol
+                out.emplace_back(item.asString());
             }
             else
             {
@@ -107,7 +107,22 @@ std::vector<int64_t> get_dims_from_json(const Json::Value &json_shape)
 
 } // namespace
 
-TensorSpec::TensorSpec(const std::string &name, const std::vector<int64_t> dims, const TensorType type)
+Dimension::Dimension(int64_t value) : value(value) {}
+Dimension::Dimension(std::string symbol) : value(-2), symbol(symbol) {}
+Dimension::~Dimension() = default;
+
+bool Dimension::operator==(const Dimension &other) const
+{
+    if (value == other.value)
+    {
+        // If it's a symbol, make sure the symbol name matches
+        return value == -2 ? symbol == other.symbol : true;
+    }
+
+    return false;
+}
+
+TensorSpec::TensorSpec(const std::string &name, const std::vector<Dimension> dims, const TensorType type)
     : name(name), dims(dims), type(type)
 {
 }

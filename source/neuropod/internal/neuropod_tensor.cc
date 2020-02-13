@@ -133,13 +133,13 @@ bool NeuropodTensor::operator==(const NeuropodTensor &other) const
 NeuropodTensor *NeuropodValue::as_tensor()
 {
     assure_tensor();
-    return dynamic_cast<NeuropodTensor *>(this);
+    return static_cast<NeuropodTensor *>(this);
 }
 
 const NeuropodTensor *NeuropodValue::as_tensor() const
 {
     assure_tensor();
-    return dynamic_cast<const NeuropodTensor *>(this);
+    return static_cast<const NeuropodTensor *>(this);
 }
 
 template <typename T>

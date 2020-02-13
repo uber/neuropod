@@ -43,10 +43,12 @@ TEST(test_config_utils, valid_config)
     auto               model_config = neuropod::load_model_config(config);
     EXPECT_EQ("x", model_config->inputs[0].name);
     EXPECT_EQ(neuropod::TensorType::FLOAT_TENSOR, model_config->inputs[0].type);
-    EXPECT_EQ(std::vector<int64_t>({-1, 2, -2}), model_config->inputs[0].dims);
+    EXPECT_EQ(std::vector<neuropod::Dimension>({-1, 2, neuropod::Dimension("some_symbol")}),
+              model_config->inputs[0].dims);
     EXPECT_EQ("y", model_config->outputs[0].name);
     EXPECT_EQ(neuropod::TensorType::FLOAT_TENSOR, model_config->outputs[0].type);
-    EXPECT_EQ(std::vector<int64_t>({-1, 2, -2}), model_config->outputs[0].dims);
+    EXPECT_EQ(std::vector<neuropod::Dimension>({-1, 2, neuropod::Dimension("some_symbol")}),
+              model_config->outputs[0].dims);
 }
 
 TEST(test_config_utils, invalid_name)
