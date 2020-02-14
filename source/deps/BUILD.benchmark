@@ -14,7 +14,10 @@ cc_library(
         exclude = ["src/benchmark_main.cc"],
     ),
     hdrs = ["include/benchmark/benchmark.h"],
-    linkopts = ["-pthread"],
+    linkopts = select({
+        "@bazel_tools//src/conditions:darwin": ["-pthread"],
+        "//conditions:default": ["-pthread", "-lrt"],
+    }),
     strip_include_prefix = "include",
     visibility = ["//visibility:public"],
     # Don't warn in third party libs

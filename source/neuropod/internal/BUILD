@@ -164,7 +164,6 @@ cc_library(
     visibility = [
         "//neuropod:__subpackages__",
     ],
-    linkopts = ["-lz"],
 )
 
 cc_library(
