@@ -66,7 +66,7 @@ std::unique_ptr<NeuropodValueMap> NeuropodBackend::infer_internal(const Neuropod
         auto tensor = data->find(tensor_name);
         if (tensor == data->end())
         {
-            NEUROPOD_ERROR("Tried to request a tensor that does not exist: " << tensor_name);
+            NEUROPOD_ERROR("Tried to request a tensor that does not exist: {}", tensor_name);
         }
 
         (*out)[tensor_name] = std::move(tensor->second);

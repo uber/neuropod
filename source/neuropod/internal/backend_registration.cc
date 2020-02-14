@@ -54,20 +54,16 @@ void load_default_backend(const std::unordered_map<std::string, std::string> &de
 
     if (backend_it == default_backend_for_type.end())
     {
-        NEUROPOD_ERROR("Default Neuropod backend not found for type '"
-                       << type
-                       << "'! "
-                          "Make sure that you load a Neuropod backend that can support '"
-                       << type << "'");
+        NEUROPOD_ERROR("Default Neuropod backend not found for type '{}'! "
+                       "Make sure that you load a Neuropod backend that can support '{}'",
+                       type,
+                       type);
     }
     else
     {
         if (dlopen(backend_it->second.c_str(), RTLD_NOW | RTLD_GLOBAL) == nullptr)
         {
-            NEUROPOD_ERROR("Loading the default backend for type '" << type
-                                                                    << "' failed. "
-                                                                       "Error from dlopen: "
-                                                                    << dlerror());
+            NEUROPOD_ERROR("Loading the default backend for type '{}' failed. Error from dlopen: {}", type, dlerror());
         }
     }
 }
@@ -107,10 +103,8 @@ BackendFactoryFunction get_backend_for_type(
     {
         // If we get here, that means that we tried loading a default backend
         // and it failed
-        NEUROPOD_ERROR("Neuropod backend not found for type '" << type
-                                                               << "'! "
-                                                                  "Loading the default backend for type '"
-                                                               << type << "' failed.");
+        NEUROPOD_ERROR(
+            "Neuropod backend not found for type '{}'! Loading the default backend for type '{}' failed.", type, type);
     }
     else
     {
@@ -125,10 +119,9 @@ BackendFactoryFunction get_backend_by_name(const std::string &name)
     auto backend_it = registered_backends_by_name->find(name);
     if (backend_it == registered_backends_by_name->end())
     {
-        NEUROPOD_ERROR("Neuropod backend not found for name'"
-                       << name
-                       << "'! "
-                          "Make sure that you have a build dependency on the correct backend");
+        NEUROPOD_ERROR("Neuropod backend not found for name'{}'! "
+                       "Make sure that you have a build dependency on the correct backend",
+                       name);
     }
     else
     {

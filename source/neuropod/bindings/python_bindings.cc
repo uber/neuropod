@@ -35,7 +35,7 @@ TensorType get_array_type(py::array &array)
         return STRING_TENSOR;
     }
 
-    NEUROPOD_ERROR("Unsupported array type in python bindings: " << array.dtype().kind())
+    NEUROPOD_ERROR("Unsupported array type in python bindings: {}", array.dtype().kind());
 #undef IS_INSTANCE_CHECK
 }
 
@@ -51,7 +51,7 @@ pybind11::dtype get_py_type(const NeuropodTensor &tensor)
     {
         FOR_EACH_TYPE_MAPPING_EXCEPT_STRING(GET_TYPE)
     default:
-        NEUROPOD_ERROR("Unsupported array type in python bindings: " << tensor_type);
+        NEUROPOD_ERROR("Unsupported array type in python bindings: {}", tensor_type);
     }
 #undef GET_TYPE
 }

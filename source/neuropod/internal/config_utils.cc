@@ -22,7 +22,7 @@ namespace
 
 [[noreturn]] void throw_neuropod_config_error(const std::string &message)
 {
-    NEUROPOD_ERROR("Error loading neuropod config! Please check your config file. " << message);
+    NEUROPOD_ERROR("Error loading neuropod config! Please check your config file. {}", message);
 }
 
 const std::unordered_map<std::string, TensorType> type_mapping = {
@@ -122,7 +122,7 @@ std::unique_ptr<ModelConfig> load_model_config(const std::string &neuropod_path)
     auto stream = loader->get_istream_for_file("config.json");
     if (!stream)
     {
-        NEUROPOD_ERROR("Error loading config file for neuropod '" << neuropod_path << "'!");
+        NEUROPOD_ERROR("Error loading config file for neuropod '{}'", neuropod_path);
     }
 
     return load_model_config(*stream);

@@ -76,7 +76,7 @@ pid_t start_worker_process(const std::string &control_queue_name, std::vector<st
     const auto status = posix_spawnp(&child_pid, "neuropod_multiprocess_worker", NULL, NULL, argv, env_arr);
     if (status != 0)
     {
-        NEUROPOD_ERROR("Failed to start the worker process. Failed with code: " << status << ": " << strerror(status));
+        NEUROPOD_ERROR("Failed to start the worker process. Failed with code: {} - {}", status, strerror(status));
     }
 
     return child_pid;
@@ -107,9 +107,11 @@ private:
             if (!successful_read)
             {
                 // We timed out
-                NEUROPOD_ERROR("Timed out waiting for the worker process to load: "
-                               << neuropod_path << ". Didn't receive a message in " << MESSAGE_TIMEOUT_MS
-                               << "ms, but expected a heartbeat every " << HEARTBEAT_INTERVAL_MS << "ms.");
+                NEUROPOD_ERROR("Timed out waiting for the worker process to load: {}. Didn't receive a message in "
+                               "{}ms, but expected a heartbeat every {}ms.",
+                               neuropod_path,
+                               MESSAGE_TIMEOUT_MS,
+                               HEARTBEAT_INTERVAL_MS);
             }
 
             if (received.type == LOAD_SUCCESS)
@@ -125,8 +127,8 @@ private:
             }
 
             // We got an unexpected message
-            NEUROPOD_ERROR(
-                "Expected LOAD_SUCCESS, but got unexpected message from the worker process:" << received.type)
+            NEUROPOD_ERROR("Expected LOAD_SUCCESS, but got unexpected message from the worker process: {}",
+                           received.type);
         }
     }
 
@@ -145,7 +147,7 @@ public:
         msg.type = LOAD_NEUROPOD;
         if (neuropod_path.size() >= 4096)
         {
-            NEUROPOD_ERROR("The multiprocess backend only supports neuropod paths < 4096 characters long.")
+            NEUROPOD_ERROR("The multiprocess backend only supports neuropod paths < 4096 characters long.");
         }
 
         // Copy in the path
@@ -261,9 +263,9 @@ protected:
             {
                 // We timed out
                 NEUROPOD_ERROR("Timed out waiting for a response from worker process. "
-                               "Didn't receive a message in "
-                               << MESSAGE_TIMEOUT_MS << "ms, but expected a heartbeat every " << HEARTBEAT_INTERVAL_MS
-                               << "ms.");
+                               "Didn't receive a message in {}ms, but expected a heartbeat every {}ms.",
+                               MESSAGE_TIMEOUT_MS,
+                               HEARTBEAT_INTERVAL_MS);
             }
 
             if (received.type == END_OUTPUT)
@@ -280,7 +282,7 @@ protected:
 
             if (received.type != RETURN_OUTPUT)
             {
-                NEUROPOD_ERROR("Got unexpected message from the worker process:" << received.type)
+                NEUROPOD_ERROR("Got unexpected message from the worker process: {}", received.type);
             }
 
             for (int i = 0; i < received.num_tensors; i++)

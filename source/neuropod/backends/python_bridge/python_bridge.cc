@@ -55,7 +55,7 @@ std::unique_ptr<py::gil_scoped_release> maybe_initialize()
 
     if (libpython == nullptr)
     {
-        NEUROPOD_ERROR("Failed to promote libpython to RTLD_GLOBAL. Error from dlopen: " << dlerror());
+        NEUROPOD_ERROR("Failed to promote libpython to RTLD_GLOBAL. Error from dlopen: {}", dlerror());
     }
 #endif
 

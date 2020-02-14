@@ -15,6 +15,7 @@
 #include <boost/uuid/uuid_generators.hpp>
 #include <boost/uuid/uuid_io.hpp>
 
+#include <iostream>
 #include <mutex>
 #include <unordered_map>
 
@@ -132,8 +133,8 @@ public:
             // This means that the other process isn't keeping references to data long enough for this
             // process to load the data.
             // This can lead to some hard to debug race conditions so we always throw an error.
-            NEUROPOD_ERROR(
-                "Tried getting a pointer to an existing chunk of memory that has a refcount of zero: " << uuid_);
+            NEUROPOD_ERROR("Tried getting a pointer to an existing chunk of memory that has a refcount of zero: {}",
+                           uuid_);
         }
 
         // Increment the refcount

@@ -42,7 +42,7 @@ std::shared_ptr<torch::jit::script::Module> load_model_from_path(std::istream & 
 
     if (libtorch == nullptr)
     {
-        NEUROPOD_ERROR("Failed to promote libtorch to RTLD_GLOBAL. Error from dlopen: " << dlerror());
+        NEUROPOD_ERROR("Failed to promote libtorch to RTLD_GLOBAL. Error from dlopen: {}", dlerror());
     }
 #endif
 
@@ -50,7 +50,7 @@ std::shared_ptr<torch::jit::script::Module> load_model_from_path(std::istream & 
     {
         if (dlopen(path.c_str(), RTLD_NOW) == nullptr)
         {
-            NEUROPOD_ERROR("Failed to load custom op. Error from dlopen: " << dlerror());
+            NEUROPOD_ERROR("Failed to load custom op. Error from dlopen: {}", dlerror());
         }
     }
 
@@ -105,16 +105,18 @@ void insert_value_in_output(NeuropodValueMap & output,
         // it was bad spec or contained non-string type
         else
         {
-            NEUROPOD_ERROR("Neuropod got a list of type '" << list[0].tagKind() << "' for tensor '" << name
-                                                           << "'."
-                                                              "Only tensors or lists of strings are supported");
+            NEUROPOD_ERROR("Neuropod got a list of type '{}' for tensor '{}'."
+                           "Only tensors or lists of strings are supported",
+                           list[0].tagKind(),
+                           name);
         }
     }
     else
     {
         NEUROPOD_ERROR("Neuropod returned an invalid type! All outputs must be tensors"
-                       "or lists of strings. Got type '"
-                       << value.tagKind() << "' for tensor '" << name << "'");
+                       "or lists of strings. Got type '{}' for tensor '{}'",
+                       value.tagKind(),
+                       name);
     }
 }
 
@@ -169,7 +171,7 @@ TorchNeuropodBackend::TorchNeuropodBackend(const std::string &neuropod_path, con
 
     if (!model_)
     {
-        NEUROPOD_ERROR("Failed to load TorchScript graph for neuropod" << neuropod_path.c_str());
+        NEUROPOD_ERROR("Failed to load TorchScript graph for neuropod {}", neuropod_path);
     }
 
     for (const auto &tensor_spec : model_config_->outputs)
@@ -311,7 +313,7 @@ std::unique_ptr<NeuropodValueMap> TorchNeuropodBackend::infer_internal(const Neu
             const auto arg_index = schema.argumentIndexWithName(input_name);
             if (!arg_index.has_value())
             {
-                NEUROPOD_ERROR("Input '" << input_name.c_str() << "' does not exist. Model inputs " << schema);
+                NEUROPOD_ERROR("Input '{}' does not exist. Model inputs {}", input_name, schema);
             }
 
             const auto device = get_torch_device(input_device_mapping_.at(input_name));

@@ -4,6 +4,7 @@
 
 #include "neuropod/multiprocess/shm_allocator.hh"
 
+#include "fmt/ranges.h"
 #include "neuropod/internal/error_utils.hh"
 #include "neuropod/internal/memory_utils.hh"
 
@@ -53,15 +54,6 @@ struct __attribute__((__packed__)) SHMBlockIDInternal
     RawSHMHandle block_handle;
     uint64_t     reuse_count = 0;
 };
-
-// Make `std::array`s printable
-// This is used in error messages below
-template <class T, std::size_t N>
-std::ostream &operator<<(std::ostream &o, const std::array<T, N> &arr)
-{
-    std::copy(arr.cbegin(), arr.cend(), std::ostream_iterator<T>(o, " "));
-    return o;
-}
 
 // Make sure the size of the ID struct matches the size of the user facing version
 static_assert(sizeof(SHMBlockIDInternal) == std::tuple_size<SHMBlockID>::value,
@@ -258,8 +250,8 @@ std::shared_ptr<void> SHMAllocator::load_shm(const SHMBlockID &block_id)
             // This means that the other process isn't keeping references to data long enough for this
             // process to load the data.
             // This can lead to some hard to debug race conditions so we always throw an error.
-            NEUROPOD_ERROR(
-                "Tried getting a pointer to an existing chunk of memory that has a refcount of zero: " << handle);
+            NEUROPOD_ERROR("Tried getting a pointer to an existing chunk of memory that has a refcount of zero: {}",
+                           handle);
         }
 
         // Make sure the `reuse_count` matches what we expect
@@ -270,9 +262,10 @@ std::shared_ptr<void> SHMAllocator::load_shm(const SHMBlockID &block_id)
             // (A block of memory went out of scope and was reused before it could be loaded by the other process)
             NEUROPOD_ERROR("Tried loading a block of memory that went out of scope in the creating process. "
                            "Ensure that blocks of SHM stay in scope until they are loaded by the receiving process. "
-                           "UUID: "
-                           << handle << ". Reuse count: " << block->reuse_count
-                           << ". Expected reuse count: " << id->reuse_count);
+                           "UUID: {}. Reuse count: {}. Expected reuse count: {}",
+                           handle,
+                           block->reuse_count,
+                           id->reuse_count);
         }
 
         // Increment the refcount

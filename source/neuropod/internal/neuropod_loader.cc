@@ -116,7 +116,7 @@ public:
         char tempdir[] = "/tmp/neuropod_tmp_XXXXXX";
         if (mkdtemp(tempdir) == nullptr)
         {
-            NEUROPOD_ERROR("Error creating temporary directory")
+            NEUROPOD_ERROR("Error creating temporary directory");
         }
 
         // Unzip into the tempdir
@@ -151,7 +151,7 @@ std::unique_ptr<NeuropodLoader> get_loader(const std::string &neuropod_path)
 {
     if (!fs::exists(neuropod_path))
     {
-        NEUROPOD_ERROR("Error loading Neuropod. No file or directory at '" << neuropod_path << "'");
+        NEUROPOD_ERROR("Error loading Neuropod. No file or directory at '{}'", neuropod_path);
     }
 
     if (fs::is_directory(neuropod_path))

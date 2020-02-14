@@ -38,7 +38,7 @@ void setup_node_mapping_and_init_ops(std::istream &                             
 
     if (!parsingSuccessful)
     {
-        NEUROPOD_ERROR("Error parsing TF Neuropod Config JSON: " + parse_err);
+        NEUROPOD_ERROR("Error parsing TF Neuropod Config JSON: {}", parse_err);
     }
 
     // Make sure that node_name_mapping exists and is an object
@@ -76,7 +76,7 @@ void check_tf_status(const tensorflow::Status &status)
 {
     if (!status.ok())
     {
-        NEUROPOD_ERROR("TensorFlow error: " << status.error_message())
+        NEUROPOD_ERROR("TensorFlow error: {}", status.error_message());
     }
 }
 
@@ -134,7 +134,7 @@ TensorflowNeuropodBackend::TensorflowNeuropodBackend(const std::string &neuropod
         {
             if (dlopen(loader_->get_file_path(path).c_str(), RTLD_NOW) == nullptr)
             {
-                NEUROPOD_ERROR("Failed to load custom op. Error from dlopen: " << dlerror());
+                NEUROPOD_ERROR("Failed to load custom op. Error from dlopen: {}", dlerror());
             }
 
             loaded_op_hashes.insert(hash);
@@ -154,7 +154,7 @@ TensorflowNeuropodBackend::TensorflowNeuropodBackend(const std::string &neuropod
     graph_stream->read(buffer.data(), graph_length);
     if (graph_stream->fail())
     {
-        NEUROPOD_ERROR("Error reading TensorFlow GraphDef for neuropod " << neuropod_path);
+        NEUROPOD_ERROR("Error reading TensorFlow GraphDef for neuropod {}", neuropod_path);
     }
 
     // Read the GraphDef
@@ -165,7 +165,7 @@ TensorflowNeuropodBackend::TensorflowNeuropodBackend(const std::string &neuropod
     auto status = session_->Create(graph);
     if (!status.ok())
     {
-        NEUROPOD_ERROR("Error loading TensorFlow graph: " << status.error_message());
+        NEUROPOD_ERROR("Error loading TensorFlow graph: {}", status.error_message());
     }
 
     // Setup the nodename mapping and get the init ops (if any)
@@ -266,10 +266,10 @@ std::unique_ptr<NeuropodValueMap> TensorflowNeuropodBackend::infer_internal(
         const auto node_name = node_name_mapping_.find(name);
         if (node_name == node_name_mapping_.end())
         {
-            NEUROPOD_ERROR("Node " << name
-                                   << " not found in node_name_mapping. "
-                                      "Ensure that all items in the input/output spec have a corresponding item "
-                                      "in the node_name_mapping.");
+            NEUROPOD_ERROR("Node {} not found in node_name_mapping. "
+                           "Ensure that all items in the input/output spec have a corresponding item "
+                           "in the node_name_mapping.",
+                           name);
         }
 
         // Add this node name as an output of the subgraph we want to run
@@ -282,10 +282,10 @@ std::unique_ptr<NeuropodValueMap> TensorflowNeuropodBackend::infer_internal(
         const auto node_name = node_name_mapping_.find(entry.first);
         if (node_name == node_name_mapping_.end())
         {
-            NEUROPOD_ERROR("Node " << entry.first
-                                   << " not found in node_name_mapping. "
-                                      "Ensure that all items in the input/output spec have a corresponding item "
-                                      "in the node_name_mapping.");
+            NEUROPOD_ERROR("Node {} not found in node_name_mapping. "
+                           "Ensure that all items in the input/output spec have a corresponding item "
+                           "in the node_name_mapping.",
+                           entry.first);
         }
 
         // Get the TensorFlow tensor from the Neuropod tensor
