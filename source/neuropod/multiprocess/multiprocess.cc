@@ -135,42 +135,23 @@ private:
 public:
     MultiprocessNeuropodBackend(const std::string &neuropod_path,
                                 const std::string &control_queue_name,
-                                bool               free_memory_every_cycle,
-                                bool               wait_for_load = true)
+                                bool               free_memory_every_cycle)
         : NeuropodBackendWithDefaultAllocator<SHMNeuropodTensor>(neuropod_path),
           control_queue_name_(control_queue_name),
           free_memory_every_cycle_(free_memory_every_cycle),
           control_channel_(control_queue_name, MAIN_PROCESS)
     {
-        // Create a message to tell the worker process to load the specified neuropod
-        control_message msg;
-        msg.type = LOAD_NEUROPOD;
-        if (neuropod_path.size() >= 4096)
-        {
-            NEUROPOD_ERROR("The multiprocess backend only supports neuropod paths < 4096 characters long.");
-        }
-
-        // Copy in the path
-        strncpy(msg.neuropod_path, neuropod_path.c_str(), 4096);
-
-        // Send the message
-        control_channel_.send_message(msg);
-
-        if (wait_for_load)
-        {
-            // Wait until the worker process confirms it has loaded the model
-            wait_for_load_confirmation(neuropod_path);
-        }
+        load_model();
     }
 
     // Generate a control queue name and start a worker
     MultiprocessNeuropodBackend(const std::string &   neuropod_path,
                                 const RuntimeOptions &options,
                                 bool                  free_memory_every_cycle)
-        : MultiprocessNeuropodBackend(neuropod_path,
-                                      boost::uuids::to_string(boost::uuids::random_generator()()),
-                                      free_memory_every_cycle,
-                                      false)
+        : NeuropodBackendWithDefaultAllocator<SHMNeuropodTensor>(neuropod_path),
+          control_queue_name_(boost::uuids::to_string(boost::uuids::random_generator()())),
+          free_memory_every_cycle_(free_memory_every_cycle),
+          control_channel_(control_queue_name_, MAIN_PROCESS)
     {
         auto env = get_env_map();
 
@@ -195,8 +176,10 @@ public:
         // Start the worker process
         child_pid_ = start_worker_process(control_queue_name_, env_vec);
 
-        // Wait until the worker process confirms it has loaded the model
-        wait_for_load_confirmation(neuropod_path);
+        if (options.load_model_at_construction)
+        {
+            load_model();
+        }
     }
 
     ~MultiprocessNeuropodBackend()
@@ -306,6 +289,27 @@ protected:
         }
 
         return to_return;
+    }
+
+protected:
+    void load_model_internal()
+    {
+        // Create a message to tell the worker process to load the specified neuropod
+        control_message msg;
+        msg.type = LOAD_NEUROPOD;
+        if (neuropod_path_.size() >= 4096)
+        {
+            NEUROPOD_ERROR("The multiprocess backend only supports neuropod paths < 4096 characters long.")
+        }
+
+        // Copy in the path
+        strncpy(msg.neuropod_path, neuropod_path_.c_str(), 4096);
+
+        // Send the message
+        control_channel_.send_message(msg);
+
+        // Wait until the worker process confirms it has loaded the model
+        wait_for_load_confirmation(neuropod_path_);
     }
 };
 

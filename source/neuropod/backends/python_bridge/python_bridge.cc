@@ -88,6 +88,14 @@ PythonBridge::PythonBridge(const std::string &             neuropod_path,
     // Modify PYTHONPATH
     set_python_path(python_path_additions);
 
+    if (options.load_model_at_construction)
+    {
+        load_model();
+    }
+}
+
+void PythonBridge::load_model_internal()
+{
     // Acquire the GIL
     py::gil_scoped_acquire gil;
 

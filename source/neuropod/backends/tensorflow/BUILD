@@ -23,6 +23,7 @@ cc_binary(
         "//neuropod:__subpackages__",
     ],
     deps = [
+        "//neuropod:neuropod_hdrs",
         "//neuropod/backends:neuropod_backend",
         "//neuropod/internal:deleter",
         "//neuropod/internal:logging",

@@ -107,15 +107,15 @@ void test_addition_model(neuropod::Neuropod &neuropod)
 void test_addition_model(const std::string &neuropod_path, const std::string &backend)
 {
     // Load the neuropod
-    neuropod::Neuropod neuropod(neuropod_path, backend);
-    test_addition_model(neuropod);
-}
+    neuropod::RuntimeOptions opts;
+    opts.load_model_at_construction = false;
+    neuropod::Neuropod neuropod(neuropod_path, backend, opts);
 
-void test_addition_model(const std::string &                                 neuropod_path,
-                         const std::unordered_map<std::string, std::string> &default_backend_overrides)
-{
-    // Load the neuropod
-    neuropod::Neuropod neuropod(neuropod_path, default_backend_overrides);
+    // Should fail because we haven't loaded the model yet
+    EXPECT_ANY_THROW(test_addition_model(neuropod));
+
+    // Load the model and try again
+    neuropod.load_model();
     test_addition_model(neuropod);
 }
 
@@ -165,15 +165,15 @@ void test_strings_model(neuropod::Neuropod &neuropod)
 void test_strings_model(const std::string &neuropod_path, const std::string &backend)
 {
     // Load the neuropod
-    neuropod::Neuropod neuropod(neuropod_path, backend);
-    test_strings_model(neuropod);
-}
+    neuropod::RuntimeOptions opts;
+    opts.load_model_at_construction = false;
+    neuropod::Neuropod neuropod(neuropod_path, backend, opts);
 
-void test_strings_model(const std::string &                                 neuropod_path,
-                        const std::unordered_map<std::string, std::string> &default_backend_overrides)
-{
-    // Load the neuropod
-    neuropod::Neuropod neuropod(neuropod_path, default_backend_overrides);
+    // Should fail because we haven't loaded the model yet
+    EXPECT_ANY_THROW(test_strings_model(neuropod));
+
+    // Load the model and try again
+    neuropod.load_model();
     test_strings_model(neuropod);
 }
 

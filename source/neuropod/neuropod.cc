@@ -37,6 +37,11 @@ Neuropod::Neuropod(const std::string &neuropod_path, std::shared_ptr<NeuropodBac
 
 Neuropod::~Neuropod() = default;
 
+void Neuropod::load_model()
+{
+    backend_->load_model();
+}
+
 std::unique_ptr<NeuropodValueMap> Neuropod::infer(const NeuropodValueMap &        inputs,
                                                   const std::vector<std::string> &requested_outputs)
 {

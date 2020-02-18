@@ -6,6 +6,7 @@
 
 #include "neuropod/backends/neuropod_backend.hh"
 #include "neuropod/backends/tensorflow/tf_tensor.hh"
+#include "neuropod/neuropod.hh"
 
 #include <map>
 #include <string>
@@ -53,6 +54,9 @@ protected:
     // Run inference with a set of requested outputs
     std::unique_ptr<NeuropodValueMap> infer_internal(const NeuropodValueMap &        inputs,
                                                      const std::vector<std::string> &requested_outputs);
+
+    // A method that loads the underlying model
+    void load_model_internal();
 };
 
 } // namespace neuropod

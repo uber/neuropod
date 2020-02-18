@@ -7,9 +7,19 @@
 namespace neuropod
 {
 
-TestNeuropodBackend::TestNeuropodBackend() = default;
-TestNeuropodBackend::TestNeuropodBackend(const std::string &neuropod_path, const RuntimeOptions &options) {}
+TestNeuropodBackend::TestNeuropodBackend()
+{
+    load_model();
+}
+
+TestNeuropodBackend::TestNeuropodBackend(const std::string &neuropod_path, const RuntimeOptions &options)
+{
+    load_model();
+}
+
 TestNeuropodBackend::~TestNeuropodBackend() = default;
+
+void TestNeuropodBackend::load_model_internal() {}
 
 // Run inference
 std::unique_ptr<NeuropodValueMap> TestNeuropodBackend::infer_internal(const NeuropodValueMap &inputs)
