@@ -15,9 +15,26 @@ http_archive(
 
 load("@com_grail_bazel_toolchain//toolchain:rules.bzl", "llvm_toolchain")
 
+# This is a manylinux2010 compatible sysroot
+http_archive(
+    name = "manylinux2010_sysroot",
+    build_file_content = """
+filegroup(
+  name = "sysroot",
+  srcs = glob(["*/**"]),
+  visibility = ["//visibility:public"],
+)
+""",
+    sha256 = "5be526543d53eada141921dd5108e082953e7fcb0131df09dde7e9efd109eeae",
+    urls = ["https://github.com/VivekPanyam/manylinux-sysroot/releases/download/0.0.1/manylinux2010_sysroot.tar.gz"],
+)
+
 llvm_toolchain(
     name = "llvm_toolchain",
     llvm_version = "9.0.0",
+    sysroot = {
+        "linux": "@manylinux2010_sysroot//:sysroot",
+    },
 )
 
 libtorch_repository(
@@ -113,6 +130,14 @@ http_archive(
     sha256 = "a83155b27ddc0843e5d4f8b637011fc4321a59278bb50a18be02afd62d4def47",
     url = "https://github.com/sebastiandev/minizip/archive/e3a8cb79a034cb4f2ffc3abb6bd916ffa8678fed.zip",
     strip_prefix = "minizip-e3a8cb79a034cb4f2ffc3abb6bd916ffa8678fed",
+)
+
+http_archive(
+    name = "zlib_repo",
+    build_file = "@//deps:BUILD.zlib",
+    sha256 = "c3e5e9fdd5004dcb542feda5ee4f0ff0744628baf8ed2dd5d66f8ca1197cb1a1",
+    url = "https://zlib.net/zlib-1.2.11.tar.gz",
+    strip_prefix = "zlib-1.2.11",
 )
 
 http_archive(

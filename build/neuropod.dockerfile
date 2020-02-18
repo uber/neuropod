@@ -28,7 +28,7 @@ RUN cd source && bazel sync
 
 # Do everything in a virtualenv
 ENV VIRTUAL_ENV=/tmp/neuropod_venv
-RUN ${NEUROPOD_PYTHON_BINARY} -m pip install virtualenv && \
+RUN ${NEUROPOD_PYTHON_BINARY} -m pip install virtualenv==16.7.9 && \
     ${NEUROPOD_PYTHON_BINARY} -m virtualenv $VIRTUAL_ENV
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
