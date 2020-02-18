@@ -94,6 +94,15 @@ void IPCControlChannel::send_message(control_message &msg)
     send_queue_->send(&msg, sizeof(control_message), 0);
 }
 
+// Does not block if the message queue is full
+bool IPCControlChannel::try_send_message(control_message &msg)
+{
+    // Make sure that it is valid to go from the previous message type to the current one
+    verifier_.assert_transition_allowed(msg.type);
+    SPDLOG_DEBUG("OPE: (non-blocking) Sending message {}", msg.type);
+    return send_queue_->try_send(&msg, sizeof(control_message), 0);
+}
+
 // Utility to send a message with no content to a message queue
 void IPCControlChannel::send_message(MessageType type)
 {
