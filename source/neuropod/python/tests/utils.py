@@ -57,6 +57,34 @@ def get_string_concat_model_spec(do_fail=False):
     )
 
 
+def get_mixed_model_spec(do_fail=False):
+    """
+    Returns the input/output spec for a mixed type model along with test data.
+    Can also return test data that causes the test to fail.
+
+    :param  do_fail     Return test data that makes the test fail
+    """
+
+    return dict(
+        input_spec=[
+            {"name": "x", "dtype": "float32", "shape": ("batch_size",)},
+            {"name": "y", "dtype": "float32", "shape": ("batch_size",)},
+        ],
+        output_spec=[
+            {"name": "out", "dtype": "float32", "shape": ("batch_size",)},
+            {"name": "some", "dtype": "string", "shape": (None,)},
+        ],
+        test_input_data={
+            "x": np.arange(5, dtype=np.float32),
+            "y": np.arange(5, dtype=np.float32),
+        },
+        test_expected_out={
+            "out": np.zeros(5) if do_fail else np.arange(5) + np.arange(5),
+            "some": np.array(["list", "of", "string"]),
+        },
+    )
+
+
 def check_addition_model(neuropod_path):
     """
     Validate that the inputs and outputs of the loaded neuropod match
