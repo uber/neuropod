@@ -124,10 +124,10 @@ class TestTensorflowPackaging(unittest.TestCase):
                 np.testing.assert_equal(neuropod_obj.name, "addition_model")
                 np.testing.assert_equal(neuropod_obj.platform, "tensorflow")
                 np.testing.assert_equal(
-                    neuropod_path.infer({"x": np.float32(2.0)}), {"out": 2.0}
+                    neuropod_obj.infer({"x": np.float32(2.0)}), {"out": 2.0}
                 )
                 np.testing.assert_equal(
-                    neuropod_path.infer({"x": np.float32(4.0)}), {"out": 6.0}
+                    neuropod_obj.infer({"x": np.float32(4.0)}), {"out": 6.0}
                 )
 
 
