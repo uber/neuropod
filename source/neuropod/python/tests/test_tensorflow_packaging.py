@@ -121,7 +121,7 @@ class TestTensorflowPackaging(unittest.TestCase):
                 neuropod_path = os.path.join(test_dir, "test_neuropod")
                 self.package_accumulator_model(neuropod_path, init_op_name_as_list)
                 neuropod_obj = load_neuropod(neuropod_path)
-                np.testing.assert_equal(neuropod_obj.name, "addition_model")
+                np.testing.assert_equal(neuropod_obj.name, "accumulator_model")
                 np.testing.assert_equal(neuropod_obj.platform, "tensorflow")
                 np.testing.assert_equal(
                     neuropod_obj.infer({"x": np.float32(2.0)}), {"out": 2.0}
