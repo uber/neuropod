@@ -62,12 +62,12 @@ const std::vector<TensorSpec> &Neuropod::get_outputs() const
 
 const std::string &Neuropod::get_name() const
 {
-    return model_config_->name;
+    return backend_->get_name();
 }
 
 const std::string &Neuropod::get_platform() const
 {
-    return model_config_->platform;
+    return backend_->get_platform();
 }
 
 std::shared_ptr<NeuropodTensorAllocator> Neuropod::get_tensor_allocator()
