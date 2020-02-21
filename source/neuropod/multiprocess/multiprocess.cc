@@ -7,6 +7,7 @@
 #include "neuropod/backends/neuropod_backend.hh"
 #include "neuropod/internal/logging.hh"
 #include "neuropod/multiprocess/control_messages.hh"
+#include "neuropod/multiprocess/heartbeat_controller.hh"
 #include "neuropod/multiprocess/ipc_control_channel.hh"
 #include "neuropod/multiprocess/shm_tensor.hh"
 
@@ -96,6 +97,9 @@ private:
     // Control channel for interacting with the worker
     IPCControlChannel control_channel_;
 
+    // Send a heartbeat message to the worker periodically
+    HeartbeatController heartbeat_controller_;
+
     void wait_for_load_confirmation(const std::string &neuropod_path)
     {
         // Wait for confirmation that the model was loaded
@@ -139,7 +143,8 @@ public:
         : NeuropodBackendWithDefaultAllocator<SHMNeuropodTensor>(neuropod_path),
           control_queue_name_(control_queue_name),
           free_memory_every_cycle_(free_memory_every_cycle),
-          control_channel_(control_queue_name, MAIN_PROCESS)
+          control_channel_(control_queue_name, MAIN_PROCESS),
+          heartbeat_controller_(control_channel_, HEARTBEAT_INTERVAL_MS)
     {
         load_model();
     }
@@ -151,7 +156,8 @@ public:
         : NeuropodBackendWithDefaultAllocator<SHMNeuropodTensor>(neuropod_path),
           control_queue_name_(boost::uuids::to_string(boost::uuids::random_generator()())),
           free_memory_every_cycle_(free_memory_every_cycle),
-          control_channel_(control_queue_name_, MAIN_PROCESS)
+          control_channel_(control_queue_name_, MAIN_PROCESS),
+          heartbeat_controller_(control_channel_, HEARTBEAT_INTERVAL_MS)
     {
         auto env = get_env_map();
 

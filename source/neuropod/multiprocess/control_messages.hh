@@ -52,8 +52,7 @@ enum MessageType
     // Valid next messages: ADD_INPUT, LOAD_NEUROPOD
     INFER_COMPLETE,
 
-    // A noop message sent by the worker process used to ensure that the worker
-    // is alive
+    // A noop message that is perioidically sent by both processes
     // Note: it is valid to send this message at any time.
     HEARTBEAT,
 

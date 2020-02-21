@@ -60,6 +60,20 @@ cc_library(
 )
 
 cc_library(
+    name = "heartbeat_controller",
+    srcs = [
+        "heartbeat_controller.cc",
+        "heartbeat_controller.hh",
+    ],
+    visibility = [
+        "//neuropod:__subpackages__",
+    ],
+    deps = [
+        ":ipc_control_channel",
+    ],
+)
+
+cc_library(
     name = "multiprocess_worker",
     hdrs = [
         "multiprocess_worker.hh",
@@ -73,6 +87,7 @@ cc_library(
     ],
     deps = [
         ":ipc_control_channel",
+        ":heartbeat_controller",
         "//neuropod:neuropod_hdrs",
         "//neuropod/internal:neuropod_tensor_raw_data_access",
     ],
@@ -123,6 +138,7 @@ cc_library(
     ],
     deps = [
         ":ipc_control_channel",
+        ":heartbeat_controller",
         "//neuropod:neuropod_hdrs",
         "//neuropod/backends:neuropod_backend",
         "//neuropod/internal:deleter",
