@@ -82,8 +82,10 @@ public:
         data_->ndims       = dims.size();
         if (data_->ndims >= MAX_DIMS)
         {
-            NEUROPOD_ERROR("For the multiprocess backend, tensors must have less than "
-                           << MAX_DIMS << " dimensions. Tried creating tensor with " << data_->ndims << " dimensions")
+            NEUROPOD_ERROR("For the multiprocess backend, tensors must have less than {} dimensions. Tried creating "
+                           "tensor with {} dimensions",
+                           MAX_DIMS,
+                           data_->ndims);
         }
 
         std::copy(dims.begin(), dims.end(), data_->dims);

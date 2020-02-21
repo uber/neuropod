@@ -62,7 +62,7 @@ def install_pytorch(version):
                 version += "+" + torch_cuda_string
 
         # If this is the 1.3.0 stable release
-        if version_base == "1.3.0" and version_date is None:
+        if (version_base == "1.3.0" or version_base == "1.4.0") and version_date is None:
             # They changed the default from cuda 10.0 to cuda 10.1
             # For CUDA 10.1 builds, they don't add `cu101` to the version string
             if torch_cuda_string != "cu101":

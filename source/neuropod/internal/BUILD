@@ -136,6 +136,10 @@ cc_library(
     visibility = [
         "//neuropod:__subpackages__",
     ],
+    deps = [
+        "@fmt_repo//:fmt",
+        ":logging",
+    ],
 )
 
 cc_library(
@@ -164,7 +168,6 @@ cc_library(
     visibility = [
         "//neuropod:__subpackages__",
     ],
-    linkopts = ["-lz"],
 )
 
 cc_library(

@@ -6,6 +6,7 @@
 
 #include "neuropod/backends/neuropod_backend.hh"
 #include "neuropod/backends/tensorflow/tf_tensor.hh"
+#include "neuropod/neuropod.hh"
 
 #include <map>
 #include <string>
@@ -45,18 +46,17 @@ private:
                          const std::map<std::string, std::string> &       tensor_fetches);
 
 public:
-    explicit TensorflowNeuropodBackend(const std::string &           neuropod_path,
-                                       std::unique_ptr<ModelConfig> &model_config,
-                                       const RuntimeOptions &        options);
+    TensorflowNeuropodBackend(const std::string &neuropod_path, const RuntimeOptions &options);
 
     ~TensorflowNeuropodBackend();
 
-    // Run inference
-    std::unique_ptr<NeuropodValueMap> infer(const NeuropodValueMap &inputs);
-
+protected:
     // Run inference with a set of requested outputs
-    std::unique_ptr<NeuropodValueMap> infer(const NeuropodValueMap &        inputs,
-                                            const std::vector<std::string> &requested_outputs);
+    std::unique_ptr<NeuropodValueMap> infer_internal(const NeuropodValueMap &        inputs,
+                                                     const std::vector<std::string> &requested_outputs);
+
+    // A method that loads the underlying model
+    void load_model_internal();
 };
 
 } // namespace neuropod

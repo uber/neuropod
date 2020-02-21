@@ -18,12 +18,14 @@ class TestNeuropodBackend : public NeuropodBackendWithDefaultAllocator<TestNeuro
 {
 public:
     TestNeuropodBackend();
-    TestNeuropodBackend(const std::string &           neuropod_path,
-                        std::unique_ptr<ModelConfig> &model_config,
-                        const RuntimeOptions &        options);
+    TestNeuropodBackend(const std::string &neuropod_path, const RuntimeOptions &options);
     ~TestNeuropodBackend();
 
+protected:
     // Run inference
-    std::unique_ptr<NeuropodValueMap> infer(const NeuropodValueMap &inputs);
+    std::unique_ptr<NeuropodValueMap> infer_internal(const NeuropodValueMap &inputs);
+
+    // A method that loads the underlying model. For this backend, it is a noop
+    void load_model_internal();
 };
 } // namespace neuropod

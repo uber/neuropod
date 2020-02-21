@@ -23,8 +23,8 @@ Eigen::Map<const Eigen::Matrix<_Scalar, Eigen::Dynamic, Eigen::Dynamic, Eigen::R
     if (dims.size() > 2)
     {
         NEUROPOD_ERROR("Only tensors with rank of 1 or 2 are supported by this function. "
-                       "Tensor has rank of "
-                       << dims.size() << ".");
+                       "Tensor has rank of {}.",
+                       dims.size());
     }
 
     const auto rows = dims[0];
@@ -44,8 +44,8 @@ Eigen::Map<Eigen::Matrix<_Scalar, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajo
     if (dims.size() > 2)
     {
         NEUROPOD_ERROR("Only tensors with rank of 1 or 2 are supported by this function. "
-                       "Tensor has rank of "
-                       << dims.size() << ".");
+                       "Tensor has rank of {}.",
+                       dims.size());
     }
 
     const auto rows = dims[0];

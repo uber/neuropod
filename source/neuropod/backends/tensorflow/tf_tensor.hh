@@ -130,8 +130,7 @@ public:
         auto flat = tensor_.flat<std::string>();
         if (data.size() != flat.size())
         {
-            NEUROPOD_ERROR("Supplied vector size (" << data.size() << ") does not match size of tensor (" << flat.size()
-                                                    << ")");
+            NEUROPOD_ERROR("Supplied vector size ({}) does not match size of tensor ({})", data.size(), flat.size());
         }
 
         for (int i = 0; i < data.size(); i++)

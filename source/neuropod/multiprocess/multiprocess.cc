@@ -76,7 +76,7 @@ pid_t start_worker_process(const std::string &control_queue_name, std::vector<st
     const auto status = posix_spawnp(&child_pid, "neuropod_multiprocess_worker", NULL, NULL, argv, env_arr);
     if (status != 0)
     {
-        NEUROPOD_ERROR("Failed to start the worker process. Failed with code: " << status << ": " << strerror(status));
+        NEUROPOD_ERROR("Failed to start the worker process. Failed with code: {} - {}", status, strerror(status));
     }
 
     return child_pid;
@@ -107,9 +107,11 @@ private:
             if (!successful_read)
             {
                 // We timed out
-                NEUROPOD_ERROR("Timed out waiting for the worker process to load: "
-                               << neuropod_path << ". Didn't receive a message in " << MESSAGE_TIMEOUT_MS
-                               << "ms, but expected a heartbeat every " << HEARTBEAT_INTERVAL_MS << "ms.");
+                NEUROPOD_ERROR("Timed out waiting for the worker process to load: {}. Didn't receive a message in "
+                               "{}ms, but expected a heartbeat every {}ms.",
+                               neuropod_path,
+                               MESSAGE_TIMEOUT_MS,
+                               HEARTBEAT_INTERVAL_MS);
             }
 
             if (received.type == LOAD_SUCCESS)
@@ -125,49 +127,31 @@ private:
             }
 
             // We got an unexpected message
-            NEUROPOD_ERROR(
-                "Expected LOAD_SUCCESS, but got unexpected message from the worker process:" << received.type)
+            NEUROPOD_ERROR("Expected LOAD_SUCCESS, but got unexpected message from the worker process: {}",
+                           received.type);
         }
     }
 
 public:
     MultiprocessNeuropodBackend(const std::string &neuropod_path,
                                 const std::string &control_queue_name,
-                                bool               free_memory_every_cycle,
-                                bool               wait_for_load = true)
-        : control_queue_name_(control_queue_name),
+                                bool               free_memory_every_cycle)
+        : NeuropodBackendWithDefaultAllocator<SHMNeuropodTensor>(neuropod_path),
+          control_queue_name_(control_queue_name),
           free_memory_every_cycle_(free_memory_every_cycle),
           control_channel_(control_queue_name, MAIN_PROCESS)
     {
-        // Create a message to tell the worker process to load the specified neuropod
-        control_message msg;
-        msg.type = LOAD_NEUROPOD;
-        if (neuropod_path.size() >= 4096)
-        {
-            NEUROPOD_ERROR("The multiprocess backend only supports neuropod paths < 4096 characters long.")
-        }
-
-        // Copy in the path
-        strncpy(msg.neuropod_path, neuropod_path.c_str(), 4096);
-
-        // Send the message
-        control_channel_.send_message(msg);
-
-        if (wait_for_load)
-        {
-            // Wait until the worker process confirms it has loaded the model
-            wait_for_load_confirmation(neuropod_path);
-        }
+        load_model();
     }
 
     // Generate a control queue name and start a worker
     MultiprocessNeuropodBackend(const std::string &   neuropod_path,
                                 const RuntimeOptions &options,
                                 bool                  free_memory_every_cycle)
-        : MultiprocessNeuropodBackend(neuropod_path,
-                                      boost::uuids::to_string(boost::uuids::random_generator()()),
-                                      free_memory_every_cycle,
-                                      false)
+        : NeuropodBackendWithDefaultAllocator<SHMNeuropodTensor>(neuropod_path),
+          control_queue_name_(boost::uuids::to_string(boost::uuids::random_generator()())),
+          free_memory_every_cycle_(free_memory_every_cycle),
+          control_channel_(control_queue_name_, MAIN_PROCESS)
     {
         auto env = get_env_map();
 
@@ -192,8 +176,10 @@ public:
         // Start the worker process
         child_pid_ = start_worker_process(control_queue_name_, env_vec);
 
-        // Wait until the worker process confirms it has loaded the model
-        wait_for_load_confirmation(neuropod_path);
+        if (options.load_model_at_construction)
+        {
+            load_model();
+        }
     }
 
     ~MultiprocessNeuropodBackend()
@@ -233,11 +219,10 @@ public:
         }
     }
 
-    std::unique_ptr<NeuropodValueMap> infer(const NeuropodValueMap &inputs) { return infer(inputs, {}); }
-
+protected:
     // Run inference
-    std::unique_ptr<NeuropodValueMap> infer(const NeuropodValueMap &        inputs,
-                                            const std::vector<std::string> &requested_outputs)
+    std::unique_ptr<NeuropodValueMap> infer_internal(const NeuropodValueMap &        inputs,
+                                                     const std::vector<std::string> &requested_outputs)
     {
         // Add inputs
         control_channel_.send_message(ADD_INPUT, inputs);
@@ -261,9 +246,9 @@ public:
             {
                 // We timed out
                 NEUROPOD_ERROR("Timed out waiting for a response from worker process. "
-                               "Didn't receive a message in "
-                               << MESSAGE_TIMEOUT_MS << "ms, but expected a heartbeat every " << HEARTBEAT_INTERVAL_MS
-                               << "ms.");
+                               "Didn't receive a message in {}ms, but expected a heartbeat every {}ms.",
+                               MESSAGE_TIMEOUT_MS,
+                               HEARTBEAT_INTERVAL_MS);
             }
 
             if (received.type == END_OUTPUT)
@@ -280,7 +265,7 @@ public:
 
             if (received.type != RETURN_OUTPUT)
             {
-                NEUROPOD_ERROR("Got unexpected message from the worker process:" << received.type)
+                NEUROPOD_ERROR("Got unexpected message from the worker process: {}", received.type);
             }
 
             for (int i = 0; i < received.num_tensors; i++)
@@ -304,6 +289,27 @@ public:
         }
 
         return to_return;
+    }
+
+protected:
+    void load_model_internal()
+    {
+        // Create a message to tell the worker process to load the specified neuropod
+        control_message msg;
+        msg.type = LOAD_NEUROPOD;
+        if (neuropod_path_.size() >= 4096)
+        {
+            NEUROPOD_ERROR("The multiprocess backend only supports neuropod paths < 4096 characters long.")
+        }
+
+        // Copy in the path
+        strncpy(msg.neuropod_path, neuropod_path_.c_str(), 4096);
+
+        // Send the message
+        control_channel_.send_message(msg);
+
+        // Wait until the worker process confirms it has loaded the model
+        wait_for_load_confirmation(neuropod_path_);
     }
 };
 

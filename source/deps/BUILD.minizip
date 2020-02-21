@@ -17,5 +17,8 @@ cc_library(
     includes = [
         "."
     ],
+    deps = [
+        "@zlib_repo//:zlib",
+    ],
     visibility = ["//visibility:public"],
 )

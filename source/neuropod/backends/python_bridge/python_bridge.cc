@@ -55,7 +55,7 @@ std::unique_ptr<py::gil_scoped_release> maybe_initialize()
 
     if (libpython == nullptr)
     {
-        NEUROPOD_ERROR("Failed to promote libpython to RTLD_GLOBAL. Error from dlopen: " << dlerror());
+        NEUROPOD_ERROR("Failed to promote libpython to RTLD_GLOBAL. Error from dlopen: {}", dlerror());
     }
 #endif
 
@@ -81,7 +81,6 @@ static auto gil_release = maybe_initialize();
 } // namespace
 
 PythonBridge::PythonBridge(const std::string &             neuropod_path,
-                           std::unique_ptr<ModelConfig> &  model_config,
                            const RuntimeOptions &          options,
                            const std::vector<std::string> &python_path_additions)
     : NeuropodBackendWithDefaultAllocator<TestNeuropodTensor>(neuropod_path)
@@ -89,6 +88,14 @@ PythonBridge::PythonBridge(const std::string &             neuropod_path,
     // Modify PYTHONPATH
     set_python_path(python_path_additions);
 
+    if (options.load_model_at_construction)
+    {
+        load_model();
+    }
+}
+
+void PythonBridge::load_model_internal()
+{
     // Acquire the GIL
     py::gil_scoped_acquire gil;
 
@@ -118,7 +125,7 @@ PythonBridge::~PythonBridge()
 }
 
 // Run inference
-std::unique_ptr<NeuropodValueMap> PythonBridge::infer(const NeuropodValueMap &inputs)
+std::unique_ptr<NeuropodValueMap> PythonBridge::infer_internal(const NeuropodValueMap &inputs)
 {
     // Acquire the GIL
     py::gil_scoped_acquire gil;

@@ -36,6 +36,21 @@ cc_test(
 )
 
 cc_test(
+    name = "benchmark_serialization",
+    srcs = [
+        "benchmark_serialization.cc",
+        "//neuropod:libneuropod.so",
+        "//neuropod/backends/test_backend:libneuropod_test_backend.so",
+    ],
+    deps = [
+        "@benchmark//:benchmark_main",
+        "//neuropod:neuropod_hdrs",
+        "//neuropod/backends/test_backend:test_backend_hdrs",
+        "//neuropod/serialization:serialization_hdrs",
+    ],
+)
+
+cc_test(
     name = "benchmark_shm_allocator",
     srcs = [
         "benchmark_shm_allocator.cc",

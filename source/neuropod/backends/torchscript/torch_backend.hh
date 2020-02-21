@@ -40,21 +40,16 @@ private:
     torch::Device get_torch_device(NeuropodDeviceType target_device);
 
 public:
-    TorchNeuropodBackend(const std::string &           neuropod_path,
-                         std::unique_ptr<ModelConfig> &model_config,
-                         const RuntimeOptions &        options);
-
-    // Create a TorchNeuropodBackend using the path to a TorchScript model exported using `torch.jit.save`
-    TorchNeuropodBackend(const std::string &torchscript_model_path);
-
-    // Create a TorchNeuropodBackend using the path to a TorchScript model exported using `torch.jit.save` along
-    // with a list of custom ops to load
-    TorchNeuropodBackend(const std::string &torchscript_model_path, const std::vector<std::string> &custom_op_paths);
+    TorchNeuropodBackend(const std::string &neuropod_path, const RuntimeOptions &options);
 
     ~TorchNeuropodBackend();
 
+protected:
     // Run inference
-    std::unique_ptr<NeuropodValueMap> infer(const NeuropodValueMap &inputs);
+    std::unique_ptr<NeuropodValueMap> infer_internal(const NeuropodValueMap &inputs);
+
+    // A method that loads the underlying model
+    void load_model_internal();
 };
 
 } // namespace neuropod

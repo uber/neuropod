@@ -32,7 +32,7 @@ void TransitionVerifier::assert_transition_allowed(MessageType current_type)
     // Special case for the first message
     if (is_first_message_ && current_type != LOAD_NEUROPOD)
     {
-        NEUROPOD_ERROR("OPE: Invalid state transition. Expected LOAD_NEUROPOD as first state. Got " << current_type);
+        NEUROPOD_ERROR("OPE: Invalid state transition. Expected LOAD_NEUROPOD as first state. Got {}", current_type);
     }
 
     // Using `set` instead of `unordered_set` because it doesn't require the type to be
@@ -56,8 +56,7 @@ void TransitionVerifier::assert_transition_allowed(MessageType current_type)
     if (!is_first_message_ &&
         allowed_transitions.find(std::make_pair(last_type_, current_type)) == allowed_transitions.end())
     {
-        NEUROPOD_ERROR("OPE: Invalid state transition. Got transition from state " << last_type_ << " to "
-                                                                                   << current_type);
+        NEUROPOD_ERROR("OPE: Invalid state transition. Got transition from state {} to {}", last_type_, current_type);
     }
 
     last_type_        = current_type;
@@ -95,6 +94,15 @@ void IPCControlChannel::send_message(control_message &msg)
     send_queue_->send(&msg, sizeof(control_message), 0);
 }
 
+// Does not block if the message queue is full
+bool IPCControlChannel::try_send_message(control_message &msg)
+{
+    // Make sure that it is valid to go from the previous message type to the current one
+    verifier_.assert_transition_allowed(msg.type);
+    SPDLOG_DEBUG("OPE: (non-blocking) Sending message {}", msg.type);
+    return send_queue_->try_send(&msg, sizeof(control_message), 0);
+}
+
 // Utility to send a message with no content to a message queue
 void IPCControlChannel::send_message(MessageType type)
 {
@@ -122,8 +130,8 @@ void IPCControlChannel::send_message(MessageType type, const std::vector<std::st
         if (name.length() >= 256)
         {
             NEUROPOD_ERROR("For the multiprocess backend, tensor names must have less than 256 characters. Tried using "
-                           "a tensor with name: "
-                           << name);
+                           "a tensor with name: {}",
+                           name);
         }
 
         strncpy(msg.tensor_name[current_index], name.c_str(), 256);
@@ -166,8 +174,8 @@ void IPCControlChannel::send_message(MessageType type, const NeuropodValueMap &d
         if (entry.first.length() >= 256)
         {
             NEUROPOD_ERROR("For the multiprocess backend, tensor names must have less than 256 characters. Tried using "
-                           "a tensor with name: "
-                           << entry.first);
+                           "a tensor with name: {}",
+                           entry.first);
         }
 
         strncpy(msg.tensor_name[current_index], entry.first.c_str(), 256);

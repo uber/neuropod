@@ -56,6 +56,13 @@ public:
     // Note: this is threadsafe
     void send_message(control_message &msg);
 
+    // Utility to send a message to a message queue
+    // Does not block if the message queue is full
+    // This must be used when sending messages to the main process outside of the
+    // normal inference process (e.g. HEARTBEAT messages)
+    // Note: this is threadsafe
+    bool try_send_message(control_message &msg);
+
     // Utility to send a message with no content to a message queue
     // Note: this is threadsafe
     void send_message(MessageType type);

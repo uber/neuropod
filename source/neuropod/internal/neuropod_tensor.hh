@@ -219,8 +219,8 @@ protected:
 
         if (requested != actual)
         {
-            NEUROPOD_ERROR("Tried to downcast tensor of type " << actual << " to a TypedNeuropodTensor of type "
-                                                               << requested);
+            NEUROPOD_ERROR(
+                "Tried to downcast tensor of type {} to a TypedNeuropodTensor of type {}", actual, requested);
         }
     }
     void assure_rank(size_t expected_rank) const
@@ -229,8 +229,7 @@ protected:
         const size_t rank = dims.size();
         if (rank != expected_rank)
         {
-            NEUROPOD_ERROR("Tensor is expected to have rank of " << expected_rank << " while the actual rank is "
-                                                                 << rank);
+            NEUROPOD_ERROR("Tensor is expected to have rank of {} while the actual rank is {}", expected_rank, rank);
         }
     }
 
@@ -436,7 +435,7 @@ std::unique_ptr<NeuropodTensor> make_tensor(TensorType tensor_type, Params &&...
     {
         FOR_EACH_TYPE_MAPPING_INCLUDING_STRING(MAKE_TENSOR)
     default:
-        NEUROPOD_ERROR("Unsupported tensor type: " << tensor_type);
+        NEUROPOD_ERROR("Unsupported tensor type: {}", tensor_type);
     }
 }
 
@@ -448,7 +447,7 @@ std::unique_ptr<NeuropodTensor> make_tensor_no_string(TensorType tensor_type, Pa
     {
         FOR_EACH_TYPE_MAPPING_EXCEPT_STRING(MAKE_TENSOR)
     default:
-        NEUROPOD_ERROR("Unsupported tensor type: " << tensor_type);
+        NEUROPOD_ERROR("Unsupported tensor type: {}", tensor_type);
     }
 }
 

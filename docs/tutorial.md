@@ -309,6 +309,7 @@ int main()
     const auto out_shape  = out_tensor->get_dims();
 }
 ```
+
 !!! note
     This shows basic usage of the C++ API. For more flexible and memory-efficient usage, please see the API docs
 

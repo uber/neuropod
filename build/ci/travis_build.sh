@@ -21,7 +21,7 @@ if [[ $(uname -s) == 'Darwin' ]]; then
 fi
 
 # Do everything in a virtualenv
-sudo ${NEUROPOD_PYTHON_BINARY} -m pip install virtualenv
+sudo ${NEUROPOD_PYTHON_BINARY} -m pip install virtualenv==16.7.9
 ${NEUROPOD_PYTHON_BINARY} -m virtualenv /tmp/neuropod_venv
 source /tmp/neuropod_venv/bin/activate
 

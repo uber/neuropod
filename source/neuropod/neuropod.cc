@@ -21,26 +21,26 @@ Neuropod::Neuropod(const std::string &neuropod_path, const RuntimeOptions &optio
 Neuropod::Neuropod(const std::string &                                 neuropod_path,
                    const std::unordered_map<std::string, std::string> &default_backend_overrides,
                    const RuntimeOptions &                              options)
-    : model_config_(load_model_config(neuropod_path)),
-      backend_(get_backend_for_type(default_backend_overrides,
-                                    model_config_->platform)(neuropod_path, model_config_, options))
+    : backend_(get_backend_for_type(default_backend_overrides,
+                                    load_model_config(neuropod_path)->platform)(neuropod_path, options))
 {
 }
 
 // Load the neuropod using the specified backend
 Neuropod::Neuropod(const std::string &neuropod_path, const std::string &backend_name, const RuntimeOptions &options)
-    : model_config_(load_model_config(neuropod_path)),
-      backend_(get_backend_by_name(backend_name)(neuropod_path, model_config_, options))
+    : backend_(get_backend_by_name(backend_name)(neuropod_path, options))
 {
 }
 
 // Load the model config and use the backend that was provided by the user
-Neuropod::Neuropod(const std::string &neuropod_path, std::shared_ptr<NeuropodBackend> backend)
-    : model_config_(load_model_config(neuropod_path)), backend_(backend)
-{
-}
+Neuropod::Neuropod(const std::string &neuropod_path, std::shared_ptr<NeuropodBackend> backend) : backend_(backend) {}
 
 Neuropod::~Neuropod() = default;
+
+void Neuropod::load_model()
+{
+    backend_->load_model();
+}
 
 std::unique_ptr<NeuropodValueMap> Neuropod::infer(const NeuropodValueMap &        inputs,
                                                   const std::vector<std::string> &requested_outputs)
@@ -52,12 +52,12 @@ std::unique_ptr<NeuropodValueMap> Neuropod::infer(const NeuropodValueMap &      
 
 const std::vector<TensorSpec> &Neuropod::get_inputs() const
 {
-    return model_config_->inputs;
+    return backend_->get_inputs();
 }
 
 const std::vector<TensorSpec> &Neuropod::get_outputs() const
 {
-    return model_config_->outputs;
+    return backend_->get_outputs();
 }
 
 std::shared_ptr<NeuropodTensorAllocator> Neuropod::get_tensor_allocator()

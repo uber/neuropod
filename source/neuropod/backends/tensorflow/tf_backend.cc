@@ -38,7 +38,7 @@ void setup_node_mapping_and_init_ops(std::istream &                             
 
     if (!parsingSuccessful)
     {
-        NEUROPOD_ERROR("Error parsing TF Neuropod Config JSON: " + parse_err);
+        NEUROPOD_ERROR("Error parsing TF Neuropod Config JSON: {}", parse_err);
     }
 
     // Make sure that node_name_mapping exists and is an object
@@ -76,7 +76,7 @@ void check_tf_status(const tensorflow::Status &status)
 {
     if (!status.ok())
     {
-        NEUROPOD_ERROR("TensorFlow error: " << status.error_message())
+        NEUROPOD_ERROR("TensorFlow error: {}", status.error_message());
     }
 }
 
@@ -118,23 +118,20 @@ std::string get_handle_cache_key(const std::map<std::string, tensorflow::Tensor>
 
 } // namespace
 
-TensorflowNeuropodBackend::TensorflowNeuropodBackend(const std::string &           neuropod_path,
-                                                     std::unique_ptr<ModelConfig> &model_config,
-                                                     const RuntimeOptions &        options)
+TensorflowNeuropodBackend::TensorflowNeuropodBackend(const std::string &neuropod_path, const RuntimeOptions &options)
     : NeuropodBackendWithDefaultAllocator<TensorflowNeuropodTensor>(neuropod_path),
       session_(tensorflow::NewSession(get_tf_opts(options)))
 {
-#ifndef __APPLE__
-    // We need to do this so the custom ops can see the symbols from TF
-    void *libtensorflow = dlopen("libtensorflow_framework.so", RTLD_NOW | RTLD_GLOBAL | RTLD_NOLOAD);
-    if (libtensorflow == nullptr)
+    if (options.load_model_at_construction)
     {
-        NEUROPOD_ERROR("Failed to promote libtensorflow to RTLD_GLOBAL. Error from dlopen: " << dlerror());
+        load_model();
     }
-#endif
+}
 
+void TensorflowNeuropodBackend::load_model_internal()
+{
     // Load custom ops (if any)
-    for (const auto &item : model_config->custom_ops)
+    for (const auto &item : model_config_->custom_ops)
     {
         const auto path = "0/ops/" + item;
         const auto hash = loader_->get_hash_for_file(path);
@@ -145,7 +142,7 @@ TensorflowNeuropodBackend::TensorflowNeuropodBackend(const std::string &        
         {
             if (dlopen(loader_->get_file_path(path).c_str(), RTLD_NOW) == nullptr)
             {
-                NEUROPOD_ERROR("Failed to load custom op. Error from dlopen: " << dlerror());
+                NEUROPOD_ERROR("Failed to load custom op. Error from dlopen: {}", dlerror());
             }
 
             loaded_op_hashes.insert(hash);
@@ -165,7 +162,7 @@ TensorflowNeuropodBackend::TensorflowNeuropodBackend(const std::string &        
     graph_stream->read(buffer.data(), graph_length);
     if (graph_stream->fail())
     {
-        NEUROPOD_ERROR("Error reading TensorFlow GraphDef for neuropod " << neuropod_path);
+        NEUROPOD_ERROR("Error reading TensorFlow GraphDef for neuropod {}", neuropod_path_);
     }
 
     // Read the GraphDef
@@ -176,7 +173,7 @@ TensorflowNeuropodBackend::TensorflowNeuropodBackend(const std::string &        
     auto status = session_->Create(graph);
     if (!status.ok())
     {
-        NEUROPOD_ERROR("Error loading TensorFlow graph: " << status.error_message());
+        NEUROPOD_ERROR("Error loading TensorFlow graph: {}", status.error_message());
     }
 
     // Setup the nodename mapping and get the init ops (if any)
@@ -185,7 +182,7 @@ TensorflowNeuropodBackend::TensorflowNeuropodBackend(const std::string &        
     setup_node_mapping_and_init_ops(*config_stream, node_name_mapping_, init_ops);
 
     // Get a list of the output nodes
-    for (const auto &output : model_config->outputs)
+    for (const auto &output : model_config_->outputs)
     {
         output_names_.emplace_back(output.name);
     }
@@ -251,14 +248,9 @@ int64_t TensorflowNeuropodBackend::get_callable(const std::map<std::string, tens
     return handle;
 }
 
-std::unique_ptr<NeuropodValueMap> TensorflowNeuropodBackend::infer(const NeuropodValueMap &inputs)
-{
-    return infer(inputs, {});
-}
-
 // Run inference with a set of requested outputs
-std::unique_ptr<NeuropodValueMap> TensorflowNeuropodBackend::infer(const NeuropodValueMap &        inputs,
-                                                                   const std::vector<std::string> &requested_outputs)
+std::unique_ptr<NeuropodValueMap> TensorflowNeuropodBackend::infer_internal(
+    const NeuropodValueMap &inputs, const std::vector<std::string> &requested_outputs)
 {
     // In TensorFlow, a callable is a way of running a subgraph given a set of inputs and
     // outputs. It's very similar to `session_->Run` except it has support for more fine-grained
@@ -282,10 +274,10 @@ std::unique_ptr<NeuropodValueMap> TensorflowNeuropodBackend::infer(const Neuropo
         const auto node_name = node_name_mapping_.find(name);
         if (node_name == node_name_mapping_.end())
         {
-            NEUROPOD_ERROR("Node " << name
-                                   << " not found in node_name_mapping. "
-                                      "Ensure that all items in the input/output spec have a corresponding item "
-                                      "in the node_name_mapping.");
+            NEUROPOD_ERROR("Node {} not found in node_name_mapping. "
+                           "Ensure that all items in the input/output spec have a corresponding item "
+                           "in the node_name_mapping.",
+                           name);
         }
 
         // Add this node name as an output of the subgraph we want to run
@@ -298,10 +290,10 @@ std::unique_ptr<NeuropodValueMap> TensorflowNeuropodBackend::infer(const Neuropo
         const auto node_name = node_name_mapping_.find(entry.first);
         if (node_name == node_name_mapping_.end())
         {
-            NEUROPOD_ERROR("Node " << entry.first
-                                   << " not found in node_name_mapping. "
-                                      "Ensure that all items in the input/output spec have a corresponding item "
-                                      "in the node_name_mapping.");
+            NEUROPOD_ERROR("Node {} not found in node_name_mapping. "
+                           "Ensure that all items in the input/output spec have a corresponding item "
+                           "in the node_name_mapping.",
+                           entry.first);
         }
 
         // Get the TensorFlow tensor from the Neuropod tensor

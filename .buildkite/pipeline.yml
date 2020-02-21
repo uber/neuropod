@@ -113,22 +113,22 @@ steps:
     retry:
       automatic: true
 
-  - label: ":docker: CPU Tests (test-cpu-variant-tf-1_14_0-torch-1_3_0_dev20190820-py2_7)"
+  - label: ":docker: CPU Tests (test-cpu-variant-tf-1_14_0-torch-1_3_0-py2_7)"
     agents:
       queue: private-default
     command: build/ci/buildkite_build.sh
     plugins:
       - docker-compose#v3.1.0:
-          build: test-cpu-variant-tf-1_14_0-torch-1_3_0_dev20190820-py2_7
+          build: test-cpu-variant-tf-1_14_0-torch-1_3_0-py2_7
           config: docker-compose.test.yml
           image-repository: 027047743804.dkr.ecr.us-east-2.amazonaws.com/uber
-          cache-from: test-cpu-variant-tf-1_14_0-torch-1_3_0_dev20190820-py2_7:027047743804.dkr.ecr.us-east-2.amazonaws.com/uber:test-cpu-variant-tf-1_14_0-torch-1_3_0_dev20190820-py2_7
+          cache-from: test-cpu-variant-tf-1_14_0-torch-1_3_0-py2_7:027047743804.dkr.ecr.us-east-2.amazonaws.com/uber:test-cpu-variant-tf-1_14_0-torch-1_3_0-py2_7
           push-retries: 5
       - docker-compose#v3.1.0:
-          push: test-cpu-variant-tf-1_14_0-torch-1_3_0_dev20190820-py2_7:027047743804.dkr.ecr.us-east-2.amazonaws.com/uber:test-cpu-variant-tf-1_14_0-torch-1_3_0_dev20190820-py2_7
+          push: test-cpu-variant-tf-1_14_0-torch-1_3_0-py2_7:027047743804.dkr.ecr.us-east-2.amazonaws.com/uber:test-cpu-variant-tf-1_14_0-torch-1_3_0-py2_7
           config: docker-compose.test.yml
       - docker-compose#v3.1.0:
-          run: test-cpu-variant-tf-1_14_0-torch-1_3_0_dev20190820-py2_7
+          run: test-cpu-variant-tf-1_14_0-torch-1_3_0-py2_7
           config: docker-compose.test.yml
           env:
             - NEUROPOD_CACHE_ACCESS_KEY
@@ -149,22 +149,22 @@ steps:
     retry:
       automatic: true
 
-  - label: ":docker: CPU Tests (test-cpu-variant-tf-1_15_0-torch-1_3_0-py2_7)"
+  - label: ":docker: CPU Tests (test-cpu-variant-tf-1_15_0-torch-1_4_0-py2_7)"
     agents:
       queue: private-default
     command: build/ci/buildkite_build.sh
     plugins:
       - docker-compose#v3.1.0:
-          build: test-cpu-variant-tf-1_15_0-torch-1_3_0-py2_7
+          build: test-cpu-variant-tf-1_15_0-torch-1_4_0-py2_7
           config: docker-compose.test.yml
           image-repository: 027047743804.dkr.ecr.us-east-2.amazonaws.com/uber
-          cache-from: test-cpu-variant-tf-1_15_0-torch-1_3_0-py2_7:027047743804.dkr.ecr.us-east-2.amazonaws.com/uber:test-cpu-variant-tf-1_15_0-torch-1_3_0-py2_7
+          cache-from: test-cpu-variant-tf-1_15_0-torch-1_4_0-py2_7:027047743804.dkr.ecr.us-east-2.amazonaws.com/uber:test-cpu-variant-tf-1_15_0-torch-1_4_0-py2_7
           push-retries: 5
       - docker-compose#v3.1.0:
-          push: test-cpu-variant-tf-1_15_0-torch-1_3_0-py2_7:027047743804.dkr.ecr.us-east-2.amazonaws.com/uber:test-cpu-variant-tf-1_15_0-torch-1_3_0-py2_7
+          push: test-cpu-variant-tf-1_15_0-torch-1_4_0-py2_7:027047743804.dkr.ecr.us-east-2.amazonaws.com/uber:test-cpu-variant-tf-1_15_0-torch-1_4_0-py2_7
           config: docker-compose.test.yml
       - docker-compose#v3.1.0:
-          run: test-cpu-variant-tf-1_15_0-torch-1_3_0-py2_7
+          run: test-cpu-variant-tf-1_15_0-torch-1_4_0-py2_7
           config: docker-compose.test.yml
           env:
             - NEUROPOD_CACHE_ACCESS_KEY
@@ -257,22 +257,22 @@ steps:
     retry:
       automatic: true
 
-  - label: ":docker: CPU Tests (test-cpu-variant-tf-1_14_0-torch-1_3_0_dev20190820-py3)"
+  - label: ":docker: CPU Tests (test-cpu-variant-tf-1_14_0-torch-1_3_0-py3)"
     agents:
       queue: private-default
     command: build/ci/buildkite_build.sh
     plugins:
       - docker-compose#v3.1.0:
-          build: test-cpu-variant-tf-1_14_0-torch-1_3_0_dev20190820-py3
+          build: test-cpu-variant-tf-1_14_0-torch-1_3_0-py3
           config: docker-compose.test.yml
           image-repository: 027047743804.dkr.ecr.us-east-2.amazonaws.com/uber
-          cache-from: test-cpu-variant-tf-1_14_0-torch-1_3_0_dev20190820-py3:027047743804.dkr.ecr.us-east-2.amazonaws.com/uber:test-cpu-variant-tf-1_14_0-torch-1_3_0_dev20190820-py3
+          cache-from: test-cpu-variant-tf-1_14_0-torch-1_3_0-py3:027047743804.dkr.ecr.us-east-2.amazonaws.com/uber:test-cpu-variant-tf-1_14_0-torch-1_3_0-py3
           push-retries: 5
       - docker-compose#v3.1.0:
-          push: test-cpu-variant-tf-1_14_0-torch-1_3_0_dev20190820-py3:027047743804.dkr.ecr.us-east-2.amazonaws.com/uber:test-cpu-variant-tf-1_14_0-torch-1_3_0_dev20190820-py3
+          push: test-cpu-variant-tf-1_14_0-torch-1_3_0-py3:027047743804.dkr.ecr.us-east-2.amazonaws.com/uber:test-cpu-variant-tf-1_14_0-torch-1_3_0-py3
           config: docker-compose.test.yml
       - docker-compose#v3.1.0:
-          run: test-cpu-variant-tf-1_14_0-torch-1_3_0_dev20190820-py3
+          run: test-cpu-variant-tf-1_14_0-torch-1_3_0-py3
           config: docker-compose.test.yml
           env:
             - NEUROPOD_CACHE_ACCESS_KEY
@@ -293,22 +293,22 @@ steps:
     retry:
       automatic: true
 
-  - label: ":docker: CPU Tests (test-cpu-variant-tf-1_15_0-torch-1_3_0-py3)"
+  - label: ":docker: CPU Tests (test-cpu-variant-tf-1_15_0-torch-1_4_0-py3)"
     agents:
       queue: private-default
     command: build/ci/buildkite_build.sh
     plugins:
       - docker-compose#v3.1.0:
-          build: test-cpu-variant-tf-1_15_0-torch-1_3_0-py3
+          build: test-cpu-variant-tf-1_15_0-torch-1_4_0-py3
           config: docker-compose.test.yml
           image-repository: 027047743804.dkr.ecr.us-east-2.amazonaws.com/uber
-          cache-from: test-cpu-variant-tf-1_15_0-torch-1_3_0-py3:027047743804.dkr.ecr.us-east-2.amazonaws.com/uber:test-cpu-variant-tf-1_15_0-torch-1_3_0-py3
+          cache-from: test-cpu-variant-tf-1_15_0-torch-1_4_0-py3:027047743804.dkr.ecr.us-east-2.amazonaws.com/uber:test-cpu-variant-tf-1_15_0-torch-1_4_0-py3
           push-retries: 5
       - docker-compose#v3.1.0:
-          push: test-cpu-variant-tf-1_15_0-torch-1_3_0-py3:027047743804.dkr.ecr.us-east-2.amazonaws.com/uber:test-cpu-variant-tf-1_15_0-torch-1_3_0-py3
+          push: test-cpu-variant-tf-1_15_0-torch-1_4_0-py3:027047743804.dkr.ecr.us-east-2.amazonaws.com/uber:test-cpu-variant-tf-1_15_0-torch-1_4_0-py3
           config: docker-compose.test.yml
       - docker-compose#v3.1.0:
-          run: test-cpu-variant-tf-1_15_0-torch-1_3_0-py3
+          run: test-cpu-variant-tf-1_15_0-torch-1_4_0-py3
           config: docker-compose.test.yml
           env:
             - NEUROPOD_CACHE_ACCESS_KEY
@@ -401,22 +401,22 @@ steps:
     retry:
       automatic: true
 
-  - label: ":docker: GPU Tests (test-gpu-variant-tf-1_14_0-torch-1_3_0_dev20190820-py2_7)"
+  - label: ":docker: GPU Tests (test-gpu-variant-tf-1_14_0-torch-1_3_0-py2_7)"
     agents:
       queue: private-gpu
     command: build/ci/buildkite_build_gpu.sh
     plugins:
       - docker-compose#v3.1.0:
-          build: test-gpu-variant-tf-1_14_0-torch-1_3_0_dev20190820-py2_7
+          build: test-gpu-variant-tf-1_14_0-torch-1_3_0-py2_7
           config: docker-compose.test.yml
           image-repository: 027047743804.dkr.ecr.us-east-2.amazonaws.com/uber
-          cache-from: test-gpu-variant-tf-1_14_0-torch-1_3_0_dev20190820-py2_7:027047743804.dkr.ecr.us-east-2.amazonaws.com/uber:test-gpu-variant-tf-1_14_0-torch-1_3_0_dev20190820-py2_7
+          cache-from: test-gpu-variant-tf-1_14_0-torch-1_3_0-py2_7:027047743804.dkr.ecr.us-east-2.amazonaws.com/uber:test-gpu-variant-tf-1_14_0-torch-1_3_0-py2_7
           push-retries: 5
       - docker-compose#v3.1.0:
-          push: test-gpu-variant-tf-1_14_0-torch-1_3_0_dev20190820-py2_7:027047743804.dkr.ecr.us-east-2.amazonaws.com/uber:test-gpu-variant-tf-1_14_0-torch-1_3_0_dev20190820-py2_7
+          push: test-gpu-variant-tf-1_14_0-torch-1_3_0-py2_7:027047743804.dkr.ecr.us-east-2.amazonaws.com/uber:test-gpu-variant-tf-1_14_0-torch-1_3_0-py2_7
           config: docker-compose.test.yml
       - docker-compose#v3.1.0:
-          run: test-gpu-variant-tf-1_14_0-torch-1_3_0_dev20190820-py2_7
+          run: test-gpu-variant-tf-1_14_0-torch-1_3_0-py2_7
           config: docker-compose.test.yml
           env:
             - NEUROPOD_CACHE_ACCESS_KEY
@@ -437,22 +437,22 @@ steps:
     retry:
       automatic: true
 
-  - label: ":docker: GPU Tests (test-gpu-variant-tf-1_15_0-torch-1_3_0-py2_7)"
+  - label: ":docker: GPU Tests (test-gpu-variant-tf-1_15_0-torch-1_4_0-py2_7)"
     agents:
       queue: private-gpu
     command: build/ci/buildkite_build_gpu.sh
     plugins:
       - docker-compose#v3.1.0:
-          build: test-gpu-variant-tf-1_15_0-torch-1_3_0-py2_7
+          build: test-gpu-variant-tf-1_15_0-torch-1_4_0-py2_7
           config: docker-compose.test.yml
           image-repository: 027047743804.dkr.ecr.us-east-2.amazonaws.com/uber
-          cache-from: test-gpu-variant-tf-1_15_0-torch-1_3_0-py2_7:027047743804.dkr.ecr.us-east-2.amazonaws.com/uber:test-gpu-variant-tf-1_15_0-torch-1_3_0-py2_7
+          cache-from: test-gpu-variant-tf-1_15_0-torch-1_4_0-py2_7:027047743804.dkr.ecr.us-east-2.amazonaws.com/uber:test-gpu-variant-tf-1_15_0-torch-1_4_0-py2_7
           push-retries: 5
       - docker-compose#v3.1.0:
-          push: test-gpu-variant-tf-1_15_0-torch-1_3_0-py2_7:027047743804.dkr.ecr.us-east-2.amazonaws.com/uber:test-gpu-variant-tf-1_15_0-torch-1_3_0-py2_7
+          push: test-gpu-variant-tf-1_15_0-torch-1_4_0-py2_7:027047743804.dkr.ecr.us-east-2.amazonaws.com/uber:test-gpu-variant-tf-1_15_0-torch-1_4_0-py2_7
           config: docker-compose.test.yml
       - docker-compose#v3.1.0:
-          run: test-gpu-variant-tf-1_15_0-torch-1_3_0-py2_7
+          run: test-gpu-variant-tf-1_15_0-torch-1_4_0-py2_7
           config: docker-compose.test.yml
           env:
             - NEUROPOD_CACHE_ACCESS_KEY
@@ -545,22 +545,22 @@ steps:
     retry:
       automatic: true
 
-  - label: ":docker: GPU Tests (test-gpu-variant-tf-1_14_0-torch-1_3_0_dev20190820-py3)"
+  - label: ":docker: GPU Tests (test-gpu-variant-tf-1_14_0-torch-1_3_0-py3)"
     agents:
       queue: private-gpu
     command: build/ci/buildkite_build_gpu.sh
     plugins:
       - docker-compose#v3.1.0:
-          build: test-gpu-variant-tf-1_14_0-torch-1_3_0_dev20190820-py3
+          build: test-gpu-variant-tf-1_14_0-torch-1_3_0-py3
           config: docker-compose.test.yml
           image-repository: 027047743804.dkr.ecr.us-east-2.amazonaws.com/uber
-          cache-from: test-gpu-variant-tf-1_14_0-torch-1_3_0_dev20190820-py3:027047743804.dkr.ecr.us-east-2.amazonaws.com/uber:test-gpu-variant-tf-1_14_0-torch-1_3_0_dev20190820-py3
+          cache-from: test-gpu-variant-tf-1_14_0-torch-1_3_0-py3:027047743804.dkr.ecr.us-east-2.amazonaws.com/uber:test-gpu-variant-tf-1_14_0-torch-1_3_0-py3
           push-retries: 5
       - docker-compose#v3.1.0:
-          push: test-gpu-variant-tf-1_14_0-torch-1_3_0_dev20190820-py3:027047743804.dkr.ecr.us-east-2.amazonaws.com/uber:test-gpu-variant-tf-1_14_0-torch-1_3_0_dev20190820-py3
+          push: test-gpu-variant-tf-1_14_0-torch-1_3_0-py3:027047743804.dkr.ecr.us-east-2.amazonaws.com/uber:test-gpu-variant-tf-1_14_0-torch-1_3_0-py3
           config: docker-compose.test.yml
       - docker-compose#v3.1.0:
-          run: test-gpu-variant-tf-1_14_0-torch-1_3_0_dev20190820-py3
+          run: test-gpu-variant-tf-1_14_0-torch-1_3_0-py3
           config: docker-compose.test.yml
           env:
             - NEUROPOD_CACHE_ACCESS_KEY
@@ -581,22 +581,22 @@ steps:
     retry:
       automatic: true
 
-  - label: ":docker: GPU Tests (test-gpu-variant-tf-1_15_0-torch-1_3_0-py3)"
+  - label: ":docker: GPU Tests (test-gpu-variant-tf-1_15_0-torch-1_4_0-py3)"
     agents:
       queue: private-gpu
     command: build/ci/buildkite_build_gpu.sh
     plugins:
       - docker-compose#v3.1.0:
-          build: test-gpu-variant-tf-1_15_0-torch-1_3_0-py3
+          build: test-gpu-variant-tf-1_15_0-torch-1_4_0-py3
           config: docker-compose.test.yml
           image-repository: 027047743804.dkr.ecr.us-east-2.amazonaws.com/uber
-          cache-from: test-gpu-variant-tf-1_15_0-torch-1_3_0-py3:027047743804.dkr.ecr.us-east-2.amazonaws.com/uber:test-gpu-variant-tf-1_15_0-torch-1_3_0-py3
+          cache-from: test-gpu-variant-tf-1_15_0-torch-1_4_0-py3:027047743804.dkr.ecr.us-east-2.amazonaws.com/uber:test-gpu-variant-tf-1_15_0-torch-1_4_0-py3
           push-retries: 5
       - docker-compose#v3.1.0:
-          push: test-gpu-variant-tf-1_15_0-torch-1_3_0-py3:027047743804.dkr.ecr.us-east-2.amazonaws.com/uber:test-gpu-variant-tf-1_15_0-torch-1_3_0-py3
+          push: test-gpu-variant-tf-1_15_0-torch-1_4_0-py3:027047743804.dkr.ecr.us-east-2.amazonaws.com/uber:test-gpu-variant-tf-1_15_0-torch-1_4_0-py3
           config: docker-compose.test.yml
       - docker-compose#v3.1.0:
-          run: test-gpu-variant-tf-1_15_0-torch-1_3_0-py3
+          run: test-gpu-variant-tf-1_15_0-torch-1_4_0-py3
           config: docker-compose.test.yml
           env:
             - NEUROPOD_CACHE_ACCESS_KEY

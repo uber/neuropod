@@ -29,13 +29,13 @@ def _impl(repository_ctx):
             "url": "https://download.pytorch.org/libtorch/cpu/libtorch-shared-with-deps-1.2.0.zip",
             "sha256": "6b0cc8840e05e5e2742e5c59d75f8379f4eda8737aeb24b5ec653735315102b2",
         },
-        "1.3.0.dev20190820-linux-cpu": {
-            "url": "https://download.pytorch.org/libtorch/nightly/cpu/libtorch-shared-with-deps-1.3.0.dev20190820%2Bcpu.zip",
-            "sha256": "8f6a24af454bdcd5782251676e5af8c6e8ce666fbd01c66eeb0d251900e71f5c",
-        },
         "1.3.0-linux-cpu": {
             "url": "https://download.pytorch.org/libtorch/cpu/libtorch-shared-with-deps-1.3.0%2Bcpu.zip",
             "sha256": "a1a4bfe2090c418150cf38b37e43b3238b9639806f0c3483097d073792c2e114",
+        },
+        "1.4.0-linux-cpu": {
+            "url": "https://download.pytorch.org/libtorch/cpu/libtorch-shared-with-deps-1.4.0%2Bcpu.zip",
+            "sha256": "cf2d79574e08198419fd53d3b0edab3e12587649a22185431e3f5c8937177a47",
         },
 
         # Linux GPU
@@ -47,13 +47,13 @@ def _impl(repository_ctx):
             "url": "https://download.pytorch.org/libtorch/cu100/libtorch-shared-with-deps-1.2.0.zip",
             "sha256": "bd385169dd6137f532648398eeee8d6479be1f6b81314a4373800fcc72bb375d",
         },
-        "1.3.0.dev20190820-linux-cu100": {
-            "url": "https://download.pytorch.org/libtorch/nightly/cu100/libtorch-shared-with-deps-1.3.0.dev20190820.zip",
-            "sha256": "538cde5b08826a38f7686809a18419f75d79918c4c48bb6f7c107776f27398a1",
-        },
         "1.3.0-linux-cu100": {
             "url": "https://download.pytorch.org/libtorch/cu100/libtorch-shared-with-deps-1.3.0.zip",
             "sha256": "5943ed9d25f473f9baf4301fc6526f048f89061f38e8cf0cc01506c96ad58ed4",
+        },
+        "1.4.0-linux-cu100": {
+            "url": "https://download.pytorch.org/libtorch/cu100/libtorch-shared-with-deps-1.4.0%2Bcu100.zip",
+            "sha256": "1557927c9929c8eb8caf8860d0ffdce39ae931af924f0fde859ad1dc0843575c",
         },
 
         # Mac CPU
@@ -65,13 +65,13 @@ def _impl(repository_ctx):
             "url": "https://download.pytorch.org/libtorch/cpu/libtorch-macos-1.2.0.zip",
             "sha256": "927cd63106d4055d4a415cf75b2ecffb430c27736b78f609350b57934883240f",
         },
-        "1.3.0.dev20190820-mac-cpu": {
-            "url": "https://download.pytorch.org/libtorch/nightly/cpu/libtorch-macos-1.3.0.dev20190820.zip",
-            "sha256": "e809c1948a11c7361ff9aa500100cca8db7eaebc76dae8bd22304390b2effc9e",
-        },
         "1.3.0-mac-cpu": {
             "url": "https://download.pytorch.org/libtorch/cpu/libtorch-macos-1.3.0.zip",
             "sha256": "c44050d28bf21676f68fa0f87caa27bc610cd9802c41b5c83e87295d22e048a4",
+        },
+        "1.4.0-mac-cpu": {
+            "url": "https://download.pytorch.org/libtorch/cpu/libtorch-macos-1.4.0.zip",
+            "sha256": "84e9112b442ee1e3dc9e078d9066a855a2344ec566616cffbff1662e08cd8bf7",
         },
     }
 

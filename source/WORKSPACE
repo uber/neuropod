@@ -15,9 +15,26 @@ http_archive(
 
 load("@com_grail_bazel_toolchain//toolchain:rules.bzl", "llvm_toolchain")
 
+# This is a manylinux2010 compatible sysroot
+http_archive(
+    name = "manylinux2010_sysroot",
+    build_file_content = """
+filegroup(
+  name = "sysroot",
+  srcs = glob(["*/**"]),
+  visibility = ["//visibility:public"],
+)
+""",
+    sha256 = "5be526543d53eada141921dd5108e082953e7fcb0131df09dde7e9efd109eeae",
+    urls = ["https://github.com/VivekPanyam/manylinux-sysroot/releases/download/0.0.1/manylinux2010_sysroot.tar.gz"],
+)
+
 llvm_toolchain(
     name = "llvm_toolchain",
     llvm_version = "9.0.0",
+    sysroot = {
+        "linux": "@manylinux2010_sysroot//:sysroot",
+    },
 )
 
 libtorch_repository(
@@ -116,6 +133,14 @@ http_archive(
 )
 
 http_archive(
+    name = "zlib_repo",
+    build_file = "@//deps:BUILD.zlib",
+    sha256 = "c3e5e9fdd5004dcb542feda5ee4f0ff0744628baf8ed2dd5d66f8ca1197cb1a1",
+    url = "https://zlib.net/zlib-1.2.11.tar.gz",
+    strip_prefix = "zlib-1.2.11",
+)
+
+http_archive(
     name = "filesystem_repo",
     build_file = "@//deps:BUILD.filesystem",
     sha256 = "29b482791dc35a3099e5e27263cb75bf6d1e332e9b4ed6489cca82c0781818b5",
@@ -137,4 +162,12 @@ http_archive(
     sha256 = "56b90f0bd5b126cf1b623eeb19bf4369516fa68f036bbc22d9729d2da511fb5a",
     url = "https://github.com/gabime/spdlog/archive/v1.4.2.zip",
     strip_prefix = "spdlog-1.4.2",
+)
+
+http_archive(
+    name = "fmt_repo",
+    build_file = "@//deps:BUILD.fmt",
+    sha256 = "2ba1469c1f7677e70cb32bcd7dd0907e6952e16a161f07e05c7ffa388643b607",
+    url = "https://github.com/fmtlib/fmt/archive/5.3.0.zip",
+    strip_prefix = "fmt-5.3.0",
 )
