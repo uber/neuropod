@@ -47,11 +47,10 @@ public:
     const std::vector<TensorSpec> &get_inputs() const;
     const std::vector<TensorSpec> &get_outputs() const;
 
-   // Get the name of this model.
+    // Get the name of this model.
     const std::string &get_name() const;
     // Get the platform of this model.
     const std::string &get_platform() const;
-
 
     // Load the model if it has not already been loaded
     void load_model();
