@@ -127,8 +127,24 @@ class TorchScriptNeuropodExecutor(NeuropodExecutor):
             for key, value in out.items():
                 neuropod_out = self._insert_value_to_output(neuropod_out, key, value)
 
-        # single output torch.Tensor or list<string>
+        elif isinstance(out, tuple):
+            # Each item in this tuple should be a dict
+            for d in out:
+                if isinstance(d, dict):
+                    # Convert the outputs to numpy arrays
+                    # acceptable values must be torch.Tensor or lists of strings
+                    for key, value in d.items():
+                        neuropod_out = self._insert_value_to_output(
+                            neuropod_out, key, value
+                        )
+                else:
+                    raise RuntimeError(
+                        "When returning a tuple, each item must be a dict. Got item of type {}".format(
+                            type(value)
+                        )
+                    )
         else:
+            # single output torch.Tensor or list<string>
             output_spec = self.neuropod_config["output_spec"]
             if not output_spec:
                 raise RuntimeError("Output spec missing." + SINGLE_OUTPUT_ERROR_MSG)
@@ -145,6 +161,13 @@ class TorchScriptNeuropodExecutor(NeuropodExecutor):
         return neuropod_out
 
     def _insert_value_to_output(self, neuropod_out, key, value, dtype=None):
+        if key in neuropod_out:
+            raise RuntimeError(
+                "An item with name `{}` was already returned by this model. Please ensure your model does not have duplicate outputs".format(
+                    key
+                )
+            )
+
         if isinstance(value, torch.Tensor):
             neuropod_out[key] = value.cpu().numpy()
         elif isinstance(value, list) and (

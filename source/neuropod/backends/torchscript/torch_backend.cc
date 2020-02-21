@@ -23,6 +23,34 @@ namespace neuropod
 namespace
 {
 
+#if CAFFE2_NIGHTLY_VERSION >= 20200115
+#define MAKE_DICT(name, type) torch::Dict<std::string, type> name;
+#elif CAFFE2_NIGHTLY_VERSION >= 20191010
+#define MAKE_DICT(name, type) c10::impl::GenericDict name(c10::AnyType::get(), c10::AnyType::get());
+#elif CAFFE2_NIGHTLY_VERSION >= 20190717
+#define MAKE_DICT(name, type) c10::impl::GenericDict name((c10::impl::deprecatedUntypedDict()));
+#elif CAFFE2_NIGHTLY_VERSION >= 20190601
+#define MAKE_DICT(name, type) auto name = c10::make_dict<torch::jit::IValue, torch::jit::IValue>();
+#else
+#define MAKE_DICT(name, type) torch::ivalue::UnorderedMap name;
+#endif
+
+#if CAFFE2_NIGHTLY_VERSION >= 20190717
+#define SCHEMA(method) method.function().getSchema()
+#else
+#define SCHEMA(method) method.getSchema()
+#endif
+
+#if CAFFE2_NIGHTLY_VERSION >= 20190601
+#define KEY(elem) (elem.key())
+#define VALUE(elem) (elem.value())
+#define DICT_INSERT(dict, key, value) dict.insert(key, value);
+#else
+#define KEY(elem) (elem.first)
+#define VALUE(elem) (elem.second)
+#define DICT_INSERT(dict, key, value) dict[key] = value;
+#endif
+
 std::shared_ptr<torch::jit::script::Module> load_model_from_path(std::istream &                  graph_stream,
                                                                  const std::vector<std::string> &custom_op_paths,
                                                                  const torch::Device &           device)
@@ -81,7 +109,17 @@ void insert_value_in_output(NeuropodValueMap & output,
         auto neuropod_tensor = make_tensor<TorchNeuropodTensor>(tensor_type, tensor);
 
         // Add it to our output
-        output[name] = std::move(neuropod_tensor);
+        auto &to_set = output[name];
+        if (!to_set)
+        {
+            to_set = std::move(neuropod_tensor);
+        }
+        else
+        {
+            NEUROPOD_ERROR("An item with name `{}` was already returned by this model. Please ensure your model does "
+                           "not have duplicate outputs",
+                           name);
+        }
     }
     else if (value.isGenericList())
     {
@@ -100,7 +138,17 @@ void insert_value_in_output(NeuropodValueMap & output,
             auto neuropod_tensor = stdx::make_unique<TorchNeuropodTensor<std::string>>(tensor);
 
             // Add it to our output
-            output[name] = std::move(neuropod_tensor);
+            auto &to_set = output[name];
+            if (!to_set)
+            {
+                to_set = std::move(neuropod_tensor);
+            }
+            else
+            {
+                NEUROPOD_ERROR("An item with name `{}` was already returned by this model. Please ensure your model "
+                               "does not have duplicate outputs",
+                               name);
+            }
         }
         // it was bad spec or contained non-string type
         else
@@ -117,6 +165,18 @@ void insert_value_in_output(NeuropodValueMap & output,
                        "or lists of strings. Got type '{}' for tensor '{}'",
                        value.tagKind(),
                        name);
+    }
+}
+
+// Insert all the elements of a dict into a NeuropodValueMap
+void process_dict(NeuropodValueMap &output, const c10::IValue &item)
+{
+    const auto &dict = ELEMENTS(item.toGenericDict());
+    for (const auto &elem : dict)
+    {
+        // Get the name of the tensor
+        const std::string &name = KEY(elem).toString()->string();
+        insert_value_in_output(output, name, VALUE(elem));
     }
 }
 
@@ -208,34 +268,6 @@ torch::Device TorchNeuropodBackend::get_torch_device(NeuropodDeviceType target_d
         return torch::Device(torch::kCUDA, options_.visible_device);
     }
 }
-
-#if CAFFE2_NIGHTLY_VERSION >= 20200115
-#define MAKE_DICT(name, type) torch::Dict<std::string, type> name;
-#elif CAFFE2_NIGHTLY_VERSION >= 20191010
-#define MAKE_DICT(name, type) c10::impl::GenericDict name(c10::AnyType::get(), c10::AnyType::get());
-#elif CAFFE2_NIGHTLY_VERSION >= 20190717
-#define MAKE_DICT(name, type) c10::impl::GenericDict name((c10::impl::deprecatedUntypedDict()));
-#elif CAFFE2_NIGHTLY_VERSION >= 20190601
-#define MAKE_DICT(name, type) auto name = c10::make_dict<torch::jit::IValue, torch::jit::IValue>();
-#else
-#define MAKE_DICT(name, type) torch::ivalue::UnorderedMap name;
-#endif
-
-#if CAFFE2_NIGHTLY_VERSION >= 20190717
-#define SCHEMA(method) method.function().getSchema()
-#else
-#define SCHEMA(method) method.getSchema()
-#endif
-
-#if CAFFE2_NIGHTLY_VERSION >= 20190601
-#define KEY(elem) (elem.key())
-#define VALUE(elem) (elem.value())
-#define DICT_INSERT(dict, key, value) dict.insert(key, value);
-#else
-#define KEY(elem) (elem.first)
-#define VALUE(elem) (elem.second)
-#define DICT_INSERT(dict, key, value) dict[key] = value;
-#endif
 
 // Run inference
 std::unique_ptr<NeuropodValueMap> TorchNeuropodBackend::infer_internal(const NeuropodValueMap &inputs)
@@ -338,14 +370,7 @@ std::unique_ptr<NeuropodValueMap> TorchNeuropodBackend::infer_internal(const Neu
 
     if (result.isGenericDict())
     {
-        const auto &outputs_dict = ELEMENTS(result.toGenericDict());
-        for (const auto &elem : outputs_dict)
-        {
-            // Get the name of the tensor
-            const std::string &name = KEY(elem).toString()->string();
-            // Todo include tensor_type if available
-            insert_value_in_output(*to_return, name, VALUE(elem));
-        }
+        process_dict(*to_return, result);
     }
     else if (result.isTensor() || result.isGenericList())
     {
@@ -361,6 +386,24 @@ std::unique_ptr<NeuropodValueMap> TorchNeuropodBackend::infer_internal(const Neu
         auto &name        = output_specs_[0].name;
         auto &tensor_type = output_specs_[0].type;
         insert_value_in_output(*to_return, name, result, true, tensor_type);
+    }
+    else if (result.isTuple())
+    {
+        // Each item in this tuple should be a dict
+        auto  tuple = result.toTuple();
+        auto &elems = tuple->elements();
+
+        for (const auto &item : elems)
+        {
+            if (item.isGenericDict())
+            {
+                process_dict(*to_return, item);
+            }
+            else
+            {
+                NEUROPOD_ERROR("When returning a tuple, each item must be a dict. Got {}", item.tagKind());
+            }
+        }
     }
     else
     {
