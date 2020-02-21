@@ -68,8 +68,16 @@ def check_addition_model(neuropod_path):
         # Validate that the specs match
         check_specs_match(neuropod.inputs, target["input_spec"])
         check_specs_match(neuropod.outputs, target["output_spec"])
-        if neuropod.name != "addition_model" or not neuropod.platform:
-            raise ValueError("Name and platform are not expected!")
+        expected_name = "addition_model"
+        if neuropod.name != expected_name:
+            raise ValueError(
+                "Expected model name '{}'. Got '{}'".format(
+                    expected_name, neuropod.name
+                )
+            )
+
+        if not neuropod.platform:
+            raise ValueError("Expected the platform field to be set")
 
 
 def check_strings_model(neuropod_path):
