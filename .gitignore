@@ -1,3 +1,4 @@
+*.profraw
 *.pyc
 source/python/.idea
 source/python/neuropod.egg-info/
