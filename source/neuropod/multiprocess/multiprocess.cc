@@ -102,8 +102,8 @@ private:
         while (true)
         {
             // Get a message from the worker
-            control_message received;
-            bool            successful_read = control_channel_.recv_message(received, MESSAGE_TIMEOUT_MS);
+            ControlMessage received;
+            bool           successful_read = control_channel_.recv_message(received, MESSAGE_TIMEOUT_MS);
             if (!successful_read)
             {
                 // We timed out
@@ -114,21 +114,22 @@ private:
                                HEARTBEAT_INTERVAL_MS);
             }
 
-            if (received.type == LOAD_SUCCESS)
+            auto msg_type = received.get_type();
+
+            if (msg_type == LOAD_SUCCESS)
             {
                 // The model was successfully loaded
                 break;
             }
 
-            if (received.type == HEARTBEAT)
+            if (msg_type == HEARTBEAT)
             {
                 // TODO(vip): Also periodically check for a heartbeat
                 continue;
             }
 
             // We got an unexpected message
-            NEUROPOD_ERROR("Expected LOAD_SUCCESS, but got unexpected message from the worker process: {}",
-                           received.type);
+            NEUROPOD_ERROR("Expected LOAD_SUCCESS, but got unexpected message from the worker process: {}", msg_type);
         }
     }
 
@@ -240,8 +241,8 @@ protected:
         {
             // Get a message from the worker
             SPDLOG_DEBUG("OPE: Waiting for load confirmation from worker...");
-            control_message received;
-            bool            successful_read = control_channel_.recv_message(received, MESSAGE_TIMEOUT_MS);
+            ControlMessage received;
+            bool           successful_read = control_channel_.recv_message(received, MESSAGE_TIMEOUT_MS);
             if (!successful_read)
             {
                 // We timed out
@@ -251,30 +252,27 @@ protected:
                                HEARTBEAT_INTERVAL_MS);
             }
 
-            if (received.type == END_OUTPUT)
+            auto msg_type = received.get_type();
+
+            if (msg_type == END_OUTPUT)
             {
                 // Got all the outputs
                 break;
             }
 
-            if (received.type == HEARTBEAT)
+            if (msg_type == HEARTBEAT)
             {
                 // TODO(vip): Also periodically check for a heartbeat
                 continue;
             }
 
-            if (received.type != RETURN_OUTPUT)
+            if (msg_type != RETURN_OUTPUT)
             {
-                NEUROPOD_ERROR("Got unexpected message from the worker process: {}", received.type);
+                NEUROPOD_ERROR("Got unexpected message from the worker process: {}", msg_type);
             }
 
-            for (int i = 0; i < received.num_tensors; i++)
-            {
-                // Get the ID and create a tensor
-                neuropod::SHMBlockID block_id;
-                std::copy_n(received.tensor_id[i], block_id.size(), block_id.begin());
-                (*to_return)[received.tensor_name[i]] = tensor_from_id(block_id);
-            }
+            // Load the returned tensors
+            received.get_valuemap(*to_return);
         }
 
         // Inference is complete
@@ -295,18 +293,11 @@ protected:
     void load_model_internal()
     {
         // Create a message to tell the worker process to load the specified neuropod
-        control_message msg;
-        msg.type = LOAD_NEUROPOD;
-        if (neuropod_path_.size() >= 4096)
-        {
-            NEUROPOD_ERROR("The multiprocess backend only supports neuropod paths < 4096 characters long.")
-        }
-
-        // Copy in the path
-        strncpy(msg.neuropod_path, neuropod_path_.c_str(), 4096);
+        ope_load_config config;
+        config.neuropod_path = neuropod_path_;
 
         // Send the message
-        control_channel_.send_message(msg);
+        control_channel_.send_message(LOAD_NEUROPOD, config);
 
         // Wait until the worker process confirms it has loaded the model
         wait_for_load_confirmation(neuropod_path_);
