@@ -18,6 +18,11 @@ void test_addition_model(neuropod::Neuropod &neuropod, bool copy_mem)
 {
     std::atomic_int free_counter{0};
     {
+        // Check name and platform.
+        EXPECT_EQ(neuropod.get_name(), "addition_model");
+        const auto &p = neuropod.get_platform();
+        EXPECT_TRUE(p == "tensorflow" || p == "python" || p == "torchscript");
+
         // Check the input and output tensor specs
         auto input_specs  = neuropod.get_inputs();
         auto output_specs = neuropod.get_outputs();

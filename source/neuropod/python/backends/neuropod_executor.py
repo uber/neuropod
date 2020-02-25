@@ -115,6 +115,20 @@ class NeuropodExecutor(object):
         }
 
     @property
+    def name(self):
+        """
+        Get the name of the loaded neuropod.
+        """
+        return self.neuropod_config["name"]
+
+    @property
+    def platform(self):
+        """
+        Get the platform of backend of the loaded neuropod.
+        """
+        return self.neuropod_config["platform"]
+
+    @property
     def inputs(self):
         """
         Get the inputs of the loaded neuropod. Returns a list of dicts representing
