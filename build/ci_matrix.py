@@ -163,6 +163,7 @@ for platform, py_version, framework_version in itertools.product(PLATFORMS, PY_V
 
         buildkite_yml_matrix.extend([
         "  - label: \":docker: {} Tests ({})\"\n".format("GPU" if is_gpu else "CPU", variant_name),
+        "    timeout_in_minutes: 60\n",
         "    agents:\n",
         "      queue: private-{}\n".format("gpu" if is_gpu else "default"),
         "    command: build/ci/{}.sh\n".format("buildkite_build_gpu" if is_gpu else "buildkite_build"),
@@ -174,6 +175,7 @@ for platform, py_version, framework_version in itertools.product(PLATFORMS, PY_V
 
             buildkite_yml_matrix.extend([
             "  - label: \":docker: Lint + Docs\"\n".format(variant_name),
+            "    timeout_in_minutes: 60\n",
             "    agents:\n",
             "      queue: private-default\n",
             "    command: build/ci/buildkite_lint.sh\n",
