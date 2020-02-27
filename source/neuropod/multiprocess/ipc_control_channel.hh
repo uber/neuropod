@@ -37,6 +37,37 @@ enum ProcessType
     MAIN_PROCESS,
 };
 
+// The user facing interface for IPC control messages
+class ControlMessage
+{
+private:
+    // Forward declare the internal control_message struct
+    struct control_message_internal;
+
+    // A pointer to the underlying struct
+    std::unique_ptr<control_message_internal> msg_;
+
+    friend class IPCControlChannel;
+
+public:
+    ControlMessage();
+    ~ControlMessage();
+
+    // Get the type of the message
+    MessageType get_type();
+
+    // Get a vector of tensor names from the message.
+    // This adds items to `data` without clearing it
+    void get_tensor_names(std::vector<std::string> &data);
+
+    // Get a the map data in the message
+    // This adds items to `data` without clearing it
+    void get_valuemap(NeuropodValueMap &data);
+
+    // Get a load_config message from this ControlMessage
+    void get_load_config(ope_load_config &data);
+};
+
 class IPCControlChannel
 {
 private:
@@ -48,9 +79,8 @@ private:
     // Verifies that the state machine is operating as expected
     TransitionVerifier verifier_;
 
-public:
-    IPCControlChannel(const std::string &control_queue_name, ProcessType type);
-    ~IPCControlChannel();
+    // Alias used in the implementation
+    using control_message = ControlMessage::control_message_internal;
 
     // Utility to send a message to a message queue
     // Note: this is threadsafe
@@ -63,9 +93,20 @@ public:
     // Note: this is threadsafe
     bool try_send_message(control_message &msg);
 
+public:
+    IPCControlChannel(const std::string &control_queue_name, ProcessType type);
+    ~IPCControlChannel();
+
     // Utility to send a message with no content to a message queue
     // Note: this is threadsafe
     void send_message(MessageType type);
+
+    // Utility to send a message to a message queue
+    // Does not block if the message queue is full
+    // This must be used when sending messages to the main process outside of the
+    // normal inference process (e.g. HEARTBEAT messages)
+    // Note: this is threadsafe
+    bool try_send_message(MessageType type);
 
     // Utility to send a vector of tensor names to a message queue
     // Note: this is threadsafe
@@ -75,11 +116,14 @@ public:
     // Note: this is threadsafe
     void send_message(MessageType type, const NeuropodValueMap &data);
 
+    // Utility to send a `ope_load_config` struct to a message queue
+    void send_message(MessageType type, const ope_load_config &data);
+
     // Receive a message
-    void recv_message(control_message &received);
+    void recv_message(ControlMessage &received);
 
     // Receive a message with a timeout
-    bool recv_message(control_message &received, size_t timeout_ms);
+    bool recv_message(ControlMessage &received, size_t timeout_ms);
 
     // Cleanup the message queues
     void cleanup();

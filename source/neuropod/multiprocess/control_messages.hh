@@ -80,23 +80,11 @@ constexpr int MESSAGE_TIMEOUT_MS = 5000;
 // Ensure the timeout is larger than the heartbeat interval
 static_assert(MESSAGE_TIMEOUT_MS > HEARTBEAT_INTERVAL_MS, "Message timeout must be larger than the heartbeat interval");
 
-// TODO(vip): split into multiple structs
-struct __attribute__((__packed__)) control_message
+// Contains everything needed to load a model in the worker process
+struct ope_load_config
 {
-    MessageType type;
-
-    // Only used if the message type is ADD_INPUT or RETURN_OUTPUT
-    size_t num_tensors;
-
-    // Only used if the message type is ADD_INPUT or RETURN_OUTPUT
-    char tensor_id[MAX_NUM_TENSORS_PER_MESSAGE][24];
-
-    // Only used if the message type is ADD_INPUT, REQUEST_OUTPUT, or RETURN_OUTPUT
-    char tensor_name[MAX_NUM_TENSORS_PER_MESSAGE][256];
-
-    // Linux defines the max path length as 4096 (including a NULL char)
-    // https://github.com/torvalds/linux/blob/master/include/uapi/linux/limits.h
-    char neuropod_path[4096];
+    // The path of the model to load
+    std::string neuropod_path;
 };
 
 } // namespace neuropod
