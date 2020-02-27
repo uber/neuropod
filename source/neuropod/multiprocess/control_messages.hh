@@ -43,23 +43,16 @@ enum MessageType
 
     // Sent by the worker process once inference is completed and all outputs
     // have been sent to the main process
-    // Valid next messages: INFER_COMPLETE
-    END_OUTPUT,
-
-    // Sent by the main process once inference is complete
-    // This is used to notify the worker process that it no longer needs to store
-    // the model outputs.
     // Valid next messages: ADD_INPUT, LOAD_NEUROPOD
-    INFER_COMPLETE,
-
-    // A noop message sent by the worker process used to ensure that the worker
-    // is alive
-    // Note: it is valid to send this message at any time.
-    HEARTBEAT,
+    END_OUTPUT,
 
     // A message sent by the main process to ask the worker to terminate
     // Note: it is valid to send this message at any time.
     SHUTDOWN,
+
+    // A message sent by the worker process to let the main process know there was an exception
+    // Note: it is valid to send this message at any time.
+    EXCEPTION,
 };
 
 // Used to print out the enum names rather than just a number

@@ -47,17 +47,36 @@ cc_library(
     name = "ipc_control_channel",
     hdrs = [
         "ipc_control_channel.hh",
-        "control_messages.hh",
     ],
     srcs = [
         "ipc_control_channel.cc",
+    ],
+    visibility = [
+        "//neuropod:__subpackages__",
+    ],
+    deps = [
+        ":ipc_message_queue",
+    ],
+)
+
+cc_library(
+    name = "ipc_message_queue",
+    hdrs = [
+        "ipc_message_queue.hh",
+        "control_messages.hh",
+        "ipc_serialization.hh",
+    ],
+    srcs = [
+        "ipc_message_queue.cc",
         "control_messages.cc",
+        "ipc_serialization.cc",
     ],
     visibility = [
         "//neuropod:__subpackages__",
     ],
     deps = [
         ":shm_tensor",
+        "@mpmcqueue_repo//:mpmcqueue",
     ],
 )
 
