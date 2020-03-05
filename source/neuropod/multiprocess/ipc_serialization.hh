@@ -52,4 +52,14 @@ void ipc_serialize(std::ostream &out, const ope_load_config &data);
 template <>
 void ipc_deserialize(std::istream &in, ope_load_config &data);
 
+// Specialization for uint64_t (for ACK messages)
+// Serialization and deserialization are running on the same machine so we don't
+// need to worry about things like endianness
+template <>
+void ipc_serialize(std::ostream &out, const uint64_t &data);
+
+template <>
+void ipc_deserialize(std::istream &in, uint64_t &data);
+
+
 } // namespace neuropod

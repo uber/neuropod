@@ -107,6 +107,10 @@ void multiprocess_worker_loop(const std::string &control_queue_name)
             {
                 break;
             }
+            else
+            {
+                NEUROPOD_ERROR("OPE: Unhandled message type: {}", msg_type);
+            }
         }
         catch (const std::exception &e)
         {
@@ -118,6 +122,8 @@ void multiprocess_worker_loop(const std::string &control_queue_name)
         {
             control_channel.send_message(EXCEPTION, "An unknown exception occurred during inference");
         }
+
+        SPDLOG_TRACE("OPE: BOTTOM OF WORKER LOOP");
     }
 }
 

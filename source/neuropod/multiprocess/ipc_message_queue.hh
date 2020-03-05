@@ -79,7 +79,7 @@ public:
             std::unique_lock<std::mutex> lock(mutex_);
             if (queue_.size() < capacity_)
             {
-                queue_.emplace(item);
+                queue_.emplace(std::forward<T>(item));
                 success = true;
             }
         }
@@ -103,7 +103,7 @@ public:
                 full_cv_.wait(lock, [&] { return queue_.size() < capacity_; });
             }
 
-            queue_.emplace(item);
+            queue_.emplace(std::forward<T>(item));
         }
 
         // Notify any waiting read threads
@@ -128,6 +128,21 @@ public:
         full_cv_.notify_all();
     }
 };
+
+// class RAIITimer
+// {
+// private:
+//     std::string name_;
+//     std::chrono::time_point<std::chrono::steady_clock> start_;
+
+// public:
+//     RAIITimer(std::string name) : name_(std::move(name)), start_(std::chrono::steady_clock::now()) {}
+//     ~RAIITimer()
+//     {
+//         auto end = std::chrono::steady_clock::now();
+//         SPDLOG_TRACE("Timer: {} took {}ns to execute", name_, std::chrono::duration_cast<std::chrono::nanoseconds>(end - start_).count());
+//     }
+// };
 
 // Forward declare IPCMessageQueue
 template <typename>
@@ -189,6 +204,8 @@ private:
     QueueMessage(const Payload &payload, detail::Transferrables &transferrables)
         : id_(detail::msg_counter++) // Atomically increment and generate an ID for the message
     {
+        // RAIITimer timer("OPE Payload Serialization");
+
         // Serialize the payload
         std::stringstream ss;
         ipc_serialize(ss, payload);
@@ -232,6 +249,15 @@ private:
     std::shared_ptr<IPCMessageQueue<UserPayloadType>> ack_queue_;
 
 public:
+
+    // Delete the copy constructor and the copy assignment operator
+    QueueMessage(const QueueMessage&) = delete;
+    QueueMessage& operator=(const QueueMessage& other) = delete;
+
+    // Keep the move constructor and move assignment operator
+    QueueMessage(QueueMessage&&) = default;
+    QueueMessage& operator=(QueueMessage&& other) = default;
+
     ~QueueMessage()
     {
         // Send an ack message if we need to
@@ -245,6 +271,8 @@ public:
     template <typename Payload>
     void get(Payload &out)
     {
+        // RAIITimer timer("OPE Payload Deserialization");
+
         std::stringstream ss;
         if (is_inline_)
         {
@@ -337,6 +365,11 @@ private:
                                HEARTBEAT_INTERVAL_MS);
             }
 
+            if (received.type_ != detail::USER_PAYLOAD)
+            {
+                SPDLOG_TRACE("OPE: Read thread received IPC control message {}.", received.type_);
+            }
+
             if (received.type_ == detail::HEARTBEAT)
             {
                 // This is a heartbeat message so continue
@@ -376,6 +409,20 @@ private:
         }
     }
 
+    void send_message(const Message &msg)
+    {
+        if (msg.type_ == detail::USER_PAYLOAD)
+        {
+            SPDLOG_TRACE("OPE: Sending user payload of type: {}", msg.payload_type_);
+        }
+        else
+        {
+            SPDLOG_TRACE("OPE: Sending IPC control message {}.", msg.type_);
+        }
+
+        send_queue_->send(&msg, sizeof(Message), 0);
+    }
+
     // The worker loop for the heartbeat thread
     void send_heartbeat_loop()
     {
@@ -383,7 +430,7 @@ private:
         {
             // Attempt to send a heartbeat message
             Message msg(detail::HEARTBEAT);
-            send_queue_->try_send(&msg, sizeof(Message), 0);
+            send_message(msg);
 
             // Using a condition variable lets us wake up while we're waiting
             std::unique_lock<std::mutex> lk(heartbeat_mutex_);
@@ -427,6 +474,7 @@ public:
 
         // Send a shutdown message to ourselves
         Message msg(detail::SHUTDOWN_QUEUES);
+        SPDLOG_TRACE("OPE: Shutting down read thread...");
         recv_queue_->send(&msg, sizeof(Message), 0);
 
         // Join the read thread
@@ -457,7 +505,7 @@ public:
         }
 
         // Send the message
-        send_queue_->send(&msg, sizeof(Message), 0);
+        send_message(msg);
     }
 
     // Send a message with a payload and ensure `payload` stays in
@@ -487,12 +535,17 @@ public:
         }
 
         // Send the message
-        send_queue_->send(&msg, sizeof(Message), 0);
+        send_message(msg);
     }
 
     // Send a message with just a payload_type
     // Note: this is threadsafe
-    void send_message(UserPayloadType payload_type) { send_message(payload_type, 0); }
+    void send_message(UserPayloadType payload_type)
+    {
+        Message msg(detail::USER_PAYLOAD);
+        msg.payload_type_ = payload_type;
+        send_message(msg);
+    }
 
     // Get a message. Blocks if the queue is empty.
     // Note: this is _NOT_ threadsafe. There should only be one thread calling `recv_message`
@@ -502,9 +555,15 @@ public:
         Message out;
         out_queue_.pop(out);
 
+        SPDLOG_TRACE("OPE: Received user payload of type: {} (requires ack: {})", out.payload_type_, out.requires_ack_);
+
         if (out.requires_ack_)
         {
             out.ack_queue_ = this->shared_from_this();
+        }
+        else
+        {
+            out.ack_queue_ = nullptr;
         }
 
         return out;
@@ -528,7 +587,7 @@ public:
         }
 
         // Send the message
-        send_queue_->send(&ack_msg, sizeof(Message), 0);
+        send_message(ack_msg);
     }
 };
 

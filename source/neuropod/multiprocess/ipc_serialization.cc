@@ -67,4 +67,19 @@ void ipc_deserialize(std::istream &in, ope_load_config &data)
     ar >> data.neuropod_path;
 }
 
+// Specialization for uint64_t (for ACK messages)
+// Serialization and deserialization are running on the same machine so we don't
+// need to worry about things like endianness
+template <>
+void ipc_serialize(std::ostream &out, const uint64_t &data)
+{
+    out.write(reinterpret_cast<const char *>(&data), sizeof(data));
+}
+
+template <>
+void ipc_deserialize(std::istream &in, uint64_t &data)
+{
+    in.read(reinterpret_cast<char *>(&data), sizeof(data));
+}
+
 } // namespace neuropod
