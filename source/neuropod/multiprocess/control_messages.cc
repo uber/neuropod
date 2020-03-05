@@ -21,7 +21,6 @@ std::ostream &operator<<(std::ostream &out, const MessageType value)
         GENERATE_CASE(LOAD_SUCCESS);
         GENERATE_CASE(ADD_INPUT);
         GENERATE_CASE(INFER);
-        GENERATE_CASE(REQUEST_OUTPUT);
         GENERATE_CASE(RETURN_OUTPUT);
         GENERATE_CASE(END_OUTPUT);
         GENERATE_CASE(SHUTDOWN);

@@ -24,13 +24,8 @@ enum MessageType
     LOAD_SUCCESS,
 
     // Sent by the main process when passing tensors to the worker process
-    // Valid next messages: ADD_INPUT, REQUEST_OUTPUT, INFER
+    // Valid next messages: ADD_INPUT, INFER
     ADD_INPUT,
-
-    // Sent by the main process to the worker process to request a subset
-    // of the outputs
-    // Valid next messages: REQUEST_OUTPUT, INFER
-    REQUEST_OUTPUT,
 
     // Sent by the main process once all inputs have been added and we're ready
     // to run inference
