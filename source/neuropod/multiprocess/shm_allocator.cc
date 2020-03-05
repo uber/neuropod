@@ -11,6 +11,7 @@
 #include <boost/interprocess/sync/interprocess_mutex.hpp>
 #include <boost/interprocess/sync/scoped_lock.hpp>
 
+#include <list>
 #include <mutex>
 #include <unordered_map>
 
@@ -109,8 +110,19 @@ private:
         RawSHMHandle          block_handle;
     };
 
-    std::unordered_multimap<size_t, RawBlockWrapper> created_cache_;
-    std::mutex                                       created_cache_mutex_;
+    // In our cache, the main operations we care about are the following:
+    //  - equal_range (give me all raw blocks of a certain size)
+    //  - erase       (remove a specific raw block from the cache)
+    //  - insert      (add a raw block of a specific size to the cache)
+    //
+    // By using an unordered_map with a list, all the operations we care about can be implemented
+    // in an O(1) way. This is better than using an `std::unordered_multimap` or a `std::multimap`
+    // directly
+    //
+    // More importantly, using this structure has a significant improvement on benchmarks over
+    // using a multimap or an unordered_multimap
+    std::unordered_map<size_t, std::list<RawBlockWrapper>> created_cache_;
+    std::mutex                                             created_cache_mutex_;
 
 public:
     AllocationCache()  = default;
@@ -122,10 +134,10 @@ public:
     void maybe_get_and_pop(size_t requested_size, std::shared_ptr<void> &raw_block, SHMBlockIDInternal &id)
     {
         std::lock_guard<std::mutex> lock(created_cache_mutex_);
-        auto                        range = created_cache_.equal_range(requested_size);
-        for (auto it = range.first; it != range.second; it++)
+        auto &                      range = created_cache_[requested_size];
+        for (auto it = range.begin(); it != range.end(); it++)
         {
-            auto &cache_item   = it->second;
+            auto &cache_item   = *it;
             auto *cached_block = static_cast<SHMBlockInternal *>(cache_item.block.get());
 
             ipc::scoped_lock<ipc::interprocess_mutex> lock(cached_block->mutex);
@@ -144,7 +156,7 @@ public:
                 id.reuse_count  = cached_block->reuse_count;
                 id.block_handle = cache_item.block_handle;
 
-                created_cache_.erase(it);
+                range.erase(it);
                 return;
             }
         }
@@ -154,7 +166,7 @@ public:
     {
         std::lock_guard<std::mutex> lock(created_cache_mutex_);
         RawBlockWrapper             wrapper = {std::move(item), handle};
-        created_cache_.emplace(size_bytes, wrapper);
+        created_cache_[size_bytes].emplace_back(std::move(wrapper));
     }
 
     void clear()
