@@ -32,9 +32,6 @@ void multiprocess_worker_loop(const std::string &control_queue_name)
     // A map to store the inputs
     NeuropodValueMap inputs;
 
-    // A vector of requested outputs
-    std::vector<std::string> requested_outputs;
-
     while (true)
     {
         // Get a message
@@ -66,13 +63,12 @@ void multiprocess_worker_loop(const std::string &control_queue_name)
                         wrap_existing_tensor(*allocator, std::dynamic_pointer_cast<NeuropodTensor>(item.second));
                 }
             }
-            else if (msg_type == REQUEST_OUTPUT)
-            {
-                // Get the requested tensor names
-                received.get(requested_outputs);
-            }
             else if (msg_type == INFER)
             {
+                // Get the requested tensor names
+                std::vector<std::string> requested_outputs;
+                received.get(requested_outputs);
+
                 // Run inference
                 auto outputs = neuropod->infer(inputs, requested_outputs);
 
@@ -95,9 +91,6 @@ void multiprocess_worker_loop(const std::string &control_queue_name)
 
                 // Clean up any unused shm tensors that haven't been reused
                 shm_allocator.free_unused_shm_blocks();
-
-                // Clear the requested outputs
-                requested_outputs.clear();
 
                 // Empty the inputs set. This is done after sending outputs back to the main process
                 // because this takes a nontrivial amount of time

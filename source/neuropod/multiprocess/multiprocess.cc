@@ -212,12 +212,8 @@ protected:
         // Add inputs
         control_channel_.send_message_move(ADD_INPUT, std::move(inputs));
 
-        // Request outputs
-        // TODO(vip): Don't send this message if requested_outputs is empty
-        control_channel_.send_message(REQUEST_OUTPUT, requested_outputs);
-
-        // Run inference
-        control_channel_.send_message(INFER);
+        // Run inference with a set of requested outputs
+        control_channel_.send_message(INFER, requested_outputs);
 
         // Get the outputs from the worker
         auto to_return = stdx::make_unique<NeuropodValueMap>();
