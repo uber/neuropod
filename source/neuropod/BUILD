@@ -54,6 +54,7 @@ pkg_tar(
         "//neuropod/internal:libneuropod_internal_hdrs",
         "//neuropod/backends:libneuropod_backends_hdrs",
         "//neuropod/serialization:libneuropod_serialization_hdrs",
+        "//neuropod/multiprocess:libneuropod_multiprocess_hdrs",
     ],
 )
 
