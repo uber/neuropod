@@ -63,6 +63,72 @@ void TransitionVerifier::assert_transition_allowed(MessageType current_type)
     is_first_message_ = false;
 }
 
+ControlMessage::ControlMessage() : msg_(stdx::make_unique<control_message_internal>()) {}
+ControlMessage::~ControlMessage() = default;
+
+// The internal control message format
+// TODO(vip): split into multiple structs
+struct __attribute__((__packed__)) ControlMessage::control_message_internal
+{
+    MessageType type;
+
+    // Only used if the message type is ADD_INPUT or RETURN_OUTPUT
+    size_t num_tensors;
+
+    // Only used if the message type is ADD_INPUT or RETURN_OUTPUT
+    char tensor_id[MAX_NUM_TENSORS_PER_MESSAGE][24];
+
+    // Only used if the message type is ADD_INPUT, REQUEST_OUTPUT, or RETURN_OUTPUT
+    char tensor_name[MAX_NUM_TENSORS_PER_MESSAGE][256];
+
+    // Linux defines the max path length as 4096 (including a NULL char)
+    // https://github.com/torvalds/linux/blob/master/include/uapi/linux/limits.h
+    char neuropod_path[4096];
+};
+
+MessageType ControlMessage::get_type()
+{
+    return msg_->type;
+}
+
+void ControlMessage::get_tensor_names(std::vector<std::string> &data)
+{
+    for (int i = 0; i < msg_->num_tensors; i++)
+    {
+        std::string tensor_name = msg_->tensor_name[i];
+        data.emplace_back(tensor_name);
+    }
+}
+
+void ControlMessage::get_valuemap(NeuropodValueMap &data)
+{
+    for (int i = 0; i < msg_->num_tensors; i++)
+    {
+        // Make sure we're not overwriting anything
+        std::string tensor_name = msg_->tensor_name[i];
+        auto &      item        = data[tensor_name];
+        if (!item)
+        {
+            // Get the ID and create a tensor
+            neuropod::SHMBlockID block_id;
+            std::copy_n(msg_->tensor_id[i], block_id.size(), block_id.begin());
+            item = tensor_from_id(block_id);
+        }
+        else
+        {
+            NEUROPOD_ERROR(
+                "When receiving a message of type {} as part of OPE, attempted to overwrite a tensor with name {}",
+                msg_->type,
+                tensor_name);
+        }
+    }
+}
+
+void ControlMessage::get_load_config(ope_load_config &data)
+{
+    data.neuropod_path = msg_->neuropod_path;
+}
+
 IPCControlChannel::IPCControlChannel(const std::string &control_queue_name, ProcessType type)
     : control_queue_name_(control_queue_name),
       send_queue_(stdx::make_unique<ipc::message_queue>(ipc::open_or_create,
@@ -109,6 +175,15 @@ void IPCControlChannel::send_message(MessageType type)
     control_message msg;
     msg.type = type;
     send_message(msg);
+}
+
+// Utility to send a message with no content to a message queue
+// Does not block if the message queue is full
+bool IPCControlChannel::try_send_message(MessageType type)
+{
+    control_message msg;
+    msg.type = type;
+    return try_send_message(msg);
 }
 
 // Utility to send a vector of tensor names to a message queue
@@ -201,22 +276,40 @@ void IPCControlChannel::send_message(MessageType type, const NeuropodValueMap &d
     }
 }
 
+// Utility to send a `ope_load_config` struct to a message queue
+void IPCControlChannel::send_message(MessageType type, const ope_load_config &data)
+{
+    const auto &neuropod_path = data.neuropod_path;
+    if (neuropod_path.size() >= 4096)
+    {
+        NEUROPOD_ERROR("The multiprocess backend only supports neuropod paths < 4096 characters long.")
+    }
+
+    // Copy in the path
+    control_message msg;
+    msg.type = type;
+    strncpy(msg.neuropod_path, neuropod_path.c_str(), 4096);
+
+    // Send the message
+    send_message(msg);
+}
+
 // Receive a message
-void IPCControlChannel::recv_message(control_message &received)
+void IPCControlChannel::recv_message(ControlMessage &received)
 {
     // Get a message
     size_t       received_size;
     unsigned int priority;
-    recv_queue_->receive(&received, sizeof(control_message), received_size, priority);
+    recv_queue_->receive(received.msg_.get(), sizeof(control_message), received_size, priority);
 
-    SPDLOG_DEBUG("OPE: Received message {}", received.type);
+    SPDLOG_DEBUG("OPE: Received message {}", received.msg_->type);
 
     // Make sure that it is valid to go from the previous message type to the current one
-    verifier_.assert_transition_allowed(received.type);
+    verifier_.assert_transition_allowed(received.msg_->type);
 }
 
 // Receive a message with a timeout
-bool IPCControlChannel::recv_message(control_message &received, size_t timeout_ms)
+bool IPCControlChannel::recv_message(ControlMessage &received, size_t timeout_ms)
 {
     // Get a message
     size_t       received_size;
@@ -226,13 +319,13 @@ bool IPCControlChannel::recv_message(control_message &received, size_t timeout_m
         boost::interprocess::microsec_clock::universal_time() + boost::posix_time::milliseconds(timeout_ms);
 
     bool successful_read =
-        recv_queue_->timed_receive(&received, sizeof(control_message), received_size, priority, timeout_at);
+        recv_queue_->timed_receive(received.msg_.get(), sizeof(control_message), received_size, priority, timeout_at);
     if (successful_read)
     {
-        SPDLOG_DEBUG("OPE: Received message {}", received.type);
+        SPDLOG_DEBUG("OPE: Received message {}", received.msg_->type);
 
         // Make sure that it is valid to go from the previous message type to the current one
-        verifier_.assert_transition_allowed(received.type);
+        verifier_.assert_transition_allowed(received.msg_->type);
     }
 
     return successful_read;

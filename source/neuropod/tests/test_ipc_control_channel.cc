@@ -47,31 +47,24 @@ TEST(test_ipc_control_channel, simple)
     for (int i = 0; i < 3; i++)
     {
         // Get a message
-        neuropod::control_message received;
+        neuropod::ControlMessage received;
         worker_control_channel.recv_message(received);
+        auto msg_type = received.get_type();
 
         switch (i)
         {
         case 0:
-            EXPECT_EQ(received.type, neuropod::LOAD_NEUROPOD);
+            EXPECT_EQ(msg_type, neuropod::LOAD_NEUROPOD);
             break;
         case 1:
-            EXPECT_EQ(received.type, neuropod::LOAD_SUCCESS);
+            EXPECT_EQ(msg_type, neuropod::LOAD_SUCCESS);
             break;
         case 2:
-            EXPECT_EQ(received.type, neuropod::ADD_INPUT);
-            for (int i = 0; i < received.num_tensors; i++)
-            {
-                // Get the ID and create a tensor
-                neuropod::SHMBlockID block_id;
-                std::copy_n(received.tensor_id[i], block_id.size(), block_id.begin());
-                auto shm_tensor = neuropod::tensor_from_id(block_id);
-
-                recvd_map[received.tensor_name[i]] = shm_tensor;
-            }
+            EXPECT_EQ(msg_type, neuropod::ADD_INPUT);
+            received.get_valuemap(recvd_map);
             break;
         default:
-            EXPECT_EQ(received.type, neuropod::INFER);
+            EXPECT_EQ(msg_type, neuropod::INFER);
             break;
         }
     }
@@ -117,23 +110,28 @@ TEST(test_ipc_control_channel, no_tensors)
     for (int i = 0; i < 3; i++)
     {
         // Get a message
-        neuropod::control_message received;
+        neuropod::ControlMessage received;
         worker_control_channel.recv_message(received);
+        auto msg_type = received.get_type();
 
         switch (i)
         {
         case 0:
-            EXPECT_EQ(received.type, neuropod::LOAD_NEUROPOD);
+            EXPECT_EQ(msg_type, neuropod::LOAD_NEUROPOD);
             break;
         case 1:
-            EXPECT_EQ(received.type, neuropod::LOAD_SUCCESS);
+            EXPECT_EQ(msg_type, neuropod::LOAD_SUCCESS);
             break;
-        case 2:
-            EXPECT_EQ(received.type, neuropod::ADD_INPUT);
-            EXPECT_EQ(received.num_tensors, 0);
+        case 2: {
+            // We need a new scope here because of the `tmp` variable declaration
+            EXPECT_EQ(msg_type, neuropod::ADD_INPUT);
+            neuropod::NeuropodValueMap tmp;
+            received.get_valuemap(tmp);
+            EXPECT_EQ(tmp.size(), 0);
             break;
+        }
         default:
-            EXPECT_EQ(received.type, neuropod::INFER);
+            EXPECT_EQ(msg_type, neuropod::INFER);
             break;
         }
     }

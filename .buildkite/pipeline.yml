@@ -6,6 +6,7 @@
 
 steps:
   - label: ":docker: CPU Tests (test-cpu-variant-tf-1_12_0-torch-1_1_0-py2_7)"
+    timeout_in_minutes: 60
     agents:
       queue: private-default
     command: build/ci/buildkite_build.sh
@@ -42,6 +43,7 @@ steps:
       automatic: true
 
   - label: ":docker: Lint + Docs"
+    timeout_in_minutes: 60
     agents:
       queue: private-default
     command: build/ci/buildkite_lint.sh
@@ -78,6 +80,7 @@ steps:
       automatic: true
 
   - label: ":docker: CPU Tests (test-cpu-variant-tf-1_13_1-torch-1_2_0-py2_7)"
+    timeout_in_minutes: 60
     agents:
       queue: private-default
     command: build/ci/buildkite_build.sh
@@ -114,6 +117,7 @@ steps:
       automatic: true
 
   - label: ":docker: CPU Tests (test-cpu-variant-tf-1_14_0-torch-1_3_0-py2_7)"
+    timeout_in_minutes: 60
     agents:
       queue: private-default
     command: build/ci/buildkite_build.sh
@@ -150,6 +154,7 @@ steps:
       automatic: true
 
   - label: ":docker: CPU Tests (test-cpu-variant-tf-1_15_0-torch-1_4_0-py2_7)"
+    timeout_in_minutes: 60
     agents:
       queue: private-default
     command: build/ci/buildkite_build.sh
@@ -186,6 +191,7 @@ steps:
       automatic: true
 
   - label: ":docker: CPU Tests (test-cpu-variant-tf-1_12_0-torch-1_1_0-py3)"
+    timeout_in_minutes: 60
     agents:
       queue: private-default
     command: build/ci/buildkite_build.sh
@@ -222,6 +228,7 @@ steps:
       automatic: true
 
   - label: ":docker: CPU Tests (test-cpu-variant-tf-1_13_1-torch-1_2_0-py3)"
+    timeout_in_minutes: 60
     agents:
       queue: private-default
     command: build/ci/buildkite_build.sh
@@ -258,6 +265,7 @@ steps:
       automatic: true
 
   - label: ":docker: CPU Tests (test-cpu-variant-tf-1_14_0-torch-1_3_0-py3)"
+    timeout_in_minutes: 60
     agents:
       queue: private-default
     command: build/ci/buildkite_build.sh
@@ -294,6 +302,7 @@ steps:
       automatic: true
 
   - label: ":docker: CPU Tests (test-cpu-variant-tf-1_15_0-torch-1_4_0-py3)"
+    timeout_in_minutes: 60
     agents:
       queue: private-default
     command: build/ci/buildkite_build.sh
@@ -330,6 +339,7 @@ steps:
       automatic: true
 
   - label: ":docker: GPU Tests (test-gpu-variant-tf-1_12_0-torch-1_1_0-py2_7)"
+    timeout_in_minutes: 60
     agents:
       queue: private-gpu
     command: build/ci/buildkite_build_gpu.sh
@@ -366,6 +376,7 @@ steps:
       automatic: true
 
   - label: ":docker: GPU Tests (test-gpu-variant-tf-1_13_1-torch-1_2_0-py2_7)"
+    timeout_in_minutes: 60
     agents:
       queue: private-gpu
     command: build/ci/buildkite_build_gpu.sh
@@ -402,6 +413,7 @@ steps:
       automatic: true
 
   - label: ":docker: GPU Tests (test-gpu-variant-tf-1_14_0-torch-1_3_0-py2_7)"
+    timeout_in_minutes: 60
     agents:
       queue: private-gpu
     command: build/ci/buildkite_build_gpu.sh
@@ -438,6 +450,7 @@ steps:
       automatic: true
 
   - label: ":docker: GPU Tests (test-gpu-variant-tf-1_15_0-torch-1_4_0-py2_7)"
+    timeout_in_minutes: 60
     agents:
       queue: private-gpu
     command: build/ci/buildkite_build_gpu.sh
@@ -474,6 +487,7 @@ steps:
       automatic: true
 
   - label: ":docker: GPU Tests (test-gpu-variant-tf-1_12_0-torch-1_1_0-py3)"
+    timeout_in_minutes: 60
     agents:
       queue: private-gpu
     command: build/ci/buildkite_build_gpu.sh
@@ -510,6 +524,7 @@ steps:
       automatic: true
 
   - label: ":docker: GPU Tests (test-gpu-variant-tf-1_13_1-torch-1_2_0-py3)"
+    timeout_in_minutes: 60
     agents:
       queue: private-gpu
     command: build/ci/buildkite_build_gpu.sh
@@ -546,6 +561,7 @@ steps:
       automatic: true
 
   - label: ":docker: GPU Tests (test-gpu-variant-tf-1_14_0-torch-1_3_0-py3)"
+    timeout_in_minutes: 60
     agents:
       queue: private-gpu
     command: build/ci/buildkite_build_gpu.sh
@@ -582,6 +598,7 @@ steps:
       automatic: true
 
   - label: ":docker: GPU Tests (test-gpu-variant-tf-1_15_0-torch-1_4_0-py3)"
+    timeout_in_minutes: 60
     agents:
       queue: private-gpu
     command: build/ci/buildkite_build_gpu.sh

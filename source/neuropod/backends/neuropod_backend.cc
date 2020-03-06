@@ -56,6 +56,16 @@ const std::vector<TensorSpec> &NeuropodBackend::get_outputs() const
     return model_config_->outputs;
 }
 
+const std::string &NeuropodBackend::get_name() const
+{
+    return model_config_->name;
+}
+
+const std::string &NeuropodBackend::get_platform() const
+{
+    return model_config_->platform;
+}
+
 std::unique_ptr<NeuropodValueMap> NeuropodBackend::infer(const NeuropodValueMap &        inputs,
                                                          const std::vector<std::string> &requested_outputs)
 {

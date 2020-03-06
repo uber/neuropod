@@ -55,9 +55,7 @@ public:
                   // queue and the main process is waiting for this process to shutdown.
 
                   // try_send_message is threadsafe so we don't need synchronization here
-                  control_message msg;
-                  msg.type = HEARTBEAT;
-                  if (!control_channel.try_send_message(msg))
+                  if (!control_channel.try_send_message(HEARTBEAT))
                   {
                       SPDLOG_DEBUG("OPE: Message queue full - skipped sending heartbeat");
                   }
@@ -112,44 +110,41 @@ void multiprocess_worker_loop(const std::string &control_queue_name)
     while (true)
     {
         // Get a message
-        control_message received;
+        ControlMessage received;
         control_channel.recv_message(received);
 
-        if (received.type == LOAD_NEUROPOD)
+        auto msg_type = received.get_type();
+
+        if (msg_type == LOAD_NEUROPOD)
         {
+            ope_load_config config;
+            received.get_load_config(config);
+
             // Load a neuropod
-            neuropod  = stdx::make_unique<Neuropod>(received.neuropod_path);
+            neuropod  = stdx::make_unique<Neuropod>(config.neuropod_path);
             allocator = neuropod->get_tensor_allocator();
             inputs.clear();
             last_outputs.clear();
             control_channel.send_message(LOAD_SUCCESS);
         }
-        else if (received.type == ADD_INPUT)
+        else if (msg_type == ADD_INPUT)
         {
-            for (int i = 0; i < received.num_tensors; i++)
+            NeuropodValueMap tmp;
+            received.get_valuemap(tmp);
+
+            for (auto &item : tmp)
             {
-                // Get the ID and create a tensor
-                neuropod::SHMBlockID block_id;
-                std::copy_n(received.tensor_id[i], block_id.size(), block_id.begin());
-                auto shm_tensor = tensor_from_id(block_id);
-
-                // Make sure we're not overwriting a tensor
-                std::string tensor_name = received.tensor_name[i];
-                assert(inputs.find(tensor_name) == inputs.end());
-
                 // Wrap in a tensor type that this neuropod expects
-                inputs[tensor_name] = wrap_existing_tensor(*allocator, shm_tensor);
+                inputs[item.first] =
+                    wrap_existing_tensor(*allocator, std::dynamic_pointer_cast<NeuropodTensor>(item.second));
             }
         }
-        else if (received.type == REQUEST_OUTPUT)
+        else if (msg_type == REQUEST_OUTPUT)
         {
-            for (int i = 0; i < received.num_tensors; i++)
-            {
-                std::string tensor_name = received.tensor_name[i];
-                requested_outputs.emplace_back(tensor_name);
-            }
+            // Get the requested tensor names
+            received.get_tensor_names(requested_outputs);
         }
-        else if (received.type == INFER)
+        else if (msg_type == INFER)
         {
             // Run inference
             auto outputs = neuropod->infer(inputs, requested_outputs);
@@ -180,13 +175,13 @@ void multiprocess_worker_loop(const std::string &control_queue_name)
             // because this takes a nontrivial amount of time
             inputs.clear();
         }
-        else if (received.type == INFER_COMPLETE)
+        else if (msg_type == INFER_COMPLETE)
         {
             // The main process loaded our output tensors
             // We no longer need to maintain references to these tensors
             last_outputs.clear();
         }
-        else if (received.type == SHUTDOWN)
+        else if (msg_type == SHUTDOWN)
         {
             break;
         }
