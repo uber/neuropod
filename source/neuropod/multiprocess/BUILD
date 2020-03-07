@@ -2,6 +2,8 @@
 # Uber, Inc. (c) 2019
 #
 
+load("@bazel_tools//tools/build_defs/pkg:pkg.bzl", "pkg_tar")
+
 cc_library(
     name = "shm_allocator",
     srcs = [
@@ -127,5 +129,15 @@ cc_library(
         "//neuropod/backends:neuropod_backend",
         "//neuropod/internal:deleter",
         "@boost_repo//:boost",
+    ],
+)
+
+# Package all the header files
+pkg_tar(
+    name = "libneuropod_multiprocess_hdrs",
+    package_dir = "multiprocess/",
+    srcs = glob(["*.hh"]),
+    visibility = [
+        "//visibility:public",
     ],
 )
