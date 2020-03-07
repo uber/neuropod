@@ -61,5 +61,4 @@ void ipc_serialize(std::ostream &out, const uint64_t &data);
 template <>
 void ipc_deserialize(std::istream &in, uint64_t &data);
 
-
 } // namespace neuropod

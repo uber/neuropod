@@ -52,6 +52,118 @@ enum QueueMessageType
 // Used to generate IDs for messages
 extern std::atomic_uint64_t msg_counter;
 
+// The on-the-wire format of the data
+// UserPayloadType should be an enum that specifies types of payloads
+template <typename UserPayloadType>
+struct __attribute__((__packed__)) WireFormat
+{
+    // The ID of the message
+    uint64_t id;
+
+    // The type of the message
+    QueueMessageType type;
+
+    // Whether or not this message requires an ack
+    bool requires_ack = false;
+
+    // Whether or not the payload is inline
+    bool is_inline;
+
+    // The size of the payload in bytes
+    uint32_t payload_size;
+
+    // A user-defined type of the payload
+    // Note: this field is only checked if `type` is USER_PAYLOAD
+    UserPayloadType payload_type;
+
+    union {
+        // An inline payload
+        char payload[8192];
+
+        // An SHM id of the actual payload
+        // This is used for large messages that are serialized and put in
+        // shm
+        char payload_id[24];
+    };
+
+    WireFormat() = default;
+
+    // Delete the copy constructor and the copy assignment operator
+    WireFormat(const WireFormat<UserPayloadType> &) = delete;
+    WireFormat &operator=(const WireFormat<UserPayloadType> &other) = delete;
+
+    // Keep the move constructor and move assignment operator
+    WireFormat(WireFormat<UserPayloadType> &&) = default;
+    WireFormat &operator=(WireFormat<UserPayloadType> &&other) = default;
+};
+
+// Serialize a payload into `data` and add any created transferrables to `transferrables`
+// If the payload is small enough (less than the size of `payload_` in the wire format), it will be
+// stored inline in the message. Otherwise it'll be serialized and put into a shared memory
+// block. That block will be added to `transferrables` to ensure it stays in scope while the message
+// is in transit.
+template <typename Payload, typename UserPayloadType>
+void serialize_payload(const Payload &payload, WireFormat<UserPayloadType> &data, Transferrables &transferrables)
+{
+    // Serialize the payload
+    std::stringstream ss;
+    ipc_serialize(ss, payload);
+
+    // Set the size
+    auto size_bytes     = ss.tellp();
+    data.payload_size = size_bytes;
+
+    if (size_bytes <= sizeof(data.payload))
+    {
+        // We can store this message inline
+        ss.read(data.payload, size_bytes);
+        data.is_inline = true;
+    }
+    else
+    {
+        // Store in SHM and set msg.payload_id
+        SPDLOG_DEBUG("Could not fit data in inline message. Sending via SHM. Requested size: {}", size_bytes);
+        SHMBlockID block_id;
+
+        auto block = shm_allocator.allocate_shm(size_bytes, block_id);
+
+        // Write the serialized message into the block
+        ss.read(static_cast<char *>(block.get()), size_bytes);
+
+        // Copy the block id into the message
+        memcpy(data.payload_id, block_id.data(), sizeof(data.payload_id));
+        data.is_inline = false;
+
+        // Add this block to our list of transferrables so it stays in scope until
+        // the other process reads the message
+        transferrables.emplace_back(std::move(block));
+    }
+}
+
+// Get a payload of type `Payload` from a message
+template <typename Payload, typename UserPayloadType>
+void deserialize_payload(const WireFormat<UserPayloadType> &data, Payload &out)
+{
+    std::stringstream ss;
+    if (data.is_inline)
+    {
+        // The message is inline so we can just read it
+        ss.write(data.payload, data.payload_size);
+    }
+    else
+    {
+        // The message is stored in SHM
+        SHMBlockID block_id;
+        memcpy(block_id.data(), data.payload_id, sizeof(data.payload_id));
+
+        // Load the block and get the data
+        auto block = shm_allocator.load_shm(block_id);
+        ss.write(static_cast<char *>(block.get()), data.payload_size);
+    }
+
+    ipc_deserialize(ss, out);
+}
+
 } // namespace detail
 
 // A bounded blocking spsc queue
@@ -129,174 +241,41 @@ public:
     }
 };
 
-// class RAIITimer
-// {
-// private:
-//     std::string name_;
-//     std::chrono::time_point<std::chrono::steady_clock> start_;
-
-// public:
-//     RAIITimer(std::string name) : name_(std::move(name)), start_(std::chrono::steady_clock::now()) {}
-//     ~RAIITimer()
-//     {
-//         auto end = std::chrono::steady_clock::now();
-//         SPDLOG_TRACE("Timer: {} took {}ns to execute", name_, std::chrono::duration_cast<std::chrono::nanoseconds>(end - start_).count());
-//     }
-// };
-
 // Forward declare IPCMessageQueue
 template <typename>
 class IPCMessageQueue;
 
-// The on-the-wire format of the data
+// This is the user-facing queue message type
 // UserPayloadType should be an enum that specifies types of payloads
 template <typename UserPayloadType>
-class __attribute__((__packed__)) QueueMessage
+class QueueMessage
 {
 private:
-    // The ID of the message
-    uint64_t id_;
+    // A pointer to the underlying data
+    std::shared_ptr<detail::WireFormat<UserPayloadType>> data_;
 
-    // The type of the message
-    detail::QueueMessageType type_;
-
-    // Whether or not this message requires an ack
-    bool requires_ack_ = false;
-
-    // Whether or not the payload is inline
-    bool is_inline_;
-
-    // The size of the payload in bytes
-    uint32_t payload_size_;
-
-    // A user-defined type of the payload
-    // Note: this field is only checked if `type` is USER_PAYLOAD
-    UserPayloadType payload_type_;
-
-    union {
-        // An inline payload
-        char payload_[8192];
-
-        // An SHM id of the actual payload
-        // This is used for large messages that are serialized and put in
-        // shm
-        char payload_id_[24];
-    };
-
-    // Note: all the constructors are private and are only used in `IPCMessageQueue`
+    // Note: The constructor is private and only used in `IPCMessageQueue`
     template <typename>
     friend class IPCMessageQueue;
 
-    // Create a message without a payload
-    // This is usually used for sending things like HEARTBEAT messages
-    QueueMessage(detail::QueueMessageType type)
-        : id_(detail::msg_counter++), // Atomically increment and generate an ID for the message
-          type_(type)
-    {
-    }
-
-    // Create a message with a payload
-    // If the payload is small enough (less than the size of `payload_` above), it will be
-    // stored inline in the message. Otherwise it'll be serialized and put into a shared memory
-    // block. That block will be added to `transferrables` to ensure it stays in scope while the message
-    // is in transit.
-    template <typename Payload>
-    QueueMessage(const Payload &payload, detail::Transferrables &transferrables)
-        : id_(detail::msg_counter++) // Atomically increment and generate an ID for the message
-    {
-        // RAIITimer timer("OPE Payload Serialization");
-
-        // Serialize the payload
-        std::stringstream ss;
-        ipc_serialize(ss, payload);
-
-        // Set the size
-        auto size_bytes = ss.tellp();
-        payload_size_   = size_bytes;
-
-        if (size_bytes <= sizeof(payload_))
-        {
-            // We can store this message inline
-            ss.read(payload_, size_bytes);
-            is_inline_ = true;
-        }
-        else
-        {
-            // Store in SHM and set msg.payload_id
-            SPDLOG_DEBUG("Could not fit data in inline message. Sending via SHM. Requested size: {}", size_bytes);
-            SHMBlockID block_id;
-
-            auto block = shm_allocator.allocate_shm(size_bytes, block_id);
-
-            // Write the serialized message into the block
-            ss.read(static_cast<char *>(block.get()), size_bytes);
-
-            // Copy the block id into the message
-            memcpy(payload_id_, block_id.data(), sizeof(payload_id_));
-            is_inline_ = false;
-
-            // Add this block to our list of transferrables so it stays in scope until
-            // the other process reads the message
-            transferrables.emplace_back(std::move(block));
-        }
-    }
-
-    // A default constructor used when receiving messages
-    QueueMessage() {}
-
-    // TODO(vip): we can't store this here because we don't want this in
-    // shared memory
-    std::shared_ptr<IPCMessageQueue<UserPayloadType>> ack_queue_;
+    // Constructor used when receiving messages
+    QueueMessage(std::shared_ptr<detail::WireFormat<UserPayloadType>> data) : data_(std::move(data)) {}
 
 public:
 
-    // Delete the copy constructor and the copy assignment operator
-    QueueMessage(const QueueMessage&) = delete;
-    QueueMessage& operator=(const QueueMessage& other) = delete;
-
-    // Keep the move constructor and move assignment operator
-    QueueMessage(QueueMessage&&) = default;
-    QueueMessage& operator=(QueueMessage&& other) = default;
-
-    ~QueueMessage()
-    {
-        // Send an ack message if we need to
-        if (ack_queue_)
-        {
-            ack_queue_->done(*this);
-        }
-    }
+    ~QueueMessage() = default;
 
     // Get a payload of type `Payload` from this message
     template <typename Payload>
     void get(Payload &out)
     {
-        // RAIITimer timer("OPE Payload Deserialization");
-
-        std::stringstream ss;
-        if (is_inline_)
-        {
-            // The message is inline so we can just read it
-            ss.write(payload_, payload_size_);
-        }
-        else
-        {
-            // The message is stored in SHM
-            SHMBlockID block_id;
-            memcpy(block_id.data(), payload_id_, sizeof(payload_id_));
-
-            // Load the block and get the data
-            auto block = shm_allocator.load_shm(block_id);
-            ss.write(static_cast<char *>(block.get()), payload_size_);
-        }
-
-        ipc_deserialize(ss, out);
+        detail::deserialize_payload(*data_, out);
     }
 
     // Get the type of the user-defined payload included in this message
     // This should only be used when it is known that this message contains
     // a user-defined payload
-    UserPayloadType get_payload_type() { return payload_type_; }
+    UserPayloadType get_payload_type() { return data_->payload_type; }
 };
 
 // The type of the process creating the message queue
@@ -312,10 +291,10 @@ template <typename UserPayloadType>
 class IPCMessageQueue : public std::enable_shared_from_this<IPCMessageQueue<UserPayloadType>>
 {
 private:
-    using Message = QueueMessage<UserPayloadType>;
+    using WireFormat = detail::WireFormat<UserPayloadType>;
 
     // Output messages
-    BlockingSPSCQueue<Message>     out_queue_;
+    BlockingSPSCQueue<std::unique_ptr<WireFormat>> out_queue_;
 
     // Internal IPC queues
     std::string                         control_queue_name_;
@@ -350,11 +329,11 @@ private:
                               boost::posix_time::milliseconds(MESSAGE_TIMEOUT_MS);
 
             // Get a message
-            Message      received;
+            auto         received = stdx::make_unique<WireFormat>();
             size_t       received_size;
             unsigned int priority;
             bool         successful_read =
-                recv_queue_->timed_receive(&received, sizeof(Message), received_size, priority, timeout_at);
+                recv_queue_->timed_receive(received.get(), sizeof(WireFormat), received_size, priority, timeout_at);
 
             if (!successful_read)
             {
@@ -365,26 +344,26 @@ private:
                                HEARTBEAT_INTERVAL_MS);
             }
 
-            if (received.type_ != detail::USER_PAYLOAD)
+            if (received->type != detail::USER_PAYLOAD)
             {
-                SPDLOG_TRACE("OPE: Read thread received IPC control message {}.", received.type_);
+                SPDLOG_TRACE("OPE: Read thread received IPC control message {}.", received->type);
             }
 
-            if (received.type_ == detail::HEARTBEAT)
+            if (received->type == detail::HEARTBEAT)
             {
                 // This is a heartbeat message so continue
                 continue;
             }
-            else if (received.type_ == detail::ACK)
+            else if (received->type == detail::ACK)
             {
                 // Handle ack messages by erasing all the in_transit items for that message
                 uint64_t acked_id;
-                received.get(acked_id);
+                detail::deserialize_payload(*received, acked_id);
 
                 std::lock_guard<std::mutex> lock(in_transit_mutex_);
                 in_transit_.erase(acked_id);
             }
-            else if (received.type_ == detail::SHUTDOWN_QUEUES)
+            else if (received->type == detail::SHUTDOWN_QUEUES)
             {
                 // Shutdown once we've received ACKs for all the messages we've sent
                 shutdown_started_ = true;
@@ -409,18 +388,18 @@ private:
         }
     }
 
-    void send_message(const Message &msg)
+    void send_message(const WireFormat &msg)
     {
-        if (msg.type_ == detail::USER_PAYLOAD)
+        if (msg.type == detail::USER_PAYLOAD)
         {
-            SPDLOG_TRACE("OPE: Sending user payload of type: {}", msg.payload_type_);
+            SPDLOG_TRACE("OPE: Sending user payload of type: {}", msg.payload_type);
         }
         else
         {
-            SPDLOG_TRACE("OPE: Sending IPC control message {}.", msg.type_);
+            SPDLOG_TRACE("OPE: Sending IPC control message {}.", msg.type);
         }
 
-        send_queue_->send(&msg, sizeof(Message), 0);
+        send_queue_->send(&msg, sizeof(msg), 0);
     }
 
     // The worker loop for the heartbeat thread
@@ -429,7 +408,8 @@ private:
         while (send_heartbeat_)
         {
             // Attempt to send a heartbeat message
-            Message msg(detail::HEARTBEAT);
+            WireFormat msg;
+            msg.type = detail::HEARTBEAT;
             send_message(msg);
 
             // Using a condition variable lets us wake up while we're waiting
@@ -446,11 +426,11 @@ public:
           send_queue_(stdx::make_unique<ipc::message_queue>(ipc::open_or_create,
                                                             ("neuropod_" + control_queue_name_ + "_tw").c_str(),
                                                             detail::MAX_QUEUE_SIZE,
-                                                            sizeof(Message))),
+                                                            sizeof(WireFormat))),
           recv_queue_(stdx::make_unique<ipc::message_queue>(ipc::open_or_create,
                                                             ("neuropod_" + control_queue_name_ + "_fw").c_str(),
                                                             detail::MAX_QUEUE_SIZE,
-                                                            sizeof(Message))),
+                                                            sizeof(WireFormat))),
           read_worker_(&IPCMessageQueue<UserPayloadType>::read_worker_loop, this),
           heartbeat_thread_(&IPCMessageQueue<UserPayloadType>::send_heartbeat_loop, this)
     {
@@ -473,9 +453,10 @@ public:
         heartbeat_thread_.join();
 
         // Send a shutdown message to ourselves
-        Message msg(detail::SHUTDOWN_QUEUES);
+        WireFormat msg;
+        msg.type = detail::SHUTDOWN_QUEUES;
         SPDLOG_TRACE("OPE: Shutting down read thread...");
-        recv_queue_->send(&msg, sizeof(Message), 0);
+        recv_queue_->send(&msg, sizeof(msg), 0);
 
         // Join the read thread
         read_worker_.join();
@@ -486,10 +467,15 @@ public:
     template <typename Payload>
     void send_message(UserPayloadType payload_type, const Payload &payload)
     {
+        // Create a message
+        WireFormat msg;
+        msg.id           = detail::msg_counter++;
+        msg.type         = detail::USER_PAYLOAD;
+        msg.payload_type = payload_type;
+
+        // Set the payload
         detail::Transferrables transferrables;
-        Message                msg(payload, transferrables);
-        msg.type_         = detail::USER_PAYLOAD;
-        msg.payload_type_ = payload_type;
+        detail::serialize_payload(payload, msg, transferrables);
 
         // Check if there are any transferrable items attached
         if (!transferrables.empty())
@@ -498,10 +484,10 @@ public:
             std::lock_guard<std::mutex> lock(in_transit_mutex_);
             for (auto &transferrable : transferrables)
             {
-                in_transit_.emplace(msg.id_, std::move(transferrable));
+                in_transit_.emplace(msg.id, std::move(transferrable));
             }
 
-            msg.requires_ack_ = true;
+            msg.requires_ack = true;
         }
 
         // Send the message
@@ -514,11 +500,17 @@ public:
     template <typename Payload>
     void send_message_move(UserPayloadType payload_type, Payload payload)
     {
-        detail::Transferrables transferrables;
-        Message                msg(payload, transferrables);
-        msg.type_         = detail::USER_PAYLOAD;
-        msg.payload_type_ = payload_type;
+        // Create a message
+        WireFormat msg;
+        msg.id           = detail::msg_counter++;
+        msg.type         = detail::USER_PAYLOAD;
+        msg.payload_type = payload_type;
 
+        // Set the payload
+        detail::Transferrables transferrables;
+        detail::serialize_payload(payload, msg, transferrables);
+
+        // Add the payload to transferrables
         transferrables.emplace_back(std::move(payload));
 
         // Check if there are any transferrable items attached
@@ -528,10 +520,10 @@ public:
             std::lock_guard<std::mutex> lock(in_transit_mutex_);
             for (auto &transferrable : transferrables)
             {
-                in_transit_.emplace(msg.id_, std::move(transferrable));
+                in_transit_.emplace(msg.id, std::move(transferrable));
             }
 
-            msg.requires_ack_ = true;
+            msg.requires_ack = true;
         }
 
         // Send the message
@@ -542,52 +534,52 @@ public:
     // Note: this is threadsafe
     void send_message(UserPayloadType payload_type)
     {
-        Message msg(detail::USER_PAYLOAD);
-        msg.payload_type_ = payload_type;
+        WireFormat msg;
+        msg.type = detail::USER_PAYLOAD;
+        msg.payload_type = payload_type;
         send_message(msg);
     }
 
     // Get a message. Blocks if the queue is empty.
     // Note: this is _NOT_ threadsafe. There should only be one thread calling `recv_message`
     // at a time.
-    Message recv_message()
+    QueueMessage<MessageType> recv_message()
     {
-        Message out;
+        auto shared_this = this->shared_from_this();
+
+        // Read the message
+        std::unique_ptr<WireFormat> out;
         out_queue_.pop(out);
+        SPDLOG_TRACE("OPE: Received user payload of type: {} (requires ack: {})", out->payload_type, out->requires_ack);
 
-        SPDLOG_TRACE("OPE: Received user payload of type: {} (requires ack: {})", out.payload_type_, out.requires_ack_);
+        // Convert this to a shared ptr with a deleter that acks the message
+        std::shared_ptr<WireFormat> received_shared(out.release(), [shared_this](WireFormat *msg) {
+            if (msg->requires_ack)
+            {
+                // Notify the other process that this message is done being read from
+                // and any associated resources can be freed
+                // This is called in the destructor of `Message` and should not be explicitly called
+                detail::Transferrables transferrables;
 
-        if (out.requires_ack_)
-        {
-            out.ack_queue_ = this->shared_from_this();
-        }
-        else
-        {
-            out.ack_queue_ = nullptr;
-        }
+                // Create a message to ack `msg`
+                WireFormat ack_msg;
+                ack_msg.type = detail::ACK;
+                detail::serialize_payload(msg->id, ack_msg, transferrables);
 
-        return out;
-    }
+                if (!transferrables.empty())
+                {
+                    // This must be empty otherwise we'll have an infinite ACK chain
+                    NEUROPOD_ERROR("[OPE] Transferrables must be empty when sending an `ack` message.");
+                }
 
-    // Notify the other process that this message is done being read from
-    // and any associated resources can be freed
-    // This is called in the destructor of `Message` and should not be explicitly called
-    void done(const Message &msg)
-    {
-        detail::Transferrables transferrables;
+                // Send the message
+                shared_this->send_message(ack_msg);
+            }
 
-        // Create a message to ack `msg`
-        Message ack_msg(msg.id_, transferrables);
-        ack_msg.type_ = detail::ACK;
+            delete msg;
+        });
 
-        if (!transferrables.empty())
-        {
-            // This must be empty otherwise we'll have an infinite ACK chain
-            NEUROPOD_ERROR("[OPE] Transferrables must be empty when sending an `ack` message.");
-        }
-
-        // Send the message
-        send_message(ack_msg);
+        return QueueMessage<MessageType>(std::move(received_shared));
     }
 };
 
