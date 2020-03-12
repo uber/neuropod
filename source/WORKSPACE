@@ -174,11 +174,3 @@ http_archive(
     url = "https://github.com/fmtlib/fmt/archive/5.3.0.zip",
     strip_prefix = "fmt-5.3.0",
 )
-
-http_archive(
-    name = "mpmcqueue_repo",
-    build_file = "@//deps:BUILD.mpmcqueue",
-    sha256 = "5092fbaa0705f565ec3152142707c7faf5798e25166118d708d289f5bf7be01f",
-    url = "https://github.com/rigtorp/MPMCQueue/archive/0dac08b19b41d6499bd6e76b6afeb0e2fca96e19.zip",
-    strip_prefix = "MPMCQueue-0dac08b19b41d6499bd6e76b6afeb0e2fca96e19",
-)

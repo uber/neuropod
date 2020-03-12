@@ -76,7 +76,6 @@ cc_library(
     ],
     deps = [
         ":shm_tensor",
-        "@mpmcqueue_repo//:mpmcqueue",
     ],
 )
 
