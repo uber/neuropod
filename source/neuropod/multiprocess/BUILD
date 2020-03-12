@@ -63,6 +63,7 @@ cc_library(
     name = "ipc_message_queue",
     hdrs = [
         "ipc_message_queue.hh",
+        "ipc_message_queue_impl.hh",
         "control_messages.hh",
         "ipc_serialization.hh",
     ],
@@ -76,6 +77,7 @@ cc_library(
     ],
     deps = [
         ":shm_tensor",
+        "//neuropod/internal:blocking_spsc_queue"
     ],
 )
 
