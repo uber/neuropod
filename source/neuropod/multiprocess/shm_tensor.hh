@@ -7,7 +7,7 @@
 #include "neuropod/backends/tensor_allocator.hh"
 #include "neuropod/internal/deleter.hh"
 #include "neuropod/internal/neuropod_tensor.hh"
-#include "neuropod/multiprocess/shm_allocator.hh"
+#include "neuropod/multiprocess/shm/shm_allocator.hh"
 
 #include <cassert>
 #include <chrono>

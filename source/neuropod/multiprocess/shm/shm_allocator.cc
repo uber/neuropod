@@ -2,7 +2,7 @@
 // Uber, Inc. (c) 2020
 //
 
-#include "neuropod/multiprocess/shm_allocator.hh"
+#include "neuropod/multiprocess/shm/shm_allocator.hh"
 
 #include "fmt/ranges.h"
 #include "neuropod/internal/error_utils.hh"
