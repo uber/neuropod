@@ -2,6 +2,8 @@
 // Uber, Inc. (c) 2020
 //
 
+#pragma once
+
 #include <array>
 #include <memory>
 

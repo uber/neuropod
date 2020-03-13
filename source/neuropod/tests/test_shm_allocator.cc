@@ -3,7 +3,7 @@
 //
 
 #include "gtest/gtest.h"
-#include "neuropod/multiprocess/shm_allocator.hh"
+#include "neuropod/multiprocess/shm/shm_allocator.hh"
 
 TEST(test_shm_allocator, simple)
 {
