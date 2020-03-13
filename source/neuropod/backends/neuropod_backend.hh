@@ -20,10 +20,6 @@
 namespace neuropod
 {
 
-// A map from a tensor name to a pointer to a NeuropodValue
-// This is the input and output type of `infer`
-using NeuropodValueMap = std::unordered_map<std::string, std::shared_ptr<NeuropodValue>>;
-
 // The interface that every neuropod backend implements
 class NeuropodBackend
 {
