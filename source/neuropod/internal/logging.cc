@@ -21,6 +21,11 @@ spdlog::level::level_enum get_default_log_level()
     }
 
     std::string log_level(log_level_cstr);
+    if (log_level == "TRACE")
+    {
+        return spdlog::level::trace;
+    }
+
     if (log_level == "DEBUG")
     {
         return spdlog::level::debug;
