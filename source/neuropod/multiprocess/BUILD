@@ -17,6 +17,7 @@ cc_library(
         "//neuropod/backends:neuropod_backend",
         "//neuropod/internal:deleter",
         "//neuropod/multiprocess/shm",
+        "//neuropod/multiprocess/serialization",
     ],
 )
 
@@ -25,10 +26,12 @@ cc_library(
     hdrs = [
         "ipc_control_channel.hh",
         "control_messages.hh",
+        "ope_load_config.hh",
     ],
     srcs = [
         "ipc_control_channel.cc",
         "control_messages.cc",
+        "ope_load_config.cc",
     ],
     visibility = [
         "//neuropod:__subpackages__",
