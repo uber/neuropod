@@ -4,12 +4,12 @@
 
 #pragma once
 
-#include "neuropod/backends/neuropod_backend.hh"
 #include "neuropod/internal/blocking_spsc_queue.hh"
-#include "neuropod/multiprocess/ipc_serialization.hh"
-#include "neuropod/multiprocess/shm_tensor.hh"
+#include "neuropod/internal/error_utils.hh"
+#include "neuropod/internal/memory_utils.hh"
+#include "neuropod/multiprocess/mq/heartbeat.hh"
+#include "neuropod/multiprocess/mq/wire_format.hh"
 
-#include <boost/any.hpp>
 #include <boost/interprocess/ipc/message_queue.hpp>
 
 #include <atomic>
@@ -22,35 +22,6 @@ namespace ipc = boost::interprocess;
 
 namespace neuropod
 {
-
-namespace detail
-{
-
-// `Transferrables` are items that must be kept in scope while a message is in transit
-// Usually, these contain data that is stored in shared memory and is
-// used to ensure the sending process maintains a reference to the
-// data until the receiving process is done loading it.
-// This is used to implement cross-process "moves" of data in shared memory
-using Transferrables = std::vector<boost::any>;
-
-// The on-the-wire format of the data
-// UserPayloadType should be an enum that specifies types of payloads
-template <typename UserPayloadType>
-struct WireFormat;
-
-// Serialize a payload into `data` and add any created transferrables to `transferrables`
-// If the payload is small enough (less than the size of `payload_` in the wire format), it will be
-// stored inline in the message. Otherwise it'll be serialized and put into a shared memory
-// block. That block will be added to `transferrables` to ensure it stays in scope while the message
-// is in transit.
-template <typename Payload, typename UserPayloadType>
-void serialize_payload(const Payload &payload, WireFormat<UserPayloadType> &data, Transferrables &transferrables);
-
-// Get a payload of type `Payload` from a message
-template <typename Payload, typename UserPayloadType>
-void deserialize_payload(const WireFormat<UserPayloadType> &data, Payload &out);
-
-} // namespace detail
 
 // Forward declare IPCMessageQueue
 template <typename>
@@ -113,18 +84,12 @@ private:
     std::unique_ptr<ipc::message_queue> send_queue_;
     std::unique_ptr<ipc::message_queue> recv_queue_;
 
-    // Stores items in transit
-    // A mapping from message_id to items that need to be kept in scope
-    // until a DONE message is received for that message id
-    // This is used to implement cross-process "moves" of items in
-    // shared memory
-    std::unordered_multimap<uint64_t, boost::any> in_transit_;
-    std::mutex                                    in_transit_mutex_;
+    // Responsible for periodically sending a heartbeat
+    friend class detail::HeartbeatController;
+    std::unique_ptr<detail::HeartbeatController> heartbeat_controller_;
 
-    // State needed for the heartbeat thread
-    std::atomic_bool        send_heartbeat_{true};
-    std::condition_variable heartbeat_cv_;
-    std::mutex              heartbeat_mutex_;
+    // Responsible for keeping things in scope during cross-process moves
+    std::unique_ptr<detail::TransferrableController> transferrable_controller_;
 
     // Whether or not a shutdown is in progress
     bool shutdown_started_ = false;
@@ -132,17 +97,11 @@ private:
     // A thread that handles incoming messages
     std::thread read_worker_;
 
-    // A thread that sends heartbeats
-    std::thread heartbeat_thread_;
-
     // The worker loop for the message reading thread
     void read_worker_loop();
 
     // Send a message to the other process
     void send_message(const WireFormat &msg);
-
-    // The worker loop for the heartbeat thread
-    void send_heartbeat_loop();
 
 public:
     IPCMessageQueue(const std::string &control_queue_name, ProcessType type);
@@ -167,7 +126,7 @@ public:
     // Get a message. Blocks if the queue is empty.
     // Note: this is _NOT_ threadsafe. There should only be one thread calling `recv_message`
     // at a time.
-    QueueMessage<MessageType> recv_message();
+    QueueMessage<UserPayloadType> recv_message();
 };
 
 // Cleanup control channels for the queue with name `control_queue_name`

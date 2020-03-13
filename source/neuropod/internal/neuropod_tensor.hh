@@ -465,4 +465,8 @@ public:
     virtual T get_native_data() = 0;
 };
 
+// A map from a tensor name to a pointer to a NeuropodValue
+// This is the input and output type of `infer`
+using NeuropodValueMap = std::unordered_map<std::string, std::shared_ptr<NeuropodValue>>;
+
 } // namespace neuropod

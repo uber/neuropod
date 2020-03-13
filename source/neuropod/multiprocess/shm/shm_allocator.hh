@@ -2,7 +2,9 @@
 // Uber, Inc. (c) 2020
 //
 
-#include "neuropod/multiprocess/raw_shm_block_allocator.hh"
+#pragma once
+
+#include "neuropod/multiprocess/shm/raw_shm_block_allocator.hh"
 
 #include <array>
 #include <memory>

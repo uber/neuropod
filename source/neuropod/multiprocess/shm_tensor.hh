@@ -7,7 +7,8 @@
 #include "neuropod/backends/tensor_allocator.hh"
 #include "neuropod/internal/deleter.hh"
 #include "neuropod/internal/neuropod_tensor.hh"
-#include "neuropod/multiprocess/shm_allocator.hh"
+#include "neuropod/multiprocess/serialization/ipc_serialization.hh"
+#include "neuropod/multiprocess/shm/shm_allocator.hh"
 
 #include <cassert>
 #include <chrono>
@@ -230,5 +231,12 @@ protected:
         return std::string(wrapper->data, wrapper->data + wrapper->length);
     }
 };
+
+// Serialization specializations for a NeuropodValueMap of SHMTensors
+template <>
+void ipc_serialize(std::ostream &out, const NeuropodValueMap &data);
+
+template <>
+void ipc_deserialize(std::istream &in, NeuropodValueMap &data);
 
 } // namespace neuropod

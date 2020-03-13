@@ -57,7 +57,7 @@ cc_test(
     ],
     deps = [
         "@benchmark//:benchmark_main",
-        "//neuropod/multiprocess:shm_allocator",
+        "//neuropod/multiprocess/shm",
     ],
 )
 
@@ -207,7 +207,7 @@ cc_test(
     ],
     deps = [
         "@gtest//:main",
-        "//neuropod/multiprocess:shm_allocator",
+        "//neuropod/multiprocess/shm",
     ],
 )
 
