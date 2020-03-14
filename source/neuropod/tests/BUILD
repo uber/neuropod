@@ -107,6 +107,39 @@ cc_test(
 )
 
 cc_test(
+    name = "test_ope_wire_format",
+    srcs = [
+        "test_ope_wire_format.cc",
+    ],
+    deps = [
+        "@gtest//:main",
+        "//neuropod/multiprocess/mq",
+    ],
+)
+
+cc_test(
+    name = "test_ope_heartbeat",
+    srcs = [
+        "test_ope_heartbeat.cc",
+    ],
+    deps = [
+        "@gtest//:main",
+        "//neuropod/multiprocess/mq",
+    ],
+)
+
+cc_test(
+    name = "test_ope_transferrables",
+    srcs = [
+        "test_ope_transferrables.cc",
+    ],
+    deps = [
+        "@gtest//:main",
+        "//neuropod/multiprocess/mq",
+    ],
+)
+
+cc_test(
     name = "test_python_bridge",
     srcs = [
         "test_python_bridge.cc",
