@@ -5,6 +5,7 @@
 #pragma once
 
 #include "neuropod/internal/deleter.hh"
+#include "neuropod/internal/error_utils.hh"
 #include "neuropod/internal/neuropod_tensor.hh"
 
 #include <caffe2/core/macros.h>

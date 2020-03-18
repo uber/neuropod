@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "neuropod/internal/error_utils.hh"
+#include "neuropod/internal/error_utils_header_only.hh"
 #include "neuropod/internal/memory_utils.hh"
 #include "neuropod/internal/tensor_accessor.hh"
 #include "neuropod/internal/type_macros.hh"
@@ -16,6 +16,7 @@
 #include <sstream>
 #include <stdexcept>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 namespace neuropod
@@ -46,6 +47,17 @@ FOR_EACH_TYPE_MAPPING_INCLUDING_STRING(GET_TENSOR_TYPE_FN)
     std::string        get_serialize_tag() const { return tag; }
 
 } // namespace
+
+namespace detail
+{
+
+// Overloads for error signatures we need in this file
+[[noreturn]] void throw_error_hh(
+    const char *file, int line, const char *function, const std::string &message, TensorType type);
+[[noreturn]] void throw_error_hh(
+    const char *file, int line, const char *function, const std::string &message, TensorType type1, TensorType type2);
+
+} // namespace detail
 
 // Forward declare NeuropodTensor
 class NeuropodTensor;
@@ -99,7 +111,7 @@ protected:
     {
         if (!is_tensor_)
         {
-            NEUROPOD_ERROR("This NeuropodValue is expected to be a NeuropodTensor.");
+            NEUROPOD_ERROR_HH("This NeuropodValue is expected to be a NeuropodTensor.");
         }
     }
 };
@@ -179,7 +191,7 @@ public:
         this->assure_rank(1);
         if (this->get_dims()[0] != 1)
         {
-            NEUROPOD_ERROR("Tensor is expected to have shape of {1} to be casted to a scalar.");
+            NEUROPOD_ERROR_HH("Tensor is expected to have shape of {1} to be casted to a scalar.");
         }
         return this->template as_typed_tensor<T>()->template accessor<1>()[0];
     }
@@ -192,7 +204,7 @@ public:
         this->assure_rank(1);
         if (this->get_dims()[0] != 1)
         {
-            NEUROPOD_ERROR("Tensor is expected to have shape of {1} to be casted to a scalar.");
+            NEUROPOD_ERROR_HH("Tensor is expected to have shape of {1} to be casted to a scalar.");
         }
         return this->template as_typed_tensor<T>()->template accessor<1>()[0];
     }
@@ -219,7 +231,7 @@ protected:
 
         if (requested != actual)
         {
-            NEUROPOD_ERROR(
+            NEUROPOD_ERROR_HH(
                 "Tried to downcast tensor of type {} to a TypedNeuropodTensor of type {}", actual, requested);
         }
     }
@@ -229,7 +241,7 @@ protected:
         const size_t rank = dims.size();
         if (rank != expected_rank)
         {
-            NEUROPOD_ERROR("Tensor is expected to have rank of {} while the actual rank is {}", expected_rank, rank);
+            NEUROPOD_ERROR_HH("Tensor is expected to have rank of {} while the actual rank is {}", expected_rank, rank);
         }
     }
 
@@ -301,8 +313,8 @@ public:
 
         if (numel != input_data_size)
         {
-            NEUROPOD_ERROR("The size of the provided data does not match the number"
-                           "of elements in the tensor.");
+            NEUROPOD_ERROR_HH("The size of the provided data does not match the number"
+                              "of elements in the tensor.");
         }
 
         // Copy the data into the tensor
@@ -408,16 +420,16 @@ protected:
     virtual const std::string operator[](size_t index) const = 0;
 
     // We can't get a raw pointer from a string tensor
-    void *get_untyped_data_ptr() { NEUROPOD_ERROR("`get_untyped_data_ptr` is not supported for string tensors"); };
+    void *get_untyped_data_ptr() { NEUROPOD_ERROR_HH("`get_untyped_data_ptr` is not supported for string tensors"); };
 
     const void *get_untyped_data_ptr() const
     {
-        NEUROPOD_ERROR("`get_untyped_data_ptr` is not supported for string tensors");
+        NEUROPOD_ERROR_HH("`get_untyped_data_ptr` is not supported for string tensors");
     };
 
     size_t get_bytes_per_element() const
     {
-        NEUROPOD_ERROR("`get_bytes_per_element` is not supported for string tensors");
+        NEUROPOD_ERROR_HH("`get_bytes_per_element` is not supported for string tensors");
     };
 };
 
@@ -435,7 +447,7 @@ std::unique_ptr<NeuropodTensor> make_tensor(TensorType tensor_type, Params &&...
     {
         FOR_EACH_TYPE_MAPPING_INCLUDING_STRING(MAKE_TENSOR)
     default:
-        NEUROPOD_ERROR("Unsupported tensor type: {}", tensor_type);
+        NEUROPOD_ERROR_HH("Unsupported tensor type: {}", tensor_type);
     }
 }
 
@@ -447,7 +459,7 @@ std::unique_ptr<NeuropodTensor> make_tensor_no_string(TensorType tensor_type, Pa
     {
         FOR_EACH_TYPE_MAPPING_EXCEPT_STRING(MAKE_TENSOR)
     default:
-        NEUROPOD_ERROR("Unsupported tensor type: {}", tensor_type);
+        NEUROPOD_ERROR_HH("Unsupported tensor type: {}", tensor_type);
     }
 }
 
