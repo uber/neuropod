@@ -389,21 +389,43 @@ std::unique_ptr<NeuropodValueMap> TorchNeuropodBackend::infer_internal(const Neu
     }
     else if (result.isTuple())
     {
-        // Each item in this tuple should be a dict
         auto  tuple = result.toTuple();
         auto &elems = tuple->elements();
 
-        for (const auto &item : elems)
+        // Macros to handle namedtuples (Torch >= 1.3.0)
+#if CAFFE2_NIGHTLY_VERSION >= 20191010
+        const auto tuple_type     = result.type()->cast<torch::TupleType>();
+        const bool is_named_tuple = tuple_type && tuple_type->schema();
+#define GET_NAME(i) tuple_type->schema()->arguments()[i].name()
+#else
+        const bool is_named_tuple = false;
+#define GET_NAME(i) ""
+#endif
+        if (is_named_tuple)
         {
-            if (item.isGenericDict())
+            // This is a named tuple
+            for (int i = 0; i < elems.size(); i++)
             {
-                process_dict(*to_return, item);
-            }
-            else
-            {
-                NEUROPOD_ERROR("When returning a tuple, each item must be a dict. Got {}", item.tagKind());
+                insert_value_in_output(*to_return, GET_NAME(i), elems.at(i));
             }
         }
+        else
+        {
+            // Each item in this tuple should be a dict
+            for (const auto &item : elems)
+            {
+                if (item.isGenericDict())
+                {
+                    process_dict(*to_return, item);
+                }
+                else
+                {
+                    NEUROPOD_ERROR("When returning a tuple, each item must be a dict. Got {}", item.tagKind());
+                }
+            }
+        }
+
+#undef GET_NAME
     }
     else
     {

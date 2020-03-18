@@ -20,6 +20,28 @@ SINGLE_OUTPUT_ERROR_MSG = (
 loaded_op_hashes = set()
 
 
+def isnamedtuple(x):
+    """
+    Utility to check whether something is a named tuple
+    Since a namedtuple is basically a tuple with some additional metadata, we can't just do an `isinstance` check
+    Based on https://stackoverflow.com/questions/2166818/how-to-check-if-an-object-is-an-instance-of-a-namedtuple/2166841#2166841
+    """
+    t = type(x)
+    b = t.__bases__
+
+    # Named tuples are tuple subclasses
+    if len(b) != 1 or b[0] != tuple:
+        return False
+
+    # They have a fields tuple
+    f = getattr(t, "_fields", None)
+    if not isinstance(f, tuple):
+        return False
+
+    # All the items in the fields tuple are strings
+    return all(type(n) == str for n in f)
+
+
 class TorchScriptNeuropodExecutor(NeuropodExecutor):
     """
     Executes a TorchScript neuropod
@@ -125,6 +147,11 @@ class TorchScriptNeuropodExecutor(NeuropodExecutor):
             # Convert the outputs to numpy arrays
             # acceptable values must be torch.Tensor or lists of strings
             for key, value in out.items():
+                neuropod_out = self._insert_value_to_output(neuropod_out, key, value)
+
+        elif isnamedtuple(out):
+            # This is a named tuple
+            for key, value in out._asdict().items():
                 neuropod_out = self._insert_value_to_output(neuropod_out, key, value)
 
         elif isinstance(out, tuple):
