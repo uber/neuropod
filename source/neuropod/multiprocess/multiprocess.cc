@@ -306,21 +306,26 @@ protected:
 
 } // namespace
 
-std::unique_ptr<Neuropod> load_neuropod_in_new_process(const std::string &   neuropod_path,
-                                                       const RuntimeOptions &options,
-                                                       bool                  free_memory_every_cycle)
+std::unique_ptr<NeuropodBackend> load_neuropod_ope(const std::string &neuropod_path, const RuntimeOptions &options)
 {
-    auto backend = std::make_shared<MultiprocessNeuropodBackend>(neuropod_path, options, free_memory_every_cycle);
-    return stdx::make_unique<Neuropod>(neuropod_path, backend);
-}
+    if (!options.use_ope)
+    {
+        NEUROPOD_ERROR("`load_neuropod_ope` was called, but `options.use_ope` was false");
+    }
 
-std::unique_ptr<Neuropod> load_neuropod_in_worker(const std::string &neuropod_path,
-                                                  const std::string &control_queue_name,
-                                                  bool               free_memory_every_cycle)
-{
-    auto backend =
-        std::make_shared<MultiprocessNeuropodBackend>(neuropod_path, control_queue_name, free_memory_every_cycle);
-    return stdx::make_unique<Neuropod>(neuropod_path, backend);
+    const auto  free_memory_every_cycle = options.ope_options.free_memory_every_cycle;
+    const auto &control_queue_name      = options.ope_options.control_queue_name;
+    if (control_queue_name.empty())
+    {
+        // Start a new worker
+        return stdx::make_unique<MultiprocessNeuropodBackend>(neuropod_path, options, free_memory_every_cycle);
+    }
+    else
+    {
+        // Use an existing worker
+        return stdx::make_unique<MultiprocessNeuropodBackend>(
+            neuropod_path, control_queue_name, free_memory_every_cycle);
+    }
 }
 
 } // namespace neuropod

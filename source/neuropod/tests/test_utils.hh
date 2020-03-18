@@ -131,6 +131,15 @@ void test_addition_model(const std::string &neuropod_path)
     test_addition_model(neuropod);
 }
 
+void test_addition_model_ope(const std::string &neuropod_path)
+{
+    // Load the neuropod
+    neuropod::RuntimeOptions opts;
+    opts.use_ope = true;
+    neuropod::Neuropod neuropod(neuropod_path, opts);
+    test_addition_model(neuropod);
+}
+
 void test_strings_model(neuropod::Neuropod &neuropod)
 {
     // Tests a model that concatenates string tensors
@@ -186,5 +195,14 @@ void test_strings_model(const std::string &neuropod_path)
 {
     // Load the neuropod
     neuropod::Neuropod neuropod(neuropod_path);
+    test_strings_model(neuropod);
+}
+
+void test_strings_model_ope(const std::string &neuropod_path)
+{
+    // Load the neuropod
+    neuropod::RuntimeOptions opts;
+    opts.use_ope = true;
+    neuropod::Neuropod neuropod(neuropod_path, opts);
     test_strings_model(neuropod);
 }

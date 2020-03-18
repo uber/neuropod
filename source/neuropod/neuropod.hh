@@ -32,6 +32,31 @@ constexpr int GPU7 = 7;
 
 struct RuntimeOptions
 {
+    // Whether or not to use out-of-process execution
+    // (using shared memory to communicate between the processes)
+    bool use_ope = false;
+
+    // These options are only used if use_ope is set to true
+    struct OPEOptions
+    {
+        // Internally, OPE uses a shared memory allocator that reuses blocks of memory if possible.
+        // Therefore memory isn't necessarily allocated during each inference cycle as blocks may
+        // be reused.
+        //
+        // If free_memory_every_cycle is set, then unused shared memory will be freed every cycle
+        // This is useful for simple inference, but for code that is pipelined
+        // (e.g. generating inputs for cycle t + 1 during the inference of cycle t), this may not
+        // be desirable.
+        //
+        // If free_memory_every_cycle is false, the user is responsible for periodically calling
+        // neuropod::free_unused_shm_blocks()
+        bool free_memory_every_cycle = true;
+
+        // This option can be used to run the neuropod in an existing worker process
+        // If this string is empty, a new worker will be started.
+        std::string control_queue_name;
+    } ope_options;
+
     // The device to run this Neuropod on.
     // Some devices are defined in the namespace above. For machines with more
     // than 8 GPUs, passing in an index will also work (e.g. `9` for `GPU9`).

@@ -6,7 +6,6 @@
 // NEUROPOD_CI_SKIP_INFER
 
 #include "benchmark/benchmark.h"
-#include "neuropod/multiprocess/multiprocess.hh"
 #include "neuropod/neuropod.hh"
 
 namespace
@@ -24,7 +23,9 @@ struct load_out_of_process
 {
     std::unique_ptr<neuropod::Neuropod> operator()(const std::string &path)
     {
-        return neuropod::load_neuropod_in_new_process(path);
+        neuropod::RuntimeOptions opts;
+        opts.use_ope = true;
+        return neuropod::stdx::make_unique<neuropod::Neuropod>(path, opts);
     }
 };
 
