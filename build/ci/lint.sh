@@ -1,14 +1,10 @@
 #!/bin/bash
 set -e
 
-pushd source
-
 # Generate compile commands
-bazel-compdb
+./build/compile_commands.sh
 
-# Filter compile commands
-jq '[.[] | select(.file | (contains(".so") or contains("external/") or contains(".hh")) | not)]' compile_commands.json > compile_commands.json2
-mv compile_commands.json2 compile_commands.json
+pushd source
 
 # Run infer
 python ../build/ci/set_status.py --context "lint/infer" --description "Infer Static Analysis" \
