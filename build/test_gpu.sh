@@ -13,8 +13,13 @@ else
     nvidia-smi -L
 fi
 
-# Set LD_LIBRARY_PATH
-source ../build/set_build_env.sh
+# Add the python library to the pythonpath
+export PYTHONPATH=$PYTHONPATH:`pwd`/python
+
+# On linux we don't want to use GCC5 to build the custom ops
+if [[ $(uname -s) == 'Linux' ]]; then
+    export TF_CXX=g++-4.8
+fi
 
 # Run python tests
 pushd python

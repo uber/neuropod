@@ -10,7 +10,6 @@ import sys
 import unittest
 from testpath.tempdir import TemporaryDirectory
 
-from neuropod.loader import load_neuropod
 from neuropod.packagers import create_pytorch_neuropod
 from neuropod.tests.utils import get_addition_model_spec
 
@@ -96,22 +95,6 @@ class TestPytorchPackaging(unittest.TestCase):
                 self.package_simple_addition_model(
                     test_dir, do_fail=True, custom_ops=[self.custom_op_path]
                 )
-
-    def test_custom_op_conflict(self):
-        # Test that we throw an error when there is a custom op conflict
-        with TemporaryDirectory() as test_dir1:
-            with TemporaryDirectory() as test_dir2:
-                path1 = self.package_simple_addition_model(
-                    test_dir1, custom_ops=[self.custom_op_path]
-                )
-                path2 = self.package_simple_addition_model(
-                    test_dir2, custom_ops=[self.other_op_path]
-                )
-
-                with load_neuropod(path1):
-                    with self.assertRaises(ValueError):
-                        with load_neuropod(path2):
-                            pass
 
 
 if __name__ == "__main__":

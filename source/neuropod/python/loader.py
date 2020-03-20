@@ -2,11 +2,91 @@
 # Uber, Inc. (c) 2018
 #
 
+import os
 from neuropod.backends import config_utils
 from neuropod.utils import zip_loader
 
+from neuropod.registry import _REGISTERED_BACKENDS
+from neuropod.utils.dtype_utils import maybe_convert_bindings_types
+from neuropod.backends.neuropod_executor import NeuropodExecutor
 
-def load_neuropod(neuropod_path, **kwargs):
+# Add the script's directory to the PATH so we can find the worker binary
+os.environ["PATH"] += ":" + os.path.dirname(os.path.realpath(__file__))
+
+
+def load_installed_backends():
+    """
+    Get all the installed backends
+    """
+    # TODO(vip): Make sure these are all whitelisted packages published by us
+    PACKAGES = [
+        # Torch CPU
+        "neuropod-backend-torchscript-1-1-0-cpu",
+        "neuropod-backend-torchscript-1-2-0-cpu",
+        "neuropod-backend-torchscript-1-3-0-cpu",
+        "neuropod-backend-torchscript-1-4-0-cpu",
+        # Torch GPU
+        "neuropod-backend-torchscript-1-1-0-gpu-cuda-9-0",
+        "neuropod-backend-torchscript-1-2-0-gpu-cuda-10-0",
+        "neuropod-backend-torchscript-1-3-0-gpu-cuda-10-0",
+        "neuropod-backend-torchscript-1-4-0-gpu-cuda-10-0",
+        # TF CPU
+        "neuropod-backend-tensorflow-1-12-0-cpu",
+        "neuropod-backend-tensorflow-1-13-1-cpu",
+        "neuropod-backend-tensorflow-1-14-0-cpu",
+        "neuropod-backend-tensorflow-1-15-0-cpu",
+        # TF GPU
+        "neuropod-backend-tensorflow-1-12-0-gpu-cuda-9-0",
+        "neuropod-backend-tensorflow-1-13-1-gpu-cuda-10-0",
+        "neuropod-backend-tensorflow-1-14-0-gpu-cuda-10-0",
+        "neuropod-backend-tensorflow-1-15-0-gpu-cuda-10-0",
+        # Python
+        "neuropod-backend-python-27",
+        "neuropod-backend-python-35",
+        "neuropod-backend-python-36",
+        "neuropod-backend-python-37",
+        "neuropod-backend-python-38",
+    ]
+
+    import importlib
+
+    for package in PACKAGES:
+        try:
+            importlib.import_module(package)
+        except ImportError:
+            pass
+
+
+# Load all the installed backends when we import this file
+load_installed_backends()
+
+
+class NativeNeuropodExecutor(NeuropodExecutor):
+    """
+    Executes a Neuropod using the native bindings
+    """
+
+    def __init__(self, neuropod_path, **kwargs):
+        """
+        Load a Neuropod using the native bindings
+
+        :param  neuropod_path:  The path to a python neuropod package
+        """
+        super(NativeNeuropodExecutor, self).__init__(neuropod_path)
+
+        # Load the model
+        from neuropod.neuropod_native import Neuropod as NeuropodNative
+
+        self.model = NeuropodNative(
+            neuropod_path, _REGISTERED_BACKENDS, use_ope=True, **kwargs
+        )
+
+    def forward(self, inputs):
+        inputs = maybe_convert_bindings_types(inputs)
+        return self.model.infer(inputs)
+
+
+def load_neuropod(neuropod_path, _always_use_native=True, **kwargs):
     """
     Load a neuropod package. Returns a NeuropodExecutor
 
@@ -18,6 +98,9 @@ def load_neuropod(neuropod_path, **kwargs):
     """
     # If we were given a zipfile, extract it to a temp dir and use it
     neuropod_path = zip_loader.extract_neuropod_if_necessary(neuropod_path)
+
+    if _always_use_native:
+        return NativeNeuropodExecutor(neuropod_path, **kwargs)
 
     # Figure out what type of neuropod this is
     neuropod_config = config_utils.read_neuropod_config(neuropod_path)
@@ -62,16 +145,6 @@ if __name__ == "__main__":
     parser.add_argument(
         "--output-pkl-path", help="Where to write the output of the model", default=None
     )
-    parser.add_argument(
-        "--use-native",
-        help=(
-            "Use the native bindings to run the model. This option can currently "
-            "only be used when running from the `source/python` directory within "
-            "the Neuropod source tree."
-        ),
-        default=False,
-        action="store_true",
-    )
     args = parser.parse_args()
 
     def run_model(model):
@@ -89,11 +162,5 @@ if __name__ == "__main__":
     with open(args.args_pkl_path, "rb") as pkl:
         load_neuropod_kwargs = pickle.load(pkl)
 
-    if args.use_native:
-        from neuropod_native import Neuropod as NeuropodNative
-
-        model = NeuropodNative(args.neuropod_path, **load_neuropod_kwargs)
+    with load_neuropod(args.neuropod_path, **load_neuropod_kwargs) as model:
         run_model(model)
-    else:
-        with load_neuropod(args.neuropod_path, **load_neuropod_kwargs) as model:
-            run_model(model)
