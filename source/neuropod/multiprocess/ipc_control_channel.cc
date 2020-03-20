@@ -12,18 +12,10 @@
 namespace neuropod
 {
 
-namespace
-{
-
-// The max size for the send and recv control queues
-constexpr auto MAX_QUEUE_SIZE = 20;
-
-} // namespace
-
 void TransitionVerifier::assert_transition_allowed(MessageType current_type)
 {
     std::lock_guard<std::mutex> lock(mutex_);
-    if (current_type == HEARTBEAT || current_type == SHUTDOWN)
+    if (current_type == SHUTDOWN || current_type == EXCEPTION)
     {
         // These messages are allowed at any time
         return;
@@ -40,17 +32,11 @@ void TransitionVerifier::assert_transition_allowed(MessageType current_type)
     static const std::set<std::pair<MessageType, MessageType>> allowed_transitions = {
         std::make_pair(LOAD_NEUROPOD, LOAD_SUCCESS),
         std::make_pair(LOAD_SUCCESS, ADD_INPUT),
-        std::make_pair(ADD_INPUT, ADD_INPUT),
-        std::make_pair(ADD_INPUT, REQUEST_OUTPUT),
+        std::make_pair(LOAD_SUCCESS, LOAD_NEUROPOD),
         std::make_pair(ADD_INPUT, INFER),
-        std::make_pair(REQUEST_OUTPUT, REQUEST_OUTPUT),
-        std::make_pair(REQUEST_OUTPUT, INFER),
         std::make_pair(INFER, RETURN_OUTPUT),
-        std::make_pair(RETURN_OUTPUT, RETURN_OUTPUT),
-        std::make_pair(RETURN_OUTPUT, END_OUTPUT),
-        std::make_pair(END_OUTPUT, INFER_COMPLETE),
-        std::make_pair(INFER_COMPLETE, ADD_INPUT),
-        std::make_pair(INFER_COMPLETE, LOAD_NEUROPOD),
+        std::make_pair(RETURN_OUTPUT, ADD_INPUT),
+        std::make_pair(RETURN_OUTPUT, LOAD_NEUROPOD),
     };
 
     if (!is_first_message_ &&
@@ -63,279 +49,23 @@ void TransitionVerifier::assert_transition_allowed(MessageType current_type)
     is_first_message_ = false;
 }
 
-ControlMessage::ControlMessage() : msg_(stdx::make_unique<control_message_internal>()) {}
-ControlMessage::~ControlMessage() = default;
-
-// The internal control message format
-// TODO(vip): split into multiple structs
-struct __attribute__((__packed__)) ControlMessage::control_message_internal
-{
-    MessageType type;
-
-    // Only used if the message type is ADD_INPUT or RETURN_OUTPUT
-    size_t num_tensors;
-
-    // Only used if the message type is ADD_INPUT or RETURN_OUTPUT
-    char tensor_id[MAX_NUM_TENSORS_PER_MESSAGE][24];
-
-    // Only used if the message type is ADD_INPUT, REQUEST_OUTPUT, or RETURN_OUTPUT
-    char tensor_name[MAX_NUM_TENSORS_PER_MESSAGE][256];
-
-    // Linux defines the max path length as 4096 (including a NULL char)
-    // https://github.com/torvalds/linux/blob/master/include/uapi/linux/limits.h
-    char neuropod_path[4096];
-};
-
-MessageType ControlMessage::get_type()
-{
-    return msg_->type;
-}
-
-void ControlMessage::get_tensor_names(std::vector<std::string> &data)
-{
-    for (int i = 0; i < msg_->num_tensors; i++)
-    {
-        std::string tensor_name = msg_->tensor_name[i];
-        data.emplace_back(tensor_name);
-    }
-}
-
-void ControlMessage::get_valuemap(NeuropodValueMap &data)
-{
-    for (int i = 0; i < msg_->num_tensors; i++)
-    {
-        // Make sure we're not overwriting anything
-        std::string tensor_name = msg_->tensor_name[i];
-        auto &      item        = data[tensor_name];
-        if (!item)
-        {
-            // Get the ID and create a tensor
-            neuropod::SHMBlockID block_id;
-            std::copy_n(msg_->tensor_id[i], block_id.size(), block_id.begin());
-            item = tensor_from_id(block_id);
-        }
-        else
-        {
-            NEUROPOD_ERROR(
-                "When receiving a message of type {} as part of OPE, attempted to overwrite a tensor with name {}",
-                msg_->type,
-                tensor_name);
-        }
-    }
-}
-
-void ControlMessage::get_load_config(ope_load_config &data)
-{
-    data.neuropod_path = msg_->neuropod_path;
-}
-
 IPCControlChannel::IPCControlChannel(const std::string &control_queue_name, ProcessType type)
-    : control_queue_name_(control_queue_name),
-      send_queue_(stdx::make_unique<ipc::message_queue>(ipc::open_or_create,
-                                                        ("neuropod_" + control_queue_name_ + "_tw").c_str(),
-                                                        MAX_QUEUE_SIZE,
-                                                        sizeof(control_message))),
-      recv_queue_(stdx::make_unique<ipc::message_queue>(ipc::open_or_create,
-                                                        ("neuropod_" + control_queue_name_ + "_fw").c_str(),
-                                                        MAX_QUEUE_SIZE,
-                                                        sizeof(control_message)))
+    : control_queue_name_(control_queue_name), queue_(std::make_shared<MessageQueue>(control_queue_name, type))
 {
-    if (type == WORKER_PROCESS)
-    {
-        // Switch the send and recv queues
-        std::swap(send_queue_, recv_queue_);
-    }
 }
 
 IPCControlChannel::~IPCControlChannel() = default;
 
-// Utility to send a message to a message queue
-// Boost message_queue is threadsafe so we don't need synchronization here
-// assert_transition_allowed is also threadsafe
-void IPCControlChannel::send_message(control_message &msg)
-{
-    // Make sure that it is valid to go from the previous message type to the current one
-    verifier_.assert_transition_allowed(msg.type);
-    SPDLOG_DEBUG("OPE: Sending message {}", msg.type);
-    send_queue_->send(&msg, sizeof(control_message), 0);
-}
-
-// Does not block if the message queue is full
-bool IPCControlChannel::try_send_message(control_message &msg)
-{
-    // Make sure that it is valid to go from the previous message type to the current one
-    verifier_.assert_transition_allowed(msg.type);
-    SPDLOG_DEBUG("OPE: (non-blocking) Sending message {}", msg.type);
-    return send_queue_->try_send(&msg, sizeof(control_message), 0);
-}
-
-// Utility to send a message with no content to a message queue
 void IPCControlChannel::send_message(MessageType type)
 {
-    control_message msg;
-    msg.type = type;
-    send_message(msg);
-}
-
-// Utility to send a message with no content to a message queue
-// Does not block if the message queue is full
-bool IPCControlChannel::try_send_message(MessageType type)
-{
-    control_message msg;
-    msg.type = type;
-    return try_send_message(msg);
-}
-
-// Utility to send a vector of tensor names to a message queue
-void IPCControlChannel::send_message(MessageType type, const std::vector<std::string> &data)
-{
-    control_message msg;
-    msg.type        = type;
-    msg.num_tensors = 0;
-
-    for (const auto &name : data)
-    {
-        // Get the current index
-        const auto current_index = msg.num_tensors;
-
-        // Increment the number of tensors
-        msg.num_tensors++;
-
-        // Copy in the tensor name
-        if (name.length() >= 256)
-        {
-            NEUROPOD_ERROR("For the multiprocess backend, tensor names must have less than 256 characters. Tried using "
-                           "a tensor with name: {}",
-                           name);
-        }
-
-        strncpy(msg.tensor_name[current_index], name.c_str(), 256);
-
-        // Send the message if needed
-        if (msg.num_tensors == MAX_NUM_TENSORS_PER_MESSAGE)
-        {
-            send_message(msg);
-            msg.num_tensors = 0;
-        }
-    }
-
-    if (data.size() == 0 || msg.num_tensors != 0)
-    {
-        // Send the last message
-        // (or the only message if we're attempting to send an empty map)
-        send_message(msg);
-    }
-}
-
-// Utility to send a NeuropodValueMap to a message queue
-void IPCControlChannel::send_message(MessageType type, const NeuropodValueMap &data)
-{
-    control_message msg;
-    msg.type        = type;
-    msg.num_tensors = 0;
-
-    for (const auto &entry : data)
-    {
-        const auto &block_id =
-            std::dynamic_pointer_cast<NativeDataContainer<SHMBlockID>>(entry.second)->get_native_data();
-
-        // Get the current index
-        const auto current_index = msg.num_tensors;
-
-        // Increment the number of tensors
-        msg.num_tensors++;
-
-        // Copy in the tensor name
-        if (entry.first.length() >= 256)
-        {
-            NEUROPOD_ERROR("For the multiprocess backend, tensor names must have less than 256 characters. Tried using "
-                           "a tensor with name: {}",
-                           entry.first);
-        }
-
-        strncpy(msg.tensor_name[current_index], entry.first.c_str(), 256);
-
-        // Copy in the block ID
-        static_assert(std::tuple_size<SHMBlockID>::value == sizeof(msg.tensor_id[0]),
-                      "The size of SHMBlockID should match the size of the IDs in control_message");
-        memcpy(msg.tensor_id[current_index], block_id.data(), sizeof(msg.tensor_id[current_index]));
-
-        // Send the message if needed
-        if (msg.num_tensors == MAX_NUM_TENSORS_PER_MESSAGE)
-        {
-            send_message(msg);
-            msg.num_tensors = 0;
-        }
-    }
-
-    if (data.size() == 0 || msg.num_tensors != 0)
-    {
-        // Send the last message
-        // (or the only message if we're attempting to send an empty map)
-        send_message(msg);
-    }
-}
-
-// Utility to send a `ope_load_config` struct to a message queue
-void IPCControlChannel::send_message(MessageType type, const ope_load_config &data)
-{
-    const auto &neuropod_path = data.neuropod_path;
-    if (neuropod_path.size() >= 4096)
-    {
-        NEUROPOD_ERROR("The multiprocess backend only supports neuropod paths < 4096 characters long.")
-    }
-
-    // Copy in the path
-    control_message msg;
-    msg.type = type;
-    strncpy(msg.neuropod_path, neuropod_path.c_str(), 4096);
-
-    // Send the message
-    send_message(msg);
-}
-
-// Receive a message
-void IPCControlChannel::recv_message(ControlMessage &received)
-{
-    // Get a message
-    size_t       received_size;
-    unsigned int priority;
-    recv_queue_->receive(received.msg_.get(), sizeof(control_message), received_size, priority);
-
-    SPDLOG_DEBUG("OPE: Received message {}", received.msg_->type);
-
-    // Make sure that it is valid to go from the previous message type to the current one
-    verifier_.assert_transition_allowed(received.msg_->type);
-}
-
-// Receive a message with a timeout
-bool IPCControlChannel::recv_message(ControlMessage &received, size_t timeout_ms)
-{
-    // Get a message
-    size_t       received_size;
-    unsigned int priority;
-
-    auto timeout_at =
-        boost::interprocess::microsec_clock::universal_time() + boost::posix_time::milliseconds(timeout_ms);
-
-    bool successful_read =
-        recv_queue_->timed_receive(received.msg_.get(), sizeof(control_message), received_size, priority, timeout_at);
-    if (successful_read)
-    {
-        SPDLOG_DEBUG("OPE: Received message {}", received.msg_->type);
-
-        // Make sure that it is valid to go from the previous message type to the current one
-        verifier_.assert_transition_allowed(received.msg_->type);
-    }
-
-    return successful_read;
+    verifier_.assert_transition_allowed(type);
+    queue_->send_message(type);
 }
 
 void IPCControlChannel::cleanup()
 {
-    // Delete the control channels
-    ipc::message_queue::remove(("neuropod_" + control_queue_name_ + "_tw").c_str());
-    ipc::message_queue::remove(("neuropod_" + control_queue_name_ + "_fw").c_str());
+    queue_.reset();
+    cleanup_control_channels(control_queue_name_);
 }
 
 } // namespace neuropod

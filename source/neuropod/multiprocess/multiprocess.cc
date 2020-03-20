@@ -100,35 +100,21 @@ private:
     void wait_for_load_confirmation(const std::string &neuropod_path)
     {
         // Wait for confirmation that the model was loaded
-        while (true)
+        SPDLOG_DEBUG("OPE: Waiting for load confirmation from worker...");
+        auto received = control_channel_.recv_message();
+        auto msg_type = received.get_payload_type();
+
+        if (msg_type == EXCEPTION)
         {
-            // Get a message from the worker
-            ControlMessage received;
-            bool           successful_read = control_channel_.recv_message(received, MESSAGE_TIMEOUT_MS);
-            if (!successful_read)
-            {
-                // We timed out
-                NEUROPOD_ERROR("Timed out waiting for the worker process to load: {}. Didn't receive a message in "
-                               "{}ms, but expected a heartbeat every {}ms.",
-                               neuropod_path,
-                               MESSAGE_TIMEOUT_MS,
-                               HEARTBEAT_INTERVAL_MS);
-            }
+            // Get the message
+            std::string msg;
+            received.get(msg);
 
-            auto msg_type = received.get_type();
+            NEUROPOD_ERROR("Got an exception when loading the model at {}: {}", neuropod_path, msg);
+        }
 
-            if (msg_type == LOAD_SUCCESS)
-            {
-                // The model was successfully loaded
-                break;
-            }
-
-            if (msg_type == HEARTBEAT)
-            {
-                // TODO(vip): Also periodically check for a heartbeat
-                continue;
-            }
-
+        if (msg_type != LOAD_SUCCESS)
+        {
             // We got an unexpected message
             NEUROPOD_ERROR("Expected LOAD_SUCCESS, but got unexpected message from the worker process: {}", msg_type);
         }
@@ -227,59 +213,32 @@ protected:
                                                      const std::vector<std::string> &requested_outputs)
     {
         // Add inputs
-        control_channel_.send_message(ADD_INPUT, inputs);
+        control_channel_.send_message_move(ADD_INPUT, std::move(inputs));
 
-        // Request outputs
-        // TODO(vip): Don't send this message if requested_outputs is empty
-        control_channel_.send_message(REQUEST_OUTPUT, requested_outputs);
-
-        // Run inference
-        control_channel_.send_message(INFER);
+        // Run inference with a set of requested outputs
+        control_channel_.send_message(INFER, requested_outputs);
 
         // Get the outputs from the worker
-        auto to_return = stdx::make_unique<NeuropodValueMap>();
-        while (true)
+        auto received = control_channel_.recv_message();
+        auto msg_type = received.get_payload_type();
+
+        if (msg_type == EXCEPTION)
         {
-            // Get a message from the worker
-            SPDLOG_DEBUG("OPE: Waiting for load confirmation from worker...");
-            ControlMessage received;
-            bool           successful_read = control_channel_.recv_message(received, MESSAGE_TIMEOUT_MS);
-            if (!successful_read)
-            {
-                // We timed out
-                NEUROPOD_ERROR("Timed out waiting for a response from worker process. "
-                               "Didn't receive a message in {}ms, but expected a heartbeat every {}ms.",
-                               MESSAGE_TIMEOUT_MS,
-                               HEARTBEAT_INTERVAL_MS);
-            }
+            // Get the message
+            std::string msg;
+            received.get(msg);
 
-            auto msg_type = received.get_type();
-
-            if (msg_type == END_OUTPUT)
-            {
-                // Got all the outputs
-                break;
-            }
-
-            if (msg_type == HEARTBEAT)
-            {
-                // TODO(vip): Also periodically check for a heartbeat
-                continue;
-            }
-
-            if (msg_type != RETURN_OUTPUT)
-            {
-                NEUROPOD_ERROR("Got unexpected message from the worker process: {}", msg_type);
-            }
-
-            // Load the returned tensors
-            received.get_valuemap(*to_return);
+            NEUROPOD_ERROR("Got an exception during inference: {}", msg);
         }
 
-        // Inference is complete
-        // Let the worker know it no longer needs to keep references to the output
-        // tensors
-        control_channel_.send_message(INFER_COMPLETE);
+        if (msg_type != RETURN_OUTPUT)
+        {
+            NEUROPOD_ERROR("Got unexpected message from the worker process: {}", msg_type);
+        }
+
+        // Load the returned tensors
+        auto to_return = stdx::make_unique<NeuropodValueMap>();
+        received.get(*to_return);
 
         if (free_memory_every_cycle_)
         {
