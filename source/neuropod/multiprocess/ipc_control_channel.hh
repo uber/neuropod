@@ -6,6 +6,7 @@
 
 #include "neuropod/backends/neuropod_backend.hh"
 #include "neuropod/multiprocess/control_messages.hh"
+#include "neuropod/multiprocess/ope_load_config.hh"
 
 #include <boost/interprocess/ipc/message_queue.hpp>
 

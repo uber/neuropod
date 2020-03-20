@@ -7,6 +7,7 @@
 #include "neuropod/backends/tensor_allocator.hh"
 #include "neuropod/internal/deleter.hh"
 #include "neuropod/internal/neuropod_tensor.hh"
+#include "neuropod/multiprocess/serialization/ipc_serialization.hh"
 #include "neuropod/multiprocess/shm/shm_allocator.hh"
 
 #include <cassert>
@@ -230,5 +231,14 @@ protected:
         return std::string(wrapper->data, wrapper->data + wrapper->length);
     }
 };
+
+// Serialization specializations for SHMNeuropodTensor
+// Note: the specialization is for `shared_ptr<NeuropodValue>`, but we check internally
+// that the item is a SHMNeuropodTensor
+template <>
+void ipc_serialize(std::ostream &out, const std::shared_ptr<NeuropodValue> &data);
+
+template <>
+void ipc_deserialize(std::istream &in, std::shared_ptr<NeuropodValue> &data);
 
 } // namespace neuropod

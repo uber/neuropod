@@ -80,11 +80,4 @@ constexpr int MESSAGE_TIMEOUT_MS = 5000;
 // Ensure the timeout is larger than the heartbeat interval
 static_assert(MESSAGE_TIMEOUT_MS > HEARTBEAT_INTERVAL_MS, "Message timeout must be larger than the heartbeat interval");
 
-// Contains everything needed to load a model in the worker process
-struct ope_load_config
-{
-    // The path of the model to load
-    std::string neuropod_path;
-};
-
 } // namespace neuropod

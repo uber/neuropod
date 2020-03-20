@@ -92,6 +92,21 @@ cc_test(
 )
 
 cc_test(
+    name = "test_ipc_serialization",
+    srcs = [
+        "test_ipc_serialization.cc",
+        "//neuropod:libneuropod.so",
+    ],
+    deps = [
+        "@gtest//:main",
+        "//neuropod:neuropod_hdrs",
+        "//neuropod/multiprocess/serialization",
+        "//neuropod/multiprocess:ipc_control_channel",
+        "//neuropod/multiprocess:shm_tensor",
+    ],
+)
+
+cc_test(
     name = "test_python_bridge",
     srcs = [
         "test_python_bridge.cc",

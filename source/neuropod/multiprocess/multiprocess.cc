@@ -8,6 +8,7 @@
 #include "neuropod/internal/logging.hh"
 #include "neuropod/multiprocess/control_messages.hh"
 #include "neuropod/multiprocess/ipc_control_channel.hh"
+#include "neuropod/multiprocess/ope_load_config.hh"
 #include "neuropod/multiprocess/shm_tensor.hh"
 
 #include <boost/date_time/microsec_time_clock.hpp>

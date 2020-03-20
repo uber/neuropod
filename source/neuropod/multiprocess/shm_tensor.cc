@@ -24,4 +24,35 @@ std::shared_ptr<NeuropodTensor> tensor_from_id(const SHMBlockID &block_id)
     return make_tensor<SHMNeuropodTensor>(data->tensor_type, dims, std::move(block), data, block_id);
 }
 
+// Serialization specializations for SHMNeuropodTensor
+// Note: the specialization is for `shared_ptr<NeuropodValue>`, but we check internally
+// that the item is a SHMNeuropodTensor
+template <>
+void ipc_serialize(std::ostream &out, const std::shared_ptr<NeuropodValue> &data)
+{
+    // Cast to a `NativeDataContainer`
+    auto container = std::dynamic_pointer_cast<NativeDataContainer<SHMBlockID>>(data);
+    if (!container)
+    {
+        NEUROPOD_ERROR("ipc_serialize only works with NeuropodValueMaps containing SHMNeuropodTensors. The "
+                       "supplied map contained tensors of another type.");
+    }
+
+    // Write the block ID
+    const auto &block_id = container->get_native_data();
+
+    detail::checked_write(out, reinterpret_cast<const char *>(block_id.data()), block_id.size());
+}
+
+template <>
+void ipc_deserialize(std::istream &in, std::shared_ptr<NeuropodValue> &data)
+{
+    // Read the block ID
+    SHMBlockID block_id;
+    detail::checked_read(in, reinterpret_cast<char *>(block_id.data()), block_id.size());
+
+    // Load the tensor
+    data = tensor_from_id(block_id);
+}
+
 } // namespace neuropod

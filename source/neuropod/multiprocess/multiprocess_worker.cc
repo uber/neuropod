@@ -5,6 +5,7 @@
 #include "neuropod/internal/logging.hh"
 #include "neuropod/multiprocess/control_messages.hh"
 #include "neuropod/multiprocess/ipc_control_channel.hh"
+#include "neuropod/multiprocess/ope_load_config.hh"
 #include "neuropod/multiprocess/shm_tensor.hh"
 #include "neuropod/multiprocess/tensor_utils.hh"
 #include "neuropod/neuropod.hh"
