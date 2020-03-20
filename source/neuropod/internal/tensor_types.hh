@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <ostream>
+
 namespace neuropod
 {
 
@@ -24,5 +26,8 @@ enum TensorType
     UINT32_TENSOR,
     UINT64_TENSOR,
 };
+
+// Used to print out the enum names rather than just a number
+std::ostream &operator<<(std::ostream &out, const TensorType value);
 
 } // namespace neuropod
