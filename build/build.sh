@@ -2,21 +2,35 @@
 set -e
 pushd source
 
-# Set LD_LIBRARY_PATH
-source ../build/set_build_env.sh
+# Build the native code
+bazel build "$@" //...:all //neuropod:packages
+
+# Copy the binaries needed by the python bindings
+cp bazel-bin/neuropod/bindings/neuropod_native.so python/neuropod/
+cp bazel-bin/neuropod/libneuropod.so python/neuropod/
+cp bazel-bin/neuropod/multiprocess/neuropod_multiprocess_worker python/neuropod/
+
+if [[ $(uname -s) == 'Darwin' ]]; then
+    # Postprocessing needed on mac
+    chmod 755 "python/neuropod/libneuropod.so"
+    for FILE in "python/neuropod/neuropod_native.so" "python/neuropod/neuropod_multiprocess_worker"
+    do
+        chmod 755 $FILE
+        OLD_PATH=$(otool -L ${FILE} | grep libneuropod.so | cut -d ' ' -f1 | column -t)
+        install_name_tool -change "${OLD_PATH}" "@rpath/libneuropod.so" "${FILE}"
+    done
+fi
 
 # Build a wheel
 pushd python
 python setup.py bdist_wheel
 popd
 
-# Build the native code
-bazel build "$@" //...:all
+# Add the python libray to the pythonpath
+export PYTHONPATH=$PYTHONPATH:`pwd`/python
 
-# Build the packages if we need to (at least one of these are not empty)
-if [[ ! -z "${NEUROPOD_DO_PACKAGE}${BUILDKITE_TAG}${TRAVIS_TAG}" ]]; then
-    bazel build "$@" //neuropod:packages
-fi
+# Build the wheels for the backends
+python ../build/wheel/build_wheel.py
 
 if [[ $(uname -s) == 'Linux' ]]; then
     # Copy the build artificts into a dist folder

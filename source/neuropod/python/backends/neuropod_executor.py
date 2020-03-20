@@ -176,6 +176,11 @@ class NeuropodExecutor(object):
         # Make sure the key is ascii
         out = {key: value for key, value in out.items()}
 
+        # Convert unicode to string
+        for k, v in out.items():
+            if v.dtype.type == np.unicode_:
+                out[k] = v.astype("str")
+
         # Validate outputs
         validate_tensors_against_specs(out, self.neuropod_config["output_spec"])
 
