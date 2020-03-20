@@ -199,6 +199,16 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "blocking_spsc_queue",
+    hdrs = [
+        "blocking_spsc_queue.hh",
+    ],
+    visibility = [
+        "//neuropod:__subpackages__",
+    ],
+)
+
 # Package all the header files
 pkg_tar(
     name = "libneuropod_internal_hdrs",
