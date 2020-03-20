@@ -9,15 +9,6 @@ add-apt-repository -y ppa:deadsnakes/ppa
 apt-get update
 apt-get install -y --no-install-recommends libstdc++6 python3.6 python3.6-dev tzdata jq
 
-# Install bazel-compdb
-INSTALL_DIR="/usr/local/bin"
-VERSION="0.4.2"
-(
-  cd "${INSTALL_DIR}" \
-  && curl -L "https://github.com/grailbio/bazel-compilation-database/archive/${VERSION}.tar.gz" | tar -xz \
-  && ln -f -s "${INSTALL_DIR}/bazel-compilation-database-${VERSION}/generate.sh" bazel-compdb
-)
-
 # Install infer
 VERSION=0.17.0; \
 curl -sSL "https://github.com/facebook/infer/releases/download/v$VERSION/infer-linux64-v$VERSION.tar.xz" \
