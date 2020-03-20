@@ -122,6 +122,14 @@ inline void ipc_deserialize(std::istream &in, std::string &item)
     }
 }
 
+// Specialization for serializing char[] (for constant strings)
+template <size_t N>
+inline void ipc_serialize(std::ostream &out, const char (&item)[N])
+{
+    std::string str = item;
+    ipc_serialize(out, str);
+}
+
 // Specialization for vector
 template <typename T>
 inline void ipc_serialize(std::ostream &out, const std::vector<T> &item)

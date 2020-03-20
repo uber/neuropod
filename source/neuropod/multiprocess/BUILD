@@ -36,6 +36,7 @@ cc_library(
     ],
     deps = [
         ":shm_tensor",
+        "//neuropod/multiprocess/mq",
     ],
 )
 

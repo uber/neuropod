@@ -47,9 +47,8 @@ TEST(test_ipc_control_channel, simple)
     for (int i = 0; i < 4; i++)
     {
         // Get a message
-        neuropod::ControlMessage received;
-        worker_control_channel.recv_message(received);
-        auto msg_type = received.get_type();
+        auto received = worker_control_channel.recv_message();
+        auto msg_type = received.get_payload_type();
 
         switch (i)
         {
@@ -61,7 +60,7 @@ TEST(test_ipc_control_channel, simple)
             break;
         case 2:
             EXPECT_EQ(msg_type, neuropod::ADD_INPUT);
-            received.get_valuemap(recvd_map);
+            received.get(recvd_map);
             break;
         default:
             EXPECT_EQ(msg_type, neuropod::INFER);
@@ -110,9 +109,8 @@ TEST(test_ipc_control_channel, no_tensors)
     for (int i = 0; i < 4; i++)
     {
         // Get a message
-        neuropod::ControlMessage received;
-        worker_control_channel.recv_message(received);
-        auto msg_type = received.get_type();
+        auto received = worker_control_channel.recv_message();
+        auto msg_type = received.get_payload_type();
 
         switch (i)
         {
@@ -126,7 +124,7 @@ TEST(test_ipc_control_channel, no_tensors)
             // We need a new scope here because of the `tmp` variable declaration
             EXPECT_EQ(msg_type, neuropod::ADD_INPUT);
             neuropod::NeuropodValueMap tmp;
-            received.get_valuemap(tmp);
+            received.get(tmp);
             EXPECT_EQ(tmp.size(), 0);
             break;
         }
