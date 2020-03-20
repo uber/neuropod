@@ -4,6 +4,7 @@
 
 #include "neuropod/bindings/python_bindings.hh"
 
+#include "neuropod/internal/error_utils.hh"
 #include "neuropod/internal/neuropod_tensor.hh"
 #include "neuropod/internal/neuropod_tensor_raw_data_access.hh"
 #include "neuropod/neuropod.hh"

@@ -5,6 +5,7 @@
 #include "neuropod/backends/neuropod_backend.hh"
 
 #include "neuropod/internal/config_utils.hh"
+#include "neuropod/internal/error_utils.hh"
 #include "neuropod/internal/neuropod_loader.hh"
 
 namespace neuropod

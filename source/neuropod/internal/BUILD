@@ -132,6 +132,10 @@ cc_library(
     name = "error_utils",
     hdrs = [
         "error_utils.hh",
+        "error_utils_header_only.hh",
+    ],
+    srcs = [
+        "error_utils_header_only.cc",
     ],
     visibility = [
         "//neuropod:__subpackages__",

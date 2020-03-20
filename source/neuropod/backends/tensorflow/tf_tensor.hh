@@ -6,6 +6,7 @@
 
 #include "neuropod/backends/tensorflow/type_utils.hh"
 #include "neuropod/internal/deleter.hh"
+#include "neuropod/internal/error_utils.hh"
 #include "neuropod/internal/logging.hh"
 #include "neuropod/internal/neuropod_tensor.hh"
 #include "tensorflow/core/framework/tensor.h"

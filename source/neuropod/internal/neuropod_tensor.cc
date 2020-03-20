@@ -4,6 +4,8 @@
 
 #include "neuropod/internal/neuropod_tensor.hh"
 
+#include "neuropod/internal/error_utils.hh"
+
 namespace neuropod
 {
 
@@ -39,6 +41,22 @@ size_t compute_num_elements(const std::vector<int64_t> &dims)
 }
 
 } // namespace
+
+namespace detail
+{
+
+void throw_error_hh(const char *file, int line, const char *function, const std::string &message, TensorType type)
+{
+    throw_error(file, line, function, message, type);
+}
+
+void throw_error_hh(
+    const char *file, int line, const char *function, const std::string &message, TensorType type1, TensorType type2)
+{
+    throw_error(file, line, function, message, type1, type2);
+}
+
+} // namespace detail
 
 NeuropodTensor::NeuropodTensor(TensorType tensor_type, const std::vector<int64_t> dims)
     : NeuropodValue(true),
