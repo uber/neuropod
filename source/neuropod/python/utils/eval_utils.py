@@ -65,10 +65,10 @@ def load_and_test_native(
     # Converts unicode to ascii for Python 3
     test_input_data = maybe_convert_bindings_types(test_input_data)
 
-    from neuropod_native import load_neuropod_in_new_process
+    from neuropod_native import Neuropod
 
     # Load the model using native out-of-process execution
-    model = load_neuropod_in_new_process(neuropod_path, **neuropod_load_args)
+    model = Neuropod(neuropod_path, use_ope=True, **neuropod_load_args)
     out = model.infer(test_input_data)
 
     # Check the output

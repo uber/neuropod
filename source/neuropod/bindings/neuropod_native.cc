@@ -4,7 +4,6 @@
 
 #include "neuropod/backends/test_backend/test_neuropod_tensor.hh"
 #include "neuropod/bindings/python_bindings.hh"
-#include "neuropod/multiprocess/multiprocess.hh"
 #include "neuropod/neuropod.hh"
 #include "neuropod/serialization/serialization.hh"
 
@@ -83,15 +82,29 @@ RuntimeOptions get_options_from_kwargs(py::kwargs &kwargs)
 {
     RuntimeOptions options;
 
-    if (kwargs.contains("visible_gpu"))
+    for (const auto &item : kwargs)
     {
-        if (kwargs["visible_gpu"].is_none())
+        const auto  key   = item.first.cast<std::string>();
+        const auto &value = item.second;
+
+        if (key == "visible_gpu")
         {
-            options.visible_device = Device::CPU;
+            if (value.is_none())
+            {
+                options.visible_device = Device::CPU;
+            }
+            else
+            {
+                options.visible_device = value.cast<int>();
+            }
+        }
+        else if (key == "use_ope")
+        {
+            options.use_ope = value.cast<bool>();
         }
         else
         {
-            options.visible_device = kwargs["visible_gpu"].cast<int>();
+            NEUROPOD_ERROR("Got unexpected keyword argument {}", key);
         }
     }
 
@@ -103,12 +116,6 @@ std::unique_ptr<Neuropod> make_neuropod(py::kwargs kwargs, Params &&... params)
 {
     auto options = get_options_from_kwargs(kwargs);
     return stdx::make_unique<Neuropod>(std::forward<Params>(params)..., options);
-}
-
-std::unique_ptr<Neuropod> make_ope_neuropod(const std::string &path, py::kwargs kwargs)
-{
-    auto options = get_options_from_kwargs(kwargs);
-    return load_neuropod_in_new_process(path, options);
 }
 
 } // namespace
@@ -136,8 +143,6 @@ PYBIND11_MODULE(neuropod_native, m)
     m.def("deserialize_dict",
           &deserialize_valuemap_binding,
           "Deserialize a string of bytes to a NeuropodValueMap (and return it as a dict of numpy arrays)");
-
-    m.def("load_neuropod_in_new_process", &make_ope_neuropod, "Load a neuropod in a new process");
 }
 
 } // namespace neuropod

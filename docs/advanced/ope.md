@@ -3,14 +3,12 @@
 Neuropod can run models in different processes using an optimized shared memory implementation with extremely low overhead (~100 to 500 microseconds).
 
 
-To run a model in another process, modify your loading code as follows:
+To run a model in another process, set the `use_ope` option when loading a model:
 
 ```cpp
-#include <neuropod/multiprocess/multiprocess.hh>
-
-...
-
-auto neuropod = neuropod::load_neuropod_in_new_process(neuropod_path);
+neuropod::RuntimeOptions opts;
+opts.use_ope = true;
+Neuropod model(neuropod_path, opts);
 ```
 
 Nothing else should need to change.
@@ -24,5 +22,7 @@ There are many potential benefits of this approach:
 
 The worker process can also be run in a docker container to provide even more isolation.
 
+
+For more details and options, see the `OPEOptions` struct inside `RuntimeOptions`.
 
 TODO(vip): OPE string tensor support

@@ -7,7 +7,9 @@
 #include "neuropod/backends/neuropod_backend.hh"
 #include "neuropod/internal/backend_registration.hh"
 #include "neuropod/internal/config_utils.hh"
+#include "neuropod/internal/error_utils.hh"
 #include "neuropod/internal/neuropod_tensor.hh"
+#include "neuropod/multiprocess/multiprocess.hh"
 
 namespace neuropod
 {
@@ -21,15 +23,34 @@ Neuropod::Neuropod(const std::string &neuropod_path, const RuntimeOptions &optio
 Neuropod::Neuropod(const std::string &                                 neuropod_path,
                    const std::unordered_map<std::string, std::string> &default_backend_overrides,
                    const RuntimeOptions &                              options)
-    : backend_(get_backend_for_type(default_backend_overrides,
-                                    load_model_config(neuropod_path)->platform)(neuropod_path, options))
 {
+    if (options.use_ope)
+    {
+        if (!default_backend_overrides.empty())
+        {
+            // For now, we can't provide overrides and use OPE
+            NEUROPOD_ERROR("`default_backend_overrides` cannot be specified when `use_ope` is set to true");
+        }
+
+        // Load the model using OPE
+        backend_ = load_neuropod_ope(neuropod_path, options);
+    }
+    else
+    {
+        // Get the backend in a normal way
+        backend_ = get_backend_for_type(default_backend_overrides,
+                                        load_model_config(neuropod_path)->platform)(neuropod_path, options);
+    }
 }
 
 // Load the neuropod using the specified backend
 Neuropod::Neuropod(const std::string &neuropod_path, const std::string &backend_name, const RuntimeOptions &options)
     : backend_(get_backend_by_name(backend_name)(neuropod_path, options))
 {
+    if (options.use_ope)
+    {
+        NEUROPOD_ERROR("The `use_ope` option is not allowed when specifying a backend_name.");
+    }
 }
 
 // Load the model config and use the backend that was provided by the user
