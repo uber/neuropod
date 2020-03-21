@@ -5,7 +5,7 @@
 load("@bazel_tools//tools/build_defs/pkg:pkg.bzl", "pkg_tar")
 
 cc_library(
-    name = "serialization_hdrs",
+    name = "serialization",
     hdrs = [
         "serialization.hh",
     ],
@@ -18,7 +18,7 @@ cc_library(
 )
 
 cc_library(
-    name = "serialization_impl",
+    name = "impl",
     srcs = [
         "serialization.cc",
     ],
@@ -26,7 +26,7 @@ cc_library(
         "//neuropod:__subpackages__",
     ],
     deps = [
-        ":serialization_hdrs",
+        ":serialization",
         "//neuropod/backends:neuropod_backend",
     ],
 )

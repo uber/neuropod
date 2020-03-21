@@ -17,11 +17,7 @@ cc_library(
         "//visibility:public",
     ],
     deps = [
-        "//neuropod/internal:backend_registration",
-        "//neuropod/internal:deleter",
-        "//neuropod/internal:neuropod_config_utils",
-        "//neuropod/internal:neuropod_tensor",
-        "//neuropod/internal:neuropod_loader",
+        "//neuropod/internal",
     ],
 )
 

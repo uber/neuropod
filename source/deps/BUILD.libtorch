@@ -7,7 +7,15 @@ package(
 )
 
 cc_library(
-    name = "libtorch_hdrs",
+    name = "libtorch",
+    srcs = select({
+        "@bazel_tools//src/conditions:darwin": glob(["lib/libcaffe2.dylib", "lib/libc10.dylib", "lib/libtorch.dylib", "lib/libtorch.1.dylib"]),
+        "//conditions:default": glob(["lib/libcaffe2.so", "lib/libtorch.so", "lib/libc10.so"]),
+    }),
+    deps = select({
+        "@bazel_tools//src/conditions:darwin": ["@mklml_repo_darwin//:mklml"],
+        "//conditions:default": [],
+    }),
     hdrs = glob([
         "include/ATen/**",
         "include/c10/**",
@@ -22,18 +30,6 @@ cc_library(
         "include/torch/csrc/api/include",
     ],
     defines = {TORCH_DEFINES}
-)
-
-cc_library(
-    name = "libtorch",
-    srcs = select({
-        "@bazel_tools//src/conditions:darwin": glob(["lib/libcaffe2.dylib", "lib/libc10.dylib", "lib/libtorch.dylib", "lib/libtorch.1.dylib"]),
-        "//conditions:default": ["lib/libtorch.so"],
-    }),
-    deps = select({
-        "@bazel_tools//src/conditions:darwin": ["@mklml_repo_darwin//:mklml"],
-        "//conditions:default": [],
-    }),
 )
 
 filegroup(

@@ -18,9 +18,7 @@ cc_library(
         "//conditions:default": ["-lrt"],
     }),
     deps = [
-        "//neuropod/internal:error_utils",
-        "//neuropod/internal:logging",
-        "//neuropod/internal:memory_utils",
+        "//neuropod/internal",
         "@boost_repo//:boost",
     ],
 )
