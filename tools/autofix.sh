@@ -3,6 +3,14 @@ set -e
 
 # This script attempts to autofix lint errors
 
+# Try to fix bazel files
+# Note: this assumes that `lint.sh` has been run to download the deps
+if [[ $(uname -s) == 'Darwin' ]]; then
+    /tmp/buildifier.mac -r source
+else
+    /tmp/buildifier -r source
+fi
+
 pushd source
 
 # Reformat with clang-format

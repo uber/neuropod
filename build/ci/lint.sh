@@ -6,9 +6,9 @@ set -e
 
 pushd source
 
-# Run infer
-python ../build/ci/set_status.py --context "lint/infer" --description "Infer Static Analysis" \
-    infer --fail-on-issue --compilation-database compile_commands.json
+# Lint bazel files
+python ../build/ci/set_status.py --context "lint/bazel" --description "Bazel Buildifier Lint" \
+    /tmp/buildifier --mode check -r .
 
 # Run clang-tidy
 # ./bazel-source/external/llvm_toolchain/share/clang/run-clang-tidy.py -clang-tidy-binary ./bazel-source/external/llvm_toolchain/bin/clang-tidy
@@ -28,4 +28,9 @@ python ../../build/ci/set_status.py --context "lint/flake8" --description "flake
     flake8 neuropod
 
 popd
+
+# Run infer (this is last because it's slow)
+python ../build/ci/set_status.py --context "lint/infer" --description "Infer Static Analysis" \
+    infer --fail-on-issue --compilation-database compile_commands.json
+
 popd
