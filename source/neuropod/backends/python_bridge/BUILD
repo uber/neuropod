@@ -7,14 +7,28 @@ load("@bazel_tools//tools/build_defs/pkg:pkg.bzl", "pkg_tar")
 cc_binary(
     name = "libneuropod_pythonbridge_backend.so",
     srcs = [
-        "python_bridge.cc",
-        "python_bridge.hh",
         "//neuropod:libneuropod.so",
     ],
     linkshared = True,
     linkstatic = True,
     linkopts = [
         "-Wl,-rpath,$$ORIGIN",
+    ],
+    visibility = [
+        "//neuropod:__subpackages__",
+    ],
+    deps = [
+        ":python_bridge",
+    ],
+)
+
+cc_library(
+    name = "python_bridge",
+    srcs = [
+        "python_bridge.cc",
+        "python_bridge.hh",
+    ],
+    linkopts = [
         "-ldl",
     ],
     visibility = [
@@ -23,9 +37,10 @@ cc_binary(
     deps = [
         "//neuropod/backends:neuropod_backend",
         "//neuropod/backends/test_backend:test_backend_hdrs",
-        "//neuropod/bindings:bindings",
-        "//neuropod/internal:deleter",
+        "//neuropod/bindings",
+        "//neuropod/internal",
     ],
+    alwayslink = True,
 )
 
 pkg_tar(

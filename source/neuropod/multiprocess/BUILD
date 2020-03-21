@@ -13,7 +13,7 @@ cc_library(
     ],
     deps = [
         "//neuropod/backends:neuropod_backend",
-        "//neuropod/internal:deleter",
+        "//neuropod/internal",
         "//neuropod/multiprocess/shm",
         "//neuropod/multiprocess/serialization",
     ],
@@ -55,7 +55,7 @@ cc_library(
     deps = [
         ":ipc_control_channel",
         "//neuropod:neuropod_hdrs",
-        "//neuropod/internal:neuropod_tensor_raw_data_access",
+        "//neuropod/internal",
     ],
 )
 
@@ -76,7 +76,7 @@ cc_binary(
 )
 
 cc_library(
-    name = "multiprocess_hdrs",
+    name = "multiprocess",
     hdrs = [
         "multiprocess.hh",
     ],
@@ -92,7 +92,7 @@ cc_library(
 )
 
 cc_library(
-    name = "multiprocess_impl",
+    name = "impl",
     srcs = [
         "multiprocess.cc",
     ],
@@ -106,7 +106,7 @@ cc_library(
         ":ipc_control_channel",
         "//neuropod:neuropod_hdrs",
         "//neuropod/backends:neuropod_backend",
-        "//neuropod/internal:deleter",
+        "//neuropod/internal",
         "@boost_repo//:boost",
     ],
 )
