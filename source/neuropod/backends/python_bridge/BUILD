@@ -11,9 +11,10 @@ cc_binary(
     ],
     linkshared = True,
     linkstatic = True,
-    linkopts = [
-        "-Wl,-rpath,$$ORIGIN",
-    ],
+    linkopts = select({
+        "@bazel_tools//src/conditions:darwin": ["-Wl,-rpath,@loader_path"],
+        "//conditions:default": ["-Wl,-rpath,$$ORIGIN"],
+    }),
     visibility = [
         "//neuropod:__subpackages__",
     ],

@@ -8,6 +8,10 @@ cc_binary(
         "neuropod_native.cc",
         "//neuropod:libneuropod.so",
     ],
+    linkopts = select({
+        "@bazel_tools//src/conditions:darwin": ["-Wl,-rpath,@loader_path"],
+        "//conditions:default": ["-Wl,-rpath,$$ORIGIN"],
+    }),
     deps = [
         ":bindings",
         "//neuropod/multiprocess",
