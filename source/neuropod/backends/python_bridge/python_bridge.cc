@@ -100,8 +100,8 @@ void PythonBridge::load_model_internal()
     // Acquire the GIL
     py::gil_scoped_acquire gil;
 
-    // Get the neuropod loader
-    py::object load_neuropod = py::module::import("neuropod.loader").attr("load_neuropod");
+    // Get the python neuropod loader
+    py::object load_neuropod = py::module::import("neuropod.backends.python.executor").attr("PythonNeuropodExecutor");
 
     // Converts from unicode to ascii for python 3 string arrays
     maybe_convert_bindings_types_ = stdx::make_unique<py::object>(
