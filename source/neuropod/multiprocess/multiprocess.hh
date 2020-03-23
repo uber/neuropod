@@ -12,6 +12,9 @@ namespace neuropod
 {
 
 // Load a neuropod using out of process execution. See the comments in `RuntimeOptions` for more details
-std::unique_ptr<NeuropodBackend> load_neuropod_ope(const std::string &neuropod_path, const RuntimeOptions &options);
+std::unique_ptr<NeuropodBackend> load_neuropod_ope(
+    const std::string &                                 neuropod_path,
+    const RuntimeOptions &                              options,
+    const std::unordered_map<std::string, std::string> &default_backend_overrides);
 
 } // namespace neuropod
