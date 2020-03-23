@@ -12,17 +12,33 @@ import re
 import subprocess
 import sys
 import unittest
+import os
+
+import xml.etree.ElementTree as ET
 
 class TestBazelTargets(unittest.TestCase):
     pass
 
 # Dynamically generate a unittest given a bazel test target
-def make_test(test_target):
+def make_test(test_target, tags):
     def test(self):
         test_path = test_target.replace('//', './').replace(':', '/')
         runfiles_path = "bazel-bin/" + test_path + ".runfiles/__main__/"
 
-        subprocess.check_call(test_path, cwd=runfiles_path)
+        env = os.environ.copy()
+        if "requires_ld_library_path" in tags:
+            # Set PATH and LD_LIBRARY_PATH for this test
+            LD_LIBRARY_PATH = env.get("LD_LIBRARY_PATH", "")
+            LD_LIBRARY_PATH += ":" + os.path.join(os.getcwd(), "bazel-bin/neuropod/backends/python_bridge/")
+            LD_LIBRARY_PATH += ":" + os.path.join(os.getcwd(), "bazel-bin/neuropod/backends/torchscript/")
+            LD_LIBRARY_PATH += ":" + os.path.join(os.getcwd(), "bazel-bin/neuropod/backends/tensorflow/")
+            env["LD_LIBRARY_PATH"] = LD_LIBRARY_PATH
+
+            PATH = env.get("PATH", "")
+            PATH += ":" + os.path.join(os.getcwd(), "bazel-bin/neuropod/multiprocess/")
+            env["PATH"] = PATH
+
+        subprocess.check_call(test_path, cwd=runfiles_path, env=env)
     return test
 
 if __name__ == '__main__':
@@ -32,15 +48,28 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     # Get all the bazel test targets
-    CPP_TESTS = subprocess.check_output(['bazel', 'query', 'kind(".*_test rule", //...)']).splitlines()
+    cpp_tests = []
+    cpp_tests_xml = subprocess.check_output(['bazel', 'query', 'kind(".*_test rule", //...)', '--output=xml'])
+
+    # Parse the xml
+    root = ET.fromstring(cpp_tests_xml)
+    for child in root:
+
+        # Get tags (if any)
+        tags = []
+        for prop in child:
+            if prop.attrib["name"] == "tags":
+                # Got tags
+                for tag in prop:
+                    tags.append(tag.attrib["value"])
+
+        cpp_tests.append((child.attrib["name"], tags))
+
 
     # Generate unittests for each bazel test target
-    for test_target in CPP_TESTS:
-        # Needed for python 3
-        test_target = test_target.decode("utf-8")
-
+    for test_target, tags in cpp_tests:
         # Skip GPU tests by default
-        if test_target.split(":")[1].startswith("gpu") and not args.run_gpu_tests:
+        if "gpu" in tags and not args.run_gpu_tests:
             continue
 
         # Name the test and squeeze underscores
@@ -49,7 +78,7 @@ if __name__ == '__main__':
 
         # Create the test
         print("Creating unittest: {}".format(test_name))
-        setattr(TestBazelTargets, test_name, make_test(test_target))
+        setattr(TestBazelTargets, test_name, make_test(test_target, tags))
 
     # Run the tests (and ignore command line args)
     unittest.main(argv=[sys.argv[0]])

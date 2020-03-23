@@ -74,6 +74,11 @@ Neuropod has a set of tests implemented in C++ and a set of tests implemented in
 
 The Python tests run against both the Python and C++ libraries by using python bindings. This means that many tests only need to be written in Python.
 
+C++ tests can have the following tags:
+
+ - `gpu`: Only run when running GPU tests
+ - `requires_ld_library_path`: `LD_LIBRARY_PATH` and `PATH` variables will be set so the backends and multiprocess worker are available. This is useful for tests that run a model using OPE
+
 ## CI
 
 ### Build Matrix
