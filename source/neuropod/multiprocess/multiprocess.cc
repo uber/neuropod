@@ -94,6 +94,9 @@ private:
     std::string control_queue_name_;
     bool        free_memory_every_cycle_;
 
+    // The load config to send to the worker process
+    ope_load_config load_config_;
+
     // Control channel for interacting with the worker
     IPCControlChannel control_channel_;
 
@@ -129,13 +132,18 @@ public:
           free_memory_every_cycle_(free_memory_every_cycle),
           control_channel_(control_queue_name, MAIN_PROCESS)
     {
+        // Setup the load configuration
+        load_config_.neuropod_path = neuropod_path_;
+
+        // Load the model
         load_model();
     }
 
     // Generate a control queue name and start a worker
-    MultiprocessNeuropodBackend(const std::string &   neuropod_path,
-                                const RuntimeOptions &options,
-                                bool                  free_memory_every_cycle)
+    MultiprocessNeuropodBackend(const std::string &                                 neuropod_path,
+                                const RuntimeOptions &                              options,
+                                bool                                                free_memory_every_cycle,
+                                const std::unordered_map<std::string, std::string> &default_backend_overrides)
         : NeuropodBackendWithDefaultAllocator<SHMNeuropodTensor>(neuropod_path),
           control_queue_name_(boost::uuids::to_string(boost::uuids::random_generator()())),
           free_memory_every_cycle_(free_memory_every_cycle),
@@ -163,6 +171,10 @@ public:
 
         // Start the worker process
         child_pid_ = start_worker_process(control_queue_name_, env_vec);
+
+        // Setup the load configuration
+        load_config_.neuropod_path             = neuropod_path_;
+        load_config_.default_backend_overrides = default_backend_overrides;
 
         if (options.load_model_at_construction)
         {
@@ -249,15 +261,10 @@ protected:
         return to_return;
     }
 
-protected:
     void load_model_internal()
     {
-        // Create a message to tell the worker process to load the specified neuropod
-        ope_load_config config;
-        config.neuropod_path = neuropod_path_;
-
-        // Send the message
-        control_channel_.send_message(LOAD_NEUROPOD, config);
+        // Send a message to load the model
+        control_channel_.send_message(LOAD_NEUROPOD, load_config_);
 
         // Wait until the worker process confirms it has loaded the model
         wait_for_load_confirmation(neuropod_path_);
@@ -266,7 +273,10 @@ protected:
 
 } // namespace
 
-std::unique_ptr<NeuropodBackend> load_neuropod_ope(const std::string &neuropod_path, const RuntimeOptions &options)
+std::unique_ptr<NeuropodBackend> load_neuropod_ope(
+    const std::string &                                 neuropod_path,
+    const RuntimeOptions &                              options,
+    const std::unordered_map<std::string, std::string> &default_backend_overrides)
 {
     if (!options.use_ope)
     {
@@ -278,10 +288,18 @@ std::unique_ptr<NeuropodBackend> load_neuropod_ope(const std::string &neuropod_p
     if (control_queue_name.empty())
     {
         // Start a new worker
-        return stdx::make_unique<MultiprocessNeuropodBackend>(neuropod_path, options, free_memory_every_cycle);
+        return stdx::make_unique<MultiprocessNeuropodBackend>(
+            neuropod_path, options, free_memory_every_cycle, default_backend_overrides);
     }
     else
     {
+        if (!default_backend_overrides.empty())
+        {
+            // For now, we can't provide overrides and use an existing worker
+            NEUROPOD_ERROR("`default_backend_overrides` cannot be specified when using an existing worker (i.e. when "
+                           "`control_queue_name` is not empty)");
+        }
+
         // Use an existing worker
         return stdx::make_unique<MultiprocessNeuropodBackend>(
             neuropod_path, control_queue_name, free_memory_every_cycle);

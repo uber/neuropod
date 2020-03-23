@@ -14,6 +14,9 @@ struct ope_load_config
 {
     // The path of the model to load
     std::string neuropod_path;
+
+    // See the docs in `neuropod.hh`
+    std::unordered_map<std::string, std::string> default_backend_overrides;
 };
 
 // Serialization specializations for ope_load_config
