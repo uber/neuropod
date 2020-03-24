@@ -133,7 +133,9 @@ public:
     // Returns a tensor of type `T` and shape `input_dims` filled with random numbers from a normal
     // distribution with mean `mean` and standard deviation `stddev`.
     template <typename T>
-    std::shared_ptr<TypedNeuropodTensor<T>> randn(const std::vector<int64_t> &input_dims, T mean = 0, T stddev = 1) const
+    std::shared_ptr<TypedNeuropodTensor<T>> randn(const std::vector<int64_t> &input_dims,
+                                                  T                           mean   = 0,
+                                                  T                           stddev = 1) const
     {
         // Note: This is intended to be used in tests and therefore is not optimized for performance
 
@@ -162,7 +164,8 @@ template <template <class> class TensorImpl>
 class DefaultTensorAllocator final : public NeuropodTensorAllocator
 {
 public:
-    std::unique_ptr<NeuropodTensor> allocate_tensor(const std::vector<int64_t> &input_dims, TensorType tensor_type) const
+    std::unique_ptr<NeuropodTensor> allocate_tensor(const std::vector<int64_t> &input_dims,
+                                                    TensorType                  tensor_type) const
     {
         return make_tensor<TensorImpl>(tensor_type, input_dims);
     }
