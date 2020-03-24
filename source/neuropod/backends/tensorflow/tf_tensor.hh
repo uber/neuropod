@@ -96,7 +96,7 @@ protected:
         return tensor_->tensor_data().data();
     }
 
-    std::shared_ptr<NeuropodValue> seal(NeuropodDevice device)
+    std::shared_ptr<SealedNeuropodTensor> seal(NeuropodDevice device)
     {
         auto out = std::make_shared<SealedTensorflowTensor>();
 
@@ -149,7 +149,7 @@ public:
 protected:
     const std::string operator[](size_t index) const { return tensor_->flat<std::string>()(index); }
 
-    std::shared_ptr<NeuropodValue> seal(NeuropodDevice device)
+    std::shared_ptr<SealedNeuropodTensor> seal(NeuropodDevice device)
     {
         auto out = std::make_shared<SealedTensorflowTensor>();
 

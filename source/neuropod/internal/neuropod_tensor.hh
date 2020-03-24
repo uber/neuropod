@@ -77,7 +77,7 @@ struct NeuropodTensorRawDataAccess;
 } // namespace internal
 
 // Base value type for Neuropod
-class NeuropodValue : public std::enable_shared_from_this<NeuropodValue>
+class NeuropodValue
 {
 private:
     // Whether or not this item is a tensor
@@ -260,10 +260,8 @@ protected:
     virtual size_t get_bytes_per_element() const = 0;
 
     // Seal this tensor, move to the appropriate device, and return the sealed tensor
-    // TODO(vip): Make this pure virtual once all backends have a seal implementation
-    // TODO(vip): Make this return a `SealedNeuropodTensor` instead of a `NeuropodValue`
     friend class Sealer;
-    virtual std::shared_ptr<NeuropodValue> seal(NeuropodDevice device) { return this->shared_from_this(); }
+    virtual std::shared_ptr<SealedNeuropodTensor> seal(NeuropodDevice device) = 0;
 };
 
 // A TypedNeuropodTensor is a NeuropodTensor of a specific type.

@@ -44,7 +44,7 @@ protected:
     const void *get_untyped_data_ptr() const { return data_.get(); }
 
     // TestNeuropodTensor should not be used for inference so it's okay to return a nullptr here
-    std::shared_ptr<NeuropodValue> seal(NeuropodDevice device) { return nullptr; }
+    std::shared_ptr<SealedNeuropodTensor> seal(NeuropodDevice device) { return nullptr; }
 };
 
 // Specialization for strings
@@ -66,7 +66,7 @@ protected:
     const std::string operator[](size_t index) const { return data_[index]; }
 
     // TestNeuropodTensor should not be used for inference so it's okay to return a nullptr here
-    std::shared_ptr<NeuropodValue> seal(NeuropodDevice device) { return nullptr; }
+    std::shared_ptr<SealedNeuropodTensor> seal(NeuropodDevice device) { return nullptr; }
 };
 
 } // namespace neuropod

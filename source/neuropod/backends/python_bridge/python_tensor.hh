@@ -42,7 +42,7 @@ public:
     ~PythonNeuropodTensor() = default;
 
 protected:
-    std::shared_ptr<NeuropodValue> seal(NeuropodDevice device)
+    std::shared_ptr<SealedNeuropodTensor> seal(NeuropodDevice device)
     {
         // Acquire the GIL
         py::gil_scoped_acquire gil;
@@ -63,7 +63,7 @@ public:
     ~PythonNeuropodTensor() = default;
 
 protected:
-    std::shared_ptr<NeuropodValue> seal(NeuropodDevice device)
+    std::shared_ptr<SealedNeuropodTensor> seal(NeuropodDevice device)
     {
         // Acquire the GIL
         py::gil_scoped_acquire gil;

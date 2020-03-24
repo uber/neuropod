@@ -121,7 +121,7 @@ protected:
     // Get a pointer to the underlying data
     const void *get_untyped_data_ptr() const { return get_data_from_torch_tensor<T>(tensor); }
 
-    std::shared_ptr<NeuropodValue> seal(NeuropodDevice device)
+    std::shared_ptr<SealedNeuropodTensor> seal(NeuropodDevice device)
     {
         auto out = std::make_shared<SealedTorchTensor>();
 
@@ -227,7 +227,7 @@ protected:
         return GET_STRING_FROM_LIST(tensor_data[index]);
     }
 
-    std::shared_ptr<NeuropodValue> seal(NeuropodDevice device)
+    std::shared_ptr<SealedNeuropodTensor> seal(NeuropodDevice device)
     {
         auto out   = std::make_shared<SealedTorchTensor>();
         out->value = get_native_data();

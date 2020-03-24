@@ -139,7 +139,7 @@ public:
 
     SHMBlockID get_native_data() const { return block_id_; };
 
-    std::shared_ptr<NeuropodValue> seal(NeuropodDevice device)
+    std::shared_ptr<SealedNeuropodTensor> seal(NeuropodDevice device)
     {
         // TODO: send to the worker process
         auto out = std::make_shared<SealedSHMTensor>();
@@ -254,7 +254,7 @@ protected:
         return std::string(wrapper->data, wrapper->data + wrapper->length);
     }
 
-    std::shared_ptr<NeuropodValue> seal(NeuropodDevice device) { return data_->seal(device); }
+    std::shared_ptr<SealedNeuropodTensor> seal(NeuropodDevice device) { return data_->seal(device); }
 };
 
 // Serialization specializations for SHMNeuropodTensor
