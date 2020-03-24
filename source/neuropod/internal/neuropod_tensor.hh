@@ -494,7 +494,7 @@ public:
     NativeDataContainer() {}
     virtual ~NativeDataContainer() {}
 
-    virtual T get_native_data() = 0;
+    virtual T get_native_data() const = 0;
 };
 
 // A map from a tensor name to a pointer to a NeuropodValue

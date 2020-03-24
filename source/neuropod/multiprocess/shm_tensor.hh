@@ -51,6 +51,17 @@ inline void *get_next_aligned_offset(void *base)
 // A shared memory allocator
 extern SHMAllocator shm_allocator;
 
+// A sealed SHM tensor
+class SealedSHMTensor : public SealedNeuropodTensor
+{
+public:
+    // A pointer to the block of shared memory
+    std::shared_ptr<void> block;
+
+    // The ID of the chunk of shared memory
+    SHMBlockID block_id;
+};
+
 template <typename T>
 class SHMNeuropodTensor : public TypedNeuropodTensor<T>, public NativeDataContainer<SHMBlockID>
 {
@@ -126,7 +137,18 @@ public:
 
     const void *get_untyped_data_ptr() const { return data_->data; }
 
-    SHMBlockID get_native_data() { return block_id_; };
+    SHMBlockID get_native_data() const { return block_id_; };
+
+    std::shared_ptr<NeuropodValue> seal(NeuropodDevice device)
+    {
+        // TODO: send to the worker process
+        auto out = std::make_shared<SealedSHMTensor>();
+
+        out->block    = block_;
+        out->block_id = block_id_;
+
+        return out;
+    }
 };
 
 std::shared_ptr<NeuropodTensor> tensor_from_id(const SHMBlockID &block_id);
@@ -221,7 +243,7 @@ public:
         }
     }
 
-    SHMBlockID get_native_data() { return data_->get_native_data(); };
+    SHMBlockID get_native_data() const { return data_->get_native_data(); };
 
 protected:
     const std::string operator[](size_t index) const
@@ -231,11 +253,13 @@ protected:
 
         return std::string(wrapper->data, wrapper->data + wrapper->length);
     }
+
+    std::shared_ptr<NeuropodValue> seal(NeuropodDevice device) { return data_->seal(device); }
 };
 
 // Serialization specializations for SHMNeuropodTensor
 // Note: the specialization is for `shared_ptr<NeuropodValue>`, but we check internally
-// that the item is a SHMNeuropodTensor
+// that the item is a SHMNeuropodTensor or a SealedSHMTensor
 template <>
 void ipc_serialize(std::ostream &out, const std::shared_ptr<NeuropodValue> &data);
 
