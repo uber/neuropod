@@ -8,7 +8,7 @@
 TEST(test_shm_tensor, simple)
 {
     // A tensor allocator that allocates tensors in shared memory
-    std::unique_ptr<neuropod::NeuropodTensorAllocator> allocator =
+    std::unique_ptr<const neuropod::NeuropodTensorAllocator> allocator =
         neuropod::stdx::make_unique<neuropod::DefaultTensorAllocator<neuropod::SHMNeuropodTensor>>();
 
     // Store tensors we allocate so they don't go out of scope

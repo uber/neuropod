@@ -25,7 +25,7 @@ public:
 
     // Allocate a tensor of a specific type
     virtual std::unique_ptr<NeuropodTensor> allocate_tensor(const std::vector<int64_t> &input_dims,
-                                                            TensorType                  tensor_type) = 0;
+                                                            TensorType                  tensor_type) const = 0;
 
     // Allocate a tensor of a specific type and wrap existing memory.
     // Note: Some backends may have specific alignment requirements (e.g. tensorflow).
@@ -35,11 +35,11 @@ public:
     virtual std::unique_ptr<NeuropodTensor> tensor_from_memory(const std::vector<int64_t> &input_dims,
                                                                TensorType                  tensor_type,
                                                                void *                      data,
-                                                               const Deleter &             deleter) = 0;
+                                                               const Deleter &             deleter) const = 0;
 
     // Templated version of `allocate_tensor`
     template <typename T>
-    std::shared_ptr<TypedNeuropodTensor<T>> allocate_tensor(const std::vector<int64_t> &input_dims)
+    std::shared_ptr<TypedNeuropodTensor<T>> allocate_tensor(const std::vector<int64_t> &input_dims) const
     {
         std::shared_ptr<NeuropodTensor> tensor = this->allocate_tensor(input_dims, get_tensor_type_from_cpp<T>());
 
@@ -50,7 +50,7 @@ public:
     template <typename T>
     std::shared_ptr<TypedNeuropodTensor<T>> tensor_from_memory(const std::vector<int64_t> &input_dims,
                                                                T *                         data,
-                                                               const Deleter &             deleter)
+                                                               const Deleter &             deleter) const
     {
         std::shared_ptr<NeuropodTensor> tensor =
             this->tensor_from_memory(input_dims, get_tensor_type_from_cpp<T>(), data, deleter);
@@ -60,7 +60,7 @@ public:
 
     // Returns a tensor of type `T` and shape `input_dims` filled with `fill_value`
     template <typename T>
-    std::shared_ptr<TypedNeuropodTensor<T>> full(const std::vector<int64_t> &input_dims, T fill_value)
+    std::shared_ptr<TypedNeuropodTensor<T>> full(const std::vector<int64_t> &input_dims, T fill_value) const
     {
         auto tensor = allocate_tensor<T>(input_dims);
         std::fill_n(tensor->get_raw_data_ptr(), tensor->get_num_elements(), fill_value);
@@ -69,14 +69,14 @@ public:
 
     // Returns a tensor of type `T` and shape `input_dims` filled with zeros
     template <typename T>
-    std::shared_ptr<TypedNeuropodTensor<T>> zeros(const std::vector<int64_t> &input_dims)
+    std::shared_ptr<TypedNeuropodTensor<T>> zeros(const std::vector<int64_t> &input_dims) const
     {
         return full<T>(input_dims, 0);
     }
 
     // Returns a tensor of type `T` and shape `input_dims` filled with ones
     template <typename T>
-    std::shared_ptr<TypedNeuropodTensor<T>> ones(const std::vector<int64_t> &input_dims)
+    std::shared_ptr<TypedNeuropodTensor<T>> ones(const std::vector<int64_t> &input_dims) const
     {
         return full<T>(input_dims, 1);
     }
@@ -84,7 +84,7 @@ public:
     // Returns a 1D tensor of type `T` containing a sequence of numbers starting at `start`
     // with a step size of `step`. The tensor has the following shape: (`ceil((end - start) / step)`)
     template <typename T>
-    std::shared_ptr<TypedNeuropodTensor<T>> arange(T start, T end, T step = 1)
+    std::shared_ptr<TypedNeuropodTensor<T>> arange(T start, T end, T step = 1) const
     {
         // Note: This is intended to be used in tests and therefore is not optimized for performance
 
@@ -106,7 +106,7 @@ public:
     // Returns a 1D tensor of type `T` containing a sequence of numbers starting at `0` and
     // ending at `end - 1` with a step size of `1`. The tensor has the following shape: (`ceil(end)`)
     template <typename T>
-    std::shared_ptr<TypedNeuropodTensor<T>> arange(T end)
+    std::shared_ptr<TypedNeuropodTensor<T>> arange(T end) const
     {
         return arange<T>(0, end);
     }
@@ -114,7 +114,7 @@ public:
     // Returns an identity matrix of type `T` and shape (`M`, `N`). This matrix has ones on the diagonal and
     // zeros everywhere else.
     template <typename T>
-    std::shared_ptr<TypedNeuropodTensor<T>> eye(int64_t M, int64_t N)
+    std::shared_ptr<TypedNeuropodTensor<T>> eye(int64_t M, int64_t N) const
     {
         // Note: This is intended to be used in tests and therefore is not optimized for performance
 
@@ -133,7 +133,7 @@ public:
     // Returns a tensor of type `T` and shape `input_dims` filled with random numbers from a normal
     // distribution with mean `mean` and standard deviation `stddev`.
     template <typename T>
-    std::shared_ptr<TypedNeuropodTensor<T>> randn(const std::vector<int64_t> &input_dims, T mean = 0, T stddev = 1)
+    std::shared_ptr<TypedNeuropodTensor<T>> randn(const std::vector<int64_t> &input_dims, T mean = 0, T stddev = 1) const
     {
         // Note: This is intended to be used in tests and therefore is not optimized for performance
 
@@ -159,10 +159,10 @@ public:
 
 // A default allocator
 template <template <class> class TensorImpl>
-class DefaultTensorAllocator : public NeuropodTensorAllocator
+class DefaultTensorAllocator final : public NeuropodTensorAllocator
 {
 public:
-    std::unique_ptr<NeuropodTensor> allocate_tensor(const std::vector<int64_t> &input_dims, TensorType tensor_type)
+    std::unique_ptr<NeuropodTensor> allocate_tensor(const std::vector<int64_t> &input_dims, TensorType tensor_type) const
     {
         return make_tensor<TensorImpl>(tensor_type, input_dims);
     }
@@ -170,7 +170,7 @@ public:
     std::unique_ptr<NeuropodTensor> tensor_from_memory(const std::vector<int64_t> &input_dims,
                                                        TensorType                  tensor_type,
                                                        void *                      data,
-                                                       const Deleter &             deleter)
+                                                       const Deleter &             deleter) const
     {
         return make_tensor_no_string<TensorImpl>(tensor_type, input_dims, data, deleter);
     }

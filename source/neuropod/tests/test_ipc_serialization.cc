@@ -69,7 +69,7 @@ TEST(test_ipc_serialization, ope_load_config)
 TEST(test_ipc_serialization, neuropod_value_map)
 {
     // A tensor allocator that allocates tensors in shared memory
-    std::unique_ptr<neuropod::NeuropodTensorAllocator> allocator =
+    std::unique_ptr<const neuropod::NeuropodTensorAllocator> allocator =
         neuropod::stdx::make_unique<neuropod::DefaultTensorAllocator<neuropod::SHMNeuropodTensor>>();
 
     const std::shared_ptr<neuropod::NeuropodValue> float_tensor_1D =
