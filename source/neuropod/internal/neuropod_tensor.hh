@@ -8,6 +8,7 @@
 #include "neuropod/internal/memory_utils.hh"
 #include "neuropod/internal/tensor_accessor.hh"
 #include "neuropod/internal/type_macros.hh"
+#include "neuropod/options.hh"
 
 #include <cstring>
 #include <functional>
@@ -59,8 +60,9 @@ namespace detail
 
 } // namespace detail
 
-// Forward declare NeuropodTensor
+// Forward declare NeuropodTensor and SealedNeuropodTensor
 class NeuropodTensor;
+class SealedNeuropodTensor;
 
 // Forward declare TypedNeuropodTensor
 template <typename T>
@@ -75,7 +77,7 @@ struct NeuropodTensorRawDataAccess;
 } // namespace internal
 
 // Base value type for Neuropod
-class NeuropodValue
+class NeuropodValue : public std::enable_shared_from_this<NeuropodValue>
 {
 private:
     // Whether or not this item is a tensor
@@ -256,6 +258,12 @@ protected:
     virtual const void *get_untyped_data_ptr() const = 0;
 
     virtual size_t get_bytes_per_element() const = 0;
+
+    // Seal this tensor, move to the appropriate device, and return the sealed tensor
+    // TODO(vip): Make this pure virtual once all backends have a seal implementation
+    // TODO(vip): Make this return a `SealedNeuropodTensor` instead of a `NeuropodValue`
+    friend class Sealer;
+    virtual std::shared_ptr<NeuropodValue> seal(NeuropodDevice device) { return this->shared_from_this(); }
 };
 
 // A TypedNeuropodTensor is a NeuropodTensor of a specific type.
@@ -431,6 +439,18 @@ protected:
     {
         NEUROPOD_ERROR_HH("`get_bytes_per_element` is not supported for string tensors");
     };
+};
+
+// An opaque NeuropodTensor.
+// This is used to implement things like early GPU copy
+class SealedNeuropodTensor : public NeuropodValue
+{
+public:
+    SealedNeuropodTensor();
+    virtual ~SealedNeuropodTensor();
+
+    // TODO(vip): how do we serialize sealed tensors (e.g. if they're on GPU)?
+    SET_SERIALIZE_TAG("sealedneuropodtensor")
 };
 
 // Utility to make a tensor of a specific type

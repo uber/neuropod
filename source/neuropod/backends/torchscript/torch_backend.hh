@@ -29,12 +29,6 @@ private:
     // The model output specification from ModelConfig
     std::vector<TensorSpec> output_specs_;
 
-    // The options this model was loaded with
-    RuntimeOptions options_;
-
-    // The device mapping for the input tensors
-    std::unordered_map<std::string, NeuropodDeviceType> input_device_mapping_;
-
     // Get a torch device given a target neuropod device
     // (this also depends on the visible device in the options above)
     torch::Device get_torch_device(NeuropodDeviceType target_device);

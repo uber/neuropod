@@ -76,10 +76,17 @@ torch::Deleter get_torch_deleter(const Deleter &deleter, void *data)
 
 } // namespace
 
+// A container for a torch IValue
+class SealedTorchTensor : public SealedNeuropodTensor
+{
+public:
+    torch::jit::IValue value;
+};
+
 // This class is internal to neuropod and should not be exposed
 // to users
 template <typename T>
-class TorchNeuropodTensor : public TypedNeuropodTensor<T>, public NativeDataContainer<torch::jit::IValue>
+class TorchNeuropodTensor : public TypedNeuropodTensor<T>
 {
 public:
     // Allocate a torch tensor
@@ -104,8 +111,6 @@ public:
 
     ~TorchNeuropodTensor() = default;
 
-    torch::jit::IValue get_native_data() { return tensor; }
-
     // The underlying torch tensor
     torch::Tensor tensor;
 
@@ -115,6 +120,28 @@ protected:
 
     // Get a pointer to the underlying data
     const void *get_untyped_data_ptr() const { return get_data_from_torch_tensor<T>(tensor); }
+
+    std::shared_ptr<NeuropodValue> seal(NeuropodDevice device)
+    {
+        auto out = std::make_shared<SealedTorchTensor>();
+
+        if (device != Device::CPU && !torch::cuda::is_available())
+        {
+            // No matter what the target device is, we don't have a choice other than running on CPU
+            SPDLOG_WARN("Tried to move a torch tensor to GPU, but CUDA isn't available. Falling back to CPU");
+            out->value = tensor.to(torch::kCPU);
+        }
+        else if (device == Device::CPU)
+        {
+            out->value = tensor.to(torch::kCPU);
+        }
+        else
+        {
+            out->value = tensor.to(torch::Device(torch::kCUDA, device));
+        }
+
+        return out;
+    }
 };
 
 #if CAFFE2_NIGHTLY_VERSION >= 20190717
@@ -130,8 +157,7 @@ protected:
 // Note: this only implements support for 1D string tensors
 // TODO(vip, yevgeni): Design a better approach to multidimensional string tensors
 template <>
-class TorchNeuropodTensor<std::string> : public TypedNeuropodTensor<std::string>,
-                                         public NativeDataContainer<torch::jit::IValue>
+class TorchNeuropodTensor<std::string> : public TypedNeuropodTensor<std::string>
 {
 public:
     // Allocate a torch tensor
@@ -200,12 +226,20 @@ protected:
         auto &tensor_data = ELEMENTS(list);
         return GET_STRING_FROM_LIST(tensor_data[index]);
     }
+
+    std::shared_ptr<NeuropodValue> seal(NeuropodDevice device)
+    {
+        auto out   = std::make_shared<SealedTorchTensor>();
+        out->value = get_native_data();
+
+        return out;
+    }
 };
 
 // Utility function to get an IValue from a torch tensor
 torch::jit::IValue get_ivalue_from_torch_tensor(const std::shared_ptr<NeuropodValue> &tensor)
 {
-    return std::dynamic_pointer_cast<NativeDataContainer<torch::jit::IValue>>(tensor)->get_native_data();
+    return std::dynamic_pointer_cast<SealedTorchTensor>(tensor)->value;
 }
 
 } // namespace neuropod

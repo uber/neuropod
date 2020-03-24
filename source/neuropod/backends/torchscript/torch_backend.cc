@@ -180,17 +180,6 @@ void process_dict(NeuropodValueMap &output, const c10::IValue &item)
     }
 }
 
-torch::jit::IValue maybe_set_device(const torch::jit::IValue &item, const torch::Device &device)
-{
-    if (item.isTensor())
-    {
-        // .to(device) is a no-op if the tensor is already transferred
-        return item.toTensor().to(device);
-    }
-
-    return item;
-}
-
 // Used to avoid loading the same custom op multiple times
 std::unordered_set<std::string> loaded_op_hashes;
 std::mutex                      loaded_op_mutex;
@@ -198,9 +187,7 @@ std::mutex                      loaded_op_mutex;
 } // namespace
 
 TorchNeuropodBackend::TorchNeuropodBackend(const std::string &neuropod_path, const RuntimeOptions &options)
-    : NeuropodBackendWithDefaultAllocator<TorchNeuropodTensor>(neuropod_path),
-      options_(options),
-      input_device_mapping_(model_config_->input_tensor_device)
+    : NeuropodBackendWithDefaultAllocator<TorchNeuropodTensor>(neuropod_path, options)
 {
     if (options.load_model_at_construction)
     {
@@ -312,13 +299,11 @@ std::unique_ptr<NeuropodValueMap> TorchNeuropodBackend::infer_internal(const Neu
 
         for (const auto &entry : inputs)
         {
-            const auto  device = get_torch_device(input_device_mapping_.at(entry.first));
-            const auto &value  = get_ivalue_from_torch_tensor(entry.second);
+            const auto &value = get_ivalue_from_torch_tensor(entry.second);
 
             if (value.isTensor())
             {
-                // .to(device) is a no-op if the tensor is already transferred
-                DICT_INSERT(tensor_input_dict, entry.first, value.toTensor().to(device));
+                DICT_INSERT(tensor_input_dict, entry.first, value.toTensor());
             }
             else
             {
@@ -356,9 +341,7 @@ std::unique_ptr<NeuropodValueMap> TorchNeuropodBackend::infer_internal(const Neu
                 NEUROPOD_ERROR("Input '{}' does not exist. Model inputs {}", input_name, schema);
             }
 
-            const auto device = get_torch_device(input_device_mapping_.at(input_name));
-
-            torch_inputs.at(arg_index.value() - (has_class_type ? 1 : 0)) = maybe_set_device(input_data, device);
+            torch_inputs.at(arg_index.value() - (has_class_type ? 1 : 0)) = input_data;
         }
     }
 

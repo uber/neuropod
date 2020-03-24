@@ -58,6 +58,9 @@ void throw_error_hh(
 
 } // namespace detail
 
+SealedNeuropodTensor::SealedNeuropodTensor() : NeuropodValue(false) {}
+SealedNeuropodTensor::~SealedNeuropodTensor() = default;
+
 NeuropodTensor::NeuropodTensor(TensorType tensor_type, const std::vector<int64_t> dims)
     : NeuropodValue(true),
       tensor_type_(tensor_type),
