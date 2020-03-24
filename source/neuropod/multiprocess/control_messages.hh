@@ -41,6 +41,9 @@ enum MessageType
     // A message sent by the worker process to let the main process know there was an exception
     // Note: it is valid to send this message at any time.
     EXCEPTION,
+
+    // A message sent to the worker process telling it to preload a tensor
+    SEAL,
 };
 
 // Used to print out the enum names rather than just a number

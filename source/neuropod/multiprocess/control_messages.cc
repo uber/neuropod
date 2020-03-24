@@ -24,6 +24,7 @@ std::ostream &operator<<(std::ostream &out, const MessageType value)
         GENERATE_CASE(RETURN_OUTPUT);
         GENERATE_CASE(SHUTDOWN);
         GENERATE_CASE(EXCEPTION);
+        GENERATE_CASE(SEAL);
     }
 #undef GENERATE_CASE
 

@@ -83,11 +83,35 @@ pid_t start_worker_process(const std::string &control_queue_name, std::vector<st
     return child_pid;
 }
 
+class SHMTensorAllocator : public NeuropodTensorAllocator
+{
+private:
+    std::shared_ptr<IPCControlChannel> control_channel_;
+
+public:
+    SHMTensorAllocator(std::shared_ptr<IPCControlChannel> control_channel)
+        : control_channel_(std::move(control_channel))
+    {
+    }
+
+    std::unique_ptr<NeuropodTensor> allocate_tensor(const std::vector<int64_t> &input_dims, TensorType tensor_type)
+    {
+        return make_tensor<SHMNeuropodTensor>(tensor_type, input_dims, control_channel_);
+    }
+
+    std::unique_ptr<NeuropodTensor> tensor_from_memory(const std::vector<int64_t> &input_dims,
+                                                       TensorType                  tensor_type,
+                                                       void *                      data,
+                                                       const Deleter &             deleter)
+    {
+        return make_tensor_no_string<SHMNeuropodTensor>(tensor_type, input_dims, data, deleter, control_channel_);
+    }
+};
+
 // Note: we don't register this with the library as a backend because it is not
 // a backend in the normal sense. It is only used here for out of process
 // execution
-
-class MultiprocessNeuropodBackend : public NeuropodBackendWithDefaultAllocator<SHMNeuropodTensor>
+class MultiprocessNeuropodBackend : public NeuropodBackend
 {
 private:
     pid_t       child_pid_ = -1;
@@ -98,13 +122,16 @@ private:
     ope_load_config load_config_;
 
     // Control channel for interacting with the worker
-    IPCControlChannel control_channel_;
+    std::shared_ptr<IPCControlChannel> control_channel_;
+
+    // The tensor allocator used by this backend
+    std::shared_ptr<SHMTensorAllocator> allocator_;
 
     void wait_for_load_confirmation(const std::string &neuropod_path)
     {
         // Wait for confirmation that the model was loaded
         SPDLOG_DEBUG("OPE: Waiting for load confirmation from worker...");
-        auto received = control_channel_.recv_message();
+        auto received = control_channel_->recv_message();
         auto msg_type = received.get_payload_type();
 
         if (msg_type == EXCEPTION)
@@ -127,10 +154,11 @@ public:
     MultiprocessNeuropodBackend(const std::string &neuropod_path,
                                 const std::string &control_queue_name,
                                 bool               free_memory_every_cycle)
-        : NeuropodBackendWithDefaultAllocator<SHMNeuropodTensor>(neuropod_path, {}),
+        : NeuropodBackend(neuropod_path, {}),
           control_queue_name_(control_queue_name),
           free_memory_every_cycle_(free_memory_every_cycle),
-          control_channel_(control_queue_name, MAIN_PROCESS)
+          control_channel_(std::make_shared<IPCControlChannel>(control_queue_name, MAIN_PROCESS)),
+          allocator_(std::make_shared<SHMTensorAllocator>(control_channel_))
     {
         // Setup the load configuration
         load_config_.neuropod_path = neuropod_path_;
@@ -144,10 +172,11 @@ public:
                                 const RuntimeOptions &                              options,
                                 bool                                                free_memory_every_cycle,
                                 const std::unordered_map<std::string, std::string> &default_backend_overrides)
-        : NeuropodBackendWithDefaultAllocator<SHMNeuropodTensor>(neuropod_path, options),
+        : NeuropodBackend(neuropod_path, options),
           control_queue_name_(boost::uuids::to_string(boost::uuids::random_generator()())),
           free_memory_every_cycle_(free_memory_every_cycle),
-          control_channel_(control_queue_name_, MAIN_PROCESS)
+          control_channel_(std::make_shared<IPCControlChannel>(control_queue_name_, MAIN_PROCESS)),
+          allocator_(std::make_shared<SHMTensorAllocator>(control_channel_))
     {
         auto env = get_env_map();
 
@@ -188,7 +217,7 @@ public:
         if (child_pid_ > 0)
         {
             // Ask the child process to shutdown
-            control_channel_.send_message(SHUTDOWN);
+            control_channel_->send_message(SHUTDOWN);
 
             // Wait for it and make sure it exited properly
             int status;
@@ -215,9 +244,11 @@ public:
             }
 
             // Delete the control channels
-            control_channel_.cleanup();
+            control_channel_->cleanup();
         }
     }
+
+    std::shared_ptr<NeuropodTensorAllocator> get_tensor_allocator() { return allocator_; }
 
 protected:
     // Run inference
@@ -225,13 +256,13 @@ protected:
                                                      const std::vector<std::string> &requested_outputs)
     {
         // Add inputs
-        control_channel_.send_message_move(ADD_INPUT, std::move(inputs));
+        control_channel_->send_message(ADD_INPUT, inputs);
 
         // Run inference with a set of requested outputs
-        control_channel_.send_message(INFER, requested_outputs);
+        control_channel_->send_message(INFER, requested_outputs);
 
         // Get the outputs from the worker
-        auto received = control_channel_.recv_message();
+        auto received = control_channel_->recv_message();
         auto msg_type = received.get_payload_type();
 
         if (msg_type == EXCEPTION)
@@ -264,7 +295,7 @@ protected:
     void load_model_internal()
     {
         // Send a message to load the model
-        control_channel_.send_message(LOAD_NEUROPOD, load_config_);
+        control_channel_->send_message(LOAD_NEUROPOD, load_config_);
 
         // Wait until the worker process confirms it has loaded the model
         wait_for_load_confirmation(neuropod_path_);

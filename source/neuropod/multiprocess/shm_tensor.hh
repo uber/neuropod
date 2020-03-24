@@ -8,6 +8,7 @@
 #include "neuropod/internal/deleter.hh"
 #include "neuropod/internal/error_utils.hh"
 #include "neuropod/internal/neuropod_tensor.hh"
+#include "neuropod/multiprocess/ipc_control_channel.hh"
 #include "neuropod/multiprocess/serialization/ipc_serialization.hh"
 #include "neuropod/multiprocess/shm/shm_allocator.hh"
 
@@ -75,8 +76,12 @@ private:
     // The ID of the chunk of shared memory
     SHMBlockID block_id_;
 
+    // The control channel to send seal messages on
+    std::shared_ptr<IPCControlChannel> control_channel_;
+
 public:
-    SHMNeuropodTensor(const std::vector<int64_t> &dims) : TypedNeuropodTensor<T>(dims)
+    SHMNeuropodTensor(const std::vector<int64_t> &dims, std::shared_ptr<IPCControlChannel> control_channel = nullptr)
+        : TypedNeuropodTensor<T>(dims), control_channel_(std::move(control_channel))
     {
         // Give us room to make sure that everything is 64 byte aligned
         const size_t size_bytes = sizeof(shm_tensor) + this->get_num_elements() * sizeof(T) + 64;
@@ -117,8 +122,15 @@ public:
     }
 
     // This backend cannot wrap existing memory so we need to make a copy
-    SHMNeuropodTensor(const std::vector<int64_t> &dims, void *data, const Deleter &deleter) : SHMNeuropodTensor<T>(dims)
+    SHMNeuropodTensor(const std::vector<int64_t> &       dims,
+                      void *                             data,
+                      const Deleter &                    deleter,
+                      std::shared_ptr<IPCControlChannel> control_channel = nullptr)
+        : SHMNeuropodTensor<T>(dims)
     {
+        // Set the control channel
+        control_channel_ = std::move(control_channel);
+
         // Copy in the data
         this->copy_from(static_cast<T *>(data), this->get_num_elements());
 
@@ -141,11 +153,19 @@ public:
 
     std::shared_ptr<SealedNeuropodTensor> seal(NeuropodDevice device)
     {
-        // TODO: send to the worker process
+        // Create the sealed SHM tensor
         auto out = std::make_shared<SealedSHMTensor>();
 
         out->block    = block_;
         out->block_id = block_id_;
+
+        if (control_channel_)
+        {
+            // TODO(vip): do this async with a double buffered queue
+            // Send a message to the worker process
+            std::shared_ptr<NeuropodValue> value = out;
+            control_channel_->send_message_move(SEAL, value);
+        }
 
         return out;
     }
@@ -189,8 +209,14 @@ private:
     // The length of the longest string in this tensor
     size_t max_len_;
 
+    // The control channel to send seal messages on
+    std::shared_ptr<IPCControlChannel> control_channel_;
+
 public:
-    SHMNeuropodTensor(const std::vector<int64_t> &dims) : TypedNeuropodTensor<std::string>(dims), max_len_(0) {}
+    SHMNeuropodTensor(const std::vector<int64_t> &dims, std::shared_ptr<IPCControlChannel> control_channel = nullptr)
+        : TypedNeuropodTensor<std::string>(dims), max_len_(0), control_channel_(std::move(control_channel))
+    {
+    }
 
     // Load an existing tensor
     // See tensor_from_id
@@ -223,7 +249,7 @@ public:
         dims_copy.push_back(max_len_);
 
         // TODO(vip): We can optimize this
-        data_ = stdx::make_unique<SHMNeuropodTensor<uint8_t>>(dims_copy);
+        data_ = stdx::make_unique<SHMNeuropodTensor<uint8_t>>(dims_copy, control_channel_);
         data_->overwrite_type(STRING_TENSOR);
 
         // Copy data in
@@ -256,6 +282,19 @@ protected:
 
     std::shared_ptr<SealedNeuropodTensor> seal(NeuropodDevice device) { return data_->seal(device); }
 };
+
+// Serialization specializations for SHMBlockID
+template <>
+inline void ipc_serialize(std::ostream &out, const SHMBlockID &block_id)
+{
+    detail::checked_write(out, reinterpret_cast<const char *>(block_id.data()), block_id.size());
+}
+
+template <>
+inline void ipc_deserialize(std::istream &in, SHMBlockID &block_id)
+{
+    detail::checked_read(in, reinterpret_cast<char *>(block_id.data()), block_id.size());
+}
 
 // Serialization specializations for SHMNeuropodTensor
 // Note: the specialization is for `shared_ptr<NeuropodValue>`, but we check internally

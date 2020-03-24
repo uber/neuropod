@@ -24,11 +24,15 @@ namespace neuropod
 void multiprocess_worker_loop(const std::string &control_queue_name)
 {
     // Open the control channels
-    IPCControlChannel control_channel(control_queue_name, WORKER_PROCESS);
+    auto control_channel = std::make_shared<IPCControlChannel>(control_queue_name, WORKER_PROCESS);
 
     // A pointer to a neuropod (that will be loaded)
     std::unique_ptr<Neuropod>                neuropod;
     std::shared_ptr<NeuropodTensorAllocator> allocator;
+
+    // A map to store items that have been sealed
+    // TODO(vip): Switch to unordered map once SHMBlockID is hashable
+    std::map<SHMBlockID, std::shared_ptr<NeuropodValue>> sealed;
 
     // A map to store the inputs
     NeuropodValueMap inputs;
@@ -36,7 +40,7 @@ void multiprocess_worker_loop(const std::string &control_queue_name)
     while (true)
     {
         // Get a message
-        auto received = control_channel.recv_message();
+        auto received = control_channel->recv_message();
         auto msg_type = received.get_payload_type();
 
         try
@@ -49,19 +53,30 @@ void multiprocess_worker_loop(const std::string &control_queue_name)
                 // Load a neuropod
                 neuropod  = stdx::make_unique<Neuropod>(config.neuropod_path, config.default_backend_overrides);
                 allocator = neuropod->get_tensor_allocator();
+                sealed.clear();
                 inputs.clear();
-                control_channel.send_message(LOAD_SUCCESS);
+                control_channel->send_message(LOAD_SUCCESS);
+            }
+            else if (msg_type == SEAL)
+            {
+                SHMBlockID block_id;
+                received.get(block_id);
+
+                auto tensor = tensor_from_id(block_id);
+
+                // Wrap in a tensor type that this neuropod expects
+                sealed[block_id] = wrap_existing_tensor(*allocator, std::dynamic_pointer_cast<NeuropodTensor>(tensor));
             }
             else if (msg_type == ADD_INPUT)
             {
-                NeuropodValueMap tmp;
+                std::unordered_map<std::string, SHMBlockID> tmp;
                 received.get(tmp);
 
                 for (auto &item : tmp)
                 {
-                    // Wrap in a tensor type that this neuropod expects
-                    inputs[item.first] =
-                        wrap_existing_tensor(*allocator, std::dynamic_pointer_cast<NeuropodTensor>(item.second));
+                    // Get it from the sealed map (since all inputs are sealed before inference)
+                    inputs[item.first] = std::move(sealed.at(item.second));
+                    sealed.erase(item.second);
                 }
             }
             else if (msg_type == INFER)
@@ -85,7 +100,7 @@ void multiprocess_worker_loop(const std::string &control_queue_name)
                     transformed_outputs[entry.first] = shm_tensor;
                 }
 
-                control_channel.send_message_move(RETURN_OUTPUT, std::move(transformed_outputs));
+                control_channel->send_message_move(RETURN_OUTPUT, std::move(transformed_outputs));
 
                 // Clean up any unused shm tensors that haven't been reused
                 shm_allocator.free_unused_shm_blocks();
@@ -107,11 +122,11 @@ void multiprocess_worker_loop(const std::string &control_queue_name)
         {
             // Send the exception info back to the main process
             std::string msg = e.what();
-            control_channel.send_message(EXCEPTION, msg);
+            control_channel->send_message(EXCEPTION, msg);
         }
         catch (...)
         {
-            control_channel.send_message(EXCEPTION, "An unknown exception occurred during inference");
+            control_channel->send_message(EXCEPTION, "An unknown exception occurred during inference");
         }
 
         SPDLOG_TRACE("OPE: BOTTOM OF WORKER LOOP");

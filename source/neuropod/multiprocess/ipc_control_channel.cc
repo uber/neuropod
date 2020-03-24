@@ -7,7 +7,6 @@
 #include "neuropod/backends/neuropod_backend.hh"
 #include "neuropod/internal/logging.hh"
 #include "neuropod/multiprocess/control_messages.hh"
-#include "neuropod/multiprocess/shm_tensor.hh"
 
 namespace neuropod
 {
@@ -15,7 +14,7 @@ namespace neuropod
 void TransitionVerifier::assert_transition_allowed(MessageType current_type)
 {
     std::lock_guard<std::mutex> lock(mutex_);
-    if (current_type == SHUTDOWN || current_type == EXCEPTION)
+    if (current_type == SHUTDOWN || current_type == EXCEPTION || current_type == SEAL)
     {
         // These messages are allowed at any time
         return;

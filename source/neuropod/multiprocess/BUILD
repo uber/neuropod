@@ -12,6 +12,7 @@ cc_library(
         "//neuropod:__subpackages__",
     ],
     deps = [
+        ":ipc_control_channel",
         "//neuropod/backends:neuropod_backend",
         "//neuropod/internal",
         "//neuropod/multiprocess/shm",
@@ -35,7 +36,6 @@ cc_library(
         "//neuropod:__subpackages__",
     ],
     deps = [
-        ":shm_tensor",
         "//neuropod/multiprocess/mq",
     ],
 )
@@ -53,6 +53,7 @@ cc_library(
         "//neuropod:__subpackages__",
     ],
     deps = [
+        ":shm_tensor",
         ":ipc_control_channel",
         "//neuropod:neuropod_hdrs",
         "//neuropod/internal",
@@ -106,6 +107,7 @@ cc_library(
         "//neuropod:__subpackages__",
     ],
     deps = [
+        ":shm_tensor",
         ":ipc_control_channel",
         "//neuropod:neuropod_hdrs",
         "//neuropod/backends:neuropod_backend",

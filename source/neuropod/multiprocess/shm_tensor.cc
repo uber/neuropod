@@ -24,19 +24,6 @@ std::shared_ptr<NeuropodTensor> tensor_from_id(const SHMBlockID &block_id)
     return make_tensor<SHMNeuropodTensor>(data->tensor_type, dims, std::move(block), data, block_id);
 }
 
-// Serialization specializations for SHMBlockID
-template <>
-inline void ipc_serialize(std::ostream &out, const SHMBlockID &block_id)
-{
-    detail::checked_write(out, reinterpret_cast<const char *>(block_id.data()), block_id.size());
-}
-
-template <>
-inline void ipc_deserialize(std::istream &in, SHMBlockID &block_id)
-{
-    detail::checked_read(in, reinterpret_cast<char *>(block_id.data()), block_id.size());
-}
-
 // Serialization specializations for SHMNeuropodTensor and SealedSHMTensor
 template <>
 void ipc_serialize(std::ostream &out, const NativeDataContainer<SHMBlockID> &data)
