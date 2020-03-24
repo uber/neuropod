@@ -14,8 +14,17 @@ cc_library(
         "//visibility:public",
     ],
     deps = [
+        "//neuropod:options",
         "//neuropod/backends:neuropod_backend",
         "//neuropod/internal",
+    ],
+)
+
+cc_library(
+    name = "options",
+    hdrs = ["options.hh"],
+    visibility = [
+        "//visibility:public",
     ],
 )
 
