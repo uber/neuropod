@@ -297,8 +297,7 @@ std::unique_ptr<NeuropodValueMap> TensorflowNeuropodBackend::infer_internal(
         }
 
         // Get the TensorFlow tensor from the Neuropod tensor
-        const auto &input_data =
-            std::dynamic_pointer_cast<NativeDataContainer<tensorflow::Tensor &>>(entry.second)->get_native_data();
+        const auto &input_data = *std::dynamic_pointer_cast<SealedTensorflowTensor>(entry.second)->value;
 
         // Add this node name as an input to the subgraph we want to run
         tensor_feeds.emplace(std::make_pair(node_name->second, input_data));

@@ -117,13 +117,12 @@ std::vector<int64_t> get_dims(const tensorflow::Tensor &tensor)
     return shape;
 }
 
-void create_tensor_from_existing_memory(const std::vector<int64_t> &dims,
-                                        void *                      data,
-                                        const Deleter &             deleter,
-                                        size_t                      data_size_bytes,
-                                        tensorflow::DataType        type,
-                                        tensorflow::Tensor &        tensor,
-                                        tensorflow::TensorBuffer *& buf)
+void create_tensor_from_existing_memory(const std::vector<int64_t> &         dims,
+                                        void *                               data,
+                                        const Deleter &                      deleter,
+                                        size_t                               data_size_bytes,
+                                        tensorflow::DataType                 type,
+                                        std::shared_ptr<tensorflow::Tensor> &tensor)
 {
     auto deleter_handle = register_deleter(deleter, data);
     if (reinterpret_cast<intptr_t>(data) % 64 != 0)
@@ -144,8 +143,14 @@ void create_tensor_from_existing_memory(const std::vector<int64_t> &dims,
         data           = aligned;
     }
 
-    buf    = new NeuropodTensorBuffer(data, data_size_bytes, deleter_handle);
-    tensor = tensorflow::TensorCApi::MakeTensor(type, detail::get_tf_shape(dims), buf);
+    tensorflow::TensorBuffer *buf  = new NeuropodTensorBuffer(data, data_size_bytes, deleter_handle);
+    auto                      item = stdx::make_unique<tensorflow::Tensor>(
+        tensorflow::TensorCApi::MakeTensor(type, detail::get_tf_shape(dims), buf));
+
+    tensor = std::shared_ptr<tensorflow::Tensor>(item.release(), [buf](tensorflow::Tensor *ptr) {
+        delete ptr;
+        buf->Unref();
+    });
 }
 
 } // namespace detail

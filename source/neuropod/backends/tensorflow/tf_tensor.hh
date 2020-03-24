@@ -27,28 +27,34 @@ tensorflow::TensorShape get_tf_shape(const std::vector<int64_t> &dims);
 std::vector<int64_t> get_dims(const tensorflow::Tensor &tensor);
 
 // Create a TF tensor from existing memory
-void create_tensor_from_existing_memory(const std::vector<int64_t> &dims,
-                                        void *                      data,
-                                        const Deleter &             deleter,
-                                        size_t                      data_size_bytes,
-                                        tensorflow::DataType        type,
-                                        tensorflow::Tensor &        tensor,
-                                        tensorflow::TensorBuffer *& buf);
+void create_tensor_from_existing_memory(const std::vector<int64_t> &         dims,
+                                        void *                               data,
+                                        const Deleter &                      deleter,
+                                        size_t                               data_size_bytes,
+                                        tensorflow::DataType                 type,
+                                        std::shared_ptr<tensorflow::Tensor> &tensor);
 
 } // namespace detail
 
+// A container for a tensorflow Tensor
+class SealedTensorflowTensor : public SealedNeuropodTensor
+{
+public:
+    std::shared_ptr<tensorflow::Tensor> value;
+};
+
 template <typename T>
-class TensorflowNeuropodTensor : public TypedNeuropodTensor<T>, public NativeDataContainer<tensorflow::Tensor &>
+class TensorflowNeuropodTensor : public TypedNeuropodTensor<T>
 {
 private:
-    tensorflow::Tensor        tensor_;
-    tensorflow::TensorBuffer *buf_ = nullptr;
+    std::shared_ptr<tensorflow::Tensor> tensor_;
 
 public:
     // Allocate a TF tensor
     TensorflowNeuropodTensor(const std::vector<int64_t> &dims)
         : TypedNeuropodTensor<T>(dims),
-          tensor_(get_tf_type_from_neuropod_type(this->get_tensor_type()), detail::get_tf_shape(dims))
+          tensor_(std::make_shared<tensorflow::Tensor>(get_tf_type_from_neuropod_type(this->get_tensor_type()),
+                                                       detail::get_tf_shape(dims)))
     {
     }
 
@@ -63,64 +69,64 @@ public:
                                                    deleter,
                                                    this->get_num_elements() * sizeof(T),
                                                    get_tf_type_from_neuropod_type(this->get_tensor_type()),
-                                                   tensor_,
-                                                   buf_);
+                                                   tensor_);
     }
 
     // Wrap an existing TF tensor
     TensorflowNeuropodTensor(tensorflow::Tensor tensor)
-        : TypedNeuropodTensor<T>(detail::get_dims(tensor)), tensor_(std::move(tensor))
+        : TypedNeuropodTensor<T>(detail::get_dims(tensor)),
+          tensor_(std::make_shared<tensorflow::Tensor>(std::move(tensor)))
     {
     }
 
-    ~TensorflowNeuropodTensor()
-    {
-        if (buf_ != nullptr)
-        {
-            // Reset the tensor
-            tensor_ = tensorflow::Tensor();
-
-            // Unref the buffer
-            buf_->Unref();
-        }
-    }
-
-    tensorflow::Tensor &get_native_data() { return tensor_; }
+    ~TensorflowNeuropodTensor() = default;
 
 protected:
     // Get a pointer to the underlying data
     void *get_untyped_data_ptr()
     {
         // TODO(vip): make sure this tensor is contiguous
-        return const_cast<char *>(tensor_.tensor_data().data());
+        return const_cast<char *>(tensor_->tensor_data().data());
     }
 
     // Get a pointer to the underlying data
     const void *get_untyped_data_ptr() const
     {
         // TODO(vip): make sure this tensor is contiguous
-        return tensor_.tensor_data().data();
+        return tensor_->tensor_data().data();
+    }
+
+    std::shared_ptr<NeuropodValue> seal(NeuropodDevice device)
+    {
+        auto out = std::make_shared<SealedTensorflowTensor>();
+
+        // TODO(vip): Move to the correct device
+        // TODO(vip): std::move
+        out->value = tensor_;
+
+        return out;
     }
 };
 
 // Specialization for strings
 template <>
-class TensorflowNeuropodTensor<std::string> : public TypedNeuropodTensor<std::string>,
-                                              public NativeDataContainer<tensorflow::Tensor &>
+class TensorflowNeuropodTensor<std::string> : public TypedNeuropodTensor<std::string>
 {
 private:
-    tensorflow::Tensor tensor_;
+    std::shared_ptr<tensorflow::Tensor> tensor_;
 
 public:
     // Allocate a TF tensor
     TensorflowNeuropodTensor(const std::vector<int64_t> &dims)
-        : TypedNeuropodTensor<std::string>(dims), tensor_(tensorflow::DT_STRING, detail::get_tf_shape(dims))
+        : TypedNeuropodTensor<std::string>(dims),
+          tensor_(std::make_shared<tensorflow::Tensor>(tensorflow::DT_STRING, detail::get_tf_shape(dims)))
     {
     }
 
     // Wrap an existing TF tensor
     TensorflowNeuropodTensor(tensorflow::Tensor tensor)
-        : TypedNeuropodTensor<std::string>(detail::get_dims(tensor)), tensor_(std::move(tensor))
+        : TypedNeuropodTensor<std::string>(detail::get_dims(tensor)),
+          tensor_(std::make_shared<tensorflow::Tensor>(std::move(tensor)))
     {
     }
 
@@ -128,7 +134,7 @@ public:
 
     void set(const std::vector<std::string> &data)
     {
-        auto flat = tensor_.flat<std::string>();
+        auto flat = tensor_->flat<std::string>();
         if (data.size() != flat.size())
         {
             NEUROPOD_ERROR("Supplied vector size ({}) does not match size of tensor ({})", data.size(), flat.size());
@@ -140,10 +146,18 @@ public:
         }
     }
 
-    tensorflow::Tensor &get_native_data() { return tensor_; }
-
 protected:
-    const std::string operator[](size_t index) const { return tensor_.flat<std::string>()(index); }
+    const std::string operator[](size_t index) const { return tensor_->flat<std::string>()(index); }
+
+    std::shared_ptr<NeuropodValue> seal(NeuropodDevice device)
+    {
+        auto out = std::make_shared<SealedTensorflowTensor>();
+
+        // TODO(vip): std::move
+        out->value = tensor_;
+
+        return out;
+    }
 };
 
 } // namespace neuropod
