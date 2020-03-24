@@ -19,42 +19,39 @@ namespace neuropod
 template <typename T>
 class TestNeuropodTensor : public TypedNeuropodTensor<T>
 {
-private:
+protected:
     // A pointer to the data contained in the tensor
-    void *data_;
-
-    // A deleter to free the underlying memory
-    void *deleter_handle_;
+    std::shared_ptr<void> data_;
 
 public:
-    TestNeuropodTensor(const std::vector<int64_t> &dims) : TypedNeuropodTensor<T>(dims)
+    TestNeuropodTensor(const std::vector<int64_t> &dims)
+        : TypedNeuropodTensor<T>(dims), data_(malloc(this->get_num_elements() * sizeof(T)), free)
     {
-        data_           = malloc(this->get_num_elements() * sizeof(T));
-        deleter_handle_ = register_deleter([](void *data) { free(data); }, data_);
     }
 
     // Wrap existing memory
     TestNeuropodTensor(const std::vector<int64_t> &dims, void *data, const Deleter &deleter)
-        : TypedNeuropodTensor<T>(dims)
+        : TypedNeuropodTensor<T>(dims), data_(data, deleter)
     {
-        data_           = data;
-        deleter_handle_ = register_deleter(deleter, data);
     }
 
-    ~TestNeuropodTensor() { run_deleter(deleter_handle_); }
+    ~TestNeuropodTensor() {}
 
 protected:
     // Get a pointer to the underlying data
-    void *get_untyped_data_ptr() { return data_; }
+    void *get_untyped_data_ptr() { return data_.get(); }
 
-    const void *get_untyped_data_ptr() const { return data_; }
+    const void *get_untyped_data_ptr() const { return data_.get(); }
+
+    // TestNeuropodTensor should not be used for inference so it's okay to return a nullptr here
+    std::shared_ptr<NeuropodValue> seal(NeuropodDevice device) { return nullptr; }
 };
 
 // Specialization for strings
 template <>
 class TestNeuropodTensor<std::string> : public TypedNeuropodTensor<std::string>
 {
-private:
+protected:
     // The data contained in the tensor
     std::vector<std::string> data_;
 
@@ -67,6 +64,9 @@ public:
 
 protected:
     const std::string operator[](size_t index) const { return data_[index]; }
+
+    // TestNeuropodTensor should not be used for inference so it's okay to return a nullptr here
+    std::shared_ptr<NeuropodValue> seal(NeuropodDevice device) { return nullptr; }
 };
 
 } // namespace neuropod

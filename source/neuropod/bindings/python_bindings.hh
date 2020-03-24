@@ -17,6 +17,9 @@ namespace py = pybind11;
 std::shared_ptr<NeuropodTensor> tensor_from_numpy(NeuropodTensorAllocator &allocator, py::array array);
 
 // Convert a NeuropodTensor to a py::array
+py::array tensor_to_numpy(NeuropodTensor &tensor, Deleter deleter);
+
+// Convert a NeuropodTensor to a py::array
 py::array tensor_to_numpy(std::shared_ptr<NeuropodTensor> value);
 
 // Convert from a py::dict of numpy arrays to an unordered_map of `NeuropodTensor`s

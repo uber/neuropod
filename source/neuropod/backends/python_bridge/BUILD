@@ -28,6 +28,7 @@ cc_library(
     srcs = [
         "python_bridge.cc",
         "python_bridge.hh",
+        "python_tensor.hh",
     ],
     linkopts = [
         "-ldl",

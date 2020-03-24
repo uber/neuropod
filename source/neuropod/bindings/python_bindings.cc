@@ -118,35 +118,31 @@ std::shared_ptr<NeuropodTensor> tensor_from_numpy(NeuropodTensorAllocator &alloc
     }
 }
 
-py::array tensor_to_numpy(std::shared_ptr<NeuropodTensor> value)
+py::array tensor_to_numpy(NeuropodTensor &tensor, Deleter deleter)
 {
-    auto tensor = value->as_tensor();
-
-    // This isn't going to be null, but we do a null check to keep
-    // static analyzers happy
-    if (tensor == nullptr)
-    {
-        NEUROPOD_ERROR("Error converting value to tensor");
-    }
-
-    if (tensor->get_tensor_type() == STRING_TENSOR)
+    if (tensor.get_tensor_type() == STRING_TENSOR)
     {
         // This makes a copy
-        auto arr = py::array(py::cast(tensor->as_typed_tensor<std::string>()->get_data_as_vector()));
-        arr.resize(tensor->get_dims());
+        auto arr = py::array(py::cast(tensor.as_typed_tensor<std::string>()->get_data_as_vector()));
+        arr.resize(tensor.get_dims());
         return arr;
     }
     else
     {
-        auto dims = tensor->get_dims();
-        auto data = internal::NeuropodTensorRawDataAccess::get_untyped_data_ptr(*tensor);
+        auto dims = tensor.get_dims();
+        auto data = internal::NeuropodTensorRawDataAccess::get_untyped_data_ptr(tensor);
 
         // Make sure we don't deallocate the tensor until the numpy array is deallocated
-        auto deleter        = [value](void *unused) {};
-        auto deleter_handle = register_deleter(deleter, nullptr);
+        auto deleter_handle = register_deleter(deleter, data);
         auto capsule        = py::capsule(deleter_handle, [](void *handle) { run_deleter(handle); });
-        return py::array(get_py_type(*tensor), dims, data, capsule);
+        return py::array(get_py_type(tensor), dims, data, capsule);
     }
+}
+
+py::array tensor_to_numpy(std::shared_ptr<NeuropodTensor> tensor)
+{
+    // Make sure we don't deallocate the tensor until the numpy array is deallocated
+    return tensor_to_numpy(*tensor, [tensor](void * /* unused */) {});
 }
 
 NeuropodValueMap from_numpy_dict(NeuropodTensorAllocator &allocator, py::dict &items)

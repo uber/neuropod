@@ -4,7 +4,6 @@
 
 #include "python_bridge.hh"
 
-#include "neuropod/bindings/python_bindings.hh"
 #include "neuropod/internal/error_utils.hh"
 
 #include <exception>
@@ -84,7 +83,7 @@ static auto gil_release = maybe_initialize();
 PythonBridge::PythonBridge(const std::string &             neuropod_path,
                            const RuntimeOptions &          options,
                            const std::vector<std::string> &python_path_additions)
-    : NeuropodBackendWithDefaultAllocator<TestNeuropodTensor>(neuropod_path, options)
+    : NeuropodBackendWithDefaultAllocator<PythonNeuropodTensor>(neuropod_path, options)
 {
     // Modify PYTHONPATH
     set_python_path(python_path_additions);
@@ -131,8 +130,12 @@ std::unique_ptr<NeuropodValueMap> PythonBridge::infer_internal(const NeuropodVal
     // Acquire the GIL
     py::gil_scoped_acquire gil;
 
-    // Convert to a py::dict
-    py::dict model_inputs = to_numpy_dict(const_cast<NeuropodValueMap &>(inputs));
+    // Convert the items to a python dict of numpy arrays
+    py::dict model_inputs;
+    for (auto &item : inputs)
+    {
+        model_inputs[item.first.c_str()] = *std::dynamic_pointer_cast<SealedPythonTensor>(item.second)->arr_;
+    }
 
     // Run inference
     py::dict model_outputs_raw = neuropod_->attr("infer")(model_inputs).cast<py::dict>();
