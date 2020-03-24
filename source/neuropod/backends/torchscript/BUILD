@@ -24,7 +24,10 @@ cc_binary(
     ],
     data = [
         ":copy_libtorch",
-    ]
+    ] + select({
+        "@bazel_tools//src/conditions:darwin": [":copy_mklml"],
+        "//conditions:default": [],
+    }),
 )
 
 cc_library(
@@ -55,12 +58,20 @@ copy_libs(
     libs = "@libtorch_repo//:libtorch_libs"
 )
 
+copy_libs(
+    name = "copy_mklml",
+    libs = "@mklml_repo_darwin//:mklml_libs"
+)
+
 pkg_tar(
     name = "neuropod_torchscript_backend",
     srcs = [
         ":libneuropod_torchscript_backend.so",
         "@libtorch_repo//:libtorch_libs",
-    ],
+    ] + select({
+        "@bazel_tools//src/conditions:darwin": ["@mklml_repo_darwin//:mklml_libs"],
+        "//conditions:default": [],
+    }),
     tags = ["manual"],
     extension = "tar.gz",
     visibility = [
