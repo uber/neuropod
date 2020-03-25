@@ -90,6 +90,11 @@ std::shared_ptr<NeuropodTensorAllocator> Neuropod::get_tensor_allocator()
     return backend_->get_tensor_allocator();
 }
 
+Sealer Neuropod::get_sealer()
+{
+    return backend_->get_sealer();
+}
+
 template <typename T>
 std::shared_ptr<TypedNeuropodTensor<T>> Neuropod::allocate_tensor(const std::vector<int64_t> &input_dims)
 {

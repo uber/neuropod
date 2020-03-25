@@ -261,6 +261,7 @@ protected:
 
     // Seal this tensor, move to the appropriate device, and return the sealed tensor
     friend class Sealer;
+    friend void                                   multiprocess_worker_loop(const std::string &);
     virtual std::shared_ptr<SealedNeuropodTensor> seal(NeuropodDevice device) = 0;
 };
 

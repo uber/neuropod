@@ -83,6 +83,9 @@ public:
     // Returns a tensor allocator that can allocate tensors compatible with this neuropod
     std::shared_ptr<NeuropodTensorAllocator> get_tensor_allocator();
 
+    // Gets a sealer for a Neuropod. This is used to implement things like early GPU copy
+    Sealer get_sealer();
+
     // Allocate a tensor of a certain shape and type
     template <typename T>
     std::shared_ptr<TypedNeuropodTensor<T>> allocate_tensor(const std::vector<int64_t> &input_dims);

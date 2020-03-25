@@ -42,7 +42,7 @@ Sealer::Sealer(std::unordered_map<std::string, NeuropodDevice> device_mapping)
 }
 Sealer::~Sealer() = default;
 
-std::shared_ptr<NeuropodValue> Sealer::seal(const std::string &name, const std::shared_ptr<NeuropodValue> &value)
+std::shared_ptr<NeuropodValue> Sealer::seal(const std::string &name, const std::shared_ptr<NeuropodValue> &value) const
 {
     // TODO: do this better
     if (dynamic_cast<SealedNeuropodTensor *>(value.get()) != nullptr)
@@ -64,12 +64,17 @@ std::shared_ptr<NeuropodValue> Sealer::seal(const std::string &name, const std::
     }
 }
 
-NeuropodValueMap Sealer::seal(const NeuropodValueMap &inputs)
+void Sealer::seal(NeuropodValueMap &items, const std::string &name, const std::shared_ptr<NeuropodValue> &value) const
+{
+    items[name] = seal(name, value);
+}
+
+NeuropodValueMap Sealer::seal(const NeuropodValueMap &inputs) const
 {
     NeuropodValueMap out;
     for (auto &item : inputs)
     {
-        out[item.first] = seal(item.first, item.second);
+        seal(out, item.first, item.second);
     }
 
     return out;
@@ -182,6 +187,17 @@ std::unique_ptr<NeuropodValueMap> NeuropodBackend::infer_internal(const Neuropod
 std::unique_ptr<NeuropodValueMap> NeuropodBackend::infer_internal(const NeuropodValueMap &inputs)
 {
     NEUROPOD_ERROR("Backend implementations must provide a `infer_internal` implementation");
+}
+
+Sealer NeuropodBackend::get_sealer()
+{
+    if (!sealer_)
+    {
+        NEUROPOD_ERROR("Tried to get a Sealer, but it was null. This usually means you tried getting a sealer for the "
+                       "test backend")
+    }
+
+    return *sealer_;
 }
 
 } // namespace neuropod

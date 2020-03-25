@@ -37,6 +37,7 @@ void benchmark_object_detection(benchmark::State &state)
     const uint8_t some_image_data[1200 * 1920 * 3] = {0};
 
     auto neuropod = Loader()("neuropod/tests/test_data/dummy_object_detection/");
+    auto sealer   = neuropod->get_sealer();
 
     for (auto _ : state)
     {
@@ -45,7 +46,8 @@ void benchmark_object_detection(benchmark::State &state)
         // Add an input "image"
         auto image_tensor = neuropod->template allocate_tensor<uint8_t>({1200, 1920, 3});
         image_tensor->copy_from(some_image_data, 1200 * 1920 * 3);
-        input_data["image"] = image_tensor;
+        // input_data["image"] = image_tensor;
+        sealer.seal(input_data, "image", image_tensor);
 
         // Run inference
         const auto output_data = neuropod->infer(input_data);
@@ -64,6 +66,7 @@ void benchmark_small_inputs(benchmark::State &state)
     const float some_data[10 * 5] = {0};
 
     auto neuropod = Loader()("neuropod/tests/test_data/dummy_small_input_model/");
+    auto sealer   = neuropod->get_sealer();
 
     for (auto _ : state)
     {
@@ -74,7 +77,8 @@ void benchmark_small_inputs(benchmark::State &state)
             // Add all the inputs
             auto tensor = neuropod->template allocate_tensor<float>({10, 5});
             tensor->copy_from(some_data, 10 * 5);
-            input_data["small_input" + std::to_string(i)] = tensor;
+            // input_data["small_input" + std::to_string(i)] = tensor;
+            sealer.seal(input_data, "small_input" + std::to_string(i), tensor);
         }
 
         // Run inference

@@ -24,16 +24,19 @@ class Sealer
 {
 private:
     // A mapping from tensor name to device
-    std::unordered_map<std::string, NeuropodDevice> device_mapping_;
+    const std::unordered_map<std::string, NeuropodDevice> device_mapping_;
 
 public:
     Sealer(std::unordered_map<std::string, NeuropodDevice> device_mapping);
     ~Sealer();
 
-    std::shared_ptr<NeuropodValue> seal(const std::string &name, const std::shared_ptr<NeuropodValue> &value);
+    std::shared_ptr<NeuropodValue> seal(const std::string &name, const std::shared_ptr<NeuropodValue> &value) const;
+
+    // Seal a value and insert it into a NeuropodValueMap
+    void seal(NeuropodValueMap &items, const std::string &name, const std::shared_ptr<NeuropodValue> &value) const;
 
     // Make sure that every value in the map is sealed
-    NeuropodValueMap seal(const NeuropodValueMap &inputs);
+    NeuropodValueMap seal(const NeuropodValueMap &inputs) const;
 };
 
 // The interface that every neuropod backend implements
@@ -62,6 +65,9 @@ public:
 
     // Load the model if it has not already been loaded
     void load_model();
+
+    // Gets a sealer
+    Sealer get_sealer();
 
 protected:
     // Used to load files in a Neuropod

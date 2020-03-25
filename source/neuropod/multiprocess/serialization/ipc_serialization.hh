@@ -199,4 +199,11 @@ inline void ipc_deserialize(std::istream &in, std::unordered_map<K, V> &data)
     }
 }
 
+// Specialization for shared_ptr
+template <typename T>
+inline void ipc_serialize(std::ostream &out, const std::shared_ptr<T> &data)
+{
+    ipc_serialize(out, *data);
+}
+
 } // namespace neuropod

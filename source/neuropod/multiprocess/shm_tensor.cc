@@ -24,19 +24,6 @@ std::shared_ptr<NeuropodTensor> tensor_from_id(const SHMBlockID &block_id)
     return make_tensor<SHMNeuropodTensor>(data->tensor_type, dims, std::move(block), data, block_id);
 }
 
-// Serialization specializations for SHMNeuropodTensor and SealedSHMTensor
-template <>
-void ipc_serialize(std::ostream &out, const NativeDataContainer<SHMBlockID> &data)
-{
-    ipc_serialize(out, data.get_native_data());
-}
-
-template <>
-void ipc_serialize(std::ostream &out, const SealedSHMTensor &data)
-{
-    ipc_serialize(out, data.block_id);
-}
-
 // Serialization specializations for SHMNeuropodTensor
 // Note: the specialization is for `shared_ptr<NeuropodValue>`, but we check internally
 // that the item is a SHMNeuropodTensor or a SealedSHMTensor
@@ -47,12 +34,12 @@ void ipc_serialize(std::ostream &out, const std::shared_ptr<NeuropodValue> &data
     if (auto container = dynamic_cast<SealedSHMTensor *>(data.get()))
     {
         // SealedSHMTensor
-        ipc_serialize(out, *container);
+        ipc_serialize(out, container->block_id);
     }
     else if (auto container = dynamic_cast<NativeDataContainer<SHMBlockID> *>(data.get()))
     {
         // SHMNeuropodTensor
-        ipc_serialize(out, *container);
+        ipc_serialize(out, container->get_native_data());
     }
     else
     {
@@ -62,7 +49,6 @@ void ipc_serialize(std::ostream &out, const std::shared_ptr<NeuropodValue> &data
     }
 }
 
-// Only one deserialize implementation
 template <>
 void ipc_deserialize(std::istream &in, std::shared_ptr<NeuropodValue> &data)
 {

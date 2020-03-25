@@ -61,6 +61,9 @@ public:
 
     // The ID of the chunk of shared memory
     SHMBlockID block_id;
+
+    // The device to seal with in the worker process
+    NeuropodDevice device;
 };
 
 template <typename T>
@@ -158,13 +161,13 @@ public:
 
         out->block    = block_;
         out->block_id = block_id_;
+        out->device   = device;
 
         if (control_channel_)
         {
             // TODO(vip): do this async with a double buffered queue
             // Send a message to the worker process
-            std::shared_ptr<NeuropodValue> value = out;
-            control_channel_->send_message_move(SEAL, value);
+            control_channel_->send_message_move(SEAL, out);
         }
 
         return out;
@@ -294,6 +297,21 @@ template <>
 inline void ipc_deserialize(std::istream &in, SHMBlockID &block_id)
 {
     detail::checked_read(in, reinterpret_cast<char *>(block_id.data()), block_id.size());
+}
+
+// Serialization specializations for SealedSHMTensor
+template <>
+inline void ipc_serialize(std::ostream &out, const SealedSHMTensor &data)
+{
+    ipc_serialize(out, data.block_id);
+    ipc_serialize(out, data.device);
+}
+
+template <>
+inline void ipc_deserialize(std::istream &in, SealedSHMTensor &data)
+{
+    ipc_deserialize(in, data.block_id);
+    ipc_deserialize(in, data.device);
 }
 
 // Serialization specializations for SHMNeuropodTensor

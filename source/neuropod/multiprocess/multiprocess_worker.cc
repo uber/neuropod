@@ -29,6 +29,7 @@ void multiprocess_worker_loop(const std::string &control_queue_name)
     // A pointer to a neuropod (that will be loaded)
     std::unique_ptr<Neuropod>                neuropod;
     std::shared_ptr<NeuropodTensorAllocator> allocator;
+    std::unique_ptr<Sealer>                  sealer;
 
     // A map to store items that have been sealed
     // TODO(vip): Switch to unordered map once SHMBlockID is hashable
@@ -53,19 +54,22 @@ void multiprocess_worker_loop(const std::string &control_queue_name)
                 // Load a neuropod
                 neuropod  = stdx::make_unique<Neuropod>(config.neuropod_path, config.default_backend_overrides);
                 allocator = neuropod->get_tensor_allocator();
+                sealer    = stdx::make_unique<Sealer>(neuropod->get_sealer());
                 sealed.clear();
                 inputs.clear();
                 control_channel->send_message(LOAD_SUCCESS);
             }
             else if (msg_type == SEAL)
             {
-                SHMBlockID block_id;
-                received.get(block_id);
+                SealedSHMTensor sealed_info;
+                received.get(sealed_info);
 
-                auto tensor = tensor_from_id(block_id);
+                auto tensor = tensor_from_id(sealed_info.block_id);
 
                 // Wrap in a tensor type that this neuropod expects
-                sealed[block_id] = wrap_existing_tensor(*allocator, std::dynamic_pointer_cast<NeuropodTensor>(tensor));
+                auto wrapped = wrap_existing_tensor(*allocator, std::dynamic_pointer_cast<NeuropodTensor>(tensor));
+
+                sealed[sealed_info.block_id] = wrapped->seal(sealed_info.device);
             }
             else if (msg_type == ADD_INPUT)
             {
