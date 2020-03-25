@@ -14,10 +14,12 @@
 
 #include <cassert>
 #include <chrono>
+#include <condition_variable>
 #include <iostream>
 #include <memory>
 #include <mutex>
 #include <string>
+#include <thread>
 #include <vector>
 
 namespace neuropod
@@ -66,6 +68,104 @@ public:
     NeuropodDevice device;
 };
 
+// Batches tensors and seals them together
+class SHMSealer
+{
+private:
+    std::vector<std::shared_ptr<SealedSHMTensor>> items;
+    std::shared_ptr<IPCControlChannel>            control_channel_;
+    std::condition_variable                       cv_;
+    std::mutex                                    mutex_;
+
+    std::mutex  send_mutex_;
+    bool        shutdown_ = false;
+    std::thread thread_;
+
+    void worker_loop()
+    {
+        while (!shutdown_)
+        {
+            std::vector<std::shared_ptr<SealedSHMTensor>> temp;
+            std::unique_lock<std::mutex>                  lock(mutex_);
+            if (items.empty())
+            {
+                cv_.wait(lock, [&] { return shutdown_ || !items.empty(); });
+            }
+
+            if (shutdown_)
+            {
+                break;
+            }
+
+            // Swap so we can unlock the mutex as soon as possible
+            std::lock_guard<std::mutex> send_lock(send_mutex_);
+            std::swap(temp, items);
+            lock.unlock();
+
+            // Send the message
+            control_channel_->send_message_move(SEAL, std::move(temp));
+        }
+    }
+
+public:
+    SHMSealer(std::shared_ptr<IPCControlChannel> control_channel)
+        : control_channel_(control_channel), thread_(&SHMSealer::worker_loop, this)
+    {
+    }
+    ~SHMSealer()
+    {
+        {
+            // Lock the mutex
+            std::lock_guard<std::mutex> lock(mutex_);
+            shutdown_ = true;
+        }
+        cv_.notify_all();
+        thread_.join();
+    }
+
+    void sync_flush_buffers()
+    {
+        // Lock the mutex
+        std::lock_guard<std::mutex> lock(mutex_);
+
+        // We lock this mutex too to make sure nothing is in flight
+        // When `sync_flush_buffers` returns, all items that were in the buffer
+        // before this method was called should have been sent already.
+        // If we don't lock this mutex as well, it's possible that the worker thread
+        // is in the process of sending items that it removed from the buffer
+        std::lock_guard<std::mutex> send_lock(send_mutex_);
+
+        if (items.empty())
+        {
+            return;
+        }
+
+        // Send the message
+        control_channel_->send_message_move(SEAL, std::move(items));
+
+        // Return `items` to a valid state after the `std::move`
+        items.clear();
+    }
+
+    void seal(std::shared_ptr<SealedSHMTensor> item)
+    {
+        bool notify = false;
+        {
+            std::lock_guard<std::mutex> lock(mutex_);
+            items.emplace_back(std::move(item));
+            if (items.size() == 1)
+            {
+                notify = true;
+            }
+        }
+
+        if (notify)
+        {
+            cv_.notify_all();
+        }
+    }
+};
+
 template <typename T>
 class SHMNeuropodTensor : public TypedNeuropodTensor<T>, public NativeDataContainer<SHMBlockID>
 {
@@ -80,11 +180,11 @@ private:
     SHMBlockID block_id_;
 
     // The control channel to send seal messages on
-    std::shared_ptr<IPCControlChannel> control_channel_;
+    std::shared_ptr<SHMSealer> shm_sealer_;
 
 public:
-    SHMNeuropodTensor(const std::vector<int64_t> &dims, std::shared_ptr<IPCControlChannel> control_channel = nullptr)
-        : TypedNeuropodTensor<T>(dims), control_channel_(std::move(control_channel))
+    SHMNeuropodTensor(const std::vector<int64_t> &dims, std::shared_ptr<SHMSealer> shm_sealer = nullptr)
+        : TypedNeuropodTensor<T>(dims), shm_sealer_(std::move(shm_sealer))
     {
         // Give us room to make sure that everything is 64 byte aligned
         const size_t size_bytes = sizeof(shm_tensor) + this->get_num_elements() * sizeof(T) + 64;
@@ -125,14 +225,14 @@ public:
     }
 
     // This backend cannot wrap existing memory so we need to make a copy
-    SHMNeuropodTensor(const std::vector<int64_t> &       dims,
-                      void *                             data,
-                      const Deleter &                    deleter,
-                      std::shared_ptr<IPCControlChannel> control_channel = nullptr)
+    SHMNeuropodTensor(const std::vector<int64_t> &dims,
+                      void *                      data,
+                      const Deleter &             deleter,
+                      std::shared_ptr<SHMSealer>  shm_sealer = nullptr)
         : SHMNeuropodTensor<T>(dims)
     {
         // Set the control channel
-        control_channel_ = std::move(control_channel);
+        shm_sealer_ = std::move(shm_sealer);
 
         // Copy in the data
         this->copy_from(static_cast<T *>(data), this->get_num_elements());
@@ -163,11 +263,9 @@ public:
         out->block_id = block_id_;
         out->device   = device;
 
-        if (control_channel_)
+        if (shm_sealer_)
         {
-            // TODO(vip): do this async with a double buffered queue
-            // Send a message to the worker process
-            control_channel_->send_message_move(SEAL, out);
+            shm_sealer_->seal(out);
         }
 
         return out;
@@ -213,11 +311,11 @@ private:
     size_t max_len_;
 
     // The control channel to send seal messages on
-    std::shared_ptr<IPCControlChannel> control_channel_;
+    std::shared_ptr<SHMSealer> sealer_;
 
 public:
-    SHMNeuropodTensor(const std::vector<int64_t> &dims, std::shared_ptr<IPCControlChannel> control_channel = nullptr)
-        : TypedNeuropodTensor<std::string>(dims), max_len_(0), control_channel_(std::move(control_channel))
+    SHMNeuropodTensor(const std::vector<int64_t> &dims, std::shared_ptr<SHMSealer> sealer = nullptr)
+        : TypedNeuropodTensor<std::string>(dims), max_len_(0), sealer_(std::move(sealer))
     {
     }
 
@@ -252,7 +350,7 @@ public:
         dims_copy.push_back(max_len_);
 
         // TODO(vip): We can optimize this
-        data_ = stdx::make_unique<SHMNeuropodTensor<uint8_t>>(dims_copy, control_channel_);
+        data_ = stdx::make_unique<SHMNeuropodTensor<uint8_t>>(dims_copy, sealer_);
         data_->overwrite_type(STRING_TENSOR);
 
         // Copy data in

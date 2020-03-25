@@ -61,15 +61,18 @@ void multiprocess_worker_loop(const std::string &control_queue_name)
             }
             else if (msg_type == SEAL)
             {
-                SealedSHMTensor sealed_info;
-                received.get(sealed_info);
+                std::vector<SealedSHMTensor> items;
+                received.get(items);
 
-                auto tensor = tensor_from_id(sealed_info.block_id);
+                for (const auto &item : items)
+                {
+                    auto tensor = tensor_from_id(item.block_id);
 
-                // Wrap in a tensor type that this neuropod expects
-                auto wrapped = wrap_existing_tensor(*allocator, std::dynamic_pointer_cast<NeuropodTensor>(tensor));
+                    // Wrap in a tensor type that this neuropod expects
+                    auto wrapped = wrap_existing_tensor(*allocator, std::dynamic_pointer_cast<NeuropodTensor>(tensor));
 
-                sealed[sealed_info.block_id] = wrapped->seal(sealed_info.device);
+                    sealed[item.block_id] = wrapped->seal(item.device);
+                }
             }
             else if (msg_type == ADD_INPUT)
             {

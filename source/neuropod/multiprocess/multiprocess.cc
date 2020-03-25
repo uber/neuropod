@@ -86,17 +86,14 @@ pid_t start_worker_process(const std::string &control_queue_name, std::vector<st
 class SHMTensorAllocator : public NeuropodTensorAllocator
 {
 private:
-    std::shared_ptr<IPCControlChannel> control_channel_;
+    std::shared_ptr<SHMSealer> sealer_;
 
 public:
-    SHMTensorAllocator(std::shared_ptr<IPCControlChannel> control_channel)
-        : control_channel_(std::move(control_channel))
-    {
-    }
+    SHMTensorAllocator(std::shared_ptr<SHMSealer> sealer) : sealer_(std::move(sealer)) {}
 
     std::unique_ptr<NeuropodTensor> allocate_tensor(const std::vector<int64_t> &input_dims, TensorType tensor_type)
     {
-        return make_tensor<SHMNeuropodTensor>(tensor_type, input_dims, control_channel_);
+        return make_tensor<SHMNeuropodTensor>(tensor_type, input_dims, sealer_);
     }
 
     std::unique_ptr<NeuropodTensor> tensor_from_memory(const std::vector<int64_t> &input_dims,
@@ -104,7 +101,7 @@ public:
                                                        void *                      data,
                                                        const Deleter &             deleter)
     {
-        return make_tensor_no_string<SHMNeuropodTensor>(tensor_type, input_dims, data, deleter, control_channel_);
+        return make_tensor_no_string<SHMNeuropodTensor>(tensor_type, input_dims, data, deleter, sealer_);
     }
 };
 
@@ -123,6 +120,9 @@ private:
 
     // Control channel for interacting with the worker
     std::shared_ptr<IPCControlChannel> control_channel_;
+
+    // Seals SHM tensors
+    std::shared_ptr<SHMSealer> shm_sealer_;
 
     // The tensor allocator used by this backend
     std::shared_ptr<SHMTensorAllocator> allocator_;
@@ -158,7 +158,8 @@ public:
           control_queue_name_(control_queue_name),
           free_memory_every_cycle_(free_memory_every_cycle),
           control_channel_(std::make_shared<IPCControlChannel>(control_queue_name, MAIN_PROCESS)),
-          allocator_(std::make_shared<SHMTensorAllocator>(control_channel_))
+          shm_sealer_(std::make_shared<SHMSealer>(control_channel_)),
+          allocator_(std::make_shared<SHMTensorAllocator>(shm_sealer_))
     {
         // Setup the load configuration
         load_config_.neuropod_path = neuropod_path_;
@@ -176,7 +177,8 @@ public:
           control_queue_name_(boost::uuids::to_string(boost::uuids::random_generator()())),
           free_memory_every_cycle_(free_memory_every_cycle),
           control_channel_(std::make_shared<IPCControlChannel>(control_queue_name_, MAIN_PROCESS)),
-          allocator_(std::make_shared<SHMTensorAllocator>(control_channel_))
+          shm_sealer_(std::make_shared<SHMSealer>(control_channel_)),
+          allocator_(std::make_shared<SHMTensorAllocator>(shm_sealer_))
     {
         auto env = get_env_map();
 
@@ -255,6 +257,9 @@ protected:
     std::unique_ptr<NeuropodValueMap> infer_internal(const NeuropodValueMap &        inputs,
                                                      const std::vector<std::string> &requested_outputs)
     {
+        // Make sure we've sealed all our inputs
+        shm_sealer_->sync_flush_buffers();
+
         // Add inputs
         control_channel_->send_message(ADD_INPUT, inputs);
 
