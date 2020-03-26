@@ -143,6 +143,9 @@ IPCMessageQueue<UserPayloadType>::IPCMessageQueue(const std::string &control_que
 template <typename UserPayloadType>
 IPCMessageQueue<UserPayloadType>::~IPCMessageQueue()
 {
+    // Send any remaining async messages
+    async_message_group_.wait();
+
     heartbeat_controller_.reset();
 
     // Send a shutdown message to ourselves
@@ -241,25 +244,28 @@ QueueMessage<UserPayloadType> IPCMessageQueue<UserPayloadType>::recv_message()
     std::shared_ptr<WireFormat> received_shared(out.release(), [shared_this](WireFormat *msg) {
         if (msg->requires_done_msg)
         {
-            // Notify the other process that this message is done being read from
-            // and any associated resources can be freed
+            auto id_to_ack = msg->id;
+            shared_this->async_message_group_.run([id_to_ack, shared_this] {
+                // Notify the other process that this message is done being read from
+                // and any associated resources can be freed
 
-            // Create a message to ack `msg`
-            WireFormat ack_msg;
-            ack_msg.type = detail::DONE;
+                // Create a message to ack `msg`
+                WireFormat ack_msg;
+                ack_msg.type = detail::DONE;
 
-            // Serialize the payload
-            detail::Transferrables transferrables;
-            detail::serialize_payload(msg->id, ack_msg, transferrables);
+                // Serialize the payload
+                detail::Transferrables transferrables;
+                detail::serialize_payload(id_to_ack, ack_msg, transferrables);
 
-            if (!transferrables.empty())
-            {
-                // This must be empty otherwise we'll have an infinite DONE chain
-                NEUROPOD_ERROR("[OPE] Transferrables must be empty when sending a `DONE` message.");
-            }
+                if (!transferrables.empty())
+                {
+                    // This must be empty otherwise we'll have an infinite DONE chain
+                    NEUROPOD_ERROR("[OPE] Transferrables must be empty when sending a `DONE` message.");
+                }
 
-            // Send the message
-            shared_this->send_message(ack_msg);
+                // Send the message
+                shared_this->send_message(ack_msg);
+            });
         }
 
         delete msg;

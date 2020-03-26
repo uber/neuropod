@@ -9,6 +9,7 @@
 #include "neuropod/internal/memory_utils.hh"
 #include "neuropod/multiprocess/mq/heartbeat.hh"
 #include "neuropod/multiprocess/mq/wire_format.hh"
+#include "tbb/task_group.h"
 
 #include <boost/interprocess/ipc/message_queue.hpp>
 
@@ -90,6 +91,9 @@ private:
 
     // Responsible for keeping things in scope during cross-process moves
     std::unique_ptr<detail::TransferrableController> transferrable_controller_;
+
+    // A group to send async done messages
+    tbb::task_group async_message_group_;
 
     // Whether or not a shutdown is in progress
     bool shutdown_started_ = false;

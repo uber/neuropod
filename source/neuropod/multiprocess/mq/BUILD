@@ -25,5 +25,6 @@ cc_library(
         "//neuropod/multiprocess/shm",
         "//neuropod/multiprocess/serialization",
         "@boost_repo//:boost",
+        "@tbb_repo_linux//:tbb",
     ],
 )
