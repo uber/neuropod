@@ -17,6 +17,7 @@
 #include <thread>
 #include <vector>
 
+#include "tbb/tbb.h"
 #include "tbb/task_group.h"
 
 namespace neuropod
@@ -25,6 +26,9 @@ namespace neuropod
 // The main loop for a worker that runs a neuropod
 void multiprocess_worker_loop(const std::string &control_queue_name)
 {
+    // Use a single thread
+    tbb::task_scheduler_init init(1);
+
     // Open the control channels
     auto control_channel = std::make_shared<IPCControlChannel>(control_queue_name, WORKER_PROCESS);
 
