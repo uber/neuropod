@@ -1,0 +1,17 @@
+#
+# Uber, Inc. (c) 2020
+#
+
+package(
+    default_visibility = ["//visibility:public"],
+)
+
+cc_library(
+    name = "tbb",
+    srcs = [
+        "lib/intel64/gcc4.8/libtbb.so.2"
+    ],
+    hdrs = glob(["include/**"]),
+    includes = ["include"],
+    visibility = ["//visibility:public"],
+)

@@ -174,3 +174,11 @@ http_archive(
     url = "https://github.com/fmtlib/fmt/archive/5.3.0.zip",
     strip_prefix = "fmt-5.3.0",
 )
+
+http_archive(
+    name = "tbb_repo_linux",
+    build_file = "@//deps:BUILD.tbb",
+    sha256 = "81eaabaa0f87a2aa2f96d538440978b4f8c22cad38ca36634a77a9874b695559",
+    url = "https://github.com/intel/tbb/releases/download/2019_U9/tbb2019_20191006oss_lin.tgz",
+    strip_prefix = "tbb2019_20191006oss",
+)

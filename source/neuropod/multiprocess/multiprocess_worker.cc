@@ -17,6 +17,8 @@
 #include <thread>
 #include <vector>
 
+#include "tbb/task_group.h"
+
 namespace neuropod
 {
 
@@ -30,10 +32,12 @@ void multiprocess_worker_loop(const std::string &control_queue_name)
     std::unique_ptr<Neuropod>                neuropod;
     std::shared_ptr<NeuropodTensorAllocator> allocator;
     std::unique_ptr<Sealer>                  sealer;
+    std::unique_ptr<tbb::task_group>         seal_group;
 
     // A map to store items that have been sealed
     // TODO(vip): Switch to unordered map once SHMBlockID is hashable
     std::map<SHMBlockID, std::shared_ptr<NeuropodValue>> sealed;
+    std::mutex sealed_mutex;
 
     // A map to store the inputs
     NeuropodValueMap inputs;
@@ -52,30 +56,49 @@ void multiprocess_worker_loop(const std::string &control_queue_name)
                 received.get(config);
 
                 // Load a neuropod
-                neuropod  = stdx::make_unique<Neuropod>(config.neuropod_path, config.default_backend_overrides);
-                allocator = neuropod->get_tensor_allocator();
-                sealer    = stdx::make_unique<Sealer>(neuropod->get_sealer());
+                neuropod   = stdx::make_unique<Neuropod>(config.neuropod_path, config.default_backend_overrides);
+                allocator  = neuropod->get_tensor_allocator();
+                sealer     = stdx::make_unique<Sealer>(neuropod->get_sealer());
+                seal_group = stdx::make_unique<tbb::task_group>();
+
                 sealed.clear();
                 inputs.clear();
                 control_channel->send_message(LOAD_SUCCESS);
             }
             else if (msg_type == SEAL)
             {
-                std::vector<SealedSHMTensor> items;
-                received.get(items);
+                auto items = std::make_shared<std::vector<SealedSHMTensor>>();
+                received.get(*items);
 
-                for (const auto &item : items)
-                {
-                    auto tensor = tensor_from_id(item.block_id);
+                // Kick off a task to seal the tensors
+                seal_group->run([items, allocator, &sealed, &sealed_mutex] {
+                    std::map<SHMBlockID, std::shared_ptr<NeuropodValue>> tmp;
+                    for (const auto &item : *items)
+                    {
+                        auto tensor = tensor_from_id(item.block_id);
 
-                    // Wrap in a tensor type that this neuropod expects
-                    auto wrapped = wrap_existing_tensor(*allocator, std::dynamic_pointer_cast<NeuropodTensor>(tensor));
+                        // Wrap in a tensor type that this neuropod expects
+                        auto wrapped =
+                            wrap_existing_tensor(*allocator, std::dynamic_pointer_cast<NeuropodTensor>(tensor));
 
-                    sealed[item.block_id] = wrapped->seal(item.device);
-                }
+                        tmp[item.block_id] = wrapped->seal(item.device);
+                    }
+
+                    // Lock the mutex and add inputs
+                    std::lock_guard<std::mutex> lock(sealed_mutex);
+                    for (auto &item : tmp)
+                    {
+                        sealed.insert(std::move(item));
+                    }
+                });
             }
             else if (msg_type == ADD_INPUT)
             {
+                // Wait on the task group and then reset it
+                seal_group->wait();
+                seal_group = stdx::make_unique<tbb::task_group>();
+
+                // Grab the sealed tensors
                 std::unordered_map<std::string, SHMBlockID> tmp;
                 received.get(tmp);
 

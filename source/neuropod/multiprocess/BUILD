@@ -57,6 +57,7 @@ cc_library(
         ":ipc_control_channel",
         "//neuropod:neuropod_hdrs",
         "//neuropod/internal",
+        "@tbb_repo_linux//:tbb",
     ],
 )
 
