@@ -15,14 +15,14 @@ namespace neuropod
 {
 
 Neuropod::Neuropod(const std::string &neuropod_path, const RuntimeOptions &options)
-    : Neuropod(neuropod_path, std::unordered_map<std::string, std::string>(), options)
+    : Neuropod(neuropod_path, {}, options)
 {
 }
 
 // Find the right backend to use and load the neuropod
-Neuropod::Neuropod(const std::string &                                 neuropod_path,
-                   const std::unordered_map<std::string, std::string> &default_backend_overrides,
-                   const RuntimeOptions &                              options)
+Neuropod::Neuropod(const std::string &                 neuropod_path,
+                   const std::vector<BackendLoadSpec> &default_backend_overrides,
+                   const RuntimeOptions &              options)
 {
     if (options.use_ope)
     {

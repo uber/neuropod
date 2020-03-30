@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "neuropod/internal/backend_registration.hh"
 #include "neuropod/multiprocess/serialization/ipc_serialization.hh"
 
 namespace neuropod
@@ -16,7 +17,7 @@ struct ope_load_config
     std::string neuropod_path;
 
     // See the docs in `neuropod.hh`
-    std::unordered_map<std::string, std::string> default_backend_overrides;
+    std::vector<BackendLoadSpec> default_backend_overrides;
 };
 
 // Serialization specializations for ope_load_config

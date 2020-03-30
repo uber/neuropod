@@ -61,8 +61,8 @@ TEST(test_ipc_serialization, ope_load_config)
     neuropod::ope_load_config expected;
     expected.neuropod_path             = "/some/path";
     expected.default_backend_overrides = {
-        {"tensorflow", "/some/path/to/neuropod_tensorflow_backend.so"},
-        {"torchscript", "/some/path/to/neuropod_torchscrtipt_backend.so"},
+        {"tensorflow", "1.1.0", "/some/path/to/neuropod_tensorflow_backend.so"},
+        {"torchscript", "1.12.0", "/some/path/to/neuropod_torchscrtipt_backend.so"},
     };
 
     const auto actual = serialize_deserialize(expected);

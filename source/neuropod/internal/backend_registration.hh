@@ -37,15 +37,29 @@ bool register_backend(const std::string &    name,
                       const std::string &    version,
                       BackendFactoryFunction factory_fn);
 
+struct BackendLoadSpec
+{
+    // A neuropod platform (e.g. "python", "tensorflow", "torchscript")
+    std::string type;
+
+    // The version of the platform (e.g. "1.12.0")
+    std::string version;
+
+    // The name or path of a shared library that supports the above platform and version
+    // (e.g. "libneuropod_tensorflow_backend.so")
+    std::string path;
+
+    bool operator==(const BackendLoadSpec &other) const;
+};
+
 // Get a backend factory function for a neuropod type (e.g. "python", "tensorflow", "torchscript")
 // `default_backend_overrides` allows users to override the default backend for a given type.
 // This is a mapping from a neuropod type to the name of a shared library that supports that type.
 // Note: Libraries in this map will only be loaded if a backend for the requested type hasn't already
 // been loaded
-BackendFactoryFunction get_backend_for_type(
-    const std::unordered_map<std::string, std::string> &default_backend_overrides,
-    const std::string &                                 type,
-    const std::string &                                 target_version_range = "*");
+BackendFactoryFunction get_backend_for_type(const std::vector<BackendLoadSpec> &default_backend_overrides,
+                                            const std::string &                 type,
+                                            const std::string &                 target_version_range = "*");
 
 // A macro to easily define a backend
 // Example: REGISTER_NEUROPOD_BACKEND(SomeTensorflowBackend, "tensorflow", "1.13.1")

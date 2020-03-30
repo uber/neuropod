@@ -14,7 +14,7 @@ from testpath.tempdir import TemporaryDirectory
 TEMPLATE_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "template")
 IS_MAC = platform.system() == "Darwin"
 
-def package(package_name, tar_path, platforms):
+def package(package_name, tar_path, platform, platform_version):
     # Remove all `.` characters from the name
     package_name = package_name.replace(".", "-")
 
@@ -69,7 +69,8 @@ def package(package_name, tar_path, platforms):
             NEUROPOD_VERSION="0.1.0",
             SHARED_LIBRARY_NAME=shared_library_name,
             LIBS=str(members),
-            PLATFORM=str(platforms),
+            PLATFORM=platform,
+            PLATFORM_VERSION=platform_version,
         )
 
         # Write it out
@@ -123,8 +124,9 @@ if __name__ == '__main__':
     gpustring = "gpu-cuda-{}".format(CUDA_VERSION) if IS_GPU else "cpu"
 
     # Build wheels for the backends
-    package("neuropod-backend-tensorflow-{}-{}".format(REQUESTED_TF_VERSION, gpustring), "bazel-bin/neuropod/backends/tensorflow/neuropod_tensorflow_backend.tar.gz", ["tensorflow"])
-    package("neuropod-backend-torchscript-{}-{}".format(REQUESTED_TORCH_VERSION, gpustring), "bazel-bin/neuropod/backends/torchscript/neuropod_torchscript_backend.tar.gz", ["torchscript"])
+    package("neuropod-backend-tensorflow-{}-{}".format(REQUESTED_TF_VERSION, gpustring), "bazel-bin/neuropod/backends/tensorflow/neuropod_tensorflow_backend.tar.gz", "tensorflow", REQUESTED_TF_VERSION)
+    package("neuropod-backend-torchscript-{}-{}".format(REQUESTED_TORCH_VERSION, gpustring), "bazel-bin/neuropod/backends/torchscript/neuropod_torchscript_backend.tar.gz", "torchscript", REQUESTED_TORCH_VERSION)
 
     # The python backend isn't different depending on CPU/GPU so we don't include that in the name
-    package("neuropod-backend-python-{}".format(PYTHON_VERSION), "bazel-bin/neuropod/backends/python_bridge/neuropod_pythonbridge_backend.tar.gz", ["python", "pytorch"])
+    # TODO(vip): It isn't necessarily true that the current python version is the version we're packaging
+    package("neuropod-backend-python-{}".format(PYTHON_VERSION), "bazel-bin/neuropod/backends/python_bridge/neuropod_pythonbridge_backend.tar.gz", "python", platform.python_version())
