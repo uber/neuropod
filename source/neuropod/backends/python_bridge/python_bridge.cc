@@ -49,8 +49,6 @@ std::unique_ptr<py::gil_scoped_release> maybe_initialize()
 #ifndef __APPLE__
 // This binary is already linked against `libpython`; the dlopen just
 // promotes it to RTLD_GLOBAL.
-#define STR_HELPER(x) #x
-#define STR(x) STR_HELPER(x)
 #define PYTHON_LIB_NAME "libpython" STR(PYTHON_VERSION) ".so"
     void *libpython = dlopen(PYTHON_LIB_NAME, RTLD_NOW | RTLD_GLOBAL | RTLD_NOLOAD);
 
@@ -147,6 +145,6 @@ std::unique_ptr<NeuropodValueMap> PythonBridge::infer_internal(const NeuropodVal
     return stdx::make_unique<NeuropodValueMap>(std::move(outputs));
 }
 
-REGISTER_NEUROPOD_BACKEND(PythonBridge, "python", "pytorch")
+REGISTER_NEUROPOD_BACKEND(PythonBridge, "python", PY_VERSION)
 
 } // namespace neuropod

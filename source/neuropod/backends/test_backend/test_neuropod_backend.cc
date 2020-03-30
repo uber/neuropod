@@ -27,6 +27,6 @@ std::unique_ptr<NeuropodValueMap> TestNeuropodBackend::infer_internal(const Neur
     return stdx::make_unique<NeuropodValueMap>();
 }
 
-REGISTER_NEUROPOD_BACKEND(TestNeuropodBackend, "noop")
+REGISTER_NEUROPOD_BACKEND(TestNeuropodBackend, "noop", "0.1.0")
 
 } // namespace neuropod

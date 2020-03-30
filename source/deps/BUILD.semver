@@ -1,0 +1,18 @@
+#
+# Uber, Inc. (c) 2020
+#
+
+package(
+    default_visibility = ["//visibility:public"],
+)
+
+cc_library(
+    name = "semver",
+    hdrs = glob([
+        "include/**",
+    ]),
+    includes = [
+        "include"
+    ],
+    visibility = ["//visibility:public"],
+)

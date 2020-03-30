@@ -384,6 +384,6 @@ std::unique_ptr<NeuropodValueMap> TensorflowNeuropodBackend::infer_internal(
     return to_return;
 }
 
-REGISTER_NEUROPOD_BACKEND(TensorflowNeuropodBackend, "tensorflow")
+REGISTER_NEUROPOD_BACKEND(TensorflowNeuropodBackend, "tensorflow", STR(TENSORFLOW_VERSION))
 
 } // namespace neuropod

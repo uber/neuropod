@@ -11,6 +11,7 @@ from testpath.tempdir import TemporaryDirectory
 from neuropod.packagers import create_tensorflow_neuropod
 from neuropod.loader import load_neuropod
 from neuropod.tests.utils import get_addition_model_spec, check_addition_model
+from neuropod.utils.eval_utils import RUN_NATIVE_TESTS
 
 
 def create_tf_addition_model():
@@ -53,9 +54,12 @@ def create_tf_accumulator_model():
 
 
 class TestTensorflowPackaging(unittest.TestCase):
-    def package_simple_addition_model(self, do_fail=False, package_as_zip=True):
+    def package_simple_addition_model(self, do_fail=False, **kwargs):
         with TemporaryDirectory() as test_dir:
             neuropod_path = os.path.join(test_dir, "test_neuropod")
+
+            # Get the input/output spec along with test data
+            kwargs.update(get_addition_model_spec(do_fail=do_fail))
 
             # `create_tensorflow_neuropod` runs inference with the test data immediately
             # after creating the neuropod. Raises a ValueError if the model output
@@ -70,9 +74,7 @@ class TestTensorflowPackaging(unittest.TestCase):
                     # The `:0` is optional
                     "out": "some_namespace/out",
                 },
-                package_as_zip=package_as_zip,
-                # Get the input/output spec along with test data
-                **get_addition_model_spec(do_fail=do_fail)
+                **kwargs
             )
 
             # Run some additional checks
@@ -129,6 +131,39 @@ class TestTensorflowPackaging(unittest.TestCase):
                 np.testing.assert_equal(
                     neuropod_obj.infer({"x": np.float32(4.0)}), {"out": 6.0}
                 )
+
+    #
+    # Note: The following tests only run against the native bindings. This is okay because the
+    # native bindings are the default inference implementation (and will soon be the only
+    # inference implementation)
+    #
+
+    @unittest.skipIf(
+        not RUN_NATIVE_TESTS,
+        "Target versions are only supported by the native bindings",
+    )
+    def test_simple_addition_model_invalid_target_version(self):
+        # Tests a case where the target platform is an invalid version or range
+        with self.assertRaises(RuntimeError):
+            self.package_simple_addition_model(platform_version_semver="a.b.c")
+
+    @unittest.skipIf(
+        not RUN_NATIVE_TESTS,
+        "Target versions are only supported by the native bindings",
+    )
+    def test_simple_addition_model_no_matching_version(self):
+        # Tests a case where the target platform version is not one that is
+        # available
+        with self.assertRaises(RuntimeError):
+            self.package_simple_addition_model(platform_version_semver="0.0.1")
+
+    @unittest.skipIf(
+        not RUN_NATIVE_TESTS,
+        "Target versions are only supported by the native bindings",
+    )
+    def test_simple_addition_model_matching_range(self):
+        # Tests a case where we have an appropraite backend for the target range
+        self.package_simple_addition_model(platform_version_semver="1.0.1 - 2.0.0")
 
 
 if __name__ == "__main__":

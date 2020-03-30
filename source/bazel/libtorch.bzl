@@ -10,7 +10,7 @@ def _impl(repository_ctx):
     # Get the torch cuda string (e.g. cpu, cu90, cu92, cu100)
     torch_cuda_string = "cu" + CUDA_VERSION.replace(".", "") if IS_GPU else "cpu"
 
-    defines = []
+    defines = ["TORCH_VERSION=" + version]
 
     # If this is a nightly build, we want to define a variable
     # to let our code know what nightly version this is

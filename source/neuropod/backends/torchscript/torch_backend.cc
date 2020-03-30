@@ -439,6 +439,6 @@ std::unique_ptr<NeuropodValueMap> TorchNeuropodBackend::infer_internal(const Neu
     return to_return;
 }
 
-REGISTER_NEUROPOD_BACKEND(TorchNeuropodBackend, "torchscript")
+REGISTER_NEUROPOD_BACKEND(TorchNeuropodBackend, "torchscript", STR(TORCH_VERSION))
 
 } // namespace neuropod
