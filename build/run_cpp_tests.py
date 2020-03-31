@@ -38,6 +38,9 @@ def make_test(test_target, tags):
             PATH += ":" + os.path.join(os.getcwd(), "bazel-bin/neuropod/multiprocess/")
             env["PATH"] = PATH
 
+        if "no_trace_logging" not in tags:
+            env["NEUROPOD_LOG_LEVEL"] = "TRACE"
+
         subprocess.check_call(test_path, cwd=runfiles_path, env=env)
     return test
 
