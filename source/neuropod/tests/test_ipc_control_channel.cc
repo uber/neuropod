@@ -20,7 +20,7 @@ TEST(test_ipc_control_channel, simple)
     const std::vector<int64_t> dims      = {2, 4, 8, 16};
 
     // TODO(vip): maybe dynamically generate a queue name?
-    constexpr auto              queue_name = "neuropod_test_message_queue_simple";
+    constexpr auto              queue_name = "neuropod_test_control_channel_simple";
     neuropod::IPCControlChannel main_control_channel(queue_name, neuropod::MAIN_PROCESS);
     neuropod::IPCControlChannel worker_control_channel(queue_name, neuropod::WORKER_PROCESS);
 
@@ -44,7 +44,7 @@ TEST(test_ipc_control_channel, simple)
 
     // Receive the tensors
     neuropod::NeuropodValueMap recvd_map;
-    for (int i = 0; i < 3; i++)
+    for (int i = 0; i < 4; i++)
     {
         // Get a message
         neuropod::ControlMessage received;
@@ -96,7 +96,7 @@ TEST(test_ipc_control_channel, no_tensors)
     neuropod::NeuropodValueMap sender_map;
 
     // TODO(vip): maybe dynamically generate a queue name?
-    constexpr auto              queue_name = "neuropod_test_message_queue_no_tensors";
+    constexpr auto              queue_name = "neuropod_test_control_channel_no_tensors";
     neuropod::IPCControlChannel main_control_channel(queue_name, neuropod::MAIN_PROCESS);
     neuropod::IPCControlChannel worker_control_channel(queue_name, neuropod::WORKER_PROCESS);
 
@@ -107,7 +107,7 @@ TEST(test_ipc_control_channel, no_tensors)
     main_control_channel.send_message(neuropod::INFER);
 
     // Receive the tensors
-    for (int i = 0; i < 3; i++)
+    for (int i = 0; i < 4; i++)
     {
         // Get a message
         neuropod::ControlMessage received;

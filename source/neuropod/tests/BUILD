@@ -282,6 +282,18 @@ cc_test(
 )
 
 cc_test(
+    name = "test_ipc_message_queue",
+    srcs = [
+        "test_ipc_message_queue.cc",
+    ],
+    deps = [
+        "@gtest//:main",
+        "//neuropod/multiprocess/mq",
+        "//neuropod/multiprocess:ipc_control_channel",
+    ],
+)
+
+cc_test(
     name = "test_multiprocess_worker",
     srcs = [
         "test_multiprocess_worker.cc",
