@@ -10,8 +10,8 @@ cc_binary(
     ],
     deps = [
         ":bindings",
-        "//neuropod/multiprocess:multiprocess_hdrs",
-        "//neuropod/serialization:serialization_hdrs",
+        "//neuropod/multiprocess",
+        "//neuropod/serialization",
         "//neuropod/backends/test_backend:test_backend_hdrs",
     ],
     linkshared = True,
@@ -29,8 +29,7 @@ cc_library(
         "//neuropod:__subpackages__",
     ],
     deps = [
-        "//neuropod/internal:neuropod_tensor",
-        "//neuropod/internal:neuropod_tensor_raw_data_access",
+        "//neuropod/internal",
         "//neuropod:neuropod_hdrs",
         "@pybind11_repo//:pybind11",
     ],

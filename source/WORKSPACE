@@ -15,9 +15,9 @@ http_archive(
 
 load("@com_grail_bazel_toolchain//toolchain:rules.bzl", "llvm_toolchain")
 
-# This is a manylinux2010 compatible sysroot
+# This is a manylinux2014 compatible sysroot
 http_archive(
-    name = "manylinux2010_sysroot",
+    name = "manylinux2014_sysroot",
     build_file_content = """
 filegroup(
   name = "sysroot",
@@ -25,15 +25,15 @@ filegroup(
   visibility = ["//visibility:public"],
 )
 """,
-    sha256 = "5be526543d53eada141921dd5108e082953e7fcb0131df09dde7e9efd109eeae",
-    urls = ["https://github.com/VivekPanyam/manylinux-sysroot/releases/download/0.0.1/manylinux2010_sysroot.tar.gz"],
+    sha256 = "2c5aa261bb7a124e2363b6f42f93e6188c44f2aa8871496adef61a653ccd0575",
+    urls = ["https://github.com/VivekPanyam/manylinux-sysroot/releases/download/0.0.1/manylinux2014_sysroot.tar.gz"],
 )
 
 llvm_toolchain(
     name = "llvm_toolchain",
     llvm_version = "9.0.0",
     sysroot = {
-        "linux": "@manylinux2010_sysroot//:sysroot",
+        "linux": "@manylinux2014_sysroot//:sysroot",
     },
 )
 

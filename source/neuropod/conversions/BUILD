@@ -9,7 +9,7 @@ cc_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
-        "//neuropod/internal:neuropod_tensor",
+        "//neuropod/internal",
         "@eigen3_repo//:eigen3",
     ],
 )

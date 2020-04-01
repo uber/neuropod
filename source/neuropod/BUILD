@@ -15,8 +15,7 @@ cc_library(
     ],
     deps = [
         "//neuropod/backends:neuropod_backend",
-        "//neuropod/internal:neuropod_config_utils",
-        "//neuropod/internal:neuropod_tensor",
+        "//neuropod/internal",
     ],
 )
 
@@ -25,6 +24,16 @@ cc_binary(
     linkshared = True,
     linkstatic = True,
     linkopts = ["-Wl,-rpath,$$ORIGIN"],
+    visibility = [
+        "//visibility:public",
+    ],
+    deps = [
+        ":neuropod_impl",
+    ]
+)
+
+cc_library(
+    name = "neuropod_impl",
     srcs = [
         "neuropod.cc",
     ],
@@ -33,13 +42,11 @@ cc_binary(
     ],
     deps = [
         ":neuropod_hdrs",
-        "//neuropod/internal:backend_registration_impl",
-        "//neuropod/internal:neuropod_loader_impl",
-        "//neuropod/internal:neuropod_tensor_raw_data_access_impl",
-        "//neuropod/internal:tensor_serialization_impl",
-        "//neuropod/multiprocess:multiprocess_impl",
-        "//neuropod/serialization:serialization_impl",
-    ]
+        "//neuropod/internal:impl",
+        "//neuropod/multiprocess:impl",
+        "//neuropod/serialization:impl",
+    ],
+    alwayslink = True,
 )
 
 pkg_tar(

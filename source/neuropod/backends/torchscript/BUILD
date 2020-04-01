@@ -8,8 +8,6 @@ load("//bazel:copy_libs.bzl", "copy_libs")
 cc_binary(
     name = "libneuropod_torchscript_backend.so",
     srcs = [
-        "torch_backend.cc",
-        "type_utils.cc",
         "//neuropod:libneuropod.so",
     ],
     linkshared = True,
@@ -19,9 +17,7 @@ cc_binary(
         "//neuropod:__subpackages__",
     ],
     deps = [
-        ":neuropod_torchscript_backend_hdrs",
-        "//neuropod/internal:deleter",
-        "@libtorch_repo//:libtorch",
+        ":torch_backend",
     ],
     data = [
         ":copy_libtorch",
@@ -29,7 +25,11 @@ cc_binary(
 )
 
 cc_library(
-    name = "neuropod_torchscript_backend_hdrs",
+    name = "torch_backend",
+    srcs = [
+        "torch_backend.cc",
+        "type_utils.cc",
+    ],
     hdrs = [
         "torch_backend.hh",
         "torch_tensor.hh",
@@ -40,9 +40,11 @@ cc_library(
     ],
     deps = [
         "//neuropod:neuropod_hdrs",
+        "//neuropod/internal",
         "//neuropod/backends:neuropod_backend",
-        "@libtorch_repo//:libtorch_hdrs",
-    ]
+        "@libtorch_repo//:libtorch",
+    ],
+    alwayslink = True,
 )
 
 copy_libs(

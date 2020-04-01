@@ -13,14 +13,27 @@ cc_library(
     ],
     deps = [
         "//neuropod/backends:neuropod_backend",
-        "//neuropod/internal:deleter",
+        "//neuropod/internal",
     ],
+)
+
+cc_library(
+    name = "test_backend",
+    srcs = [
+        "test_neuropod_backend.cc",
+    ],
+    visibility = [
+        "//neuropod:__subpackages__",
+    ],
+    deps = [
+        ":test_backend_hdrs"
+    ],
+    alwayslink = True
 )
 
 cc_binary(
     name = "libneuropod_test_backend.so",
     srcs = [
-        "test_neuropod_backend.cc",
         "//neuropod:libneuropod.so",
     ],
     linkshared = True,
@@ -30,6 +43,6 @@ cc_binary(
         "//neuropod:__subpackages__",
     ],
     deps = [
-        ":test_backend_hdrs"
+        ":test_backend"
     ]
 )

@@ -8,12 +8,6 @@ load("//bazel:copy_libs.bzl", "copy_libs")
 cc_binary(
     name = "libneuropod_tensorflow_backend.so",
     srcs = [
-        "tf_backend.cc",
-        "tf_backend.hh",
-        "tf_tensor.cc",
-        "tf_tensor.hh",
-        "type_utils.cc",
-        "type_utils.hh",
         "//neuropod:libneuropod.so",
     ],
     linkshared = True,
@@ -23,16 +17,35 @@ cc_binary(
         "//neuropod:__subpackages__",
     ],
     deps = [
-        "//neuropod:neuropod_hdrs",
-        "//neuropod/backends:neuropod_backend",
-        "//neuropod/internal:deleter",
-        "//neuropod/internal:logging",
-        "@tensorflow_hdrs_repo//:tensorflow_hdrs",
-        "@tensorflow_repo//:libtensorflow",
+        ":tensorflow_backend",
     ],
     data = [
         "copy_libtensorflow",
     ]
+)
+
+cc_library(
+    name = "tensorflow_backend",
+    srcs = [
+        "tf_backend.cc",
+        "tf_backend.hh",
+        "tf_tensor.cc",
+        "tf_tensor.hh",
+        "type_utils.cc",
+        "type_utils.hh",
+    ],
+    visibility = [
+        "//neuropod:__subpackages__",
+    ],
+    deps = [
+        "//neuropod:neuropod_hdrs",
+        "//neuropod/backends:neuropod_backend",
+        "//neuropod/internal",
+        "@tensorflow_hdrs_repo//:tensorflow_hdrs",
+        "@tensorflow_repo//:libtensorflow",
+        "@libjsoncpp_repo//:libjsoncpp",
+    ],
+    alwayslink = True,
 )
 
 copy_libs(
