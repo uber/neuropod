@@ -17,10 +17,10 @@ def _copy_libs_impl(ctx):
 
         # Copy all the input files to the output directory
         command = "cp -a %s %s" %
-            (
-                " ".join([f.path for f in in_files]),
-                out_files[0].dirname
-            ),
+                  (
+                      " ".join([f.path for f in in_files]),
+                      out_files[0].dirname,
+                  ),
     )
 
     # Tell bazel to make these files available at runtime

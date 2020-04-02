@@ -14,22 +14,22 @@ cc_library(
     deps = [
         "//neuropod/backends:neuropod_backend",
         "//neuropod/internal",
-        "//neuropod/multiprocess/shm",
         "//neuropod/multiprocess/serialization",
+        "//neuropod/multiprocess/shm",
     ],
 )
 
 cc_library(
     name = "ipc_control_channel",
-    hdrs = [
-        "ipc_control_channel.hh",
-        "control_messages.hh",
-        "ope_load_config.hh",
-    ],
     srcs = [
-        "ipc_control_channel.cc",
         "control_messages.cc",
+        "ipc_control_channel.cc",
         "ope_load_config.cc",
+    ],
+    hdrs = [
+        "control_messages.hh",
+        "ipc_control_channel.hh",
+        "ope_load_config.hh",
     ],
     visibility = [
         "//neuropod:__subpackages__",
@@ -42,12 +42,12 @@ cc_library(
 
 cc_library(
     name = "multiprocess_worker",
-    hdrs = [
-        "multiprocess_worker.hh",
-    ],
     srcs = [
         "multiprocess_worker.cc",
         "tensor_utils.hh",
+    ],
+    hdrs = [
+        "multiprocess_worker.hh",
     ],
     visibility = [
         "//neuropod:__subpackages__",
@@ -65,11 +65,11 @@ cc_binary(
         "multiprocess_worker_main.cc",
         "//neuropod:libneuropod.so",
     ],
-    linkstatic = True,
     linkopts = select({
         "@bazel_tools//src/conditions:darwin": ["-Wl,-rpath,@loader_path"],
         "//conditions:default": ["-Wl,-rpath,$$ORIGIN"],
     }),
+    linkstatic = True,
     visibility = [
         "//neuropod:__subpackages__",
     ],
@@ -83,14 +83,14 @@ cc_library(
     hdrs = [
         "multiprocess.hh",
     ],
+    data = [
+        ":neuropod_multiprocess_worker",
+    ],
     visibility = [
         "//neuropod:__subpackages__",
     ],
     deps = [
         "//neuropod:neuropod_hdrs",
-    ],
-    data = [
-        ":neuropod_multiprocess_worker",
     ],
 )
 

@@ -13,7 +13,7 @@ cc_library(
     deps = [
         "@fmt_repo//:fmt",
         "@spdlog_repo//:spdlog",
-    ]
+    ],
 )
 
 cc_library(
@@ -49,8 +49,8 @@ cc_library(
 # Package all the header files
 pkg_tar(
     name = "libneuropod_internal_hdrs",
-    package_dir = "internal/",
     srcs = glob(["*.hh"]),
+    package_dir = "internal/",
     visibility = [
         "//visibility:public",
     ],

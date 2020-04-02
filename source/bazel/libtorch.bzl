@@ -3,8 +3,8 @@ def _impl(repository_ctx):
     # The `or` pattern below handles empty strings and unset env variables
     # Using a default value only handles unset env variables
     version = repository_ctx.os.environ.get("NEUROPOD_TORCH_VERSION") or "1.1.0"
-    IS_MAC  = repository_ctx.os.name.startswith("mac")
-    IS_GPU  = (repository_ctx.os.environ.get("NEUROPOD_IS_GPU") or None) != None
+    IS_MAC = repository_ctx.os.name.startswith("mac")
+    IS_GPU = (repository_ctx.os.environ.get("NEUROPOD_IS_GPU") or None) != None
     CUDA_VERSION = repository_ctx.os.environ.get("NEUROPOD_CUDA_VERSION") or "10.0"
 
     # Get the torch cuda string (e.g. cpu, cu90, cu92, cu100)
@@ -78,13 +78,13 @@ def _impl(repository_ctx):
     download_mapping = MAPPING["{}-{}-{}".format(
         version,
         "mac" if IS_MAC else "linux",
-        torch_cuda_string
+        torch_cuda_string,
     )]
 
     download_url = download_mapping["url"]
     sha256 = download_mapping["sha256"]
 
-    repository_ctx.download_and_extract(download_url, stripPrefix="libtorch", sha256=sha256)
+    repository_ctx.download_and_extract(download_url, stripPrefix = "libtorch", sha256 = sha256)
 
     # Generate a build file based on the template
     repository_ctx.template(
@@ -96,6 +96,7 @@ def _impl(repository_ctx):
     )
 
 libtorch_repository = repository_rule(
-    implementation=_impl,
-    local=True,
-    attrs={"build_file_template": attr.string(mandatory=True)})
+    implementation = _impl,
+    local = True,
+    attrs = {"build_file_template": attr.string(mandatory = True)},
+)

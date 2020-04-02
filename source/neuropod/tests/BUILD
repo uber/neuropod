@@ -8,9 +8,9 @@ cc_test(
         "benchmark_accessor.cc",
     ],
     deps = [
-        "@benchmark//:benchmark_main",
-        "//neuropod/backends/test_backend",
         "//neuropod:neuropod_impl",
+        "//neuropod/backends/test_backend",
+        "@benchmark//:benchmark_main",
     ],
 )
 
@@ -19,16 +19,16 @@ cc_test(
     srcs = [
         "benchmark_multiprocess.cc",
     ],
-    deps = [
-        "@benchmark//:benchmark_main",
-        "//neuropod:neuropod_impl",
-        "//neuropod/multiprocess",
-        "//neuropod/backends/tensorflow:tensorflow_backend",
-    ],
     data = [
         "//neuropod/tests/test_data",
     ],
     tags = ["requires_ld_library_path"],
+    deps = [
+        "//neuropod:neuropod_impl",
+        "//neuropod/backends/tensorflow:tensorflow_backend",
+        "//neuropod/multiprocess",
+        "@benchmark//:benchmark_main",
+    ],
 )
 
 cc_test(
@@ -37,10 +37,10 @@ cc_test(
         "benchmark_serialization.cc",
     ],
     deps = [
-        "@benchmark//:benchmark_main",
         "//neuropod:neuropod_impl",
         "//neuropod/backends/test_backend",
         "//neuropod/serialization",
+        "@benchmark//:benchmark_main",
     ],
 )
 
@@ -50,8 +50,8 @@ cc_test(
         "benchmark_shm_allocator.cc",
     ],
     deps = [
-        "@benchmark//:benchmark_main",
         "//neuropod/multiprocess/shm",
+        "@benchmark//:benchmark_main",
     ],
 )
 
@@ -61,10 +61,10 @@ cc_test(
         "test_input_output.cc",
     ],
     deps = [
-        "@gtest//:main",
         "//neuropod:neuropod_impl",
         "//neuropod/backends/test_backend",
         "//neuropod/serialization",
+        "@gtest//:main",
     ],
 )
 
@@ -74,10 +74,10 @@ cc_test(
         "test_serialization.cc",
     ],
     deps = [
-        "@gtest//:main",
         "//neuropod:neuropod_impl",
         "//neuropod/backends/test_backend",
         "//neuropod/serialization",
+        "@gtest//:main",
     ],
 )
 
@@ -87,11 +87,11 @@ cc_test(
         "test_ipc_serialization.cc",
     ],
     deps = [
-        "@gtest//:main",
         "//neuropod:neuropod_impl",
-        "//neuropod/multiprocess/serialization",
         "//neuropod/multiprocess:ipc_control_channel",
         "//neuropod/multiprocess:shm_tensor",
+        "//neuropod/multiprocess/serialization",
+        "@gtest//:main",
     ],
 )
 
@@ -101,9 +101,9 @@ cc_test(
         "test_ope_wire_format.cc",
     ],
     deps = [
-        "@gtest//:main",
         "//neuropod:neuropod_impl",
         "//neuropod/multiprocess/mq",
+        "@gtest//:main",
     ],
 )
 
@@ -113,9 +113,9 @@ cc_test(
         "test_ope_heartbeat.cc",
     ],
     deps = [
-        "@gtest//:main",
         "//neuropod:neuropod_impl",
         "//neuropod/multiprocess/mq",
+        "@gtest//:main",
     ],
 )
 
@@ -125,9 +125,9 @@ cc_test(
         "test_ope_transferrables.cc",
     ],
     deps = [
-        "@gtest//:main",
         "//neuropod:neuropod_impl",
         "//neuropod/multiprocess/mq",
+        "@gtest//:main",
     ],
 )
 
@@ -138,8 +138,8 @@ cc_test(
     ],
     deps = [
         ":neuropod_test_utils",
-        "//neuropod/backends/python_bridge",
         "//neuropod:neuropod_impl",
+        "//neuropod/backends/python_bridge",
     ],
 )
 
@@ -148,12 +148,12 @@ cc_test(
     srcs = [
         "gpu_test_python_bridge.cc",
     ],
+    tags = ["gpu"],
     deps = [
         ":neuropod_test_utils",
-        "//neuropod/backends/python_bridge",
         "//neuropod:neuropod_impl",
+        "//neuropod/backends/python_bridge",
     ],
-    tags = ["gpu"],
 )
 
 cc_test(
@@ -183,15 +183,15 @@ cc_test(
 cc_library(
     name = "neuropod_test_utils",
     hdrs = ["test_utils.hh"],
+    data = [
+        "//neuropod/tests/test_data",
+    ],
     visibility = [
         "//visibility:public",
     ],
     deps = [
-        "@gtest//:main",
         "//neuropod:neuropod_impl",
-    ],
-    data = [
-        "//neuropod/tests/test_data"
+        "@gtest//:main",
     ],
 )
 
@@ -201,9 +201,9 @@ cc_test(
         "test_config_utils.cc",
     ],
     deps = [
-        "@gtest//:main",
         "//neuropod:neuropod_impl",
         "//neuropod/internal",
+        "@gtest//:main",
     ],
 )
 
@@ -213,9 +213,9 @@ cc_test(
         "test_accessor.cc",
     ],
     deps = [
-        "@gtest//:main",
-        "//neuropod/backends/test_backend",
         "//neuropod:neuropod_impl",
+        "//neuropod/backends/test_backend",
+        "@gtest//:main",
     ],
 )
 
@@ -225,9 +225,9 @@ cc_test(
         "test_shm_allocator.cc",
     ],
     deps = [
-        "@gtest//:main",
         "//neuropod:neuropod_impl",
         "//neuropod/multiprocess/shm",
+        "@gtest//:main",
     ],
 )
 
@@ -237,9 +237,9 @@ cc_test(
         "test_shm_tensor.cc",
     ],
     deps = [
-        "@gtest//:main",
         "//neuropod:neuropod_impl",
         "//neuropod/multiprocess:shm_tensor",
+        "@gtest//:main",
     ],
 )
 
@@ -249,9 +249,9 @@ cc_test(
         "test_ipc_control_channel.cc",
     ],
     deps = [
-        "@gtest//:main",
         "//neuropod:neuropod_impl",
         "//neuropod/multiprocess:ipc_control_channel",
+        "@gtest//:main",
     ],
 )
 
@@ -261,10 +261,10 @@ cc_test(
         "test_ipc_message_queue.cc",
     ],
     deps = [
-        "@gtest//:main",
         "//neuropod:neuropod_impl",
-        "//neuropod/multiprocess/mq",
         "//neuropod/multiprocess:ipc_control_channel",
+        "//neuropod/multiprocess/mq",
+        "@gtest//:main",
     ],
 )
 
@@ -274,9 +274,9 @@ cc_test(
         "test_multiprocess_worker.cc",
     ],
     deps = [
-        "@gtest//:main",
         "//neuropod:neuropod_impl",
         "//neuropod/multiprocess:multiprocess_worker",
+        "@gtest//:main",
     ],
 )
 
@@ -286,9 +286,9 @@ cc_test(
         "test_multiprocess_allowed_transitions.cc",
     ],
     deps = [
-        "@gtest//:main",
         "//neuropod:neuropod_impl",
         "//neuropod/multiprocess:ipc_control_channel",
+        "@gtest//:main",
     ],
 )
 
@@ -297,15 +297,15 @@ cc_test(
     srcs = [
         "test_multiprocess.cc",
     ],
+    tags = ["requires_ld_library_path"],
     deps = [
         ":neuropod_test_utils",
         "//neuropod:neuropod_impl",
-        "//neuropod/multiprocess",
-        "//neuropod/backends/torchscript:torch_backend",
-        "//neuropod/backends/tensorflow:tensorflow_backend",
         "//neuropod/backends/python_bridge",
+        "//neuropod/backends/tensorflow:tensorflow_backend",
+        "//neuropod/backends/torchscript:torch_backend",
+        "//neuropod/multiprocess",
     ],
-    tags = ["requires_ld_library_path"],
 )
 
 cc_test(
@@ -314,10 +314,10 @@ cc_test(
         "test_internal_neuropod_tensor.cc",
     ],
     deps = [
-        "@gtest//:main",
         "//neuropod:neuropod_impl",
         "//neuropod/backends/test_backend",
         "//neuropod/internal",
+        "@gtest//:main",
     ],
 )
 
@@ -327,11 +327,11 @@ cc_test(
         "test_conversions_eigen.cc",
     ],
     deps = [
-        "@gtest//:main",
         "//neuropod:neuropod_impl",
         "//neuropod/backends/test_backend",
         "//neuropod/conversions:eigen",
         "@eigen3_repo//:eigen3",
+        "@gtest//:main",
     ],
 )
 
@@ -341,9 +341,9 @@ cc_test(
         "test_test_backend.cc",
     ],
     deps = [
-        "@gtest//:main",
         "//neuropod:neuropod_impl",
         "//neuropod/backends/test_backend",
+        "@gtest//:main",
     ],
 )
 
@@ -353,9 +353,9 @@ cc_test(
         "test_backend_registration.cc",
     ],
     deps = [
-        "@gtest//:main",
         "//neuropod:neuropod_impl",
         "//neuropod/internal",
+        "@gtest//:main",
     ],
 )
 
@@ -365,9 +365,9 @@ cc_test(
         "test_factories.cc",
     ],
     deps = [
-        "@gtest//:main",
         "//neuropod:neuropod_impl",
         "//neuropod/backends/test_backend",
+        "@gtest//:main",
     ],
 )
 
@@ -376,12 +376,12 @@ cc_test(
     srcs = [
         "test_loader.cc",
     ],
+    data = [
+        "//neuropod/tests/test_data",
+    ],
     deps = [
-        "@gtest//:main",
         "//neuropod:neuropod_impl",
         "//neuropod/internal",
-    ],
-    data = [
-        "//neuropod/tests/test_data"
+        "@gtest//:main",
     ],
 )

@@ -12,13 +12,13 @@ cc_binary(
         "@bazel_tools//src/conditions:darwin": ["-Wl,-rpath,@loader_path"],
         "//conditions:default": ["-Wl,-rpath,$$ORIGIN"],
     }),
+    linkshared = True,
     deps = [
         ":bindings",
+        "//neuropod/backends/test_backend:test_backend_hdrs",
         "//neuropod/multiprocess",
         "//neuropod/serialization",
-        "//neuropod/backends/test_backend:test_backend_hdrs",
     ],
-    linkshared = True,
 )
 
 cc_library(
@@ -33,8 +33,8 @@ cc_library(
         "//neuropod:__subpackages__",
     ],
     deps = [
-        "//neuropod/internal",
         "//neuropod:neuropod_hdrs",
+        "//neuropod/internal",
         "@pybind11_repo//:pybind11",
     ],
 )

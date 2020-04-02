@@ -3,8 +3,8 @@ def _impl(repository_ctx):
     # The `or` pattern below handles empty strings and unset env variables
     # Using a default value only handles unset env variables
     version = repository_ctx.os.environ.get("NEUROPOD_TENSORFLOW_VERSION") or "1.12.0"
-    IS_MAC  = repository_ctx.os.name.startswith("mac")
-    IS_GPU  = (repository_ctx.os.environ.get("NEUROPOD_IS_GPU") or None) != None
+    IS_MAC = repository_ctx.os.name.startswith("mac")
+    IS_GPU = (repository_ctx.os.environ.get("NEUROPOD_IS_GPU") or None) != None
 
     MAPPING = {
         # Linux CPU
@@ -65,16 +65,17 @@ def _impl(repository_ctx):
     download_mapping = MAPPING["{}-{}-{}".format(
         version,
         "mac" if IS_MAC else "linux",
-        "gpu" if IS_GPU else "cpu"
+        "gpu" if IS_GPU else "cpu",
     )]
 
     download_url = download_mapping["url"]
     sha256 = download_mapping["sha256"]
 
-    repository_ctx.download_and_extract(download_url, sha256=sha256)
+    repository_ctx.download_and_extract(download_url, sha256 = sha256)
     repository_ctx.symlink(repository_ctx.path(Label(repository_ctx.attr.build_file)), "BUILD.bazel")
 
 tensorflow_repository = repository_rule(
-    implementation=_impl,
-    local=True,
-    attrs={"build_file": attr.string(mandatory=True)})
+    implementation = _impl,
+    local = True,
+    attrs = {"build_file": attr.string(mandatory = True)},
+)
