@@ -4,6 +4,7 @@
 
 #include "neuropod/backends/tensorflow/tf_backend.hh"
 
+#include "neuropod/neuropod.hh"
 #include "tensorflow/core/framework/graph.pb.h"
 #include "tensorflow/core/public/session.h"
 
@@ -88,6 +89,18 @@ tensorflow::SessionOptions get_tf_opts(const RuntimeOptions & /*unused*/)
     // Don't preallocate the entire GPU
     auto gpu_opts = opts.config.mutable_gpu_options();
     gpu_opts->set_allow_growth(true);
+    opts.config.set_allow_soft_placement(true);
+    opts.config.set_log_device_placement(false);
+
+    // Note: we can't use GPUOptions::visible_device_list as it is a per process setting
+    //
+    // From: https://github.com/tensorflow/tensorflow/issues/18861#issuecomment-385610497
+    // Unfortunately, though `visible_deivces_list` is included in `ConfigProto`, it is
+    // actually a per-process setting. In fact, this is true of almost all options inside
+    // the GPUOptions protocol buffer.
+
+    // We set the device of the graph in the constructor below by moving each node to the
+    // target device before creating a session.
     return opts;
 }
 
@@ -120,7 +133,8 @@ std::string get_handle_cache_key(const std::map<std::string, tensorflow::Tensor>
 
 TensorflowNeuropodBackend::TensorflowNeuropodBackend(const std::string &neuropod_path, const RuntimeOptions &options)
     : NeuropodBackendWithDefaultAllocator<TensorflowNeuropodTensor>(neuropod_path),
-      session_(tensorflow::NewSession(get_tf_opts(options)))
+      session_(tensorflow::NewSession(get_tf_opts(options))),
+      options_(options)
 {
     if (options.load_model_at_construction)
     {
@@ -168,6 +182,43 @@ void TensorflowNeuropodBackend::load_model_internal()
     // Read the GraphDef
     tensorflow::GraphDef graph;
     tensorflow::ParseProtoUnlimited(&graph, buffer.data(), buffer.size());
+
+    // Figure out the correct target device
+    std::string target_device = "/device:CPU:0";
+    if (options_.visible_device != Device::CPU)
+    {
+        // Get all the available devices
+        std::vector<tensorflow::DeviceAttributes> devices;
+        check_tf_status(session_->ListDevices(&devices));
+
+        // Check if we have any GPUs
+        bool found_gpu = std::any_of(devices.begin(), devices.end(), [](const tensorflow::DeviceAttributes &device) {
+            return device.device_type() == "GPU";
+        });
+
+        // If we have a GPU, update the target device
+        if (found_gpu)
+        {
+            target_device = std::string("/device:GPU:") + std::to_string(options_.visible_device);
+        }
+    }
+
+    // Iterate through all the nodes in the graph and move them to the target device
+    for (auto &node : *graph.mutable_node())
+    {
+        const auto &node_device = node.device();
+
+        // If a node is on CPU, leave it there
+        if (node_device != "/device:CPU:0" && node_device != target_device)
+        {
+            SPDLOG_TRACE("TF: Moving node {} from device {} to device {}", node.name(), node_device, target_device);
+            node.set_device(target_device);
+        }
+        else
+        {
+            SPDLOG_TRACE("TF: Leaving node {} on device {}", node.name(), node_device);
+        }
+    }
 
     // Create a session
     auto status = session_->Create(graph);

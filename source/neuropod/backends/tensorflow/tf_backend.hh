@@ -31,6 +31,9 @@ class TensorflowNeuropodBackend : public NeuropodBackendWithDefaultAllocator<Ten
 private:
     std::unique_ptr<tensorflow::Session> session_;
 
+    // The options this model was loaded with
+    RuntimeOptions options_;
+
     // Cached access to callable handles
     std::unordered_map<std::string, int64_t> callable_handle_cache_;
 
