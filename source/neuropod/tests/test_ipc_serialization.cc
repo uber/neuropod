@@ -59,11 +59,16 @@ TEST(test_ipc_serialization, bool)
 TEST(test_ipc_serialization, ope_load_config)
 {
     neuropod::ope_load_config expected;
-    expected.neuropod_path = "/some/path";
+    expected.neuropod_path             = "/some/path";
+    expected.default_backend_overrides = {
+        {"tensorflow", "/some/path/to/neuropod_tensorflow_backend.so"},
+        {"torchscript", "/some/path/to/neuropod_torchscrtipt_backend.so"},
+    };
 
     const auto actual = serialize_deserialize(expected);
 
     EXPECT_EQ(expected.neuropod_path, actual.neuropod_path);
+    EXPECT_EQ(expected.default_backend_overrides, actual.default_backend_overrides);
 }
 
 TEST(test_ipc_serialization, neuropod_value_map)

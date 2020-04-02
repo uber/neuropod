@@ -26,14 +26,8 @@ Neuropod::Neuropod(const std::string &                                 neuropod_
 {
     if (options.use_ope)
     {
-        if (!default_backend_overrides.empty())
-        {
-            // For now, we can't provide overrides and use OPE
-            NEUROPOD_ERROR("`default_backend_overrides` cannot be specified when `use_ope` is set to true");
-        }
-
         // Load the model using OPE
-        backend_ = load_neuropod_ope(neuropod_path, options);
+        backend_ = load_neuropod_ope(neuropod_path, options, default_backend_overrides);
     }
     else
     {
