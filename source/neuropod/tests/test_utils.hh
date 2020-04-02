@@ -109,25 +109,18 @@ void test_addition_model(neuropod::Neuropod &neuropod)
     test_addition_model(neuropod, false);
 }
 
-void test_addition_model(const std::string &neuropod_path, const std::string &backend)
+void test_addition_model(const std::string &neuropod_path)
 {
     // Load the neuropod
     neuropod::RuntimeOptions opts;
     opts.load_model_at_construction = false;
-    neuropod::Neuropod neuropod(neuropod_path, backend, opts);
+    neuropod::Neuropod neuropod(neuropod_path, opts);
 
     // Should fail because we haven't loaded the model yet
     EXPECT_ANY_THROW(test_addition_model(neuropod));
 
     // Load the model and try again
     neuropod.load_model();
-    test_addition_model(neuropod);
-}
-
-void test_addition_model(const std::string &neuropod_path)
-{
-    // Load the neuropod
-    neuropod::Neuropod neuropod(neuropod_path);
     test_addition_model(neuropod);
 }
 
@@ -176,25 +169,18 @@ void test_strings_model(neuropod::Neuropod &neuropod)
     EXPECT_TRUE(out_shape == shape);
 }
 
-void test_strings_model(const std::string &neuropod_path, const std::string &backend)
+void test_strings_model(const std::string &neuropod_path)
 {
     // Load the neuropod
     neuropod::RuntimeOptions opts;
     opts.load_model_at_construction = false;
-    neuropod::Neuropod neuropod(neuropod_path, backend, opts);
+    neuropod::Neuropod neuropod(neuropod_path, opts);
 
     // Should fail because we haven't loaded the model yet
     EXPECT_ANY_THROW(test_strings_model(neuropod));
 
     // Load the model and try again
     neuropod.load_model();
-    test_strings_model(neuropod);
-}
-
-void test_strings_model(const std::string &neuropod_path)
-{
-    // Load the neuropod
-    neuropod::Neuropod neuropod(neuropod_path);
     test_strings_model(neuropod);
 }
 

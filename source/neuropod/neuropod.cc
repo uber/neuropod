@@ -37,16 +37,6 @@ Neuropod::Neuropod(const std::string &                                 neuropod_
     }
 }
 
-// Load the neuropod using the specified backend
-Neuropod::Neuropod(const std::string &neuropod_path, const std::string &backend_name, const RuntimeOptions &options)
-    : backend_(get_backend_by_name(backend_name)(neuropod_path, options))
-{
-    if (options.use_ope)
-    {
-        NEUROPOD_ERROR("The `use_ope` option is not allowed when specifying a backend_name.");
-    }
-}
-
 // Load the model config and use the backend that was provided by the user
 Neuropod::Neuropod(const std::string &neuropod_path, std::shared_ptr<NeuropodBackend> backend) : backend_(backend) {}
 
