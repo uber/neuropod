@@ -14,7 +14,7 @@ cc_library(
     ],
     deps = [
         "@boost_repo//:boost",
-    ]
+    ],
 )
 
 cc_library(
@@ -34,8 +34,8 @@ cc_library(
 # Package all the header files
 pkg_tar(
     name = "libneuropod_serialization_hdrs",
-    package_dir = "serialization/",
     srcs = glob(["*.hh"]),
+    package_dir = "serialization/",
     visibility = [
         "//visibility:public",
     ],

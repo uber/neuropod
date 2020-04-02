@@ -10,24 +10,24 @@ cc_binary(
     srcs = [
         "//neuropod:libneuropod.so",
     ],
-    linkshared = True,
-    linkstatic = True,
-    linkopts = select({
-        "@bazel_tools//src/conditions:darwin": ["-Wl,-rpath,@loader_path"],
-        "//conditions:default": ["-Wl,-rpath,$$ORIGIN"],
-    }),
-    visibility = [
-        "//neuropod:__subpackages__",
-    ],
-    deps = [
-        ":torch_backend",
-    ],
     data = [
         ":copy_libtorch",
     ] + select({
         "@bazel_tools//src/conditions:darwin": [":copy_mklml"],
         "//conditions:default": [],
     }),
+    linkopts = select({
+        "@bazel_tools//src/conditions:darwin": ["-Wl,-rpath,@loader_path"],
+        "//conditions:default": ["-Wl,-rpath,$$ORIGIN"],
+    }),
+    linkshared = True,
+    linkstatic = True,
+    visibility = [
+        "//neuropod:__subpackages__",
+    ],
+    deps = [
+        ":torch_backend",
+    ],
 )
 
 cc_library(
@@ -46,8 +46,8 @@ cc_library(
     ],
     deps = [
         "//neuropod:neuropod_hdrs",
-        "//neuropod/internal",
         "//neuropod/backends:neuropod_backend",
+        "//neuropod/internal",
         "@libtorch_repo//:libtorch",
     ],
     alwayslink = True,
@@ -55,12 +55,12 @@ cc_library(
 
 copy_libs(
     name = "copy_libtorch",
-    libs = "@libtorch_repo//:libtorch_libs"
+    libs = "@libtorch_repo//:libtorch_libs",
 )
 
 copy_libs(
     name = "copy_mklml",
-    libs = "@mklml_repo_darwin//:mklml_libs"
+    libs = "@mklml_repo_darwin//:mklml_libs",
 )
 
 pkg_tar(
@@ -72,8 +72,8 @@ pkg_tar(
         "@bazel_tools//src/conditions:darwin": ["@mklml_repo_darwin//:mklml_libs"],
         "//conditions:default": [],
     }),
-    tags = ["manual"],
     extension = "tar.gz",
+    tags = ["manual"],
     visibility = [
         "//visibility:public",
     ],

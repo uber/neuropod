@@ -9,12 +9,12 @@ cc_binary(
     srcs = [
         "//neuropod:libneuropod.so",
     ],
-    linkshared = True,
-    linkstatic = True,
     linkopts = select({
         "@bazel_tools//src/conditions:darwin": ["-Wl,-rpath,@loader_path"],
         "//conditions:default": ["-Wl,-rpath,$$ORIGIN"],
     }),
+    linkshared = True,
+    linkstatic = True,
     visibility = [
         "//neuropod:__subpackages__",
     ],
@@ -49,8 +49,8 @@ pkg_tar(
     srcs = [
         ":libneuropod_pythonbridge_backend.so",
     ],
-    tags = ["manual"],
     extension = "tar.gz",
+    tags = ["manual"],
     visibility = [
         "//visibility:public",
     ],

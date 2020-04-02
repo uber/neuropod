@@ -9,6 +9,23 @@ if [ ! -f "/tmp/run-clang-format.py" ]; then
     wget https://raw.githubusercontent.com/Sarcasm/run-clang-format/de6e8ca07d171a7f378d379ff252a00f2905e81d/run-clang-format.py -O /tmp/run-clang-format.py
 fi
 
+# Check bazel files
+if [[ $(uname -s) == 'Darwin' ]]; then
+    if [ ! -f "/tmp/buildifier.mac" ]; then
+        wget https://github.com/bazelbuild/buildtools/releases/download/2.2.1/buildifier.mac -O /tmp/buildifier.mac
+        chmod +x /tmp/buildifier.mac
+    fi
+
+    /tmp/buildifier.mac --mode diff -r source
+else
+    if [ ! -f "/tmp/buildifier" ]; then
+        wget https://github.com/bazelbuild/buildtools/releases/download/2.2.1/buildifier -O /tmp/buildifier
+        chmod +x /tmp/buildifier
+    fi
+
+    /tmp/buildifier --mode diff -r source
+fi
+
 pushd source
 
 # Run clang-format

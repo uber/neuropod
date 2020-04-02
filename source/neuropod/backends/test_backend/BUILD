@@ -26,9 +26,9 @@ cc_library(
         "//neuropod:__subpackages__",
     ],
     deps = [
-        ":test_backend_hdrs"
+        ":test_backend_hdrs",
     ],
-    alwayslink = True
+    alwayslink = True,
 )
 
 cc_binary(
@@ -36,13 +36,13 @@ cc_binary(
     srcs = [
         "//neuropod:libneuropod.so",
     ],
+    linkopts = ["-Wl,-rpath ."],
     linkshared = True,
     linkstatic = True,
-    linkopts = ["-Wl,-rpath ."],
     visibility = [
         "//neuropod:__subpackages__",
     ],
     deps = [
-        ":test_backend"
-    ]
+        ":test_backend",
+    ],
 )

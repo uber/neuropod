@@ -7,10 +7,10 @@ load("//bazel:libtorch.bzl", "libtorch_repository")
 # Use an internal LLVM toolchain instead of the system one
 http_archive(
     name = "com_grail_bazel_toolchain",
-    strip_prefix = "bazel-toolchain-8570c4ccb39f750452b0b5607c9f54a093214f26",
-    sha256 = "dd6b7b877fe7e4f927c9c44b6ea4fbc94dd4c3c0ffe8f5deac28a33b3c78c866",
-    url = "https://github.com/grailbio/bazel-toolchain/archive/8570c4ccb39f750452b0b5607c9f54a093214f26.tar.gz",
     patches = ["@//bazel:toolchain.patch"],
+    sha256 = "dd6b7b877fe7e4f927c9c44b6ea4fbc94dd4c3c0ffe8f5deac28a33b3c78c866",
+    strip_prefix = "bazel-toolchain-8570c4ccb39f750452b0b5607c9f54a093214f26",
+    url = "https://github.com/grailbio/bazel-toolchain/archive/8570c4ccb39f750452b0b5607c9f54a093214f26.tar.gz",
 )
 
 load("@com_grail_bazel_toolchain//toolchain:rules.bzl", "llvm_toolchain")
@@ -64,21 +64,21 @@ http_archive(
     name = "boost_repo",
     build_file = "@//deps:BUILD.boost",
     sha256 = "3b1db0b67079266c40b98329d85916e910bbadfc3db3e860c049056788d4d5cd",
+    strip_prefix = "boost_1_68_0",
     type = "zip",
     urls = [
         "https://dl.bintray.com/boostorg/release/1.68.0/source/boost_1_68_0.zip",
         "https://sourceforge.net/projects/boost/files/boost/1.68.0/boost_1_68_0.zip",
     ],
-    strip_prefix = "boost_1_68_0",
 )
 
 http_archive(
     name = "pybind11_repo",
     build_file = "@//deps:BUILD.pybind11",
     sha256 = "00be01c512ad5ee1bf51cbde3b5dceddb56e1dde56b034d65336023479e4e98a",
+    strip_prefix = "pybind11-2.4.2",
     type = "zip",
     url = "https://github.com/pybind/pybind11/archive/v2.4.2.zip",
-    strip_prefix = "pybind11-2.4.2",
 )
 
 python_repository(
@@ -88,89 +88,88 @@ python_repository(
 
 http_archive(
     name = "gtest",
-    url = "https://github.com/google/googletest/archive/release-1.8.0.zip",
-    sha256 = "f3ed3b58511efd272eb074a3a6d6fb79d7c2e6a0e374323d1e6bcbcc1ef141bf",
     build_file = "@//deps:BUILD.gtest",
+    sha256 = "f3ed3b58511efd272eb074a3a6d6fb79d7c2e6a0e374323d1e6bcbcc1ef141bf",
     strip_prefix = "googletest-release-1.8.0",
+    url = "https://github.com/google/googletest/archive/release-1.8.0.zip",
 )
 
 http_archive(
     name = "benchmark",
-    url = "https://github.com/google/benchmark/archive/v1.5.0.zip",
-    sha256 = "2d22dd3758afee43842bb504af1a8385cccb3ee1f164824e4837c1c1b04d92a0",
     build_file = "@//deps:BUILD.benchmark",
+    sha256 = "2d22dd3758afee43842bb504af1a8385cccb3ee1f164824e4837c1c1b04d92a0",
     strip_prefix = "benchmark-1.5.0",
+    url = "https://github.com/google/benchmark/archive/v1.5.0.zip",
 )
-
 
 http_archive(
     name = "eigen3_repo",
     build_file = "@//deps:BUILD.eigen3",
     sha256 = "3b025b3f82f2b95eb66fced90521b798c169b00fb755ee7f48194cf2d6be2faf",
-    url = "https://github.com/eigenteam/eigen-git-mirror/archive/3.2.10.zip",
     strip_prefix = "eigen-git-mirror-3.2.10",
+    url = "https://github.com/eigenteam/eigen-git-mirror/archive/3.2.10.zip",
 )
 
 http_archive(
     name = "mklml_repo_darwin",
     build_file = "@//deps:BUILD.mklml",
     sha256 = "2fbb71a0365d42a39ea7906568d69b1db3bfc9914fee75eedb06c5f32bf5fa68",
-    url = "https://github.com/intel/mkl-dnn/releases/download/v0.19/mklml_mac_2019.0.5.20190502.tgz",
     strip_prefix = "mklml_mac_2019.0.5.20190502",
+    url = "https://github.com/intel/mkl-dnn/releases/download/v0.19/mklml_mac_2019.0.5.20190502.tgz",
 )
 
 http_archive(
     name = "zipper_repo",
     build_file = "@//deps:BUILD.zipper",
     sha256 = "ab64b4dd7c43eddd8cdc0935e578fd8d62d3be26696dc6f3acd2cbfc7538831c",
-    url = "https://github.com/sebastiandev/zipper/archive/v1.0.1.zip",
     strip_prefix = "zipper-1.0.1",
+    url = "https://github.com/sebastiandev/zipper/archive/v1.0.1.zip",
 )
 
 http_archive(
     name = "minizip_repo",
     build_file = "@//deps:BUILD.minizip",
     sha256 = "a83155b27ddc0843e5d4f8b637011fc4321a59278bb50a18be02afd62d4def47",
-    url = "https://github.com/sebastiandev/minizip/archive/e3a8cb79a034cb4f2ffc3abb6bd916ffa8678fed.zip",
     strip_prefix = "minizip-e3a8cb79a034cb4f2ffc3abb6bd916ffa8678fed",
+    url = "https://github.com/sebastiandev/minizip/archive/e3a8cb79a034cb4f2ffc3abb6bd916ffa8678fed.zip",
 )
 
 http_archive(
     name = "zlib_repo",
     build_file = "@//deps:BUILD.zlib",
     sha256 = "c3e5e9fdd5004dcb542feda5ee4f0ff0744628baf8ed2dd5d66f8ca1197cb1a1",
-    url = "https://zlib.net/zlib-1.2.11.tar.gz",
     strip_prefix = "zlib-1.2.11",
+    url = "https://zlib.net/zlib-1.2.11.tar.gz",
 )
 
 http_archive(
     name = "filesystem_repo",
     build_file = "@//deps:BUILD.filesystem",
     sha256 = "29b482791dc35a3099e5e27263cb75bf6d1e332e9b4ed6489cca82c0781818b5",
-    url = "https://github.com/gulrak/filesystem/archive/v1.2.6.zip",
     strip_prefix = "filesystem-1.2.6",
+    url = "https://github.com/gulrak/filesystem/archive/v1.2.6.zip",
 )
 
 http_archive(
     name = "picosha2_repo",
     build_file = "@//deps:BUILD.picosha2",
     sha256 = "d9b23652e4838eb84db96d9090cf143a8809c27d09207e74de90f2340f8a37e1",
-    url = "https://github.com/okdshin/PicoSHA2/archive/b699e6c900be6e00152db5a3d123c1db42ea13d0.zip",
     strip_prefix = "PicoSHA2-b699e6c900be6e00152db5a3d123c1db42ea13d0",
+    url = "https://github.com/okdshin/PicoSHA2/archive/b699e6c900be6e00152db5a3d123c1db42ea13d0.zip",
 )
 
 http_archive(
     name = "spdlog_repo",
     build_file = "@//deps:BUILD.spdlog",
     sha256 = "56b90f0bd5b126cf1b623eeb19bf4369516fa68f036bbc22d9729d2da511fb5a",
-    url = "https://github.com/gabime/spdlog/archive/v1.4.2.zip",
     strip_prefix = "spdlog-1.4.2",
+    url = "https://github.com/gabime/spdlog/archive/v1.4.2.zip",
 )
 
 http_archive(
     name = "fmt_repo",
     build_file = "@//deps:BUILD.fmt",
     sha256 = "2ba1469c1f7677e70cb32bcd7dd0907e6952e16a161f07e05c7ffa388643b607",
-    url = "https://github.com/fmtlib/fmt/archive/5.3.0.zip",
     strip_prefix = "fmt-5.3.0",
+    url = "https://github.com/fmtlib/fmt/archive/5.3.0.zip",
 )

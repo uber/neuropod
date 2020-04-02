@@ -10,8 +10,8 @@ cc_library(
         "neuropod_backend.cc",
     ],
     hdrs = [
-        "tensor_allocator.hh",
         "neuropod_backend.hh",
+        "tensor_allocator.hh",
     ],
     visibility = [
         "//visibility:public",
@@ -24,8 +24,8 @@ cc_library(
 # Package all the header files
 pkg_tar(
     name = "libneuropod_backends_hdrs",
-    package_dir = "backends/",
     srcs = glob(["*.hh"]),
+    package_dir = "backends/",
     visibility = [
         "//visibility:public",
     ],

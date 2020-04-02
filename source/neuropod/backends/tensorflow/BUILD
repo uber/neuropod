@@ -10,21 +10,21 @@ cc_binary(
     srcs = [
         "//neuropod:libneuropod.so",
     ],
-    linkshared = True,
-    linkstatic = True,
+    data = [
+        "copy_libtensorflow",
+    ],
     linkopts = select({
         "@bazel_tools//src/conditions:darwin": ["-Wl,-rpath,@loader_path"],
         "//conditions:default": ["-Wl,-rpath,$$ORIGIN"],
     }),
+    linkshared = True,
+    linkstatic = True,
     visibility = [
         "//neuropod:__subpackages__",
     ],
     deps = [
         ":tensorflow_backend",
     ],
-    data = [
-        "copy_libtensorflow",
-    ]
 )
 
 cc_library(
@@ -44,16 +44,16 @@ cc_library(
         "//neuropod:neuropod_hdrs",
         "//neuropod/backends:neuropod_backend",
         "//neuropod/internal",
+        "@libjsoncpp_repo//:libjsoncpp",
         "@tensorflow_hdrs_repo//:tensorflow_hdrs",
         "@tensorflow_repo//:libtensorflow",
-        "@libjsoncpp_repo//:libjsoncpp",
     ],
     alwayslink = True,
 )
 
 copy_libs(
     name = "copy_libtensorflow",
-    libs = "@tensorflow_repo//:libtensorflow_libs"
+    libs = "@tensorflow_repo//:libtensorflow_libs",
 )
 
 pkg_tar(
@@ -62,8 +62,8 @@ pkg_tar(
         ":libneuropod_tensorflow_backend.so",
         "@tensorflow_repo//:libtensorflow_libs",
     ],
-    tags = ["manual"],
     extension = "tar.gz",
+    tags = ["manual"],
     visibility = [
         "//visibility:public",
     ],

@@ -21,18 +21,18 @@ cc_library(
 
 cc_binary(
     name = "libneuropod.so",
-    linkshared = True,
-    linkstatic = True,
     linkopts = select({
         "@bazel_tools//src/conditions:darwin": ["-Wl,-rpath,@loader_path"],
         "//conditions:default": ["-Wl,-rpath,$$ORIGIN"],
     }),
+    linkshared = True,
+    linkstatic = True,
     visibility = [
         "//visibility:public",
     ],
     deps = [
         ":neuropod_impl",
-    ]
+    ],
 )
 
 cc_library(
@@ -54,51 +54,51 @@ cc_library(
 
 pkg_tar(
     name = "libneuropod_hdrs",
-    package_dir = "include/neuropod/",
     srcs = [
         # Headers
         ":neuropod.hh",
         ":version.hh",
     ],
+    package_dir = "include/neuropod/",
     deps = [
-        "//neuropod/internal:libneuropod_internal_hdrs",
         "//neuropod/backends:libneuropod_backends_hdrs",
+        "//neuropod/internal:libneuropod_internal_hdrs",
         "//neuropod/serialization:libneuropod_serialization_hdrs",
     ],
 )
 
 pkg_tar(
     name = "libneuropod_libs",
-    package_dir = "lib/",
     srcs = [
         ":libneuropod.so",
-    ]
+    ],
+    package_dir = "lib/",
 )
 
 pkg_tar(
     name = "libneuropod_bins",
-    package_dir = "bin/",
     srcs = [
-        "//neuropod/multiprocess:neuropod_multiprocess_worker"
-    ]
+        "//neuropod/multiprocess:neuropod_multiprocess_worker",
+    ],
+    package_dir = "bin/",
 )
 
 pkg_tar(
     name = "libneuropod",
     extension = "tar.gz",
     deps = [
+        ":libneuropod_bins",
         ":libneuropod_hdrs",
         ":libneuropod_libs",
-        ":libneuropod_bins",
-    ]
+    ],
 )
 
 filegroup(
     name = "packages",
-    tags = ["manual"],
     srcs = [
         "//neuropod/backends/python_bridge:neuropod_pythonbridge_backend",
-        "//neuropod/backends/torchscript:neuropod_torchscript_backend",
         "//neuropod/backends/tensorflow:neuropod_tensorflow_backend",
+        "//neuropod/backends/torchscript:neuropod_torchscript_backend",
     ],
+    tags = ["manual"],
 )
