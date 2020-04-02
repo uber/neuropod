@@ -28,6 +28,7 @@ cc_test(
     data = [
         "//neuropod/tests/test_data",
     ],
+    tags = ["requires_ld_library_path"],
 )
 
 cc_test(
@@ -152,6 +153,7 @@ cc_test(
         "//neuropod/backends/python_bridge",
         "//neuropod:neuropod_impl",
     ],
+    tags = ["gpu"],
 )
 
 cc_test(
@@ -318,6 +320,7 @@ cc_test(
         "//neuropod/backends/tensorflow:tensorflow_backend",
         "//neuropod/backends/python_bridge",
     ],
+    tags = ["requires_ld_library_path"],
 )
 
 cc_test(
