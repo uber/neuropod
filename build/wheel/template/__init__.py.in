@@ -1,0 +1,15 @@
+#
+# Uber, Inc. (c) 2020
+#
+
+# This is a template that is filled in during the neuropod build process
+
+import os.path as osp
+
+# {{SHARED_LIBRARY_NAME}} is the name of the backend shared object (e.g. `libneuropod_torchscript_backend.so`)
+NATIVE_PATH = osp.join(osp.dirname(osp.abspath(__file__)), "{SHARED_LIBRARY_NAME}")
+
+from neuropod.registry import register_backend
+
+# {{PLATFORM}} below will be a list of platform names (e.g. `['tensorflow']`)
+register_backend({PLATFORM}, NATIVE_PATH)

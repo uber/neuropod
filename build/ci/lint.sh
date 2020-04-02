@@ -1,6 +1,9 @@
 #!/bin/bash
 set -e
 
+# Use the virtualenv
+source .neuropod_venv/bin/activate
+
 # Generate compile commands
 ./build/compile_commands.sh
 

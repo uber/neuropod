@@ -1,5 +1,15 @@
 #!/bin/bash
 set -e
+
+# Use the virtualenv
+source .neuropod_venv/bin/activate
+
+# Enable code coverage
+export LLVM_PROFILE_FILE="/tmp/neuropod_coverage/code-%p-%9m.profraw"
+export COVERAGE_PROCESS_START="`pwd`/source/python/.coveragerc"
+echo "import coverage; coverage.process_startup()" > \
+    `python -c "from distutils.sysconfig import get_python_lib; print(get_python_lib())"`/coverage.pth
+
 pushd source
 
 # Add the python library to the pythonpath

@@ -26,12 +26,6 @@ COPY source/bazel/toolchain.patch /usr/src/source/bazel/toolchain.patch
 COPY source/bazel/BUILD /usr/src/source/bazel/BUILD
 RUN cd source && bazel sync
 
-# Do everything in a virtualenv
-ENV VIRTUAL_ENV=/tmp/neuropod_venv
-RUN ${NEUROPOD_PYTHON_BINARY} -m pip install virtualenv==16.7.9 && \
-    ${NEUROPOD_PYTHON_BINARY} -m virtualenv $VIRTUAL_ENV
-ENV PATH="$VIRTUAL_ENV/bin:$PATH"
-
 # Copy the python code into the image
 RUN mkdir -p /usr/src/source/python /usr/src/source/neuropod/python
 COPY build/install_python_deps.sh /usr/src/build/install_python_deps.sh
@@ -51,12 +45,6 @@ ENV NEUROPOD_CUDA_VERSION=$NEUROPOD_CUDA_VERSION
 
 # Install python dependencies
 RUN /usr/src/build/install_python_deps.sh
-
-# Enable code coverage
-ENV LLVM_PROFILE_FILE="/tmp/neuropod_coverage/code-%p-%9m.profraw"
-ENV COVERAGE_PROCESS_START="/usr/src/source/python/.coveragerc"
-RUN echo "import coverage; coverage.process_startup()" > \
-    `python -c "from distutils.sysconfig import get_python_lib; print(get_python_lib())"`/coverage.pth
 
 # Copy the rest of the code in
 COPY . /usr/src

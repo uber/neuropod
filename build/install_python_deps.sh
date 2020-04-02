@@ -1,6 +1,14 @@
 #!/bin/bash
 set -e
 
+# Default to python 2 if not set
+NEUROPOD_PYTHON_BINARY="${NEUROPOD_PYTHON_BINARY:-python}"
+
+# Setup a virtualenv
+${NEUROPOD_PYTHON_BINARY} -m pip install virtualenv==16.7.9
+${NEUROPOD_PYTHON_BINARY} -m virtualenv .neuropod_venv
+source .neuropod_venv/bin/activate
+
 # Install deps for the python interface
 # (the -f flag tells pip where to find the torch nightly builds)
 pushd source/python

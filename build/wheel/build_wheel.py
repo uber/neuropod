@@ -1,6 +1,8 @@
-
+import distutils.util
+import glob
 import os
 import platform
+import shutil
 import sys
 import subprocess
 import re
@@ -81,10 +83,33 @@ def package(package_name, tar_path, platforms):
         os.path.join(tmpdir, "setup.py")
     )
 
+    # Rename the __init__.py file
+    os.rename(
+        os.path.join(package_path, "__init__.py.in"),
+        os.path.join(package_path, "__init__.py")
+    )
+
     # Run it
-    subprocess.check_call([sys.executable, "setup.py", "bdist_wheel"], cwd=tmpdir)
+    subprocess.check_call([
+        sys.executable,
+        "setup.py",
+        "bdist_wheel",
+        "--plat-name",
+        distutils.util.get_platform().replace("-","_").replace(".","_") if IS_MAC else "manylinux2014_x86_64",
+        "--universal"], cwd=tmpdir)
     subprocess.check_call([sys.executable, "setup.py", "install"], cwd=tmpdir)
 
+    # Move the wheel to the target directory
+    whl_path = glob.glob(os.path.join(tmpdir, "dist/*.whl"))[0]
+    target_path = os.path.join("python/dist/", os.path.basename(whl_path))
+    print("Moving wheel {} to dist directory {}".format(whl_path, target_path))
+    os.rename(
+        whl_path,
+        target_path
+    )
+
+    # Cleanup
+    shutil.rmtree(tmpdir)
 
 if __name__ == '__main__':
     # The `or` pattern below handles empty strings and unset env variables

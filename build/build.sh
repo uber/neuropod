@@ -1,5 +1,9 @@
 #!/bin/bash
 set -e
+
+# Use the virtualenv
+source .neuropod_venv/bin/activate
+
 pushd source
 
 # Build the native code
@@ -23,7 +27,12 @@ fi
 
 # Build a wheel
 pushd python
-python setup.py bdist_wheel
+if [[ $(uname -s) == 'Darwin' ]]; then
+    PLATFORM_TAG=`python -c 'import distutils.util;print(distutils.util.get_platform().replace("-","_").replace(".","_"))'`
+else
+    PLATFORM_TAG="manylinux2014_x86_64"
+fi
+python setup.py bdist_wheel --plat-name "$PLATFORM_TAG"
 popd
 
 # Add the python libray to the pythonpath
