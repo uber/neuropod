@@ -44,9 +44,6 @@ bool register_backend(const std::string &             name,
 BackendFactoryFunction get_backend_for_type(
     const std::unordered_map<std::string, std::string> &default_backend_overrides, const std::string &type);
 
-// Get a backend factory function by backend name (e.g. "PythonBridge", "TestNeuropodBackend")
-BackendFactoryFunction get_backend_by_name(const std::string &name);
-
 // A macro to easily define a backend
 // Example: REGISTER_NEUROPOD_BACKEND(MyPythonBackend, "pytorch", "python")
 #define REGISTER_NEUROPOD_BACKEND(CLS, ... /* supported types */) \

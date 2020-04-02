@@ -22,12 +22,10 @@ namespace
 
 std::once_flag                                                           registrar_initialized;
 std::unique_ptr<std::unordered_map<std::string, BackendFactoryFunction>> registered_backends_by_type;
-std::unique_ptr<std::unordered_map<std::string, BackendFactoryFunction>> registered_backends_by_name;
 
 void init_registrar_if_needed()
 {
     std::call_once(registrar_initialized, []() {
-        registered_backends_by_name = stdx::make_unique<std::unordered_map<std::string, BackendFactoryFunction>>();
         registered_backends_by_type = stdx::make_unique<std::unordered_map<std::string, BackendFactoryFunction>>();
     });
 }
@@ -81,8 +79,6 @@ bool register_backend(const std::string &             name,
         (*registered_backends_by_type)[type] = factory_fn;
     }
 
-    (*registered_backends_by_name)[name] = factory_fn;
-
     return true;
 }
 
@@ -105,23 +101,6 @@ BackendFactoryFunction get_backend_for_type(
         // and it failed
         NEUROPOD_ERROR(
             "Neuropod backend not found for type '{}'! Loading the default backend for type '{}' failed.", type, type);
-    }
-    else
-    {
-        return backend_it->second;
-    }
-}
-
-BackendFactoryFunction get_backend_by_name(const std::string &name)
-{
-    init_registrar_if_needed();
-
-    auto backend_it = registered_backends_by_name->find(name);
-    if (backend_it == registered_backends_by_name->end())
-    {
-        NEUROPOD_ERROR("Neuropod backend not found for name'{}'! "
-                       "Make sure that you have a build dependency on the correct backend",
-                       name);
     }
     else
     {

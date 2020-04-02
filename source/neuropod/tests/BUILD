@@ -180,21 +180,6 @@ cc_test(
     ],
 )
 
-cc_test(
-    name = "test_default_backend",
-    srcs = [
-        "test_default_backend.cc",
-    ],
-    deps = [
-        ":neuropod_test_utils",
-        "//neuropod:neuropod_impl",
-        "//neuropod/backends/torchscript:torch_backend",
-        "//neuropod/backends/tensorflow:tensorflow_backend",
-        "//neuropod/backends/python_bridge",
-    ],
-    linkstatic = True,
-)
-
 cc_library(
     name = "neuropod_test_utils",
     hdrs = ["test_utils.hh"],

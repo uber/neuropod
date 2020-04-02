@@ -127,9 +127,6 @@ PYBIND11_MODULE(neuropod_native, m)
         .def(py::init([](const std::string &                                 path,
                          const std::unordered_map<std::string, std::string> &default_backend_overrides,
                          py::kwargs kwargs) { return make_neuropod(kwargs, path, default_backend_overrides); }))
-        .def(py::init([](const std::string &path, const std::string &backend_name, py::kwargs kwargs) {
-            return make_neuropod(kwargs, path, backend_name);
-        }))
         .def("infer", &infer);
 
     m.def("serialize", &serialize_tensor_binding, "Convert a numpy array to a NeuropodTensor and serialize it");
