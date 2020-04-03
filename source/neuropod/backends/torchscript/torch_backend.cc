@@ -353,7 +353,11 @@ std::unique_ptr<NeuropodValueMap> TorchNeuropodBackend::infer_internal(const Neu
             const auto arg_index = schema.argumentIndexWithName(input_name);
             if (!arg_index.has_value())
             {
-                NEUROPOD_ERROR("Input '{}' does not exist. Model inputs {}", input_name, schema);
+                NEUROPOD_ERROR(
+                    "An tensor named '{}' was provided, but does not exist in the input schema of the "
+                    "TorchScript model. Please ensure your model expects an input with that name. Schema: {}",
+                    input_name,
+                    schema);
             }
 
             const auto device = get_torch_device(input_device_mapping_.at(input_name));
