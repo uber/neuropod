@@ -212,6 +212,18 @@ cc_test(
 )
 
 cc_test(
+    name = "test_tensor_validation",
+    srcs = [
+        "test_tensor_validation.cc",
+    ],
+    deps = [
+        "//neuropod:neuropod_impl",
+        "//neuropod/backends/test_backend",
+        "@gtest//:main",
+    ],
+)
+
+cc_test(
     name = "test_accessor",
     srcs = [
         "test_accessor.cc",

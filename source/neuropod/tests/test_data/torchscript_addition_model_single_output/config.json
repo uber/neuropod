@@ -3,7 +3,8 @@
         {
             "dtype": "float32", 
             "shape": [
-                "batch_size"
+                "batch_size",
+                null
             ], 
             "name": "out"
         }
@@ -13,14 +14,16 @@
         {
             "dtype": "float32", 
             "shape": [
-                "batch_size"
+                "batch_size",
+                null
             ], 
             "name": "x"
         }, 
         {
             "dtype": "float32", 
             "shape": [
-                "batch_size"
+                "batch_size",
+                null
             ], 
             "name": "y"
         }, 

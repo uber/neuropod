@@ -92,4 +92,10 @@ public:
     std::shared_ptr<NeuropodTensorAllocator> get_tensor_allocator() { return allocator_; }
 };
 
+// A utility for validating tensors against a vector of specs. Throws an error if validation fails
+// Note: This function is exposed in order to properly unit test it and should not be directly used
+void validate_tensors_against_specs(const NeuropodValueMap &       tensors,
+                                    const std::vector<TensorSpec> &specs,
+                                    const std::string &            debug_spec_name = "spec");
+
 } // namespace neuropod

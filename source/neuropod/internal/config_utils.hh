@@ -23,15 +23,33 @@ constexpr int CPU = 0;
 constexpr int GPU = 1;
 }; // namespace DeviceType
 
+// A struct that stores the value of a dimension
+struct Dimension
+{
+    Dimension(int64_t value);
+    Dimension(std::string symbol);
+    ~Dimension();
+
+    bool operator==(const Dimension &other) const;
+
+    // The value
+    // -1 == Any value is allowed (None/null)
+    // -2 == Symbol
+    int64_t value;
+
+    // The name of this symbol (if it is a symbol)
+    std::string symbol;
+};
+
 // A struct that stores a specification for a tensor
 struct TensorSpec
 {
-    TensorSpec(const std::string &name, const std::vector<int64_t> dims, const TensorType type);
+    TensorSpec(const std::string &name, const std::vector<Dimension> dims, const TensorType type);
     ~TensorSpec();
 
-    const std::string          name;
-    const std::vector<int64_t> dims;
-    const TensorType           type;
+    const std::string            name;
+    const std::vector<Dimension> dims;
+    const TensorType             type;
 };
 
 // A struct that stores the expected inputs and outputs of a model
