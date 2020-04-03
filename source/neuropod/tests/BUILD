@@ -22,7 +22,11 @@ cc_test(
     data = [
         "//neuropod/tests/test_data",
     ],
-    tags = ["requires_ld_library_path"],
+    tags = [
+        "requires_ld_library_path",
+        # Don't do trace logging in CI for this benchmark
+        "no_trace_logging",
+    ],
     deps = [
         "//neuropod:neuropod_impl",
         "//neuropod/backends/tensorflow:tensorflow_backend",

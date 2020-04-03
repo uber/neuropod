@@ -76,8 +76,9 @@ The Python tests run against both the Python and C++ libraries by using python b
 
 C++ tests can have the following tags:
 
- - `gpu`: Only run when running GPU tests
- - `requires_ld_library_path`: `LD_LIBRARY_PATH` and `PATH` variables will be set so the backends and multiprocess worker are available. This is useful for tests that run a model using OPE
+ - `gpu`: Only run this test when running GPU tests
+ - `requires_ld_library_path`: Set the `LD_LIBRARY_PATH` and `PATH` environment variables so the backends and multiprocess worker are available. This is useful for tests that run a model using OPE.
+ - `no_trace_logging`: Don't set the log level to `TRACE` when running this test. This is useful to avoid lots of output when running benchmarks.
 
 ## CI
 
