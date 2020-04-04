@@ -8,10 +8,10 @@ package(
 
 cc_library(
     name = "mklml",
-    srcs = ["lib/libmklml.dylib"],
+    srcs = ["lib/libmklml.dylib", "lib/libiomp5.dylib"],
 )
 
 filegroup(
     name = "mklml_libs",
-    srcs = ["lib/libmklml.dylib"],
+    srcs = ["lib/libmklml.dylib", "lib/libiomp5.dylib"],
 )
