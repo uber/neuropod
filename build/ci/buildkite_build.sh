@@ -12,16 +12,24 @@ export AWS_SECRET_ACCESS_KEY=$NEUROPOD_CACHE_ACCESS_SECRET
 bazels3cache --bucket=neuropod-build-cache
 
 # Build with the remote cache
-./build/build.sh --remote_http_cache=http://localhost:7777
+if [[ -z "${BUILDKITE_TAG}" ]]; then
+    # No tag so build with coverage
+    ./build/build.sh --config=coverage --remote_http_cache=http://localhost:7777
+else
+    # This is a release
+    ./build/build.sh --remote_http_cache=http://localhost:7777
+fi
 
 # Run tests
 ./build/test.sh
 
-# Run coverage
-./build/coverage.sh
+if [[ -z "${BUILDKITE_TAG}" ]]; then
+    # Run coverage
+    ./build/coverage.sh
 
-# Upload to codecov
-bash <(curl -s https://codecov.io/bash) -X coveragepy
+    # Upload to codecov
+    bash <(curl -s https://codecov.io/bash) -X coveragepy
+fi
 
 # Shutdown the cache
 curl http://localhost:7777/shutdown
