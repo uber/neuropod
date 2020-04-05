@@ -1,6 +1,9 @@
 #!/bin/bash
 set -e
 
+# Use the virtualenv
+source .neuropod_venv/bin/activate
+
 BASE_PATH=`pwd`
 
 # Merge all the python coverage reports and print

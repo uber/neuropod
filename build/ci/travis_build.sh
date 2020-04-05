@@ -20,12 +20,10 @@ if [[ $(uname -s) == 'Darwin' ]]; then
     brew install https://homebrew.bintray.com/bottles/libomp-5.0.1.high_sierra.bottle.tar.gz
 fi
 
-# Do everything in a virtualenv
+# Install virtualenv
 sudo ${NEUROPOD_PYTHON_BINARY} -m pip install virtualenv==16.7.9
-${NEUROPOD_PYTHON_BINARY} -m virtualenv /tmp/neuropod_venv
-source /tmp/neuropod_venv/bin/activate
 
-# Install python dependencies
+# Install the rest of the python dependencies
 ./build/install_python_deps.sh
 
 # Make sure that the CI matrix is correct

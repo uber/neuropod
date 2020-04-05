@@ -75,7 +75,7 @@ with load_neuropod(ADDITION_MODEL_PATH) as neuropod:
 To use the C++ Neuropod library from Python, you can use the native bindings
 
 ```py
-from neuropod_native import Neuropod
+from neuropod.neuropod_native import Neuropod
 
 # This takes the same arguments (and supports the same options)
 # as `load_neuropod`
@@ -92,7 +92,7 @@ In order to serialize and deserialize tensors from Python, you must have the nat
 
 ```py
 import numpy as np
-import neuropod_native
+from neuropod import neuropod_native
 
 # An array to serialize
 tensor = np.arange(5)

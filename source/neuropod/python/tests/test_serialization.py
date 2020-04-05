@@ -3,7 +3,7 @@
 #
 
 import numpy as np
-import neuropod_native
+from neuropod import neuropod_native
 import six
 import unittest
 
