@@ -84,9 +84,6 @@ struct __attribute__((__packed__)) WireFormat
     WireFormat &operator=(WireFormat<UserPayloadType> &&other) = default;
 };
 
-// The allocator used to allocate any SHM for the wire format
-extern SHMAllocator wire_format_shm_allocator;
-
 // Serialize a payload into `data` and add any created transferrables to `transferrables`
 // If the payload is small enough (less than the size of `payload_` in the wire format), it will be
 // stored inline in the message. Otherwise it'll be serialized and put into a shared memory
@@ -115,7 +112,7 @@ void serialize_payload(const Payload &payload, WireFormat<UserPayloadType> &data
         SPDLOG_DEBUG("Could not fit data in inline message. Sending via SHM. Requested size: {}", size_bytes);
         SHMBlockID block_id;
 
-        auto block = wire_format_shm_allocator.allocate_shm(size_bytes, block_id);
+        auto block = shm_allocator.allocate_shm(size_bytes, block_id);
 
         // Write the serialized message into the block
         ss.read(static_cast<char *>(block.get()), size_bytes);
@@ -147,7 +144,7 @@ void deserialize_payload(const WireFormat<UserPayloadType> &data, Payload &out)
         memcpy(block_id.data(), data.payload_id, sizeof(data.payload_id));
 
         // Load the block and get the data
-        auto block = wire_format_shm_allocator.load_shm(block_id);
+        auto block = shm_allocator.load_shm(block_id);
         ss.write(static_cast<char *>(block.get()), data.payload_size);
     }
 

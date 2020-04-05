@@ -7,9 +7,6 @@
 namespace neuropod
 {
 
-// The SHMAllocator used by all SHMNeuropodTensors
-SHMAllocator shm_allocator;
-
 std::shared_ptr<NeuropodTensor> tensor_from_id(const SHMBlockID &block_id)
 {
     // Load the block of shared memory
