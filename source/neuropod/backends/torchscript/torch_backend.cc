@@ -70,7 +70,16 @@ std::shared_ptr<torch::jit::script::Module> load_model_from_path(std::istream & 
 
     if (libtorch == nullptr)
     {
-        NEUROPOD_ERROR("Failed to promote libtorch to RTLD_GLOBAL. Error from dlopen: {}", dlerror());
+        const auto err = dlerror();
+        if (err == nullptr)
+        {
+            NEUROPOD_ERROR("Failed to promote libtorch to RTLD_GLOBAL; this likely means the neuropod backend library "
+                           "was not built correctly");
+        }
+        else
+        {
+            NEUROPOD_ERROR("Failed to promote libtorch to RTLD_GLOBAL. Error from dlopen: {}", err);
+        }
     }
 #endif
 
@@ -78,7 +87,15 @@ std::shared_ptr<torch::jit::script::Module> load_model_from_path(std::istream & 
     {
         if (dlopen(path.c_str(), RTLD_NOW) == nullptr)
         {
-            NEUROPOD_ERROR("Failed to load custom op. Error from dlopen: {}", dlerror());
+            const auto err = dlerror();
+            if (err == nullptr)
+            {
+                NEUROPOD_ERROR("Failed to load custom op. dlopen failed but no error was available");
+            }
+            else
+            {
+                NEUROPOD_ERROR("Failed to load custom op. Error from dlopen: {}", err);
+            }
         }
     }
 

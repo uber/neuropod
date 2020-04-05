@@ -60,7 +60,16 @@ std::unique_ptr<py::gil_scoped_release> maybe_initialize()
 
     if (libpython == nullptr)
     {
-        NEUROPOD_ERROR("Failed to promote libpython to RTLD_GLOBAL. Error from dlopen: {}", dlerror());
+        const auto err = dlerror();
+        if (err == nullptr)
+        {
+            NEUROPOD_ERROR("Failed to promote libpython to RTLD_GLOBAL; this likely means the neuropod backend library "
+                           "was not built correctly");
+        }
+        else
+        {
+            NEUROPOD_ERROR("Failed to promote libpython to RTLD_GLOBAL. Error from dlopen: {}", err);
+        }
     }
 #endif
 

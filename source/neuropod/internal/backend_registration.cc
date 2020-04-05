@@ -100,7 +100,16 @@ bool load_default_backend(const std::vector<BackendLoadSpec> &backends,
         const auto &sopath = backend.path;
         if (dlopen(sopath.c_str(), RTLD_NOW | RTLD_GLOBAL) == nullptr)
         {
-            SPDLOG_TRACE("Loading the default backend '{}' failed. Error from dlopen: {}", sopath, dlerror());
+            const auto err = dlerror();
+            if (err == nullptr)
+            {
+                NEUROPOD_ERROR("Loading the default backend for type '{}' failed, but no error message was avaliable",
+                               type);
+            }
+            else
+            {
+                NEUROPOD_ERROR("Loading the default backend for type '{}' failed. Error from dlopen: {}", type, err);
+            }
         }
         else
         {
