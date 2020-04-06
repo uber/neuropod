@@ -1,0 +1,59 @@
+# Because we use semver during library initialization, we can't assume that global variables
+# have been initialized already. This patch refactors semver to remove the 3 global variables
+# that are used
+diff --git a/include/base/util.hpp b/include/base/util.hpp
+index 921a2c2..b80bb55 100755
+--- a/include/base/util.hpp
++++ b/include/base/util.hpp
+@@ -6,13 +6,10 @@
+
+ namespace semver
+ {
+-  const std::string any_space = " \n\r\t\v\f";
+-  const std::string any_number = "0123456789";
+-  const std::string any_alphabat = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+-
+   // [    x y    z  ] -> [ x y z ]
+   inline std::string reduce_space(const std::string& str)
+   {
++    const std::string any_space = " \n\r\t\v\f";
+     std::string new_string;
+     bool pre_space = false;
+     for (const char& c : str)
+@@ -30,6 +27,7 @@ namespace semver
+   // [    x y    z  ] -> [x y    z]
+   inline std::string trim_string(const std::string& str)
+   {
++    const std::string any_space = " \n\r\t\v\f";
+     size_t start = str.find_first_not_of(any_space);
+     if (start == std::string::npos)
+       return {};
+diff --git a/include/parser/parser.hpp b/include/parser/parser.hpp
+index b1151c8..1bc0157 100755
+--- a/include/parser/parser.hpp
++++ b/include/parser/parser.hpp
+@@ -11,6 +11,7 @@ namespace semver
+ {
+   inline int parse_nr(const std::string& input)
+   {
++    const std::string any_number = "0123456789";
+     // nr ::= '0' | ['1'-'9'] ( ['0'-'9'] ) *
+
+     if (input.length() == 0)
+@@ -45,6 +46,8 @@ namespace semver
+
+   inline std::string parse_part(const std::string& input)
+   {
++    const std::string any_number = "0123456789";
++    const std::string any_alphabat = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+     // part  ::=
+
+     if (input.empty() || any_number.find(input.at(0)) != std::string::npos)
+@@ -172,6 +175,7 @@ namespace semver
+
+   inline syntax::range parse_range(const std::string& input)
+   {
++    const std::string any_space = " \n\r\t\v\f";
+     // range ::=
+     std::vector<std::string> hyphen_tokens = split(input, " - ", true);
+     if (hyphen_tokens.size() == 2)

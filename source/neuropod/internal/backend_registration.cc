@@ -12,6 +12,7 @@
 #include <stdexcept>
 #include <unordered_map>
 
+#include <cpp-semver.hpp>
 #include <dlfcn.h>
 
 namespace neuropod
@@ -20,13 +21,19 @@ namespace neuropod
 namespace
 {
 
-std::once_flag                                                           registrar_initialized;
-std::unique_ptr<std::unordered_map<std::string, BackendFactoryFunction>> registered_backends_by_type;
+struct BackendInfo
+{
+    std::string            version;
+    BackendFactoryFunction factory;
+};
+
+std::once_flag                                                     registrar_initialized;
+std::unique_ptr<std::unordered_multimap<std::string, BackendInfo>> registered_backends_by_type;
 
 void init_registrar_if_needed()
 {
     std::call_once(registrar_initialized, []() {
-        registered_backends_by_type = stdx::make_unique<std::unordered_map<std::string, BackendFactoryFunction>>();
+        registered_backends_by_type = stdx::make_unique<std::unordered_multimap<std::string, BackendInfo>>();
     });
 }
 
@@ -68,22 +75,37 @@ void load_default_backend(const std::unordered_map<std::string, std::string> &de
 
 } // namespace
 
-bool register_backend(const std::string &             name,
-                      const std::vector<std::string> &supported_types,
-                      BackendFactoryFunction          factory_fn)
+bool register_backend(const std::string &    name,
+                      const std::string &    type,
+                      const std::string &    version,
+                      BackendFactoryFunction factory_fn)
 {
     init_registrar_if_needed();
 
-    for (const std::string &type : supported_types)
+    SPDLOG_DEBUG("Registering backend {} with type {} and version {}", name, type, version);
+
+    BackendInfo info;
+    info.version = version;
+    info.factory = std::move(factory_fn);
+
+    if (!semver::valid(version))
     {
-        (*registered_backends_by_type)[type] = factory_fn;
+        NEUROPOD_ERROR("Tried registering backend {} with type {} and version {}, but the specified version is not a "
+                       "valid semver version. See https://semver.org/ for more details.",
+                       name,
+                       type,
+                       version);
     }
+
+    registered_backends_by_type->insert(std::make_pair(type, info));
 
     return true;
 }
 
 BackendFactoryFunction get_backend_for_type(
-    const std::unordered_map<std::string, std::string> &default_backend_overrides, const std::string &type)
+    const std::unordered_map<std::string, std::string> &default_backend_overrides,
+    const std::string &                                 type,
+    const std::string &                                 target_version_range)
 {
     init_registrar_if_needed();
 
@@ -94,18 +116,21 @@ BackendFactoryFunction get_backend_for_type(
         load_default_backend(default_backend_overrides, type);
     }
 
-    auto backend_it = registered_backends_by_type->find(type);
-    if (backend_it == registered_backends_by_type->end())
+    auto range = registered_backends_by_type->equal_range(type);
+    for (auto it = range.first; it != range.second; it++)
     {
-        // If we get here, that means that we tried loading a default backend
-        // and it failed
-        NEUROPOD_ERROR(
-            "Neuropod backend not found for type '{}'! Loading the default backend for type '{}' failed.", type, type);
+        // Check if it matches the version range
+        if (semver::satisfies(it->second.version, target_version_range))
+        {
+            return it->second.factory;
+        }
     }
-    else
-    {
-        return backend_it->second;
-    }
+
+    // If we get here, that means that we don't have any matching backends
+    NEUROPOD_ERROR(
+        "Neuropod backend not found for type '{}' and version range '{}'! Default backend did not match either.",
+        type,
+        target_version_range);
 }
 
 } // namespace neuropod

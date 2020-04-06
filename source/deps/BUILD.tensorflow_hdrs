@@ -23,4 +23,5 @@ cc_library(
         "tensorflow-{TENSORFLOW_VERSION}.data/purelib/tensorflow/include/",
         "tensorflow_core/include/",
     ],
+    defines = ["TENSORFLOW_VERSION={TENSORFLOW_VERSION}"],
 )

@@ -31,6 +31,7 @@ cc_library(
         "@filesystem_repo//:filesystem",
         "@libjsoncpp_repo//:libjsoncpp",
         "@picosha2_repo//:picosha2",
+        "@semver_repo//:semver",
         "@zipper_repo//:zipper",
     ],
     alwayslink = True,

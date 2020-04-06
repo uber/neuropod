@@ -173,3 +173,13 @@ http_archive(
     strip_prefix = "fmt-5.3.0",
     url = "https://github.com/fmtlib/fmt/archive/5.3.0.zip",
 )
+
+http_archive(
+    name = "semver_repo",
+    build_file = "@//deps:BUILD.semver",
+    patch_args = ["-p1"],
+    patches = ["@//bazel:semver.patch"],
+    sha256 = "3cb8b507c3389f8d8b80304360afc0ba8b3dbbe9504332d9b8f5d6793fb221e8",
+    strip_prefix = "cpp-semver-ff341259099465283bc3dc60fb5ede16776e1607",
+    url = "https://github.com/easz/cpp-semver/archive/ff341259099465283bc3dc60fb5ede16776e1607.zip",
+)

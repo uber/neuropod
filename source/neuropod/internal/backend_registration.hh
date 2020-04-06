@@ -32,9 +32,10 @@ std::unique_ptr<NeuropodBackend> createNeuropodBackend(const std::string &neurop
 
 // Register a backend for a set of specific types
 // This is used in the macro below
-bool register_backend(const std::string &             name,
-                      const std::vector<std::string> &supported_types,
-                      BackendFactoryFunction          factory_fn);
+bool register_backend(const std::string &    name,
+                      const std::string &    type,
+                      const std::string &    version,
+                      BackendFactoryFunction factory_fn);
 
 // Get a backend factory function for a neuropod type (e.g. "python", "tensorflow", "torchscript")
 // `default_backend_overrides` allows users to override the default backend for a given type.
@@ -42,11 +43,17 @@ bool register_backend(const std::string &             name,
 // Note: Libraries in this map will only be loaded if a backend for the requested type hasn't already
 // been loaded
 BackendFactoryFunction get_backend_for_type(
-    const std::unordered_map<std::string, std::string> &default_backend_overrides, const std::string &type);
+    const std::unordered_map<std::string, std::string> &default_backend_overrides,
+    const std::string &                                 type,
+    const std::string &                                 target_version_range = "*");
 
 // A macro to easily define a backend
-// Example: REGISTER_NEUROPOD_BACKEND(MyPythonBackend, "pytorch", "python")
-#define REGISTER_NEUROPOD_BACKEND(CLS, ... /* supported types */) \
-    bool is_registered_##CLS = register_backend(#CLS, {__VA_ARGS__}, createNeuropodBackend<CLS>);
+// Example: REGISTER_NEUROPOD_BACKEND(SomeTensorflowBackend, "tensorflow", "1.13.1")
+#define REGISTER_NEUROPOD_BACKEND(CLS, type, version) \
+    bool is_registered_##CLS = register_backend(#CLS, type, version, createNeuropodBackend<CLS>);
+
+// Utility macros
+#define STR_HELPER(x) #x
+#define STR(x) STR_HELPER(x)
 
 } // namespace neuropod

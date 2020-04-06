@@ -31,9 +31,11 @@ Neuropod::Neuropod(const std::string &                                 neuropod_
     }
     else
     {
-        // Get the backend in a normal way
-        backend_ = get_backend_for_type(default_backend_overrides,
-                                        load_model_config(neuropod_path)->platform)(neuropod_path, options);
+        // Get the backend from the registered backends
+        const auto model_config = load_model_config(neuropod_path);
+        backend_                = get_backend_for_type(default_backend_overrides,
+                                        model_config->platform,
+                                        model_config->platform_version_semver)(neuropod_path, options);
     }
 }
 

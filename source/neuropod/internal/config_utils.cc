@@ -14,6 +14,8 @@
 #include <stdexcept>
 #include <unordered_map>
 
+#include <cpp-semver.hpp>
+
 namespace neuropod
 {
 
@@ -168,6 +170,21 @@ std::unique_ptr<ModelConfig> load_model_config(std::istream &input_stream)
     const Json::Value &input_spec  = obj["input_spec"];
     const Json::Value &output_spec = obj["output_spec"];
 
+    // By default, any version is okay
+    std::string platform_version_semver = "*";
+    if (obj.isMember("platform_version_semver"))
+    {
+        platform_version_semver = obj["platform_version_semver"].asString();
+    }
+
+    // Make sure that it's a valid semver version or range
+    if (!semver::valid(platform_version_semver))
+    {
+        throw_neuropod_config_error("The provided platform version (" + platform_version_semver +
+                                    ") was not a valid semver version or range. See https://semver.org/ and "
+                                    "https://docs.npmjs.com/misc/semver#ranges");
+    }
+
     // Get the inputs
     std::vector<TensorSpec> inputs;
     for (const auto &spec : input_spec)
@@ -242,7 +259,7 @@ std::unique_ptr<ModelConfig> load_model_config(std::istream &input_stream)
 
     // Not directly using make_unique because of brace initialization
     return stdx::make_unique<ModelConfig>(
-        ModelConfig{name, platform, inputs, outputs, custom_ops, input_tensor_device});
+        ModelConfig{name, platform, platform_version_semver, inputs, outputs, custom_ops, input_tensor_device});
 }
 
 } // namespace neuropod

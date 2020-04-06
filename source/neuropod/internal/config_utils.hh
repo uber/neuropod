@@ -58,6 +58,14 @@ struct ModelConfig
     const std::string name;
     const std::string platform;
 
+    // The requested versions of the platform specified as a semver range
+    // e.g. `1.13.1` or `> 1.13.1`
+    // See the following URLs for examples and more info:
+    // - https://semver.org/
+    // - https://docs.npmjs.com/misc/semver#ranges
+    // - https://docs.npmjs.com/misc/semver#advanced-range-syntax
+    const std::string platform_version_semver;
+
     const std::vector<TensorSpec> inputs;
     const std::vector<TensorSpec> outputs;
 

@@ -163,6 +163,7 @@ def write_neuropod_config(
     platform,
     input_spec,
     output_spec,
+    platform_version_semver="*",
     custom_ops=None,
     input_tensor_device=None,
     default_input_tensor_device="GPU",
@@ -174,6 +175,12 @@ def write_neuropod_config(
     :param  neuropod_path:  The path to a neuropod package
     :param  model_name:     The name of the model (e.g. "my_addition_model")
     :param  platform:       The model type (e.g. "python", "pytorch", "tensorflow", etc.)
+
+    :param  platform_version_semver: The required platform version specified as semver range
+                                     See https://semver.org/, https://docs.npmjs.com/misc/semver#ranges
+                                     or https://docs.npmjs.com/misc/semver#advanced-range-syntax for
+                                     examples and more info. Default is `*` (any version is okay)
+                                     Ex: `1.13.1` or `> 1.13.1`
 
     :param  input_spec:     A list of dicts specifying the input to the model.
                             Ex: [{"name": "x", "dtype": "float32", "shape": (None, )}]
@@ -227,6 +234,7 @@ def write_neuropod_config(
         config = {
             "name": model_name,
             "platform": platform,
+            "platform_version_semver": platform_version_semver,
             "input_spec": input_spec,
             "output_spec": output_spec,
             "custom_ops": custom_ops,
