@@ -48,9 +48,6 @@ inline void *get_next_aligned_offset(void *base)
 
 } // namespace
 
-// A shared memory allocator
-extern SHMAllocator shm_allocator;
-
 template <typename T>
 class SHMNeuropodTensor : public TypedNeuropodTensor<T>, public NativeDataContainer<SHMBlockID>
 {

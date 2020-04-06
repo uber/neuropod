@@ -305,4 +305,8 @@ void SHMAllocator::free_unused_shm_blocks()
     load_cache_->clear();
 }
 
+// A shared memory allocator that is used by the WireFormat and by SHMNeuropodTensor
+// TODO(vip): Remove global allocator instance
+SHMAllocator shm_allocator;
+
 } // namespace neuropod

@@ -7,7 +7,6 @@ cc_library(
     srcs = [
         "ipc_message_queue.cc",
         "transferrables.cc",
-        "wire_format.cc",
     ],
     hdrs = [
         "heartbeat.hh",
