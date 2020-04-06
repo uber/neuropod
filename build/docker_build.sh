@@ -15,5 +15,5 @@ if [[ "$1" == "-i" ]]; then
     docker run --rm -it -v neuropod_cache:/root/.cache neuropod /bin/bash
 else
     # Build and test Neuropod
-    docker run --rm -v neuropod_cache:/root/.cache neuropod /bin/bash -c "set -e; build/build.sh $@; build/test.sh $@; build/coverage.sh $@"
+    docker run --rm -v neuropod_cache:/root/.cache neuropod /bin/bash -c "set -e; build/build.sh --config=coverage $@; build/test.sh; build/coverage.sh"
 fi
