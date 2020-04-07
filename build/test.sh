@@ -4,6 +4,9 @@ set -e
 # Use the virtualenv
 source .neuropod_venv/bin/activate
 
+# Use the system's libpython
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib/x86_64-linux-gnu/
+
 # Enable code coverage
 export LLVM_PROFILE_FILE="/tmp/neuropod_coverage/code-%p-%9m.profraw"
 export COVERAGE_PROCESS_START="`pwd`/source/python/.coveragerc"
@@ -15,9 +18,12 @@ pushd source
 # Add the python library to the pythonpath
 export PYTHONPATH=$PYTHONPATH:`pwd`/python
 
-# On linux we don't want to use GCC5 to build the custom ops
 if [[ $(uname -s) == 'Linux' ]]; then
+    # On linux we don't want to use GCC5 to build the custom ops
     export TF_CXX=g++-4.8
+else
+    # For building custom ops
+    export MACOSX_DEPLOYMENT_TARGET=10.13
 fi
 
 # Run python tests

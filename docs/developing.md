@@ -92,26 +92,25 @@ Our build matrix is defined as all combinations of the following:
  - Ubuntu 16.04 CPU (in Docker) - Buildkite
  - Mac CPU (native) - Travis CI
 
-**Python:**
-
- - 2.7
- - 3
-
 **Framework versions (each row of the table):**
 
-| CUDA | TF | Torch |
-| --- | --- | --- |
-| 9.0 | 1.12.0 | 1.1.0 |
-| 10.0 | 1.13.1 | 1.2.0 |
-| 10.0 | 1.14.0 | 1.3.0 |
-| 10.0 | 1.15.0 | 1.4.0 |
+| CUDA | TF | Torch | Python |
+| --- | --- | --- | --- |
+| 9.0 | 1.12.0 | 1.1.0 | 2.7 |
+| 10.0 | 1.13.1 | 1.2.0 | 3.5 |
+| 10.0 | 1.14.0 | 1.3.0 | 3.6 |
+| 10.0 | 1.15.0 | 1.4.0 | 3.7 |
 
-We also have an additional build that runs natively on an Ubuntu 16.04 machine (outside of docker)
-to make sure that we don't accidentally break workflows of users not using docker.
+We also have the following ad-hoc builds:
 
-This is a total of 25 builds (4 * 2 * 3 + 1) running in CI
+ - A lint + docs + static analysis build (Buildkite)
+ - A native Ubuntu 16.04 build (outside of docker) to make sure that we don't accidentally break workflows of users not using docker
+
+This is a total of 14 builds (3 * 4 + 2) running in CI
 
 The current build matrix is defined in [build/ci_matrix.py](https://github.com/uber/neuropod/blob/master/build/ci_matrix.py#L73-L91)
+
+Code coverage is run on all Buildkite Linux builds
 
 ### Future additions
 
@@ -119,5 +118,4 @@ We're also planning on adding the following configurations to the build matrix:
 
 **Configs:**
 
- - ASAN + Code Coverage
- - Release
+ - ASAN

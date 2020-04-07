@@ -49,8 +49,14 @@ std::unique_ptr<py::gil_scoped_release> maybe_initialize()
 #ifndef __APPLE__
 // This binary is already linked against `libpython`; the dlopen just
 // promotes it to RTLD_GLOBAL.
-#define PYTHON_LIB_NAME "libpython" STR(PYTHON_VERSION) ".so"
+#define PYTHON_LIB_NAME "libpython" STR(PYTHON_VERSION) ".so.1.0"
+#define PYTHON_LIB_M_NAME "libpython" STR(PYTHON_VERSION) "m.so.1.0"
     void *libpython = dlopen(PYTHON_LIB_NAME, RTLD_NOW | RTLD_GLOBAL | RTLD_NOLOAD);
+
+    if (libpython == nullptr)
+    {
+        libpython = dlopen(PYTHON_LIB_M_NAME, RTLD_NOW | RTLD_GLOBAL | RTLD_NOLOAD);
+    }
 
     if (libpython == nullptr)
     {

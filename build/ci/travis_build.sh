@@ -1,29 +1,35 @@
 #!/bin/bash
 set -e
 
-# Default to python 2 if not set
-NEUROPOD_PYTHON_BINARY="${NEUROPOD_PYTHON_BINARY:-python}"
+# Defaults to python 2 if not set
+NEUROPOD_PYTHON_BINARY="python${NEUROPOD_PYTHON_VERSION}"
 
 # Install system dependencies
 ./build/install_system_deps.sh
 
 # Mac and Travis CI specific deps
 if [[ $(uname -s) == 'Darwin' ]]; then
-    # Install python 3.6 (Newest version of py3 that supports TF 1.12.0)
+    # Install the requested version of python
     export HOMEBREW_NO_AUTO_UPDATE=1
     brew unlink python
-    wget https://www.python.org/ftp/python/3.6.8/python-3.6.8-macosx10.9.pkg &> /dev/null
-    sudo installer -pkg python-3.6.8-macosx10.9.pkg -target /
+
+    if [[ "${NEUROPOD_PYTHON_VERSION}" == "3.5" ]]; then
+        wget https://www.python.org/ftp/python/3.5.4/python-3.5.4-macosx10.6.pkg &> /dev/null
+        sudo installer -pkg python-3.5.4-macosx10.6.pkg -target /
+    elif [[ "${NEUROPOD_PYTHON_VERSION}" == "3.6" ]]; then
+        wget https://www.python.org/ftp/python/3.6.8/python-3.6.8-macosx10.9.pkg &> /dev/null
+        sudo installer -pkg python-3.6.8-macosx10.9.pkg -target /
+    elif [[ "${NEUROPOD_PYTHON_VERSION}" == "3.7" ]]; then
+        wget https://www.python.org/ftp/python/3.7.7/python-3.7.7-macosx10.9.pkg &> /dev/null
+        sudo installer -pkg python-3.7.7-macosx10.9.pkg -target /
+    fi
 
     # Install libomp 5
     brew unlink libomp
     brew install https://homebrew.bintray.com/bottles/libomp-5.0.1.high_sierra.bottle.tar.gz
 fi
 
-# Install virtualenv
-sudo ${NEUROPOD_PYTHON_BINARY} -m pip install virtualenv==16.7.9
-
-# Install the rest of the python dependencies
+# Install python dependencies
 ./build/install_python_deps.sh
 
 # Make sure that the CI matrix is correct
