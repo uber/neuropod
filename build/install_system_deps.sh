@@ -18,10 +18,32 @@ if [[ $(uname -s) == 'Darwin' ]]; then
     export HOMEBREW_NO_AUTO_UPDATE=1
     brew install libomp
 else
-    # Install bazel deps, pip, and python dev
+    # Install bazel deps
     # Install g++-4.8 for TensorFlow custom op builds
     sudo apt-get update
-    sudo apt-get install -y pkg-config zip g++ zlib1g-dev unzip python3 curl wget ${NEUROPOD_PYTHON_BINARY}-dev ${NEUROPOD_PYTHON_BINARY}-pip g++-4.8
+    sudo apt-get install -y \
+        pkg-config \
+        zip \
+        g++ \
+        zlib1g-dev \
+        unzip \
+        curl \
+        wget \
+        g++-4.8
+
+    # Add a repo that includes newer python versions
+    sudo apt-get install -y --no-install-recommends software-properties-common
+    sudo add-apt-repository -y ppa:deadsnakes/ppa
+    sudo apt-get update
+
+    # Install python
+    sudo apt-get install -y \
+        ${NEUROPOD_PYTHON_BINARY} \
+        ${NEUROPOD_PYTHON_BINARY}-dev
+
+    # Install pip
+    wget https://bootstrap.pypa.io/get-pip.py -O /tmp/get-pip.py
+    ${NEUROPOD_PYTHON_BINARY} /tmp/get-pip.py
 
     # Install bazel
     tmpdir=$(mktemp -d)

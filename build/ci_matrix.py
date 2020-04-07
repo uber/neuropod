@@ -77,29 +77,24 @@ PLATFORMS = [
     "macos_cpu",
 ]
 
-# Versions of python to use
-PY_VERSIONS = [
-    "2.7",
-    "3",
-]
-
 # Versions of frameworks to test with
 FRAMEWORK_VERSIONS = [
-    {"cuda": "9.0", "tensorflow": "1.12.0", "torch": "1.1.0"},
-    {"cuda": "10.0", "tensorflow": "1.13.1", "torch": "1.2.0"},
-    {"cuda": "10.0", "tensorflow": "1.14.0", "torch": "1.3.0"},
-    {"cuda": "10.0", "tensorflow": "1.15.0", "torch": "1.4.0"},
+    {"cuda": "9.0", "tensorflow": "1.12.0", "torch": "1.1.0", "python": "2.7"},
+    {"cuda": "10.0", "tensorflow": "1.13.1", "torch": "1.2.0", "python": "3.5"},
+    {"cuda": "10.0", "tensorflow": "1.14.0", "torch": "1.3.0", "python": "3.6"},
+    {"cuda": "10.0", "tensorflow": "1.15.0", "torch": "1.4.0", "python": "3.7"},
 ]
 
 travis_matrix = []
 docker_compose_matrix = []
 buildkite_yml_matrix = []
 added_lint = False
-for platform, py_version, framework_version in itertools.product(PLATFORMS, PY_VERSIONS, FRAMEWORK_VERSIONS):
+for platform, framework_version in itertools.product(PLATFORMS, FRAMEWORK_VERSIONS):
     # Get versions of all the dependencies
     tf_version = framework_version["tensorflow"]
     torch_version = framework_version["torch"]
-    py_binary = "python" if py_version == "2.7" else "python3"
+    py_version = framework_version["python"]
+    py_binary = "python" + py_version
 
     # Generate the appropriate configuration
     if "macos" in platform:

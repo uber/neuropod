@@ -13,7 +13,7 @@ RUN mkdir -p /usr/src/build
 WORKDIR /usr/src
 COPY build/install_system_deps.sh /usr/src/build/install_system_deps.sh
 
-# Should be set to `python` or `python3`
+# The python version to use. Should be set to `python2.7`, `python3.5`, etc.
 ARG NEUROPOD_PYTHON_BINARY=python
 ENV NEUROPOD_PYTHON_BINARY=$NEUROPOD_PYTHON_BINARY
 
