@@ -11,5 +11,6 @@ NATIVE_PATH = osp.join(osp.dirname(osp.abspath(__file__)), "{SHARED_LIBRARY_NAME
 
 from neuropod.registry import register_backend
 
-# {{PLATFORM}} below will be a list of platform names (e.g. `['tensorflow']`)
-register_backend({PLATFORM}, NATIVE_PATH)
+# {{PLATFORM}} below will be a platform name (e.g. `tensorflow`)
+# {{PLATFORM_VERSION}} below will be a version (e.g. `1.12.0`)
+register_backend("{PLATFORM}", "{PLATFORM_VERSION}", NATIVE_PATH)

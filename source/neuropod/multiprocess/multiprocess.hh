@@ -18,9 +18,8 @@ namespace neuropod
 // Note: Libraries in this map will only be loaded if a backend for the requested type hasn't
 // already been loaded
 // See the comments in `neuropod.hh` for more details
-std::unique_ptr<NeuropodBackend> load_neuropod_ope(
-    const std::string &                                 neuropod_path,
-    const RuntimeOptions &                              options,
-    const std::unordered_map<std::string, std::string> &default_backend_overrides);
+std::unique_ptr<NeuropodBackend> load_neuropod_ope(const std::string &                 neuropod_path,
+                                                   const RuntimeOptions &              options,
+                                                   const std::vector<BackendLoadSpec> &default_backend_overrides);
 
 } // namespace neuropod

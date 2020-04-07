@@ -86,9 +86,9 @@ public:
     // name of a shared library that supports that type.
     // Note: Libraries in this map will only be loaded if a backend for the requested type hasn't
     // already been loaded
-    Neuropod(const std::string &                                 neuropod_path,
-             const std::unordered_map<std::string, std::string> &default_backend_overrides,
-             const RuntimeOptions &                              options = {});
+    Neuropod(const std::string &                 neuropod_path,
+             const std::vector<BackendLoadSpec> &default_backend_overrides,
+             const RuntimeOptions &              options = {});
 
     // Allows an already-initialized backend to be passed in. This enables backends that need
     // non-standard arguments. For example, this can be used to build a proxy that runs a

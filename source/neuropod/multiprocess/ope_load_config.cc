@@ -7,6 +7,23 @@
 namespace neuropod
 {
 
+// Specialization for BackendLoadSpec
+template <>
+inline void ipc_serialize(std::ostream &out, const BackendLoadSpec &data)
+{
+    ipc_serialize(out, data.type);
+    ipc_serialize(out, data.version);
+    ipc_serialize(out, data.path);
+}
+
+template <>
+inline void ipc_deserialize(std::istream &in, BackendLoadSpec &data)
+{
+    ipc_deserialize(in, data.type);
+    ipc_deserialize(in, data.version);
+    ipc_deserialize(in, data.path);
+}
+
 template <>
 void ipc_serialize(std::ostream &out, const ope_load_config &data)
 {

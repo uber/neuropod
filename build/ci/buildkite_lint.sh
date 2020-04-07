@@ -1,9 +1,6 @@
 #!/bin/bash
 set -e
 
-# Make sure we can build the docs
-./build/ci/docs.sh
-
 # Used for bazel caching to s3 in CI
 curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -
 sudo apt-get install -y nodejs
@@ -19,6 +16,9 @@ bazels3cache --bucket=neuropod-build-cache
 
 # Install lint deps
 ./build/ci/install_lint_deps.sh
+
+# Make sure we can build the docs
+./build/ci/docs.sh
 
 # Run lint
 ./build/ci/lint.sh

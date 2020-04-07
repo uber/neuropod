@@ -19,6 +19,8 @@ def load_installed_backends():
     Get all the installed backends
     """
     # TODO(vip): Make sure these are all whitelisted packages published by us
+    # Note: these are listed in reverse priority order
+    # The ordering below means we'd prefer to load a newer, GPU capable version of a framework if one is available
     PACKAGES = [
         # Torch CPU
         "neuropod-backend-torchscript-1-1-0-cpu",

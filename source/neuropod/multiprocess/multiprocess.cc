@@ -140,10 +140,10 @@ public:
     }
 
     // Generate a control queue name and start a worker
-    MultiprocessNeuropodBackend(const std::string &                                 neuropod_path,
-                                const RuntimeOptions &                              options,
-                                bool                                                free_memory_every_cycle,
-                                const std::unordered_map<std::string, std::string> &default_backend_overrides)
+    MultiprocessNeuropodBackend(const std::string &                 neuropod_path,
+                                const RuntimeOptions &              options,
+                                bool                                free_memory_every_cycle,
+                                const std::vector<BackendLoadSpec> &default_backend_overrides)
         : NeuropodBackendWithDefaultAllocator<SHMNeuropodTensor>(neuropod_path),
           control_queue_name_(boost::uuids::to_string(boost::uuids::random_generator()())),
           free_memory_every_cycle_(free_memory_every_cycle),
@@ -273,10 +273,9 @@ protected:
 
 } // namespace
 
-std::unique_ptr<NeuropodBackend> load_neuropod_ope(
-    const std::string &                                 neuropod_path,
-    const RuntimeOptions &                              options,
-    const std::unordered_map<std::string, std::string> &default_backend_overrides)
+std::unique_ptr<NeuropodBackend> load_neuropod_ope(const std::string &                 neuropod_path,
+                                                   const RuntimeOptions &              options,
+                                                   const std::vector<BackendLoadSpec> &default_backend_overrides)
 {
     if (!options.use_ope)
     {
