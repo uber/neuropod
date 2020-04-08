@@ -1,9 +1,6 @@
 #!/bin/bash
 set -e
 
-# Default to python 2 if not set
-NEUROPOD_PYTHON_BINARY="${NEUROPOD_PYTHON_BINARY:-python}"
-
 if [[ $(uname -s) == 'Darwin' ]]; then
     # Install bazel
     tmpdir=$(mktemp -d)
@@ -18,10 +15,23 @@ if [[ $(uname -s) == 'Darwin' ]]; then
     export HOMEBREW_NO_AUTO_UPDATE=1
     brew install libomp
 else
-    # Install bazel deps, pip, and python dev
+    # Install bazel deps
     # Install g++-4.8 for TensorFlow custom op builds
     sudo apt-get update
-    sudo apt-get install -y pkg-config zip g++ zlib1g-dev unzip python3 curl wget ${NEUROPOD_PYTHON_BINARY}-dev ${NEUROPOD_PYTHON_BINARY}-pip g++-4.8
+    sudo apt-get install -y \
+        pkg-config \
+        zip \
+        g++ \
+        zlib1g-dev \
+        unzip \
+        curl \
+        wget \
+        g++-4.8
+
+    # Add a repo that includes newer python versions
+    sudo apt-get install -y --no-install-recommends software-properties-common
+    sudo add-apt-repository -y ppa:deadsnakes/ppa
+    sudo apt-get update
 
     # Install bazel
     tmpdir=$(mktemp -d)

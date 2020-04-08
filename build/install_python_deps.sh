@@ -1,8 +1,12 @@
 #!/bin/bash
 set -e
 
-# Default to python 2 if not set
-NEUROPOD_PYTHON_BINARY="${NEUROPOD_PYTHON_BINARY:-python}"
+# Defaults to python 2 if not set
+NEUROPOD_PYTHON_BINARY="python${NEUROPOD_PYTHON_VERSION}"
+
+# Install pip
+wget https://bootstrap.pypa.io/get-pip.py -O /tmp/get-pip.py
+${NEUROPOD_PYTHON_BINARY} /tmp/get-pip.py
 
 # Setup a virtualenv
 ${NEUROPOD_PYTHON_BINARY} -m pip install virtualenv==16.7.9

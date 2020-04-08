@@ -13,10 +13,6 @@ RUN mkdir -p /usr/src/build
 WORKDIR /usr/src
 COPY build/install_system_deps.sh /usr/src/build/install_system_deps.sh
 
-# Should be set to `python` or `python3`
-ARG NEUROPOD_PYTHON_BINARY=python
-ENV NEUROPOD_PYTHON_BINARY=$NEUROPOD_PYTHON_BINARY
-
 # Install system dependencies
 RUN /usr/src/build/install_system_deps.sh
 
@@ -25,6 +21,13 @@ COPY build/workspace_prefetch /usr/src/source/WORKSPACE
 COPY source/bazel/toolchain.patch /usr/src/source/bazel/toolchain.patch
 COPY source/bazel/BUILD /usr/src/source/bazel/BUILD
 RUN cd source && bazel sync
+
+# The python version to use. Should be set to `2.7`, `3.5`, etc.
+ARG NEUROPOD_PYTHON_VERSION=2.7
+ENV NEUROPOD_PYTHON_VERSION=$NEUROPOD_PYTHON_VERSION
+
+# Install python
+RUN sudo apt-get install -y "python${NEUROPOD_PYTHON_VERSION}" "python${NEUROPOD_PYTHON_VERSION}-dev"
 
 # Copy the python code into the image
 RUN mkdir -p /usr/src/source/python /usr/src/source/neuropod/python

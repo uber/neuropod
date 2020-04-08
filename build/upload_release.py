@@ -33,7 +33,7 @@ def upload():
     # Only upload the main library on one build (because we don't need to upload once per backend version)
     # This is also not CPU/GPU dependent
     # For each OS:
-    if PYTHON_VERSION == "27" and REQUESTED_TF_VERSION == "1.12.0" and not IS_GPU:
+    if REQUESTED_TF_VERSION == "1.12.0" and not IS_GPU:
         upload_package(
             "source/bazel-bin/neuropod/libneuropod.tar.gz",
             release_id,
@@ -43,21 +43,19 @@ def upload():
             )
         )
 
-    # Only upload these on the python 2.7 jobs (because we don't need to upload them twice)
     # For each OS: For each backend version: For each CPU/GPU:
-    if PYTHON_VERSION == "27":
-        upload_package("source/bazel-bin/neuropod/backends/tensorflow/neuropod_tensorflow_backend.tar.gz", release_id, "{}-tensorflow-{}-backend.tar.gz".format(platform, REQUESTED_TF_VERSION))
-        upload_package("source/bazel-bin/neuropod/backends/torchscript/neuropod_torchscript_backend.tar.gz", release_id, "{}-torchscript-{}-backend.tar.gz".format(platform, REQUESTED_TORCH_VERSION))
+    upload_package("source/bazel-bin/neuropod/backends/tensorflow/neuropod_tensorflow_backend.tar.gz", release_id, "{}-tensorflow-{}-backend.tar.gz".format(platform, REQUESTED_TF_VERSION))
+    upload_package("source/bazel-bin/neuropod/backends/torchscript/neuropod_torchscript_backend.tar.gz", release_id, "{}-torchscript-{}-backend.tar.gz".format(platform, REQUESTED_TORCH_VERSION))
 
-        # Upload the wheels for the backends
-        for gpath in ["source/python/dist/neuropod_backend_tensorflow*.whl", "source/python/dist/neuropod_backend_torchscript*.whl"]:
-            whl_path = glob.glob(gpath)[0]
-            fname = os.path.basename(whl_path)
-            upload_package(whl_path, release_id, fname, content_type="application/zip")
+    # Upload the wheels for the backends
+    for gpath in ["source/python/dist/neuropod_backend_tensorflow*.whl", "source/python/dist/neuropod_backend_torchscript*.whl"]:
+        whl_path = glob.glob(gpath)[0]
+        fname = os.path.basename(whl_path)
+        upload_package(whl_path, release_id, fname, content_type="application/zip")
 
     # The python package is the same across CPU/GPU and different versions of backends so we'll only upload once for mac and once for linux
     # For each OS: For each python version
-    if REQUESTED_TF_VERSION == "1.12.0" and not IS_GPU:
+    if not IS_GPU:
         # Upload the pythonbridge backend
         upload_package("source/bazel-bin/neuropod/backends/python_bridge/neuropod_pythonbridge_backend.tar.gz", release_id, "{}-python-{}-backend.tar.gz".format(platform, PYTHON_VERSION))
 
