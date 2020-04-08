@@ -156,7 +156,15 @@ void TensorflowNeuropodBackend::load_model_internal()
         {
             if (dlopen(loader_->get_file_path(path).c_str(), RTLD_NOW) == nullptr)
             {
-                NEUROPOD_ERROR("Failed to load custom op. Error from dlopen: {}", dlerror());
+                const auto err = dlerror();
+                if (err == nullptr)
+                {
+                    NEUROPOD_ERROR("Failed to load custom op. dlopen failed but no error was available");
+                }
+                else
+                {
+                    NEUROPOD_ERROR("Failed to load custom op. Error from dlopen: {}", err);
+                }
             }
 
             loaded_op_hashes.insert(hash);
