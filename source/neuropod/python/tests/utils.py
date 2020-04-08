@@ -90,7 +90,7 @@ def check_addition_model(neuropod_path):
     Validate that the inputs and outputs of the loaded neuropod match
     the problem spec
     """
-    with load_neuropod(neuropod_path, _always_use_native=False) as neuropod:
+    with load_neuropod(neuropod_path) as neuropod:
         target = get_addition_model_spec()
 
         # Validate that the specs match

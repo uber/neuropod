@@ -3,6 +3,7 @@
 #
 import numpy as np
 import os
+import six
 import shutil
 import unittest
 from tempfile import mkdtemp
@@ -61,14 +62,20 @@ class TestSpecValidation(unittest.TestCase):
         self.assertGreater(result["out_string_vector"].shape[0], 0)
 
     def test_invalid_input_name(self):
-        with self.assertRaises(ValueError):
+        with six.assertRaisesRegex(
+            self, (ValueError, RuntimeError), "are not found in the input spec"
+        ):
             neuropod = load_neuropod(TestSpecValidation.neuropod_path)
             neuropod.infer(
                 {"bogus": np.asarray([[1.1, 2.2], [0, 1], [2, 3]], dtype=np.float32)}
             )
 
     def test_invalid_shape(self):
-        with self.assertRaises(ValueError):
+        with six.assertRaisesRegex(
+            self,
+            (ValueError, RuntimeError),
+            "in the input spec is expected to have 2 dimensions, but had 1",
+        ):
             neuropod = load_neuropod(TestSpecValidation.neuropod_path)
             neuropod.infer({"in_float32_matrix": np.asarray([3], dtype=np.float32)})
 

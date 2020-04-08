@@ -19,6 +19,24 @@ namespace neuropod
 namespace
 {
 
+// A mapping between numpy types and Neuropod types
+// TODO(vip): Share this with config_utils.cc
+const std::unordered_map<std::string, TensorType> type_mapping = {
+    {"float32", FLOAT_TENSOR},
+    {"float64", DOUBLE_TENSOR},
+    {"string", STRING_TENSOR},
+
+    {"int8", INT8_TENSOR},
+    {"int16", INT16_TENSOR},
+    {"int32", INT32_TENSOR},
+    {"int64", INT64_TENSOR},
+
+    {"uint8", UINT8_TENSOR},
+    {"uint16", UINT16_TENSOR},
+    {"uint32", UINT32_TENSOR},
+    {"uint64", UINT64_TENSOR},
+};
+
 py::dict infer(Neuropod &neuropod, py::dict &inputs_dict)
 {
     // Convert from a py::dict of numpy arrays to an unordered_map of `NeuropodTensor`s
@@ -127,7 +145,26 @@ PYBIND11_MODULE(neuropod_native, m)
         .def(py::init([](const std::string &                 path,
                          const std::vector<BackendLoadSpec> &default_backend_overrides,
                          py::kwargs kwargs) { return make_neuropod(kwargs, path, default_backend_overrides); }))
-        .def("infer", &infer);
+        .def("infer", &infer)
+        .def("get_inputs", &Neuropod::get_inputs)
+        .def("get_outputs", &Neuropod::get_outputs)
+        .def("get_name", &Neuropod::get_name)
+        .def("get_platform", &Neuropod::get_platform);
+
+    py::class_<TensorSpec>(m, "TensorSpec")
+        .def_readonly("name", &TensorSpec::name)
+        .def_readonly("type", &TensorSpec::type)
+        .def_readonly("dims", &TensorSpec::dims);
+
+    py::class_<Dimension>(m, "Dimension")
+        .def_readonly("value", &Dimension::value)
+        .def_readonly("symbol", &Dimension::symbol);
+
+    auto type_enum = py::enum_<TensorType>(m, "TensorType");
+    for (const auto &item : type_mapping)
+    {
+        type_enum = type_enum.value(item.first.c_str(), item.second);
+    }
 
     py::class_<BackendLoadSpec>(m, "BackendLoadSpec")
         .def(py::init<const std::string &, const std::string &, const std::string &>());
