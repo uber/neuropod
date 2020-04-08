@@ -83,6 +83,9 @@ def _impl(repository_ctx):
 
 tensorflow_hdrs_repository = repository_rule(
     implementation = _impl,
-    local = True,
+    environ = [
+        "NEUROPOD_TENSORFLOW_VERSION",
+        "NEUROPOD_IS_GPU",
+    ],
     attrs = {"build_file_template": attr.string(mandatory = True)},
 )
