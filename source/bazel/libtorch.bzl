@@ -97,6 +97,10 @@ def _impl(repository_ctx):
 
 libtorch_repository = repository_rule(
     implementation = _impl,
-    local = True,
+    environ = [
+        "NEUROPOD_TORCH_VERSION",
+        "NEUROPOD_IS_GPU",
+        "NEUROPOD_CUDA_VERSION",
+    ],
     attrs = {"build_file_template": attr.string(mandatory = True)},
 )
