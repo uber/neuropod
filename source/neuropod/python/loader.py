@@ -8,7 +8,6 @@ from neuropod.utils import zip_loader
 
 from neuropod.registry import _REGISTERED_BACKENDS
 from neuropod.utils.dtype_utils import maybe_convert_bindings_types
-from neuropod.backends.neuropod_executor import NeuropodExecutor
 
 # Add the script's directory to the PATH so we can find the worker binary
 os.environ["PATH"] += ":" + os.path.dirname(os.path.realpath(__file__))
@@ -63,7 +62,25 @@ def load_installed_backends():
 load_installed_backends()
 
 
-class NativeNeuropodExecutor(NeuropodExecutor):
+def _convert_native_shape_to_list(dims):
+    """
+    Takes a list of `neuropod_native.Dimension` objects and converts to a list of python types
+    """
+    out = []
+    for dim in dims:
+        if dim.value == -2:
+            # It's a symbol
+            out.append(dim.symbol)
+        elif dim.value == -1:
+            # Any shape is okay
+            out.append(None)
+        else:
+            out.append(dim.value)
+
+    return out
+
+
+class NativeNeuropodExecutor:
     """
     Executes a Neuropod using the native bindings
     """
@@ -72,10 +89,8 @@ class NativeNeuropodExecutor(NeuropodExecutor):
         """
         Load a Neuropod using the native bindings
 
-        :param  neuropod_path:  The path to a python neuropod package
+        :param  neuropod_path:  The path to a neuropod package
         """
-        super(NativeNeuropodExecutor, self).__init__(neuropod_path)
-
         # Load the model
         from neuropod.neuropod_native import Neuropod as NeuropodNative
 
@@ -83,9 +98,84 @@ class NativeNeuropodExecutor(NeuropodExecutor):
             neuropod_path, _REGISTERED_BACKENDS, use_ope=True, **kwargs
         )
 
-    def forward(self, inputs):
+    @property
+    def name(self):
+        """
+        Get the name of the loaded neuropod.
+        """
+        return self.model.get_name()
+
+    @property
+    def platform(self):
+        """
+        Get the platform of backend of the loaded neuropod.
+        """
+        return self.model.get_platform()
+
+    @property
+    def inputs(self):
+        """
+        Get the inputs of the loaded neuropod. Returns a list of dicts representing
+        the format of the expected input to the neuropod.
+
+        Ex: [{"name": "x", "dtype": "float32", "shape": [None,]}]
+        """
+        out = []
+        for item in self.model.get_inputs():
+            out.append(
+                {
+                    "name": item.name,
+                    "dtype": item.type.name,
+                    "shape": _convert_native_shape_to_list(item.dims),
+                }
+            )
+
+        return out
+
+    @property
+    def outputs(self):
+        """
+        Get the outputs of the loaded neuropod. Returns a list of dicts representing
+        the format of the output of the neuropod.
+
+        Ex: [{"name": "z", "dtype": "float32", "shape": [None,]}]
+        """
+        out = []
+        for item in self.model.get_outputs():
+            out.append(
+                {
+                    "name": item.name,
+                    "dtype": item.type.name,
+                    "shape": _convert_native_shape_to_list(item.dims),
+                }
+            )
+
+        return out
+
+    def infer(self, inputs):
+        """
+        Run inference using the specifed inputs.
+
+        :param  inputs:     A dict mapping input names to values. This must match the input
+                            spec in the neuropod config for the loaded model.
+                            Ex: {'x1': np.array([5]), 'x2': np.array([6])}
+                            *Note:* all the keys in this dict must be strings and all the
+                            values must be numpy arrays
+
+        :returns:   A dict mapping output names to values. This is checked to ensure that it
+                    matches the spec in the neuropod config for the loaded model. All the keys
+                    in this dict are strings and all the values are numpy arrays.
+        """
         inputs = maybe_convert_bindings_types(inputs)
         return self.model.infer(inputs)
+
+    def __enter__(self):
+        # Needed in order to be used as a contextmanager
+        return self
+
+    def __exit__(self, *args):
+        # Needed in order to be used as a contextmanager
+        pass
 
 
 def load_neuropod(neuropod_path, _always_use_native=True, **kwargs):
@@ -98,11 +188,11 @@ def load_neuropod(neuropod_path, _always_use_native=True, **kwargs):
                                 to `None` will attempt to run this model on CPU.
     :param  load_custom_ops:    Whether or not to load custom ops included in the model.
     """
-    # If we were given a zipfile, extract it to a temp dir and use it
-    neuropod_path = zip_loader.extract_neuropod_if_necessary(neuropod_path)
-
     if _always_use_native:
         return NativeNeuropodExecutor(neuropod_path, **kwargs)
+
+    # If we were given a zipfile, extract it to a temp dir and use it
+    neuropod_path = zip_loader.extract_neuropod_if_necessary(neuropod_path)
 
     # Figure out what type of neuropod this is
     neuropod_config = config_utils.read_neuropod_config(neuropod_path)
