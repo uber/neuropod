@@ -5,6 +5,7 @@
 #include "neuropod/multiprocess/multiprocess.hh"
 
 #include "neuropod/backends/neuropod_backend.hh"
+#include "neuropod/internal/cuda_device_mapping.hh"
 #include "neuropod/internal/logging.hh"
 #include "neuropod/multiprocess/control_messages.hh"
 #include "neuropod/multiprocess/ipc_control_channel.hh"
@@ -158,7 +159,9 @@ public:
         }
         else
         {
-            env["CUDA_VISIBLE_DEVICES"] = std::to_string(options.visible_device);
+            // The GPU UUID is a standard id that is not affected by CUDA_VISIBLE_DEVICES so we can
+            // use it to have stable IDs across processes (e.g. for OPE)
+            env["CUDA_VISIBLE_DEVICES"] = get_gpu_uuid(options.visible_device);
         }
 
         // Convert to a vector

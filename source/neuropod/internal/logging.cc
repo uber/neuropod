@@ -51,15 +51,29 @@ spdlog::level::level_enum get_default_log_level()
     return spdlog::level::info;
 }
 
-bool set_initial_log_level()
-{
-    spdlog::set_level(get_default_log_level());
-    spdlog::set_pattern("%D %T.%f: %L %@] [thread %t, process %P] %v");
+std::once_flag logging_initialized;
 
+} // namespace
+
+void init_logging()
+{
+    std::call_once(logging_initialized, []() {
+        spdlog::set_level(get_default_log_level());
+        spdlog::set_pattern("%D %T.%f: %L %@] [thread %t, process %P] %v");
+    });
+}
+
+namespace
+{
+
+bool static_init_logging()
+{
+    init_logging();
     return true;
 }
 
-bool current_log_level = set_initial_log_level();
+// Initialize logging if nothing else did
+bool current_log_level = static_init_logging();
 
 } // namespace
 

@@ -39,16 +39,16 @@ fi
 
 # Run python tests
 pushd python
-python -m unittest discover --verbose neuropod/tests
+NEUROPOD_LOG_LEVEL=TRACE python -m unittest discover --verbose neuropod/tests
 
 # Test the native bindings
-NEUROPOD_RUN_NATIVE_TESTS=true python -m unittest discover --verbose neuropod/tests
+NEUROPOD_LOG_LEVEL=TRACE NEUROPOD_RUN_NATIVE_TESTS=true python -m unittest discover --verbose neuropod/tests
 
 # Run GPU only python tests
-python -m unittest discover --verbose neuropod/tests -p gpu_test*.py
+NEUROPOD_LOG_LEVEL=TRACE python -m unittest discover --verbose neuropod/tests -p gpu_test*.py
 
 # Run GPU only python tests with native bindings
-NEUROPOD_RUN_NATIVE_TESTS=true python -m unittest discover --verbose neuropod/tests -p gpu_test*.py
+NEUROPOD_LOG_LEVEL=TRACE NEUROPOD_RUN_NATIVE_TESTS=true python -m unittest discover --verbose neuropod/tests -p gpu_test*.py
 popd
 
 # Run native tests
