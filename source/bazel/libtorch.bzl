@@ -55,6 +55,10 @@ def _impl(repository_ctx):
             "url": "https://download.pytorch.org/libtorch/cu100/libtorch-shared-with-deps-1.4.0%2Bcu100.zip",
             "sha256": "1557927c9929c8eb8caf8860d0ffdce39ae931af924f0fde859ad1dc0843575c",
         },
+        "1.4.0-linux-cu101": {
+            "url": "https://download.pytorch.org/libtorch/cu101/libtorch-shared-with-deps-1.4.0.zip",
+            "sha256": "",
+        },
 
         # Mac CPU
         "1.1.0-mac-cpu": {

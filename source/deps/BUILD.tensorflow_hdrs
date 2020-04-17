@@ -12,7 +12,8 @@ cc_library(
     hdrs = glob(
         [
             "tensorflow*.data/purelib/tensorflow*/include/**",
-            "tensorflow_core/include/**"
+            "tensorflow_core/include/**",
+            "tensorflow/include/**",
         ],
         exclude = glob(["**/*.so"])
     ),
@@ -22,6 +23,7 @@ cc_library(
         "tensorflow-{TENSORFLOW_VERSION}.data/purelib/tensorflow_core/include/",
         "tensorflow-{TENSORFLOW_VERSION}.data/purelib/tensorflow/include/",
         "tensorflow_core/include/",
+        "tensorflow/include/",
     ],
     defines = ["TENSORFLOW_VERSION={TENSORFLOW_VERSION}"],
 )

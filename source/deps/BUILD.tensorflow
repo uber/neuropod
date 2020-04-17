@@ -10,7 +10,14 @@ cc_library(
     name = "libtensorflow",
     srcs = select({
         "@bazel_tools//src/conditions:darwin": glob(["lib/libtensorflow.so", "lib/libtensorflow.1.dylib"]),
-        "//conditions:default": glob(["lib/libtensorflow.so", "lib/libtensorflow_framework.so", "lib/libtensorflow.so.1", "lib/libtensorflow_framework.so.1"]),
+        "//conditions:default": glob([
+            "lib/libtensorflow.so",
+            "lib/libtensorflow_framework.so",
+            "lib/libtensorflow.so.1",
+            "lib/libtensorflow_framework.so.1",
+            "lib/libtensorflow.so.2",
+            "lib/libtensorflow_framework.so.2",
+        ]),
     }),
 )
 

@@ -27,6 +27,7 @@ def create_tf_strings_model():
     return g.as_graph_def()
 
 
+@unittest.skipIf(tf.__version__[0] == "2", "Skipping TF 1.x tests for TF 2.x")
 class TestTensorflowStrings(unittest.TestCase):
     def package_strings_model(self, do_fail=False):
         with TemporaryDirectory() as test_dir:

@@ -53,6 +53,7 @@ def create_tf_accumulator_model():
     return g.as_graph_def(), init_op.name
 
 
+@unittest.skipIf(tf.__version__[0] == "2", "Skipping TF 1.x tests for TF 2.x")
 class TestTensorflowPackaging(unittest.TestCase):
     def package_simple_addition_model(self, do_fail=False, **kwargs):
         with TemporaryDirectory() as test_dir:

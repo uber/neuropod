@@ -36,6 +36,10 @@ def _impl(repository_ctx):
                 "url": "https://github.com/VivekPanyam/python-prebuilts/releases/download/v0.0.1/python-3.7.7.tar.gz",
                 "sha256": "53eb870e33b7581b44f95f79fdbeb275ab3a03794270d3f5cb64699d7c65e2fa",
             },
+            "3.8-linux": {
+                "url": "https://github.com/VivekPanyam/python-prebuilts/releases/download/v0.0.1/python-3.8.2.tar.gz",
+                "sha256": "8a93f738894db779c282a02fb7a88e4911538e26ed834a23bb1bc9f3e2fe9e04",
+            },
         }
 
         download_mapping = MAPPING["{}-{}".format(

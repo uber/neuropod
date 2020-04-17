@@ -48,7 +48,7 @@ private:
 public:
     NeuropodTensorBuffer(void *data, size_t len, void *deleter_handle)
         :
-#if TF_MAJOR_VERSION <= 1 && TF_MINOR_VERSION > 12
+#if (TF_MAJOR_VERSION <= 1 && TF_MINOR_VERSION > 12) || TF_MAJOR_VERSION > 1
           TensorBuffer(data),
 #else
           data_(data),

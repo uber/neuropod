@@ -79,17 +79,19 @@ def install_pytorch(version):
         else:
             pip_args += ["torch_nightly==" + version]
     else:
-        if IS_GPU and version_base == "1.1.0":
-            # Figure out the correct platform to use
+        if IS_GPU and (version_base == "1.1.0" or version_base == "1.4.0"):
+            # See https://github.com/pytorch/pytorch/issues/37113
+            # Manually figure out the correct whl URL
             package_version_map = {
                 (2,7): "cp27-cp27mu",
                 (3,5): "cp35-cp35m",
                 (3,6): "cp36-cp36m",
                 (3,7): "cp37-cp37m",
+                (3,8): "cp38-cp38",
             }
             platform_version = package_version_map[(sys.version_info.major, sys.version_info.minor)]
 
-            pip_args += ["https://download.pytorch.org/whl/" + torch_cuda_string + "/torch-" + version + "-" + platform_version + "-linux_x86_64.whl"]
+            pip_args += ["https://download.pytorch.org/whl/" + torch_cuda_string + "/torch-" + version.replace("+", "%2B") + "-" + platform_version + "-linux_x86_64.whl"]
         else:
             pip_args += ["torch==" + version]
 

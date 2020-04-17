@@ -36,6 +36,7 @@ def create_keras_addition_model(node_name_mapping=None):
     return model
 
 
+@unittest.skipIf(tf.__version__[0] == "2", "Skipping TF 1.x tests for TF 2.x")
 class TestKerasPackaging(unittest.TestCase):
     def package_simple_addition_model(self, alias_names=False, do_fail=False):
         with TemporaryDirectory() as test_dir:
