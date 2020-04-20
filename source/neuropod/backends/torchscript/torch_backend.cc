@@ -7,6 +7,10 @@
 #include "neuropod/backends/torchscript/type_utils.hh"
 #include "neuropod/internal/tensor_types.hh"
 
+#ifndef __APPLE__
+#include <c10/cuda/CUDAGuard.h>
+#endif
+
 #include <caffe2/core/macros.h>
 
 #include <iostream>
@@ -290,6 +294,16 @@ torch::Device TorchNeuropodBackend::get_torch_device(NeuropodDeviceType target_d
 std::unique_ptr<NeuropodValueMap> TorchNeuropodBackend::infer_internal(const NeuropodValueMap &inputs)
 {
     torch::NoGradGuard guard;
+
+#ifndef __APPLE__
+    // Make sure we're running on the correct device
+    std::unique_ptr<at::cuda::CUDAGuard> device_guard;
+    const auto                           model_device = get_torch_device(DeviceType::GPU);
+    if (model_device.is_cuda())
+    {
+        device_guard = stdx::make_unique<at::cuda::CUDAGuard>(model_device);
+    }
+#endif
 
     // Get inference schema
     const auto &method    = model_->get_method("forward");
