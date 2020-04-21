@@ -149,7 +149,6 @@ void validate_tensors_against_specs(const NeuropodValueMap &       tensors,
     }
 }
 
-NeuropodBackend::NeuropodBackend()  = default;
 NeuropodBackend::~NeuropodBackend() = default;
 
 NeuropodBackend::NeuropodBackend(const std::string &neuropod_path)
@@ -175,23 +174,11 @@ void NeuropodBackend::load_model()
 
 const std::vector<TensorSpec> &NeuropodBackend::get_inputs() const
 {
-    if (model_config_ == nullptr)
-    {
-        static const std::vector<TensorSpec> empty = {};
-        return empty;
-    }
-
     return model_config_->inputs;
 }
 
 const std::vector<TensorSpec> &NeuropodBackend::get_outputs() const
 {
-    if (model_config_ == nullptr)
-    {
-        static const std::vector<TensorSpec> empty = {};
-        return empty;
-    }
-
     return model_config_->outputs;
 }
 

@@ -6,15 +6,14 @@
 // NEUROPOD_CI_SKIP_INFER
 
 #include "benchmark/benchmark.h"
-#include "neuropod/backends/test_backend/test_neuropod_backend.hh"
+#include "neuropod/core/generic_tensor.hh"
 #include "neuropod/serialization/serialization.hh"
 
 void benchmark_serialize_object_detection(benchmark::State &state)
 {
     const uint8_t some_image_data[1200 * 1920 * 3] = {0};
 
-    neuropod::TestNeuropodBackend backend;
-    auto                          allocator = backend.get_tensor_allocator();
+    auto allocator = neuropod::get_generic_tensor_allocator();
 
     for (auto _ : state)
     {
@@ -43,8 +42,7 @@ void benchmark_serialize_small_inputs(benchmark::State &state)
 {
     const float some_data[10 * 5] = {0};
 
-    neuropod::TestNeuropodBackend backend;
-    auto                          allocator = backend.get_tensor_allocator();
+    auto allocator = neuropod::get_generic_tensor_allocator();
 
     for (auto _ : state)
     {

@@ -1,11 +1,11 @@
 //
-// Uber, Inc. (c) 2018
+// Uber, Inc. (c) 2020
 //
 
 #pragma once
 
+#include "neuropod/backends/neuropod_backend.hh"
 #include "neuropod/internal/deleter.hh"
-#include "neuropod/internal/neuropod_tensor.hh"
 
 #include <iostream>
 #include <memory>
@@ -15,9 +15,8 @@
 namespace neuropod
 {
 
-// This is used along with the TestNeuropodBackend in tests
 template <typename T>
-class TestNeuropodTensor : public TypedNeuropodTensor<T>
+class GenericNeuropodTensor : public TypedNeuropodTensor<T>
 {
 private:
     // A pointer to the data contained in the tensor
@@ -27,21 +26,21 @@ private:
     void *deleter_handle_;
 
 public:
-    TestNeuropodTensor(const std::vector<int64_t> &dims) : TypedNeuropodTensor<T>(dims)
+    GenericNeuropodTensor(const std::vector<int64_t> &dims) : TypedNeuropodTensor<T>(dims)
     {
         data_           = malloc(this->get_num_elements() * sizeof(T));
         deleter_handle_ = register_deleter([](void *data) { free(data); }, data_);
     }
 
     // Wrap existing memory
-    TestNeuropodTensor(const std::vector<int64_t> &dims, void *data, const Deleter &deleter)
+    GenericNeuropodTensor(const std::vector<int64_t> &dims, void *data, const Deleter &deleter)
         : TypedNeuropodTensor<T>(dims)
     {
         data_           = data;
         deleter_handle_ = register_deleter(deleter, data);
     }
 
-    ~TestNeuropodTensor() { run_deleter(deleter_handle_); }
+    ~GenericNeuropodTensor() { run_deleter(deleter_handle_); }
 
 protected:
     // Get a pointer to the underlying data
@@ -52,21 +51,24 @@ protected:
 
 // Specialization for strings
 template <>
-class TestNeuropodTensor<std::string> : public TypedNeuropodTensor<std::string>
+class GenericNeuropodTensor<std::string> : public TypedNeuropodTensor<std::string>
 {
 private:
     // The data contained in the tensor
     std::vector<std::string> data_;
 
 public:
-    TestNeuropodTensor(const std::vector<int64_t> &dims) : TypedNeuropodTensor<std::string>(dims) {}
+    GenericNeuropodTensor(const std::vector<int64_t> &dims) : TypedNeuropodTensor<std::string>(dims) {}
 
-    ~TestNeuropodTensor() = default;
+    ~GenericNeuropodTensor() = default;
 
     void set(const std::vector<std::string> &data) { data_ = data; }
 
 protected:
     const std::string operator[](size_t index) const { return data_[index]; }
 };
+
+// Get a `NeuropodTensorAllocator` that creates `GenericNeuropodTensor`s
+std::unique_ptr<NeuropodTensorAllocator> get_generic_tensor_allocator();
 
 } // namespace neuropod

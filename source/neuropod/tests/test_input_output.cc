@@ -3,7 +3,7 @@
 //
 
 #include "gtest/gtest.h"
-#include "neuropod/backends/test_backend/test_neuropod_backend.hh"
+#include "neuropod/core/generic_tensor.hh"
 #include "neuropod/serialization/serialization.hh"
 
 namespace
@@ -74,8 +74,7 @@ std::shared_ptr<neuropod::NeuropodTensor> serialize_deserialize(neuropod::Neurop
 // and validates the output
 TEST(test_allocate_tensor, add_tensors_and_validate)
 {
-    neuropod::TestNeuropodBackend backend;
-    auto                          allocator = backend.get_tensor_allocator();
+    auto allocator = neuropod::get_generic_tensor_allocator();
 
     // Allocate tensors
     std::shared_ptr<neuropod::NeuropodTensor> a_ten = allocator->allocate_tensor(a_shape, neuropod::INT32_TENSOR);

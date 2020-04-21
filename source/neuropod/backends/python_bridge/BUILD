@@ -37,8 +37,8 @@ cc_library(
     ],
     deps = [
         "//neuropod/backends:neuropod_backend",
-        "//neuropod/backends/test_backend:test_backend_hdrs",
         "//neuropod/bindings",
+        "//neuropod/core",
         "//neuropod/internal",
     ],
     alwayslink = True,

@@ -28,7 +28,6 @@ private:
     bool is_model_loaded_ = false;
 
 public:
-    NeuropodBackend();
     NeuropodBackend(const std::string &neuropod_path);
     virtual ~NeuropodBackend();
 

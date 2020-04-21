@@ -5,7 +5,7 @@
 #pragma once
 
 #include "neuropod/backends/neuropod_backend.hh"
-#include "neuropod/backends/test_backend/test_neuropod_tensor.hh"
+#include "neuropod/core/generic_tensor.hh"
 
 #include <pybind11/embed.h>
 
@@ -31,7 +31,7 @@ std::vector<std::string> get_default_python_path()
 // This backend starts an embedded python interpreter and is used
 // to execute neuropods that contain python code. This includes
 // models from PyTorch < 1.0 and PyTorch models that don't use TorchScript
-class PythonBridge : public NeuropodBackendWithDefaultAllocator<TestNeuropodTensor>
+class PythonBridge : public NeuropodBackendWithDefaultAllocator<GenericNeuropodTensor>
 {
 private:
     std::unique_ptr<py::object> neuropod_;

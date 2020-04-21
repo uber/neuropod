@@ -4,7 +4,7 @@
 
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
-#include "neuropod/backends/test_backend/test_neuropod_backend.hh"
+#include "neuropod/core/generic_tensor.hh"
 #include "neuropod/serialization/serialization.hh"
 
 std::shared_ptr<neuropod::NeuropodTensor> serialize_deserialize(neuropod::NeuropodTensorAllocator &allocator,
@@ -21,11 +21,9 @@ std::shared_ptr<neuropod::NeuropodTensor> serialize_deserialize(neuropod::Neurop
 
 TEST(test_allocate_tensor, serialize_string_tensor)
 {
-    neuropod::TestNeuropodBackend backend;
-
     std::vector<std::string> expected_data{"A", "B", "C", "D"};
 
-    auto allocator = backend.get_tensor_allocator();
+    auto allocator = neuropod::get_generic_tensor_allocator();
 
     // Allocate tensors
     const auto tensor_1D = allocator->allocate_tensor({4}, neuropod::STRING_TENSOR);
@@ -43,9 +41,7 @@ TEST(test_allocate_tensor, serialize_string_tensor)
 
 TEST(test_allocate_tensor, serialize_scalar_tensor)
 {
-    neuropod::TestNeuropodBackend backend;
-
-    auto allocator = backend.get_tensor_allocator();
+    auto allocator = neuropod::get_generic_tensor_allocator();
 
     const auto tensor_1D = allocator->allocate_tensor({3}, neuropod::FLOAT_TENSOR);
     tensor_1D->as_typed_tensor<float>()->copy_from({0.0, 0.1, 0.2});
@@ -68,9 +64,7 @@ TEST(test_allocate_tensor, serialize_scalar_tensor)
 
 TEST(test_allocate_tensor, multiple_tensors_in_a_stream)
 {
-    neuropod::TestNeuropodBackend backend;
-
-    auto allocator = backend.get_tensor_allocator();
+    auto allocator = neuropod::get_generic_tensor_allocator();
 
     const auto float_tensor_1D = allocator->allocate_tensor({3}, neuropod::FLOAT_TENSOR);
     float_tensor_1D->as_typed_tensor<float>()->copy_from({0.0, 0.1, 0.2});
@@ -97,9 +91,7 @@ TEST(test_allocate_tensor, multiple_tensors_in_a_stream)
 
 TEST(test_allocate_tensor, neuropod_value_map)
 {
-    neuropod::TestNeuropodBackend backend;
-
-    auto allocator = backend.get_tensor_allocator();
+    auto allocator = neuropod::get_generic_tensor_allocator();
 
     const std::shared_ptr<neuropod::NeuropodValue> float_tensor_1D =
         allocator->allocate_tensor({3}, neuropod::FLOAT_TENSOR);
