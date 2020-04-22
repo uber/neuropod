@@ -86,6 +86,7 @@ def install_pytorch(version):
                 (3,5): "cp35-cp35m",
                 (3,6): "cp36-cp36m",
                 (3,7): "cp37-cp37m",
+                (3,8): "cp38-cp38",
             }
             platform_version = package_version_map[(sys.version_info.major, sys.version_info.minor)]
 

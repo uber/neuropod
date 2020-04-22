@@ -83,6 +83,8 @@ FRAMEWORK_VERSIONS = [
     {"cuda": "10.0", "tensorflow": "1.13.1", "torch": "1.2.0", "python": "3.5"},
     {"cuda": "10.0", "tensorflow": "1.14.0", "torch": "1.3.0", "python": "3.6"},
     {"cuda": "10.0", "tensorflow": "1.15.0", "torch": "1.4.0", "python": "3.7"},
+    # TODO(vip): Replace the next variant with CUDA 10.1, TF 2.2.0, and Torch 1.5.0
+    {"cuda": "10.0", "tensorflow": "1.15.0", "torch": "1.4.0", "python": "3.8"},
 ]
 
 travis_matrix = []
