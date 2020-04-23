@@ -3,8 +3,8 @@
 //
 
 #include "gtest/gtest.h"
-#include "neuropod/backends/test_backend/test_neuropod_backend.hh"
 #include "neuropod/conversions/eigen.hh"
+#include "neuropod/core/generic_tensor.hh"
 #include "neuropod/internal/neuropod_tensor.hh"
 
 #include <gmock/gmock.h>
@@ -14,7 +14,7 @@ class int32_tensor_fixture : public ::testing::Test
 public:
     int32_tensor_fixture()
     {
-        untyped_tensor       = test_backend_.get_tensor_allocator()->allocate_tensor({ROWS}, neuropod::INT32_TENSOR);
+        untyped_tensor = neuropod::get_generic_tensor_allocator()->allocate_tensor({ROWS}, neuropod::INT32_TENSOR);
         const_untyped_tensor = untyped_tensor.get();
 
         tensor       = untyped_tensor->as_typed_tensor<int32_t>();
@@ -30,7 +30,6 @@ public:
 
 protected:
     static constexpr int                          ROWS = 4;
-    neuropod::TestNeuropodBackend                 test_backend_;
     std::unique_ptr<neuropod::NeuropodTensor>     untyped_tensor;
     const neuropod::NeuropodTensor *              const_untyped_tensor;
     neuropod::TypedNeuropodTensor<int32_t> *      tensor;
@@ -43,7 +42,8 @@ class int32_matrix_fixture : public ::testing::Test
 public:
     int32_matrix_fixture()
     {
-        untyped_tensor = test_backend_.get_tensor_allocator()->allocate_tensor({ROWS, COLS}, neuropod::INT32_TENSOR);
+        untyped_tensor =
+            neuropod::get_generic_tensor_allocator()->allocate_tensor({ROWS, COLS}, neuropod::INT32_TENSOR);
         const_untyped_tensor = untyped_tensor.get();
 
         tensor       = untyped_tensor->as_typed_tensor<int32_t>();
@@ -65,7 +65,6 @@ public:
 protected:
     static constexpr int                          ROWS = 5;
     static constexpr int                          COLS = 3;
-    neuropod::TestNeuropodBackend                 test_backend_;
     std::unique_ptr<neuropod::NeuropodTensor>     untyped_tensor;
     const neuropod::NeuropodTensor *              const_untyped_tensor;
     neuropod::TypedNeuropodTensor<int32_t> *      tensor;
@@ -150,6 +149,6 @@ TEST_F(int32_matrix_fixture, const_untyped_vector_as_eigen_type_mismatch)
 
 TEST_F(int32_matrix_fixture, higher_rank)
 {
-    untyped_tensor = test_backend_.get_tensor_allocator()->allocate_tensor({5, 5, 5}, neuropod::INT32_TENSOR);
+    untyped_tensor = neuropod::get_generic_tensor_allocator()->allocate_tensor({5, 5, 5}, neuropod::INT32_TENSOR);
     EXPECT_THROW(neuropod::as_eigen<int32_t>(*untyped_tensor), std::runtime_error);
 }

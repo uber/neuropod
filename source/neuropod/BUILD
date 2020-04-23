@@ -15,6 +15,7 @@ cc_library(
     ],
     deps = [
         "//neuropod/backends:neuropod_backend",
+        "//neuropod/core",
         "//neuropod/internal",
     ],
 )
@@ -45,6 +46,7 @@ cc_library(
     ],
     deps = [
         ":neuropod_hdrs",
+        "//neuropod/core:impl",
         "//neuropod/internal:impl",
         "//neuropod/multiprocess:impl",
         "//neuropod/serialization:impl",

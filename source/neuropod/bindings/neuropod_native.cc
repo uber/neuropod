@@ -2,8 +2,8 @@
 // Uber, Inc. (c) 2019
 //
 
-#include "neuropod/backends/test_backend/test_neuropod_tensor.hh"
 #include "neuropod/bindings/python_bindings.hh"
+#include "neuropod/core/generic_tensor.hh"
 #include "neuropod/neuropod.hh"
 #include "neuropod/serialization/serialization.hh"
 
@@ -54,8 +54,8 @@ py::array deserialize_tensor_binding(py::bytes buffer)
 {
     // Deserialize to a NeuropodTensor
     std::istringstream input_stream(buffer);
-    auto               allocator = DefaultTensorAllocator<TestNeuropodTensor>();
-    auto               val       = deserialize<std::shared_ptr<NeuropodValue>>(input_stream, allocator);
+    auto               allocator = get_generic_tensor_allocator();
+    auto               val       = deserialize<std::shared_ptr<NeuropodValue>>(input_stream, *allocator);
 
     // Wrap it in a numpy array and return
     return tensor_to_numpy(std::dynamic_pointer_cast<NeuropodTensor>(val));
@@ -64,8 +64,8 @@ py::array deserialize_tensor_binding(py::bytes buffer)
 py::bytes serialize_tensor_binding(py::array numpy_array)
 {
     // Wrap the numpy array in a NeuropodTensor
-    auto allocator = DefaultTensorAllocator<neuropod::TestNeuropodTensor>();
-    auto tensor    = tensor_from_numpy(allocator, numpy_array);
+    auto allocator = get_generic_tensor_allocator();
+    auto tensor    = tensor_from_numpy(*allocator, numpy_array);
 
     // Serialize the tensor
     std::stringstream buffer_stream;
@@ -77,8 +77,8 @@ py::dict deserialize_valuemap_binding(py::bytes buffer)
 {
     // Deserialize to a NeuropodTensor
     std::istringstream input_stream(buffer);
-    auto               allocator = DefaultTensorAllocator<TestNeuropodTensor>();
-    auto               val       = deserialize<NeuropodValueMap>(input_stream, allocator);
+    auto               allocator = get_generic_tensor_allocator();
+    auto               val       = deserialize<NeuropodValueMap>(input_stream, *allocator);
 
     // Wrap it in a numpy array and return
     return to_numpy_dict(val);
@@ -87,8 +87,8 @@ py::dict deserialize_valuemap_binding(py::bytes buffer)
 py::bytes serialize_valuemap_binding(py::dict items)
 {
     // Wrap the numpy array in a NeuropodTensor
-    auto allocator = DefaultTensorAllocator<neuropod::TestNeuropodTensor>();
-    auto valuemap  = from_numpy_dict(allocator, items);
+    auto allocator = get_generic_tensor_allocator();
+    auto valuemap  = from_numpy_dict(*allocator, items);
 
     // Serialize the tensor
     std::stringstream buffer_stream;

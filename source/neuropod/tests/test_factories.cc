@@ -3,7 +3,7 @@
 //
 
 #include "gtest/gtest.h"
-#include "neuropod/backends/test_backend/test_neuropod_backend.hh"
+#include "neuropod/core/generic_tensor.hh"
 
 namespace
 {
@@ -34,9 +34,7 @@ bool matches_expected(neuropod::TypedNeuropodTensor<T> &tensor, const std::vecto
 
 TEST(test_factories, test_factories)
 {
-    neuropod::TestNeuropodBackend backend;
-
-    auto allocator = backend.get_tensor_allocator();
+    auto allocator = neuropod::get_generic_tensor_allocator();
 
     constexpr size_t           num_items = 60;
     const std::vector<int64_t> dims      = {3, 4, 5};

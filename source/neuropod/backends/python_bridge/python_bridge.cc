@@ -97,7 +97,7 @@ static auto gil_release = maybe_initialize();
 PythonBridge::PythonBridge(const std::string &             neuropod_path,
                            const RuntimeOptions &          options,
                            const std::vector<std::string> &python_path_additions)
-    : NeuropodBackendWithDefaultAllocator<TestNeuropodTensor>(neuropod_path)
+    : NeuropodBackendWithDefaultAllocator<GenericNeuropodTensor>(neuropod_path)
 {
     // Modify PYTHONPATH
     set_python_path(python_path_additions);

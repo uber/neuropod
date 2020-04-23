@@ -9,7 +9,6 @@ cc_test(
     ],
     deps = [
         "//neuropod:neuropod_impl",
-        "//neuropod/backends/test_backend",
         "@benchmark//:benchmark_main",
     ],
 )
@@ -42,7 +41,6 @@ cc_test(
     ],
     deps = [
         "//neuropod:neuropod_impl",
-        "//neuropod/backends/test_backend",
         "//neuropod/serialization",
         "@benchmark//:benchmark_main",
     ],
@@ -66,7 +64,6 @@ cc_test(
     ],
     deps = [
         "//neuropod:neuropod_impl",
-        "//neuropod/backends/test_backend",
         "//neuropod/serialization",
         "@gtest//:main",
     ],
@@ -79,7 +76,6 @@ cc_test(
     ],
     deps = [
         "//neuropod:neuropod_impl",
-        "//neuropod/backends/test_backend",
         "//neuropod/serialization",
         "@gtest//:main",
     ],
@@ -218,7 +214,6 @@ cc_test(
     ],
     deps = [
         "//neuropod:neuropod_impl",
-        "//neuropod/backends/test_backend",
         "@gtest//:main",
     ],
 )
@@ -230,7 +225,6 @@ cc_test(
     ],
     deps = [
         "//neuropod:neuropod_impl",
-        "//neuropod/backends/test_backend",
         "@gtest//:main",
     ],
 )
@@ -331,7 +325,6 @@ cc_test(
     ],
     deps = [
         "//neuropod:neuropod_impl",
-        "//neuropod/backends/test_backend",
         "//neuropod/internal",
         "@gtest//:main",
     ],
@@ -344,21 +337,8 @@ cc_test(
     ],
     deps = [
         "//neuropod:neuropod_impl",
-        "//neuropod/backends/test_backend",
         "//neuropod/conversions:eigen",
         "@eigen3_repo//:eigen3",
-        "@gtest//:main",
-    ],
-)
-
-cc_test(
-    name = "test_test_backend",
-    srcs = [
-        "test_test_backend.cc",
-    ],
-    deps = [
-        "//neuropod:neuropod_impl",
-        "//neuropod/backends/test_backend",
         "@gtest//:main",
     ],
 )
@@ -382,7 +362,6 @@ cc_test(
     ],
     deps = [
         "//neuropod:neuropod_impl",
-        "//neuropod/backends/test_backend",
         "@gtest//:main",
     ],
 )

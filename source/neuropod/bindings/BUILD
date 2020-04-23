@@ -15,7 +15,7 @@ cc_binary(
     linkshared = True,
     deps = [
         ":bindings",
-        "//neuropod/backends/test_backend:test_backend_hdrs",
+        "//neuropod/core",
         "//neuropod/multiprocess",
         "//neuropod/serialization",
     ],

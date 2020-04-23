@@ -3,13 +3,12 @@
 //
 
 #include "gtest/gtest.h"
-#include "neuropod/backends/test_backend/test_neuropod_backend.hh"
+#include "neuropod/core/generic_tensor.hh"
 #include "neuropod/neuropod.hh"
 
 TEST(test_accessor, test_accessor)
 {
-    neuropod::TestNeuropodBackend backend;
-    auto                          allocator = backend.get_tensor_allocator();
+    auto allocator = neuropod::get_generic_tensor_allocator();
 
     auto tensor1 = allocator->allocate_tensor<float>({3, 5});
     auto tensor2 = allocator->allocate_tensor<float>({3, 5});
@@ -46,8 +45,7 @@ TEST(test_accessor, test_accessor)
 
 TEST(test_accessor, test_range_loop)
 {
-    neuropod::TestNeuropodBackend backend;
-    auto                          allocator = backend.get_tensor_allocator();
+    auto allocator = neuropod::get_generic_tensor_allocator();
 
     auto tensor1 = allocator->allocate_tensor<float>({3, 5});
 
@@ -90,8 +88,7 @@ TEST(test_accessor, test_range_loop)
 
 TEST(test_accessor, valid_dims)
 {
-    neuropod::TestNeuropodBackend backend;
-    auto                          allocator = backend.get_tensor_allocator();
+    auto allocator = neuropod::get_generic_tensor_allocator();
 
     auto tensor1 = allocator->allocate_tensor<float>({3, 5});
 
@@ -101,8 +98,7 @@ TEST(test_accessor, valid_dims)
 
 TEST(test_accessor, test_string_read)
 {
-    neuropod::TestNeuropodBackend backend;
-    auto                          allocator = backend.get_tensor_allocator();
+    auto allocator = neuropod::get_generic_tensor_allocator();
 
     auto tensor = allocator->allocate_tensor<std::string>({3, 5});
 

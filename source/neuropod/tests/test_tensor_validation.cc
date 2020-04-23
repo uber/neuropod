@@ -4,7 +4,7 @@
 
 #include "gtest/gtest.h"
 #include "neuropod/backends/neuropod_backend.hh"
-#include "neuropod/backends/test_backend/test_neuropod_backend.hh"
+#include "neuropod/core/generic_tensor.hh"
 
 namespace
 {
@@ -21,8 +21,7 @@ const std::vector<neuropod::TensorSpec> TEST_SPEC = {
 
 TEST(test_spec_validation, test_correct_inputs)
 {
-    neuropod::TestNeuropodBackend backend;
-    auto                          allocator = backend.get_tensor_allocator();
+    auto allocator = neuropod::get_generic_tensor_allocator();
 
     neuropod::NeuropodValueMap inputs;
     inputs["x"] = allocator->allocate_tensor<float>({2, 2});
@@ -55,8 +54,7 @@ TEST(test_spec_validation, test_correct_inputs)
 
 TEST(test_spec_validation, test_bogus_tensor_name)
 {
-    neuropod::TestNeuropodBackend backend;
-    auto                          allocator = backend.get_tensor_allocator();
+    auto allocator = neuropod::get_generic_tensor_allocator();
 
     neuropod::NeuropodValueMap inputs;
     inputs["x"]     = allocator->allocate_tensor<float>({2, 2});
@@ -66,8 +64,7 @@ TEST(test_spec_validation, test_bogus_tensor_name)
 
 TEST(test_spec_validation, test_incorrect_dtype)
 {
-    neuropod::TestNeuropodBackend backend;
-    auto                          allocator = backend.get_tensor_allocator();
+    auto allocator = neuropod::get_generic_tensor_allocator();
 
     neuropod::NeuropodValueMap inputs;
     inputs["x"] = allocator->allocate_tensor<int32_t>({2, 2});
@@ -79,8 +76,7 @@ TEST(test_spec_validation, test_incorrect_dtype)
 
 TEST(test_spec_validation, test_invalid_num_dims)
 {
-    neuropod::TestNeuropodBackend backend;
-    auto                          allocator = backend.get_tensor_allocator();
+    auto allocator = neuropod::get_generic_tensor_allocator();
 
     neuropod::NeuropodValueMap inputs;
     inputs["x"] = allocator->allocate_tensor<float>({2, 2});
@@ -92,8 +88,7 @@ TEST(test_spec_validation, test_invalid_num_dims)
 
 TEST(test_spec_validation, test_invalid_shape)
 {
-    neuropod::TestNeuropodBackend backend;
-    auto                          allocator = backend.get_tensor_allocator();
+    auto allocator = neuropod::get_generic_tensor_allocator();
 
     neuropod::NeuropodValueMap inputs;
     inputs["x"] = allocator->allocate_tensor<float>({2, 2});
@@ -105,8 +100,7 @@ TEST(test_spec_validation, test_invalid_shape)
 
 TEST(test_spec_validation, test_correct_symbol)
 {
-    neuropod::TestNeuropodBackend backend;
-    auto                          allocator = backend.get_tensor_allocator();
+    auto allocator = neuropod::get_generic_tensor_allocator();
 
     neuropod::NeuropodValueMap inputs;
     inputs["x"] = allocator->allocate_tensor<float>({3, 2});
@@ -126,8 +120,7 @@ TEST(test_spec_validation, test_correct_symbol)
 
 TEST(test_spec_validation, test_incorrect_symbol)
 {
-    neuropod::TestNeuropodBackend backend;
-    auto                          allocator = backend.get_tensor_allocator();
+    auto allocator = neuropod::get_generic_tensor_allocator();
 
     neuropod::NeuropodValueMap inputs;
     inputs["x"] = allocator->allocate_tensor<float>({1, 2});
@@ -147,8 +140,7 @@ TEST(test_spec_validation, test_incorrect_symbol)
 
 TEST(test_spec_validation, test_invalid_shape_entry)
 {
-    neuropod::TestNeuropodBackend backend;
-    auto                          allocator = backend.get_tensor_allocator();
+    auto allocator = neuropod::get_generic_tensor_allocator();
 
     neuropod::NeuropodValueMap inputs;
     inputs["x"] = allocator->allocate_tensor<float>({2, 2});
@@ -167,8 +159,7 @@ TEST(test_spec_validation, test_invalid_shape_entry)
 
 TEST(test_spec_validation, test_string_tensors)
 {
-    neuropod::TestNeuropodBackend backend;
-    auto                          allocator = backend.get_tensor_allocator();
+    auto allocator = neuropod::get_generic_tensor_allocator();
 
     neuropod::NeuropodValueMap inputs;
     inputs["x"] = allocator->allocate_tensor<std::string>({1, 3});
