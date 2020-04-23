@@ -75,10 +75,10 @@ http_archive(
 http_archive(
     name = "pybind11_repo",
     build_file = "@//deps:BUILD.pybind11",
-    sha256 = "00be01c512ad5ee1bf51cbde3b5dceddb56e1dde56b034d65336023479e4e98a",
-    strip_prefix = "pybind11-2.4.2",
+    sha256 = "1859f121837f6c41b0c6223d617b85a63f2f72132bae3135a2aa290582d61520",
+    strip_prefix = "pybind11-2.5.0",
     type = "zip",
-    url = "https://github.com/pybind/pybind11/archive/v2.4.2.zip",
+    url = "https://github.com/pybind/pybind11/archive/v2.5.0.zip",
 )
 
 python_repository(
