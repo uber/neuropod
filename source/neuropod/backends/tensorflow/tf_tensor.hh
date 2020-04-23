@@ -9,6 +9,7 @@
 #include "neuropod/internal/error_utils.hh"
 #include "neuropod/internal/logging.hh"
 #include "neuropod/internal/neuropod_tensor.hh"
+#include "tensorflow/core/common_runtime/dma_helper.h"
 #include "tensorflow/core/framework/tensor.h"
 
 #include <string>
@@ -91,15 +92,35 @@ protected:
     // Get a pointer to the underlying data
     void *get_untyped_data_ptr()
     {
-        // TODO(vip): make sure this tensor is contiguous
-        return const_cast<char *>(tensor_.tensor_data().data());
+        if (!tensorflow::DMAHelper::CanUseDMA(&tensor_))
+        {
+            NEUROPOD_ERROR("Error accessing backing memory of TF tensor");
+        }
+
+        auto ptr = tensorflow::DMAHelper::buffer(&tensor_)->data();
+        if (ptr == nullptr)
+        {
+            NEUROPOD_ERROR("Error accessing backing memory of TF tensor; it was null");
+        }
+
+        return ptr;
     }
 
     // Get a pointer to the underlying data
     const void *get_untyped_data_ptr() const
     {
-        // TODO(vip): make sure this tensor is contiguous
-        return tensor_.tensor_data().data();
+        if (!tensorflow::DMAHelper::CanUseDMA(&tensor_))
+        {
+            NEUROPOD_ERROR("Error accessing backing memory of TF tensor");
+        }
+
+        const auto ptr = tensorflow::DMAHelper::buffer(&tensor_)->data();
+        if (ptr == nullptr)
+        {
+            NEUROPOD_ERROR("Error accessing backing memory of TF tensor; it was null");
+        }
+
+        return ptr;
     }
 };
 

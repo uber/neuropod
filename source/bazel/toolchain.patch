@@ -24,7 +24,7 @@
              flag_set(
                  actions = all_cpp_compile_actions,
 -                flag_groups = [flag_group(flags = ["-std=c++17", "-stdlib=libc++"])],
-+                flag_groups = [flag_group(flags = ["-std=c++11", "-stdlib=libstdc++" if ctx.attr.cpu == "k8" else "-stdlib=libc++"])],
++                flag_groups = [flag_group(flags = ["-std=c++17", "-stdlib=libstdc++" if ctx.attr.cpu == "k8" else "-stdlib=libc++"])],
              ),
          ],
      )
