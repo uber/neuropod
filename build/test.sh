@@ -28,7 +28,7 @@ fi
 
 # Run python tests
 pushd python
-python -m unittest discover --verbose neuropod/tests
+NEUROPOD_LOG_LEVEL=TRACE python -m unittest discover --verbose neuropod/tests
 
 # Test the native bindings
 NEUROPOD_RUN_NATIVE_TESTS=true python -m unittest discover --verbose neuropod/tests

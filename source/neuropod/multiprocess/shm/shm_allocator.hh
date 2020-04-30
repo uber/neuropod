@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "neuropod/multiprocess/shm/raw_shm_block_allocator.hh"
+#include "neuropod/multiprocess/shm/pool_shm_allocator.hh"
 
 #include <array>
 #include <memory>
