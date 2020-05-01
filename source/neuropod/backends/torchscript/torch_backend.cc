@@ -215,8 +215,7 @@ std::mutex                      loaded_op_mutex;
 } // namespace
 
 TorchNeuropodBackend::TorchNeuropodBackend(const std::string &neuropod_path, const RuntimeOptions &options)
-    : NeuropodBackendWithDefaultAllocator<TorchNeuropodTensor>(neuropod_path),
-      options_(options),
+    : NeuropodBackendWithDefaultAllocator<TorchNeuropodTensor>(neuropod_path, options),
       input_device_mapping_(model_config_->input_tensor_device)
 {
     if (options.load_model_at_construction)

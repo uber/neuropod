@@ -8,6 +8,7 @@
 #include "neuropod/internal/memory_utils.hh"
 #include "neuropod/internal/tensor_accessor.hh"
 #include "neuropod/internal/type_macros.hh"
+#include "neuropod/options.hh"
 
 #include <cstring>
 #include <functional>
@@ -75,7 +76,7 @@ struct NeuropodTensorRawDataAccess;
 } // namespace internal
 
 // Base value type for Neuropod
-class NeuropodValue
+class NeuropodValue : public std::enable_shared_from_this<NeuropodValue>
 {
 private:
     // Whether or not this item is a tensor
@@ -134,9 +135,12 @@ private:
     // The number of elements in the tensor
     const size_t num_elements_;
 
+    // The device of this tensor
+    const NeuropodDevice device_;
+
 public:
     // Create a NeuropodTensor with a type and dims
-    NeuropodTensor(TensorType tensor_type, const std::vector<int64_t> dims);
+    NeuropodTensor(TensorType tensor_type, const std::vector<int64_t> dims, NeuropodDevice device = Device::CPU);
 
     NeuropodTensor(const NeuropodTensor &) = delete;
 
@@ -153,6 +157,7 @@ public:
         }
 
         out << ")";
+        out << " on device " << tensor.device_;
         return out;
     }
 
@@ -163,6 +168,8 @@ public:
     size_t get_num_elements() const { return num_elements_; }
 
     TensorType get_tensor_type() const { return tensor_type_; }
+
+    NeuropodDevice get_device() const { return device_; }
 
     // Downcast a NeuropodTensor to a TypedNeuropodTensor of a specific type
     // The requested type is checked to make sure it matches the actual type
@@ -245,6 +252,17 @@ protected:
         }
     }
 
+    void assure_device_cpu() const;
+
+    // Seal a tensor
+    // This is used to implement things like early GPU copy
+    friend class Sealer;
+
+    // TODO(vip): make this pure virtual once we have implementations for all backends
+    // Copy a tensor to a particular device and return it
+    // If this tensor is already on the target device, this is a noop
+    virtual std::shared_ptr<NeuropodValue> to(NeuropodDevice device) { return this->shared_from_this(); }
+
     // Get the strides of the tensor
     const std::vector<int64_t> &get_strides() const { return strides_; }
 
@@ -268,13 +286,23 @@ public:
 
     virtual ~TypedNeuropodTensor() {}
 
-    T *      get_raw_data_ptr() { return static_cast<T *>(get_untyped_data_ptr()); }
-    const T *get_raw_data_ptr() const { return static_cast<const T *>(get_untyped_data_ptr()); }
+    T *get_raw_data_ptr()
+    {
+        this->assure_device_cpu();
+        return static_cast<T *>(get_untyped_data_ptr());
+    }
+
+    const T *get_raw_data_ptr() const
+    {
+        this->assure_device_cpu();
+        return static_cast<const T *>(get_untyped_data_ptr());
+    }
 
     template <size_t N>
     TensorAccessor<T *, N> accessor()
     {
         static_assert(N > 0, "`accessor()` is used for indexing a tensors, for scalars use `as_scalar()`");
+        this->assure_device_cpu();
         this->assure_rank(N);
         return TensorAccessor<T *, N>(get_raw_data_ptr(), get_dims().data(), get_strides().data());
     }
@@ -283,16 +311,26 @@ public:
     TensorAccessor<const T *, N> accessor() const
     {
         static_assert(N > 0, "`accessor()` is used for indexing tensors, for scalars use `as_scalar()`");
+        this->assure_device_cpu();
         this->assure_rank(N);
         return TensorAccessor<const T *, N>(get_raw_data_ptr(), get_dims().data(), get_strides().data());
     }
 
-    T &as_scalar() { return NeuropodTensor::as_scalar<T>(); }
+    T &as_scalar()
+    {
+        this->assure_device_cpu();
+        return NeuropodTensor::as_scalar<T>();
+    }
 
-    const T &as_scalar() const { return NeuropodTensor::as_scalar<T>(); }
+    const T &as_scalar() const
+    {
+        this->assure_device_cpu();
+        return NeuropodTensor::as_scalar<T>();
+    }
 
     std::vector<T> get_data_as_vector() const
     {
+        this->assure_device_cpu();
         std::vector<T> out;
 
         // Get the size and a pointer to the data
@@ -307,6 +345,7 @@ public:
 
     void copy_from(const T *input_data, size_t input_data_size)
     {
+        this->assure_device_cpu();
         // Get the number of elements and a pointer to the data
         size_t numel        = get_num_elements();
         T *    data_pointer = get_raw_data_ptr();
@@ -326,6 +365,11 @@ public:
     friend std::ostream &operator<<(std::ostream &out, const TypedNeuropodTensor<T> &tensor)
     {
         out << static_cast<const NeuropodTensor &>(tensor) << std::endl;
+
+        if (tensor.get_device() != Device::CPU)
+        {
+            return out;
+        }
 
         out << '[';
 
@@ -380,6 +424,7 @@ public:
     virtual ~TypedNeuropodTensor() {}
 
     // We can't get a raw pointer from a string tensor
+    // TODO(vip): this->assure_device_cpu();
     // virtual std::string *get_raw_data_ptr() = 0;
 
     // Set the data in the string tensor
@@ -388,6 +433,8 @@ public:
     // Get the data in the string tensor
     std::vector<std::string> get_data_as_vector() const
     {
+        this->assure_device_cpu();
+
         // Setup the output vector
         const auto               numel = get_num_elements();
         std::vector<std::string> out(numel);
@@ -405,6 +452,7 @@ public:
     TensorAccessor<const TypedNeuropodTensor<std::string> &, N> accessor() const
     {
         static_assert(N > 0, "`accessor()` is used for indexing tensors, for scalars use `as_scalar()`");
+        this->assure_device_cpu();
         this->assure_rank(N);
         return TensorAccessor<const TypedNeuropodTensor<std::string> &, N>(
             *this, get_dims().data(), get_strides().data());

@@ -127,7 +127,7 @@ public:
     MultiprocessNeuropodBackend(const std::string &neuropod_path,
                                 const std::string &control_queue_name,
                                 bool               free_memory_every_cycle)
-        : NeuropodBackendWithDefaultAllocator<SHMNeuropodTensor>(neuropod_path),
+        : NeuropodBackendWithDefaultAllocator<SHMNeuropodTensor>(neuropod_path, {}),
           control_queue_name_(control_queue_name),
           free_memory_every_cycle_(free_memory_every_cycle),
           control_channel_(control_queue_name, MAIN_PROCESS)
@@ -144,7 +144,7 @@ public:
                                 const RuntimeOptions &              options,
                                 bool                                free_memory_every_cycle,
                                 const std::vector<BackendLoadSpec> &default_backend_overrides)
-        : NeuropodBackendWithDefaultAllocator<SHMNeuropodTensor>(neuropod_path),
+        : NeuropodBackendWithDefaultAllocator<SHMNeuropodTensor>(neuropod_path, options),
           control_queue_name_(boost::uuids::to_string(boost::uuids::random_generator()())),
           free_memory_every_cycle_(free_memory_every_cycle),
           control_channel_(control_queue_name_, MAIN_PROCESS)

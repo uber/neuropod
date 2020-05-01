@@ -11,6 +11,7 @@ cc_library(
         "//neuropod:__subpackages__",
     ],
     deps = [
+        "//neuropod:options",
         "@fmt_repo//:fmt",
         "@spdlog_repo//:spdlog",
     ],

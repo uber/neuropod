@@ -5,11 +5,16 @@
 #pragma once
 
 #include <cstdlib>
+#include <string>
+#include <vector>
 
 namespace neuropod
 {
 
 class NeuropodTensor;
+
+template <typename T>
+class TypedNeuropodTensor;
 
 namespace internal
 {

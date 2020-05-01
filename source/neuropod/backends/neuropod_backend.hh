@@ -20,15 +20,27 @@
 namespace neuropod
 {
 
+class Sealer
+{
+private:
+    // A mapping from tensor name to device
+    std::unordered_map<std::string, NeuropodDevice> device_mapping_;
+
+public:
+    Sealer(std::unordered_map<std::string, NeuropodDevice> device_mapping);
+    ~Sealer();
+
+    std::shared_ptr<NeuropodValue> seal(const std::string &name, const std::shared_ptr<NeuropodValue> &value);
+
+    // Seal every item in the map
+    NeuropodValueMap seal(const NeuropodValueMap &inputs);
+};
+
 // The interface that every neuropod backend implements
 class NeuropodBackend
 {
-private:
-    // Whether or not the underlying model has already been loaded
-    bool is_model_loaded_ = false;
-
 public:
-    NeuropodBackend(const std::string &neuropod_path);
+    NeuropodBackend(const std::string &neuropod_path, const RuntimeOptions &options);
     virtual ~NeuropodBackend();
 
     // Returns an allocator that can allocate tensors compatible with this backend
@@ -60,6 +72,9 @@ protected:
     // The neuropod path (if one was provided in the constructor)
     std::string neuropod_path_;
 
+    // The options this model was loaded with
+    RuntimeOptions options_;
+
     // Run inference and get a subset of the outputs
     // The default implementation runs inference, gets all the outputs, and then filters the outputs
     // Backends can override this to more efficiently generate only the requested outputs
@@ -72,6 +87,12 @@ protected:
 
     // A method that loads the underlying model
     virtual void load_model_internal() = 0;
+
+private:
+    // Whether or not the underlying model has already been loaded
+    bool is_model_loaded_ = false;
+
+    std::unique_ptr<Sealer> sealer_;
 };
 
 template <template <class> class TensorImpl>
@@ -81,10 +102,8 @@ private:
     std::shared_ptr<NeuropodTensorAllocator> allocator_;
 
 public:
-    NeuropodBackendWithDefaultAllocator() : allocator_(std::make_shared<DefaultTensorAllocator<TensorImpl>>()) {}
-
-    NeuropodBackendWithDefaultAllocator(const std::string &neuropod_path)
-        : NeuropodBackend(neuropod_path), allocator_(std::make_shared<DefaultTensorAllocator<TensorImpl>>())
+    NeuropodBackendWithDefaultAllocator(const std::string &neuropod_path, const RuntimeOptions &options)
+        : NeuropodBackend(neuropod_path, options), allocator_(std::make_shared<DefaultTensorAllocator<TensorImpl>>())
     {
     }
 

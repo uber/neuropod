@@ -14,9 +14,18 @@ cc_library(
         "//visibility:public",
     ],
     deps = [
+        ":options",
         "//neuropod/backends:neuropod_backend",
         "//neuropod/core",
         "//neuropod/internal",
+    ],
+)
+
+cc_library(
+    name = "options",
+    hdrs = ["options.hh"],
+    visibility = [
+        "//visibility:public",
     ],
 )
 
@@ -60,6 +69,7 @@ pkg_tar(
         # Headers
         ":neuropod.hh",
         ":version.hh",
+        ":options.hh",
     ],
     package_dir = "include/neuropod/",
     deps = [

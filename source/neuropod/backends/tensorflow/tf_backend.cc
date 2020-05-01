@@ -132,9 +132,8 @@ std::string get_handle_cache_key(const std::map<std::string, tensorflow::Tensor>
 } // namespace
 
 TensorflowNeuropodBackend::TensorflowNeuropodBackend(const std::string &neuropod_path, const RuntimeOptions &options)
-    : NeuropodBackendWithDefaultAllocator<TensorflowNeuropodTensor>(neuropod_path),
-      session_(tensorflow::NewSession(get_tf_opts(options))),
-      options_(options)
+    : NeuropodBackendWithDefaultAllocator<TensorflowNeuropodTensor>(neuropod_path, options),
+      session_(tensorflow::NewSession(get_tf_opts(options)))
 {
     if (options.load_model_at_construction)
     {

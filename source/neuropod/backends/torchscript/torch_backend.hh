@@ -29,9 +29,6 @@ private:
     // The model output specification from ModelConfig
     std::vector<TensorSpec> output_specs_;
 
-    // The options this model was loaded with
-    RuntimeOptions options_;
-
     // The device mapping for the input tensors
     std::unordered_map<std::string, NeuropodDeviceType> input_device_mapping_;
 
