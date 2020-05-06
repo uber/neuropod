@@ -58,12 +58,13 @@ void throw_error_hh(
 
 } // namespace detail
 
-NeuropodTensor::NeuropodTensor(TensorType tensor_type, const std::vector<int64_t> dims)
+NeuropodTensor::NeuropodTensor(TensorType tensor_type, const std::vector<int64_t> dims, NeuropodDevice device)
     : NeuropodValue(true),
       tensor_type_(tensor_type),
       dims_(dims),
       strides_(compute_strides(dims)),
-      num_elements_(compute_num_elements(dims))
+      num_elements_(compute_num_elements(dims)),
+      device_(device)
 {
 }
 
@@ -128,6 +129,15 @@ bool NeuropodTensor::operator==(const NeuropodTensor &other) const
     }
 
     return memcmp(first, second, num_bytes) == 0;
+}
+
+void NeuropodTensor::assure_device_cpu() const
+{
+    if (device_ != Device::CPU)
+    {
+        NEUROPOD_ERROR("Tried to perform an operation on a tensor that expected the tensor to be on CPU. Tensor: {}",
+                       *this);
+    }
 }
 
 NeuropodTensor *NeuropodValue::as_tensor()

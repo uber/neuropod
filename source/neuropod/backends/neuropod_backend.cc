@@ -12,6 +12,61 @@
 namespace neuropod
 {
 
+namespace
+{
+
+std::unordered_map<std::string, NeuropodDevice> get_device_mapping(const ModelConfig &   model_config,
+                                                                   const RuntimeOptions &options)
+{
+    // Generate the device mapping
+    std::unordered_map<std::string, NeuropodDevice> device_mapping;
+    for (const auto &item : model_config.input_tensor_device)
+    {
+        const NeuropodDeviceType target_device = item.second;
+        NeuropodDevice           device        = Device::CPU;
+        if (target_device == DeviceType::GPU && options.visible_device != Device::CPU)
+        {
+            device = options.visible_device;
+        }
+
+        device_mapping[item.first] = device;
+    }
+
+    return device_mapping;
+}
+
+} // namespace
+
+Sealer::Sealer(std::unordered_map<std::string, NeuropodDevice> device_mapping)
+    : device_mapping_(std::move(device_mapping))
+{
+}
+Sealer::~Sealer() = default;
+
+std::shared_ptr<NeuropodValue> Sealer::seal(const std::string &name, const std::shared_ptr<NeuropodValue> &value)
+{
+    auto device_it = device_mapping_.find(name);
+    if (device_it != device_mapping_.end())
+    {
+        return value->as_tensor()->to(device_it->second);
+    }
+    else
+    {
+        NEUROPOD_ERROR("Tried to seal a tensor with name '{}', but could not find it in the spec", name);
+    }
+}
+
+NeuropodValueMap Sealer::seal(const NeuropodValueMap &inputs)
+{
+    NeuropodValueMap out;
+    for (const auto &item : inputs)
+    {
+        out[item.first] = seal(item.first, item.second);
+    }
+
+    return out;
+}
+
 void validate_tensors_against_specs(const NeuropodValueMap &       tensors,
                                     const std::vector<TensorSpec> &specs,
                                     const std::string &            debug_spec_name)
@@ -151,8 +206,11 @@ void validate_tensors_against_specs(const NeuropodValueMap &       tensors,
 
 NeuropodBackend::~NeuropodBackend() = default;
 
-NeuropodBackend::NeuropodBackend(const std::string &neuropod_path)
-    : model_config_(load_model_config(neuropod_path)), neuropod_path_(neuropod_path)
+NeuropodBackend::NeuropodBackend(const std::string &neuropod_path, const RuntimeOptions &options)
+    : model_config_(load_model_config(neuropod_path)),
+      neuropod_path_(neuropod_path),
+      options_(options),
+      sealer_(stdx::make_unique<Sealer>(get_device_mapping(*model_config_, options_)))
 {
     loader_ = get_loader(neuropod_path);
 }
@@ -205,8 +263,11 @@ std::unique_ptr<NeuropodValueMap> NeuropodBackend::infer(const NeuropodValueMap 
     // Validate inputs
     validate_tensors_against_specs(inputs, get_inputs(), "input spec");
 
+    // Seal the inputs
+    auto sealed = sealer_->seal(inputs);
+
     // Run inference
-    auto out = infer_internal(inputs, requested_outputs);
+    auto out = infer_internal(sealed, requested_outputs);
 
     // Validate outputs
     validate_tensors_against_specs(*out, get_outputs(), "output spec");
