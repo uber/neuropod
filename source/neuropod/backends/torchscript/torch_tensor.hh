@@ -115,6 +115,27 @@ protected:
 
     // Get a pointer to the underlying data
     const void *get_untyped_data_ptr() const { return get_data_from_torch_tensor<T>(tensor); }
+
+    std::shared_ptr<NeuropodValue> to_internal(NeuropodDevice device)
+    {
+        torch::Tensor out;
+        if (device != Device::CPU && !torch::cuda::is_available())
+        {
+            // No matter what the target device is, we don't have a choice other than running on CPU
+            SPDLOG_WARN("Tried to move a torch tensor to GPU, but CUDA isn't available. Falling back to CPU");
+            out = tensor.to(torch::kCPU);
+        }
+        else if (device == Device::CPU)
+        {
+            out = tensor.to(torch::kCPU);
+        }
+        else
+        {
+            out = tensor.to(torch::Device(torch::kCUDA, device));
+        }
+
+        return std::make_shared<TorchNeuropodTensor<T>>(std::move(out));
+    }
 };
 
 #if CAFFE2_NIGHTLY_VERSION >= 20190717

@@ -258,10 +258,21 @@ protected:
     // This is used to implement things like early GPU copy
     friend class Sealer;
 
-    // TODO(vip): make this pure virtual once we have implementations for all backends
     // Copy a tensor to a particular device and return it
     // If this tensor is already on the target device, this is a noop
-    virtual std::shared_ptr<NeuropodValue> to(NeuropodDevice device) { return this->shared_from_this(); }
+    std::shared_ptr<NeuropodValue> to(NeuropodDevice device)
+    {
+        if (device == device_)
+        {
+            // Already on the target device
+            return this->shared_from_this();
+        }
+
+        return to_internal(device);
+    }
+
+    // TODO(vip): make this pure virtual once we have implementations for all backends
+    virtual std::shared_ptr<NeuropodValue> to_internal(NeuropodDevice device) { return this->shared_from_this(); }
 
     // Get the strides of the tensor
     const std::vector<int64_t> &get_strides() const { return strides_; }
