@@ -34,7 +34,7 @@ std::shared_ptr<NeuropodTensor> wrap_existing_tensor(NeuropodTensorAllocator &  
         // We need to make a copy because it's not possible to generically wrap string tensors
         // (each backend has its own in-memory representation)
         // TODO(vip): optimize
-        out->set(tensor->as_typed_tensor<std::string>()->get_data_as_vector());
+        out->copy_from(tensor->as_typed_tensor<std::string>()->get_data_as_vector());
 
         return out;
     }
@@ -72,7 +72,8 @@ std::shared_ptr<NeuropodTensor> wrap_existing_tensor(std::shared_ptr<NeuropodTen
         // We need to make a copy because it's not possible to generically wrap string tensors
         // (each backend has its own in-memory representation)
         // TODO(vip): optimize
-        out->template as_typed_tensor<std::string>()->set(tensor->as_typed_tensor<std::string>()->get_data_as_vector());
+        out->template as_typed_tensor<std::string>()->copy_from(
+            tensor->as_typed_tensor<std::string>()->get_data_as_vector());
 
         return out;
     }

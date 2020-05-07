@@ -151,21 +151,27 @@ struct __attribute__((__packed__)) string_wrapper
 
 } // namespace
 
+// This tensor operates on a local vector and then copies everything into shared memory when `get_native_data` is called
+// For now, we only call `get_native_data` once per tensor so this should be okay
 // TODO(vip): Optimize
+// It's hard to make this zero-copy because of different string representations and variable string lengths
+// Even so, this implementation makes more copies than necessary
+// A more optimal implementation would use dynamically growing backing buffers in shared memory
+// with a header pointing to offsets within the buffer for different elements
 template <>
 class SHMNeuropodTensor<std::string> : public TypedNeuropodTensor<std::string>, public NativeDataContainer<SHMBlockID>
 {
 private:
-    // We store N dimensional string tensors as N + 1 dimensional char tensors
-    // where the last dimension is the size of the max length string + 8 bytes
-    // The first 8 bytes are used to store the size of the string.
-    std::unique_ptr<SHMNeuropodTensor<uint8_t>> data_;
+    std::vector<std::string> write_buffer_;
 
-    // The length of the longest string in this tensor
-    size_t max_len_;
+    // This is the last shm block we created (if any)
+    std::unique_ptr<SHMNeuropodTensor<uint8_t>> last_shm_block_;
 
 public:
-    SHMNeuropodTensor(const std::vector<int64_t> &dims) : TypedNeuropodTensor<std::string>(dims), max_len_(0) {}
+    SHMNeuropodTensor(const std::vector<int64_t> &dims)
+        : TypedNeuropodTensor<std::string>(dims), write_buffer_(this->get_num_elements())
+    {
+    }
 
     // Load an existing tensor
     // See tensor_from_id
@@ -173,37 +179,50 @@ public:
                       std::shared_ptr<void>       block,
                       shm_tensor *                data,
                       const SHMBlockID &          block_id)
-        : TypedNeuropodTensor<std::string>(copy_and_strip_last_dim(dims))
+        : TypedNeuropodTensor<std::string>(copy_and_strip_last_dim(dims)), write_buffer_(this->get_num_elements())
     {
-        data_    = stdx::make_unique<SHMNeuropodTensor<uint8_t>>(dims, std::move(block), data, block_id);
-        max_len_ = dims[dims.size() - 1];
+        auto base_ptr =
+            stdx::make_unique<SHMNeuropodTensor<uint8_t>>(dims, std::move(block), data, block_id)->get_raw_data_ptr();
+        auto max_len = dims[dims.size() - 1];
+
+        // Copy into our local buffer
+        auto numel = get_num_elements();
+        for (int i = 0; i < numel; i++)
+        {
+            auto pos     = base_ptr + i * max_len;
+            auto wrapper = reinterpret_cast<string_wrapper *>(pos);
+
+            write_buffer_[i] = std::string(wrapper->data, wrapper->data + wrapper->length);
+        }
     }
 
     ~SHMNeuropodTensor() = default;
 
-    void set(const std::vector<std::string> &data)
+    void copy_from(const std::vector<std::string> &vec) { write_buffer_ = vec; }
+
+    SHMBlockID get_native_data()
     {
         // Compute the last dim size
-        max_len_ = 0;
-        for (const auto &item : data)
+        size_t max_len = 0;
+        for (const auto &item : write_buffer_)
         {
-            max_len_ = std::max(max_len_, item.size());
+            max_len = std::max(max_len, item.size());
         }
 
         // Space for the metadata in the wrapper struct
-        max_len_ += sizeof(string_wrapper);
+        max_len += sizeof(string_wrapper);
 
         // Add it to dims
         auto dims_copy = get_dims();
-        dims_copy.push_back(max_len_);
+        dims_copy.push_back(max_len);
 
         // TODO(vip): We can optimize this
-        data_ = stdx::make_unique<SHMNeuropodTensor<uint8_t>>(dims_copy);
-        data_->overwrite_type(STRING_TENSOR);
+        last_shm_block_ = stdx::make_unique<SHMNeuropodTensor<uint8_t>>(dims_copy);
+        last_shm_block_->overwrite_type(STRING_TENSOR);
 
         // Copy data in
-        auto pos = data_->get_raw_data_ptr();
-        for (const auto &item : data)
+        auto pos = last_shm_block_->get_raw_data_ptr();
+        for (const auto &item : write_buffer_)
         {
             auto wrapper = reinterpret_cast<string_wrapper *>(pos);
 
@@ -214,20 +233,16 @@ public:
             std::copy(item.begin(), item.end(), wrapper->data);
 
             // Move the pointer
-            pos += max_len_;
+            pos += max_len;
         }
-    }
 
-    SHMBlockID get_native_data() { return data_->get_native_data(); };
+        return last_shm_block_->get_native_data();
+    };
 
 protected:
-    const std::string operator[](size_t index) const
-    {
-        auto pos     = data_->get_raw_data_ptr() + index * max_len_;
-        auto wrapper = reinterpret_cast<string_wrapper *>(pos);
+    std::string get(size_t index) const { return write_buffer_.at(index); }
 
-        return std::string(wrapper->data, wrapper->data + wrapper->length);
-    }
+    void set(size_t index, const std::string &value) { write_buffer_[index] = value; }
 };
 
 // Serialization specializations for SHMNeuropodTensor

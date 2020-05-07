@@ -81,7 +81,7 @@ std::shared_ptr<NeuropodTensor> tensor_from_string_numpy(NeuropodTensorAllocator
     }
 
     // This potentially does another copy (depending on the backend)
-    tensor->set(out);
+    tensor->copy_from(out);
 
     return tensor;
 }

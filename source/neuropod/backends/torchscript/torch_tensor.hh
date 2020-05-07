@@ -164,7 +164,7 @@ public:
 
     ~TorchNeuropodTensor() = default;
 
-    void set(const std::vector<std::string> &data)
+    void copy_from(const std::vector<std::string> &data)
     {
         if (data.size() != get_num_elements())
         {
@@ -195,10 +195,16 @@ public:
 #endif
 
 protected:
-    const std::string operator[](size_t index) const
+    std::string get(size_t index) const
     {
         auto &tensor_data = ELEMENTS(list);
         return GET_STRING_FROM_LIST(tensor_data[index]);
+    }
+
+    void set(size_t index, const std::string &value)
+    {
+        auto &tensor_data  = ELEMENTS(list);
+        tensor_data[index] = value;
     }
 };
 
