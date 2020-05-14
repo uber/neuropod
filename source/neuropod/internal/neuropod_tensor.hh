@@ -425,6 +425,38 @@ protected:
     size_t get_bytes_per_element() const { return sizeof(T); }
 };
 
+// A class that lets us implement read/write accessors for strings
+// It can be implicitly converted to std::string and std::strings can be assigned to it
+// It proxies assignments/conversions to T::set and T::get respectively.
+// This is necessary because there isn't a standard string tensor format used by all frameworks
+// Accessors for string tensors return a StringProxy instead of an std::string directly
+template <typename T>
+class StringProxy
+{
+private:
+    T &    tensor_;
+    size_t index_;
+
+public:
+    StringProxy(T &tensor, size_t index) : tensor_(tensor), index_(index) {}
+
+    void operator=(const std::string &value) { tensor_.set(index_, value); }
+
+    // Allow implicit conversions to string
+    operator std::string() const { return tensor_.get(index_); }
+
+    // Foward all the below operators to std::string::compare
+    static int cmp(const std::string &lhs, const std::string &rhs) { return lhs.compare(rhs); }
+
+    // Based on https://en.cppreference.com/w/cpp/language/operators
+    friend bool operator==(const StringProxy &lhs, const std::string &rhs) { return cmp(lhs, rhs) == 0; }
+    friend bool operator!=(const StringProxy &lhs, const std::string &rhs) { return cmp(lhs, rhs) != 0; }
+    friend bool operator<(const StringProxy &lhs, const std::string &rhs) { return cmp(lhs, rhs) < 0; }
+    friend bool operator>(const StringProxy &lhs, const std::string &rhs) { return cmp(lhs, rhs) > 0; }
+    friend bool operator<=(const StringProxy &lhs, const std::string &rhs) { return cmp(lhs, rhs) <= 0; }
+    friend bool operator>=(const StringProxy &lhs, const std::string &rhs) { return cmp(lhs, rhs) >= 0; }
+};
+
 // A specialization for strings
 template <>
 class TypedNeuropodTensor<std::string> : public NeuropodTensor
@@ -439,7 +471,7 @@ public:
     // virtual std::string *get_raw_data_ptr() = 0;
 
     // Set the data in the string tensor
-    virtual void set(const std::vector<std::string> &data) = 0;
+    virtual void copy_from(const std::vector<std::string> &data) = 0;
 
     // Get the data in the string tensor
     std::vector<std::string> get_data_as_vector() const
@@ -453,10 +485,19 @@ public:
         // Copy the data in
         for (int i = 0; i < numel; i++)
         {
-            out[i] = (*this)[i];
+            out[i] = get(i);
         }
 
         return out;
+    }
+
+    template <size_t N>
+    TensorAccessor<TypedNeuropodTensor<std::string> &, N> accessor()
+    {
+        static_assert(N > 0, "`accessor()` is used for indexing tensors, for scalars use `as_scalar()`");
+        this->assure_device_cpu();
+        this->assure_rank(N);
+        return TensorAccessor<TypedNeuropodTensor<std::string> &, N>(*this, get_dims().data(), get_strides().data());
     }
 
     template <size_t N>
@@ -475,8 +516,22 @@ protected:
     friend class NeuropodTensor;
 
     // Get a particular element
-    // TODO(vip): Can we use absl::string_view instead?
-    virtual const std::string operator[](size_t index) const = 0;
+    template <typename T>
+    friend class StringProxy;
+    const StringProxy<const TypedNeuropodTensor<std::string>> operator[](size_t index) const
+    {
+        return StringProxy<const TypedNeuropodTensor<std::string>>(*this, index);
+    }
+
+    StringProxy<TypedNeuropodTensor<std::string>> operator[](size_t index)
+    {
+        return StringProxy<TypedNeuropodTensor<std::string>>(*this, index);
+    }
+
+    // This might be slow (virtual calls in tight loops + maybe backends redoing work)
+    // TODO(vip): Profile and maybe add a write-through cache
+    virtual std::string get(size_t index) const                     = 0;
+    virtual void        set(size_t index, const std::string &value) = 0;
 
     // We can't get a raw pointer from a string tensor
     void *get_untyped_data_ptr() { NEUROPOD_ERROR_HH("`get_untyped_data_ptr` is not supported for string tensors"); };

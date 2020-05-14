@@ -148,8 +148,14 @@ void test_strings_model(neuropod::Neuropod &neuropod)
     auto y_ten = neuropod.allocate_tensor<std::string>(shape);
 
     // Set the data
-    x_ten->set(x_data);
-    y_ten->set(y_data);
+    x_ten->copy_from(x_data);
+
+    // Test another code path
+    auto y_accessor = y_ten->accessor<1>();
+    for (int i = 0; i < y_data.size(); i++)
+    {
+        y_accessor[i] = y_data.at(i);
+    }
 
     // Run inference
     // Requesting the "out" tensor here isn't strictly necessary, but is used to test functionality

@@ -27,13 +27,13 @@ TEST(test_allocate_tensor, serialize_string_tensor)
 
     // Allocate tensors
     const auto tensor_1D = allocator->allocate_tensor({4}, neuropod::STRING_TENSOR);
-    tensor_1D->as_typed_tensor<std::string>()->set(expected_data);
+    tensor_1D->as_typed_tensor<std::string>()->copy_from(expected_data);
 
     const auto actual_1D = serialize_deserialize(*allocator, *tensor_1D);
     EXPECT_EQ(*tensor_1D, *actual_1D);
 
     const auto tensor_2D = allocator->allocate_tensor({2, 2}, neuropod::STRING_TENSOR);
-    tensor_2D->as_typed_tensor<std::string>()->set(expected_data);
+    tensor_2D->as_typed_tensor<std::string>()->copy_from(expected_data);
 
     const auto actual_2D = serialize_deserialize(*allocator, *tensor_2D);
     EXPECT_EQ(*tensor_2D, *actual_2D);
@@ -70,7 +70,7 @@ TEST(test_allocate_tensor, multiple_tensors_in_a_stream)
     float_tensor_1D->as_typed_tensor<float>()->copy_from({0.0, 0.1, 0.2});
 
     const auto string_tensor_2D = allocator->allocate_tensor({2, 2}, neuropod::STRING_TENSOR);
-    string_tensor_2D->as_typed_tensor<std::string>()->set({"A", "B", "C", "D"});
+    string_tensor_2D->as_typed_tensor<std::string>()->copy_from({"A", "B", "C", "D"});
 
     const auto int_tensor_2D = allocator->allocate_tensor({2, 3}, neuropod::INT32_TENSOR);
     int_tensor_2D->as_typed_tensor<int32_t>()->copy_from({0, 1, 2, 3, 4, 5});
@@ -99,7 +99,7 @@ TEST(test_allocate_tensor, neuropod_value_map)
 
     const std::shared_ptr<neuropod::NeuropodValue> string_tensor_2D =
         allocator->allocate_tensor({2, 2}, neuropod::STRING_TENSOR);
-    string_tensor_2D->as_typed_tensor<std::string>()->set({"A", "B", "C", "D"});
+    string_tensor_2D->as_typed_tensor<std::string>()->copy_from({"A", "B", "C", "D"});
 
     const std::shared_ptr<neuropod::NeuropodValue> int_tensor_2D =
         allocator->allocate_tensor({2, 3}, neuropod::INT32_TENSOR);

@@ -126,7 +126,7 @@ public:
 
     ~TensorflowNeuropodTensor() = default;
 
-    void set(const std::vector<std::string> &data)
+    void copy_from(const std::vector<std::string> &data)
     {
         auto flat = tensor_.flat<std::string>();
         if (data.size() != flat.size())
@@ -143,7 +143,13 @@ public:
     tensorflow::Tensor &get_native_data() { return tensor_; }
 
 protected:
-    const std::string operator[](size_t index) const { return tensor_.flat<std::string>()(index); }
+    std::string get(size_t index) const { return tensor_.flat<std::string>()(index); }
+
+    void set(size_t index, const std::string &value)
+    {
+        auto flat   = tensor_.flat<std::string>();
+        flat(index) = value;
+    }
 };
 
 } // namespace neuropod

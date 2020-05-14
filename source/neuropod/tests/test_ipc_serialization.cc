@@ -83,7 +83,7 @@ TEST(test_ipc_serialization, neuropod_value_map)
 
     const std::shared_ptr<neuropod::NeuropodValue> string_tensor_2D =
         allocator->allocate_tensor({2, 2}, neuropod::STRING_TENSOR);
-    string_tensor_2D->as_typed_tensor<std::string>()->set({"A", "B", "C", "D"});
+    string_tensor_2D->as_typed_tensor<std::string>()->copy_from({"A", "B", "C", "D"});
 
     const std::shared_ptr<neuropod::NeuropodValue> int_tensor_2D =
         allocator->allocate_tensor({2, 3}, neuropod::INT32_TENSOR);

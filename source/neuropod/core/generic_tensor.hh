@@ -58,14 +58,19 @@ private:
     std::vector<std::string> data_;
 
 public:
-    GenericNeuropodTensor(const std::vector<int64_t> &dims) : TypedNeuropodTensor<std::string>(dims) {}
+    GenericNeuropodTensor(const std::vector<int64_t> &dims)
+        : TypedNeuropodTensor<std::string>(dims), data_(this->get_num_elements())
+    {
+    }
 
     ~GenericNeuropodTensor() = default;
 
-    void set(const std::vector<std::string> &data) { data_ = data; }
+    void copy_from(const std::vector<std::string> &data) { data_ = data; }
 
 protected:
-    const std::string operator[](size_t index) const { return data_[index]; }
+    std::string get(size_t index) const { return data_[index]; }
+
+    void set(size_t index, const std::string &value) { data_[index] = value; }
 };
 
 // Get a `NeuropodTensorAllocator` that creates `GenericNeuropodTensor`s

@@ -48,7 +48,7 @@ std::shared_ptr<NeuropodTensor> deserialize_tensor(boost::archive::binary_iarchi
     {
         std::vector<std::string> data;
         ar >> data;
-        out->as_typed_tensor<std::string>()->set(data);
+        out->as_typed_tensor<std::string>()->copy_from(data);
     }
     else
     {

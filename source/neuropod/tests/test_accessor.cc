@@ -113,8 +113,8 @@ TEST(test_accessor, test_string_read)
             }
         }
 
-        tensor->set(to_set);
-    };
+        tensor->copy_from(to_set);
+    }
 
     // Read with an accessor
     const auto accessor = tensor->accessor<2>();
@@ -126,5 +126,33 @@ TEST(test_accessor, test_string_read)
                 EXPECT_EQ(accessor[i][j], std::to_string(i * 5 + j));
             }
         }
-    };
+    }
+}
+
+TEST(test_accessor, test_string_write)
+{
+    auto allocator = neuropod::get_generic_tensor_allocator();
+
+    auto tensor = allocator->allocate_tensor<std::string>({3, 5});
+
+    // Write with an accessor
+    const auto               accessor = tensor->accessor<2>();
+    std::vector<std::string> expected;
+    {
+        for (int i = 0; i < 3; i++)
+        {
+            for (int j = 0; j < 5; j++)
+            {
+                auto item      = std::to_string(i * 5 + j);
+                accessor[i][j] = item;
+                expected.emplace_back(item);
+            }
+        }
+    }
+
+    // Read as a vector
+    {
+        auto actual = tensor->get_data_as_vector();
+        EXPECT_EQ(expected, actual);
+    }
 }
