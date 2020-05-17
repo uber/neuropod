@@ -6,6 +6,8 @@ Almost all of the examples/code in this tutorial come from the Neuropod unit and
 
 The Neuropod packaging and inference interfaces also have comprehensive docstrings and provide a more detailed usage of the API than this tutorial.
 
+Make sure to follow the instructions for [installing Neuropod](installing.md) before continuing
+
 ## Package a Model
 
 The first step for packaging a model is to define a “problem” (e.g. 2d object detection).
@@ -140,10 +142,12 @@ create_tensorflow_neuropod(
 
     Converting your model to TorchScript is recommended if possible.
 
-In order to create a portable PyTorch neuropod package, we need to follow a few guidelines:
+In order to create a PyTorch neuropod package, we need to follow a few guidelines:
 
  - Absolute imports (e.g. `import torch`) are okay as long as your runtime environment has the package installed
  - For Python 3, all other imports within your package must be relative
+
+This type of neuropod package is a bit less flexible than TensorFlow/TorchScript/Keras packages because absolute imports introduce a dependency on the runtime environment. This will be improved in a future release.
 
 Let's say our addition model looks like this (and is stored at `/my/model/code/dir/main.py`):
 
@@ -246,11 +250,47 @@ create_torchscript_neuropod(
 
 ### Keras
 
-TODO(vip): Keras example
+If we have a Keras addition model that looks like:
+
+```py
+def create_keras_addition_model():
+    """
+    A simple addition model
+    """
+    x = Input(batch_shape=(None,), name="x")
+    y = Input(batch_shape=(None,), name="y")
+    out = Add(name="out")([x, y])
+    model = Model(inputs=[x, y], outputs=[out])
+    return model
+```
+
+We can package it by running:
+
+```py
+from neuropod.packagers import create_keras_neuropod
+
+create_keras_neuropod(
+    neuropod_path=neuropod_path,
+    model_name="addition_model",
+    sess=tf.keras.backend.get_session(),
+    model=create_keras_addition_model(),
+    input_spec=addition_problem_definition.INPUT_SPEC,
+    output_spec=addition_problem_definition.OUTPUT_SPEC,
+    test_input_data=addition_problem_definition.TEST_INPUT_DATA,
+    test_expected_out=addition_problem_definition.TEST_EXPECTED_OUT,
+)
+```
+
+!!! note
+    `create_keras_neuropod` runs inference with the test data immediately after creating the neuropod. Raises a `ValueError` if the model output does not match the expected output.
+
 
 ### Python
 
-TODO(vip): Example with arbitrary python code?
+Packaging aribtrary Python code has the same interface as packaging PyTorch above.
+
+For an example, see the PyTorch section above and use `create_python_neuropod` instead of `create_pytorch_neuropod`
+
 
 ## Run Inference
 
@@ -311,7 +351,7 @@ int main()
 ```
 
 !!! note
-    This shows basic usage of the C++ API. For more flexible and memory-efficient usage, please see the API docs
+    This shows basic usage of the C++ API. For more flexible and memory-efficient usage, please see the [C++ API docs](cppguide.md)
 
 ## Appendix
 

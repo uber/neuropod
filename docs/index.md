@@ -27,7 +27,7 @@ for model_path in [TF_ADDITION_MODEL_PATH, PYTORCH_ADDITION_MODEL_PATH]:
     print results["out"]
 ```
 
-TODO(vip): Link to more examples
+See the [tutorial](tutorial.md) or [Python guide](pyguide.md) for more examples.
 
 There are many benefits to this:
 
@@ -64,7 +64,6 @@ OUTPUT_SPEC = [
     {"name": "object_class_probability", "dtype": "float32", "shape": ("num_detections", "num_classes")},
 ]
 ```
-TODO(vip): Link to more details
 
 This lets you
 
@@ -74,6 +73,8 @@ This lets you
 - Swap out models that solve the same problem at runtime with no code change (even if the models are from different frameworks)
 - Run fast experiments
 
+See the [tutorial](tutorial.md) for more details.
+
 #### Build generic tools and pipelines
 
 If you have several models that take in a similar set of inputs, you can build and optimize one framework-agnostic input generation pipeline and share it across models.
@@ -81,13 +82,19 @@ If you have several models that take in a similar set of inputs, you can build a
 #### Other benefits
 
 - Fully self-contained models (including custom ops)
-- Efficient zero-copy implementation
-- Well-tested primitives
-    - Neuropod is automatically tested on 24 different platforms
+- [Efficient zero-copy operations](advanced/efficient_tensor_creation.md)
+- [Tested on](developing.md#build-matrix) platforms including
+    - Mac, Linux, Linux (GPU)
+    - Four versions of each supported frameworks
+    - Four versions of Python
 
-- Model isolation with out-of-process execution
+- Model isolation with [out-of-process execution](advanced/ope.md)
     - Use multiple different versions of frameworks in the same application
         - Ex: Experimental models using Torch nightly along with models using Torch 1.1.0
-- Switch from running in-process to running out-of-process with one line of code
+- Switch from running in-process to running out-of-process with [one line of code](advanced/ope.md)
 
-TODO(vip): Add relevant links throughout the docs above
+## Getting started
+
+See the [basic introduction tutorial](tutorial.md) for an overview of how to get started with Neuropod.
+
+The [Python guide](pyguide.md) and [C++ guide](cppguide.md) go into more detail on running Neuropod models.
