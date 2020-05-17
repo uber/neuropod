@@ -17,7 +17,9 @@ where `PATH_TO_MY_MODEL` is the path to a model exported using one of the packag
 
 ### Options
 
-You can also provide runtime options when loading a model. Currently, the only option is `visible_device`.
+You can also provide runtime options when loading a model.
+
+To select what device to run the model on, you can specify the `visible_device` option:
 
 ```cpp
 neuropod::RuntimeOptions opts;
@@ -28,9 +30,11 @@ opts.visible_device = Device::GPU0;
 Neuropod neuropod(PATH_TO_MY_MODEL, opts);
 ```
 
-For more details, see [`RuntimeOptions`](https://github.com/uber/neuropod/blob/master/source/neuropod/neuropod.hh#L33)
+This defaults to `GPU0`. If no GPUs are available, Neuropod will attempt to fallback to CPU.
 
-TODO(vip): Go into more detail on devices and usage
+Setting `opts.visible_device = Device::CPU` will force the model to run on CPU.
+
+For more details, see all the options [here](https://github.com/uber/neuropod/blob/master/source/neuropod/options.hh)
 
 ### Get the inputs and outputs of a model
 
@@ -54,10 +58,11 @@ For more details, see [`TensorSpec`](https://github.com/uber/neuropod/blob/maste
 
 ## Tensor Types
 
-The following numeric tensor types are supported:
+The following tensor types are supported:
 
 - `float`
 - `double`
+- `string`
 
 - `int8`
 - `int16`
@@ -73,9 +78,8 @@ The following numeric tensor types are supported:
     `uint16`, `uint32`, and `uint64` are not supported by PyTorch or TorchScript. See the [supported type list](https://pytorch.org/docs/stable/tensors.html) in the PyTorch documentation.
 
 
-String tensors are also supported, but have a slightly different API than numeric tensors.
-
-TODO(vip): more detail on string tensors
+!!! note
+    TorchScript does not have support for string tensors so we represent them as lists of strings. Therefore TorchScript Neuropod models only support 1D string "tensors". See [here](https://github.com/uber/neuropod/blob/master/source/neuropod/python/tests/test_torchscript_strings.py) for example usage.
 
 ## Creating tensors
 
@@ -106,9 +110,7 @@ You can also manually specify the type without using a templated function
 auto tensor = allocator->allocate_tensor({1, 2, 3}, neuropod::FLOAT_TENSOR);
 ```
 
-To do something useful with these tensors, see the Interacting with Tensors section below.
-
-TODO(vip): link
+To do something useful with these tensors, see the [Interacting with Tensors](#interacting-with-tensors) section below.
 
 ### From existing memory
 
@@ -170,7 +172,16 @@ TODO(vip): Add a utility function for wrapping a cv::Mat
 
 #### Eigen
 
-TODO(vip): Example with Eigen
+```cpp
+#include "neuropod/conversions/eigen.hh"
+
+auto tensor = allocator->allocate_tensor<float>({1, 2, 3});
+
+// Returns an `Eigen::Map`
+auto eigen_map = neuropod::as_eigen(*tensor);
+```
+
+See [the Eigen docs](https://eigen.tuxfamily.org/dox/group__TutorialMapClass.html) for more details.
 
 ### Factory functions
 
@@ -337,8 +348,44 @@ auto accessor = tensor->accessor<2>();
 accessor[5][3] = 1.0;
 ```
 
-Accessors are very efficient and are [comparable to raw pointer](https://github.com/uber/neuropod/blob/master/source/neuropod/tests/benchmark_accessor.cc) operations during an optimized build.
+Range-based for loops work with accessors as well:
 
+```cpp
+auto tensor = allocator->allocate_tensor<float>({3, 5});
+
+// 2 is the number of dimensions of this tensor
+auto accessor = tensor->accessor<2>();
+
+for (const auto &row : accessor)
+{
+    for (const auto &item : row)
+    {
+        // Do something
+    }
+}
+```
+
+Example with string tensors:
+
+```cpp
+auto tensor = allocator->allocate_tensor<std::string>({3, 5});
+
+// 2 is the number of dimensions of this tensor
+auto accessor = tensor->accessor<2>();
+
+for (int i = 0; i < 3; i++)
+{
+    for (int j = 0; j < 5; j++)
+    {
+        accessor[i][j] = std::to_string(i * 5 + j);
+    }
+}
+```
+
+Individual element access with accessors is very efficient and [comparable to raw pointer](https://github.com/uber/neuropod/blob/master/source/neuropod/tests/benchmark_accessor.cc) operations during an optimized build.
+
+!!! note
+    See the Efficient Tensor Creation page for a guide on the approach that best fits your use case. Using
 
 #### Get the dimensions of a tensor
 
@@ -372,6 +419,9 @@ auto tensor_type = tensor->get_tensor_type();
 auto data = tensor->get_raw_data_ptr();
 ```
 
+!!! note
+    This method does not work for String tensors. Use [accessors](#directly-setget-data) instead
+
 #### Get the data as a vector
 
 <small>Requires `TypedNeuropodTensor<T>`</small>
@@ -382,8 +432,6 @@ auto data = tensor->get_data_as_vector();
 
 !!! warning
     This method performs a copy
-
-TODO(vip): Talk about string tensors
 
 
 ## Inference

@@ -5,6 +5,11 @@ This guide walks through loading a Neuropod and running inference from Python
 !!! tip
     The Neuropod runtime interface is identical for all frameworks so this guide applies for models from all supported frameworks (including TensorFlow, PyTorch, Keras, and TorchScript)
 
+
+## Packaging a Neuropod
+
+See the [basic introduction guide](tutorial.md) for examples of how to create Neuropod models in all the supported frameworks.
+
 ## Loading a Neuropod
 
 ```py
@@ -25,7 +30,9 @@ with load_neuropod(PATH_TO_MY_MODEL) as neuropod:
 
 ### Options
 
-You can also provide runtime options when loading a model. Currently, the only option is `visible_gpu`.
+You can also provide runtime options when loading a model.
+
+To select what device to run the model on, you can supply a `visible_gpu` argument.
 
 This is the index of the GPU that this Neuropod should run on (if any). It can either be `None` or a nonnegative integer.
 Setting this to `None` will attempt to run this model on CPU.
@@ -69,26 +76,7 @@ with load_neuropod(ADDITION_MODEL_PATH) as neuropod:
   print results["out"]
 ```
 
-
-## Bindings
-
-To use the C++ Neuropod library from Python, you can use the native bindings
-
-```py
-from neuropod.neuropod_native import Neuropod
-
-# This takes the same arguments (and supports the same options)
-# as `load_neuropod`
-model = Neuropod(neuropod_path)
-
-# The only supported method of the loaded model is `infer` so the
-# native bindings are currently not a drop-in replacement for
-# the python interface
-```
-
 ## Serialization
-
-In order to serialize and deserialize tensors from Python, you must have the native bindings installed.
 
 ```py
 import numpy as np
@@ -109,8 +97,6 @@ print(deserialized)
 ```
 
 Under the hood, the serialization code converts between numpy arrays and C++ NeuropodTensor objects (in a zero-copy way). It then uses the C++ serialization functionality to serialize/deserialize.
-
-TODO(vip): link
 
 !!! note
     Serialization and deserialization works across Python and C++. This means you can serialize tensors in C++ and deserialize in Python or vice-versa
