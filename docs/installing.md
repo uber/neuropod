@@ -28,6 +28,7 @@ pip install neuropod-backend-torchscript-1-1-0-gpu-cuda-9-0
 pip install neuropod-backend-torchscript-1-2-0-gpu-cuda-10-0
 pip install neuropod-backend-torchscript-1-3-0-gpu-cuda-10-0
 pip install neuropod-backend-torchscript-1-4-0-gpu-cuda-10-0
+pip install neuropod-backend-torchscript-1-5-0-gpu-cuda-10-1
 
 # TF CPU
 pip install neuropod-backend-tensorflow-1-12-0-cpu

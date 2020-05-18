@@ -9,8 +9,8 @@ package(
 cc_library(
     name = "libtorch",
     srcs = select({
-        "@bazel_tools//src/conditions:darwin": glob(["lib/libcaffe2.dylib", "lib/libc10.dylib", "lib/libtorch.dylib", "lib/libtorch.1.dylib"]),
-        "//conditions:default": glob(["lib/lib*.so*"]),
+        "@bazel_tools//src/conditions:darwin": glob(["lib/libcaffe2.dylib", "lib/libc10.dylib", "lib/libtorch.dylib", "lib/libtorch_cpu.dylib", "lib/libtorch.1.dylib"]),
+        "//conditions:default": glob(["lib/lib*.so*"], exclude=["lib/libtorch_python.so"]),
     }),
     deps = select({
         "@bazel_tools//src/conditions:darwin": ["@mklml_repo_darwin//:mklml"],
@@ -37,6 +37,7 @@ filegroup(
     srcs = select({
         "@bazel_tools//src/conditions:darwin": glob([
             "lib/libtorch.dylib",
+            "lib/libtorch_cpu.dylib",
             "lib/libtorch.1.dylib",
             "lib/libcaffe2.dylib",
             "lib/libc10.dylib",

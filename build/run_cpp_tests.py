@@ -26,14 +26,8 @@ def make_test(test_target, tags):
         runfiles_path = "bazel-bin/" + test_path + ".runfiles/__main__/"
 
         env = os.environ.copy()
-        if "requires_ld_library_path" in tags:
-            # Set PATH and LD_LIBRARY_PATH for this test
-            LD_LIBRARY_PATH = env.get("LD_LIBRARY_PATH", "")
-            LD_LIBRARY_PATH += ":" + os.path.join(os.getcwd(), "bazel-bin/neuropod/backends/python_bridge/")
-            LD_LIBRARY_PATH += ":" + os.path.join(os.getcwd(), "bazel-bin/neuropod/backends/torchscript/")
-            LD_LIBRARY_PATH += ":" + os.path.join(os.getcwd(), "bazel-bin/neuropod/backends/tensorflow/")
-            env["LD_LIBRARY_PATH"] = LD_LIBRARY_PATH
-
+        if "requires_path" in tags:
+            # Set PATH for this test
             PATH = env.get("PATH", "")
             PATH += ":" + os.path.join(os.getcwd(), "bazel-bin/neuropod/multiprocess/")
             env["PATH"] = PATH

@@ -61,11 +61,18 @@ def install_pytorch(version):
             if torch_cuda_string != "cu100":
                 version += "+" + torch_cuda_string
 
-        # If this is the 1.3.0 stable release
+        # If this is the 1.3.0 or 1.4.0 stable release
         if (version_base == "1.3.0" or version_base == "1.4.0") and version_date is None:
             # They changed the default from cuda 10.0 to cuda 10.1
             # For CUDA 10.1 builds, they don't add `cu101` to the version string
             if torch_cuda_string != "cu101":
+                version += "+" + torch_cuda_string
+
+        # If this is the 1.5.0 stable release
+        if version_base == "1.5.0" and version_date is None:
+            # They changed the default from cuda 10.1 to cuda 10.2
+            # For CUDA 10.2 builds, they don't add `cu102` to the version string
+            if torch_cuda_string != "cu102":
                 version += "+" + torch_cuda_string
 
     # The Mac 1.3.0 stable release doesn't exist in `torch_stable.html`
@@ -79,7 +86,7 @@ def install_pytorch(version):
         else:
             pip_args += ["torch_nightly==" + version]
     else:
-        if IS_GPU and (version_base == "1.1.0" or version_base == "1.4.0"):
+        if IS_GPU and (version_base == "1.1.0" or version_base == "1.4.0" or version_base == "1.5.0"):
             # See https://github.com/pytorch/pytorch/issues/37113
             # Manually figure out the correct whl URL
             package_version_map = {

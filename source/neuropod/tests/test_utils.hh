@@ -6,6 +6,7 @@
 
 #include "gtest/gtest.h"
 #include "neuropod/neuropod.hh"
+#include "neuropod/tests/ope_overrides.hh"
 
 #include <algorithm>
 #include <atomic>
@@ -129,7 +130,7 @@ void test_addition_model_ope(const std::string &neuropod_path)
     // Load the neuropod
     neuropod::RuntimeOptions opts;
     opts.use_ope = true;
-    neuropod::Neuropod neuropod(neuropod_path, opts);
+    neuropod::Neuropod neuropod(neuropod_path, detail::ope_backend_location_overrides, opts);
     test_addition_model(neuropod);
 }
 
@@ -195,6 +196,6 @@ void test_strings_model_ope(const std::string &neuropod_path)
     // Load the neuropod
     neuropod::RuntimeOptions opts;
     opts.use_ope = true;
-    neuropod::Neuropod neuropod(neuropod_path, opts);
+    neuropod::Neuropod neuropod(neuropod_path, detail::ope_backend_location_overrides, opts);
     test_strings_model(neuropod);
 }
