@@ -6,6 +6,8 @@ import os
 import six
 import shutil
 import unittest
+import tensorflow as tf
+
 from tempfile import mkdtemp
 
 from neuropod.loader import load_neuropod
@@ -26,6 +28,7 @@ output_spec = [
 ]
 
 
+@unittest.skipIf(tf.__version__[0] == "2", "Skipping TF 1.x tests for TF 2.x")
 class TestSpecValidation(unittest.TestCase):
     @classmethod
     def setUpClass(cls):

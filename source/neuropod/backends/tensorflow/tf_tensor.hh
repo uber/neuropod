@@ -10,6 +10,7 @@
 #include "neuropod/internal/logging.hh"
 #include "neuropod/internal/neuropod_tensor.hh"
 #include "tensorflow/core/framework/tensor.h"
+#include "tensorflow/core/public/version.h"
 
 #include <string>
 #include <vector>
@@ -111,6 +112,12 @@ class TensorflowNeuropodTensor<std::string> : public TypedNeuropodTensor<std::st
 private:
     tensorflow::Tensor tensor_;
 
+#if TF_MAJOR_VERSION > 1
+    using StringType = tensorflow::tstring;
+#else
+    using StringType = std::string;
+#endif
+
 public:
     // Allocate a TF tensor
     TensorflowNeuropodTensor(const std::vector<int64_t> &dims)
@@ -128,7 +135,7 @@ public:
 
     void copy_from(const std::vector<std::string> &data)
     {
-        auto flat = tensor_.flat<std::string>();
+        auto flat = tensor_.flat<StringType>();
         if (data.size() != flat.size())
         {
             NEUROPOD_ERROR("Supplied vector size ({}) does not match size of tensor ({})", data.size(), flat.size());
@@ -143,11 +150,11 @@ public:
     tensorflow::Tensor &get_native_data() { return tensor_; }
 
 protected:
-    std::string get(size_t index) const { return tensor_.flat<std::string>()(index); }
+    std::string get(size_t index) const { return tensor_.flat<StringType>()(index); }
 
     void set(size_t index, const std::string &value)
     {
-        auto flat   = tensor_.flat<std::string>();
+        auto flat   = tensor_.flat<StringType>();
         flat(index) = value;
     }
 };

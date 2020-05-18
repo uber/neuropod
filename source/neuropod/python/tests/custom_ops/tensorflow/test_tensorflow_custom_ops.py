@@ -36,6 +36,7 @@ def create_tf_addition_model(custom_op_path):
     tf.__version__ == "1.14.0" and sys.platform == "darwin",
     "See https://github.com/tensorflow/tensorflow/issues/30633",
 )
+@unittest.skipIf(tf.__version__[0] == "2", "Skipping TF 1.x tests for TF 2.x")
 class TestTensorflowCustomOps(unittest.TestCase):
     @classmethod
     def setUpClass(cls):

@@ -13,8 +13,8 @@ cc_library(
         "//conditions:default": glob(["lib/libpython{PYTHON_VERSION}.so.1.0", "lib/libpython{PYTHON_VERSION}m.so.1.0"]),
     }),
     hdrs = glob([
-        "include/python{PYTHON_VERSION}/*.h",
-        "include/python{PYTHON_VERSION}m/*.h",
+        "include/python{PYTHON_VERSION}/**/*.h",
+        "include/python{PYTHON_VERSION}m/**/*.h",
     ]),
     includes = [
         "include/python{PYTHON_VERSION}",
