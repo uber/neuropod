@@ -19,14 +19,16 @@ cc_test(
         "benchmark_multiprocess.cc",
     ],
     data = [
+        "//neuropod/backends/tensorflow:libneuropod_tensorflow_backend.so",
         "//neuropod/tests/test_data",
     ],
     tags = [
-        "requires_ld_library_path",
+        "requires_path",
         # Don't do trace logging in CI for this benchmark
         "no_trace_logging",
     ],
     deps = [
+        ":ope_overrides",
         "//neuropod:neuropod_impl",
         "//neuropod/backends/tensorflow:tensorflow_backend",
         "//neuropod/multiprocess",
@@ -190,8 +192,20 @@ cc_library(
         "//visibility:public",
     ],
     deps = [
+        ":ope_overrides",
         "//neuropod:neuropod_impl",
         "@gtest//:main",
+    ],
+)
+
+cc_library(
+    name = "ope_overrides",
+    hdrs = ["ope_overrides.hh"],
+    visibility = [
+        "//visibility:public",
+    ],
+    deps = [
+        "//neuropod:neuropod_impl",
     ],
 )
 
@@ -307,7 +321,12 @@ cc_test(
     srcs = [
         "test_multiprocess.cc",
     ],
-    tags = ["requires_ld_library_path"],
+    data = [
+        "//neuropod/backends/python_bridge:libneuropod_pythonbridge_backend.so",
+        "//neuropod/backends/tensorflow:libneuropod_tensorflow_backend.so",
+        "//neuropod/backends/torchscript:libneuropod_torchscript_backend.so",
+    ],
+    tags = ["requires_path"],
     deps = [
         ":neuropod_test_utils",
         "//neuropod:neuropod_impl",

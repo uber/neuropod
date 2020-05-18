@@ -7,8 +7,8 @@ build --test_env=VIRTUAL_ENV
 # Use an internal toolchain to isolate the build from system libraries
 build --crosstool_top=@llvm_toolchain//:toolchain
 
-# Use C++11
-build --cxxopt='-std=c++11'
+# Use C++14
+build --cxxopt='-std=c++14'
 
 # Build in a mostly-static way
 build --dynamic_mode off

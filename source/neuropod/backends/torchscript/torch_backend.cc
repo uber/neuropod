@@ -138,14 +138,22 @@ void insert_value_in_output(NeuropodValueMap & output,
                            name);
         }
     }
+#if CAFFE2_NIGHTLY_VERSION >= 20200421
+    else if (value.isList())
+#else
     else if (value.isGenericList())
+#endif
     {
         // A list of strings
         // This is used in place of string tensors because torch does not
         // have native support for string tensors
         auto &tensor = value;
 
+#if CAFFE2_NIGHTLY_VERSION >= 20200421
+        const auto &list = tensor.toListRef();
+#else
         const auto &list = tensor.toGenericListRef();
+#endif
 
         // if tensor_type string or no tensor_type and empty list or list containing actual string
         if ((has_type && tensor_type == TensorType::STRING_TENSOR) || (!has_type && list.size() == 0) ||
@@ -324,7 +332,9 @@ std::unique_ptr<NeuropodValueMap> TorchNeuropodBackend::infer_internal(const Neu
             }
             else
             {
-#if CAFFE2_NIGHTLY_VERSION >= 20190717
+#if CAFFE2_NIGHTLY_VERSION >= 20200421
+                DICT_INSERT(str_input_dict, entry.first, c10::impl::toTypedList<std::string>(value.toList()));
+#elif CAFFE2_NIGHTLY_VERSION >= 20190717
                 DICT_INSERT(str_input_dict, entry.first, c10::impl::toTypedList<std::string>(value.toGenericList()));
 #else
                 DICT_INSERT(str_input_dict, entry.first, value);
@@ -376,7 +386,11 @@ std::unique_ptr<NeuropodValueMap> TorchNeuropodBackend::infer_internal(const Neu
     {
         process_dict(*to_return, result);
     }
+#if CAFFE2_NIGHTLY_VERSION >= 20200421
+    else if (result.isTensor() || result.isList())
+#else
     else if (result.isTensor() || result.isGenericList())
+#endif
     {
         if (output_specs_.empty())
         {
@@ -431,10 +445,7 @@ std::unique_ptr<NeuropodValueMap> TorchNeuropodBackend::infer_internal(const Neu
 
 #undef GET_NAME
     }
-    else
-    {
-        NEUROPOD_ERROR("Torchscript model output type not supported in neuropod");
-    }
+    else { NEUROPOD_ERROR("Torchscript model output type not supported in neuropod"); }
 
     return to_return;
 }

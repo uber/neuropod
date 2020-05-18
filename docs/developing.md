@@ -100,13 +100,14 @@ Our build matrix is defined as all combinations of the following:
 | 10.0 | 1.13.1 | 1.2.0 | 3.5 |
 | 10.0 | 1.14.0 | 1.3.0 | 3.6 |
 | 10.0 | 1.15.0 | 1.4.0 | 3.7 |
+| 10.1 | - | 1.5.0 | 3.8 |
 
 We also have the following ad-hoc builds:
 
  - A lint + docs + static analysis build (Buildkite)
  - A native Ubuntu 16.04 build (outside of docker) to make sure that we don't accidentally break workflows of users not using docker
 
-This is a total of 14 builds (3 * 4 + 2) running in CI
+This is a total of 17 builds (3 * 5 + 2) running in CI
 
 The current build matrix is defined in [build/ci_matrix.py](https://github.com/uber/neuropod/blob/master/build/ci_matrix.py#L73-L91)
 

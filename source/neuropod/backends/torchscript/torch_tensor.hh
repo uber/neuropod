@@ -32,6 +32,11 @@
 // The date of the official torch 1.4.0 release
 #define CAFFE2_NIGHTLY_VERSION 20200115
 #endif
+
+#if CAFFE2_VERSION == 10500
+// The date of the official torch 1.5.0 release
+#define CAFFE2_NIGHTLY_VERSION 20200421
+#endif
 #endif
 
 namespace neuropod
@@ -174,10 +179,14 @@ public:
 
     // Wrap an existing torch tensor
     TorchNeuropodTensor(torch::jit::IValue tensor)
+#if CAFFE2_NIGHTLY_VERSION >= 20200421
+        : TypedNeuropodTensor<std::string>({static_cast<int64_t>(tensor.toListRef().size())}),
+          list(c10::impl::toTypedList<std::string>(tensor.toList()))
+#elif CAFFE2_NIGHTLY_VERSION >= 20190717
         : TypedNeuropodTensor<std::string>({static_cast<int64_t>(tensor.toGenericListRef().size())}),
-#if CAFFE2_NIGHTLY_VERSION >= 20190717
           list(c10::impl::toTypedList<std::string>(tensor.toGenericList()))
 #else
+        : TypedNeuropodTensor<std::string>({static_cast<int64_t>(tensor.toGenericListRef().size())}),
           list(tensor.toGenericList())
 #endif
     {
@@ -204,8 +213,12 @@ public:
             tensor_data[i] = data[i];
         }
     }
+#if CAFFE2_NIGHTLY_VERSION >= 20200421
+    // Store a typed list
+    torch::jit::IValue     get_native_data() { return c10::impl::toList(list); }
+    c10::List<std::string> list;
 
-#if CAFFE2_NIGHTLY_VERSION >= 20190717
+#elif CAFFE2_NIGHTLY_VERSION >= 20190717
     // Store a typed list
     torch::jit::IValue     get_native_data() { return c10::impl::toGenericList(list); }
     c10::List<std::string> list;
