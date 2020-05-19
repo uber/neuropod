@@ -113,6 +113,23 @@ The current build matrix is defined in [build/ci_matrix.py](https://github.com/u
 
 Code coverage is run on all Buildkite Linux builds
 
+### Lint and Static Analysis
+
+We run the following lint tools in CI:
+
+- [clang-format](https://clang.llvm.org/docs/ClangFormat.html) for C++ formatting
+- [Buildifier](https://github.com/bazelbuild/buildtools/tree/master/buildifier) for Bazel BUILD and .bzl file formatting
+- [Black](https://black.readthedocs.io/en/stable/) and [Flake8](https://flake8.pycqa.org/en/latest/) for Python lint
+
+To show all lint errors and warnings locally, you can run `./tools/lint.sh`. To attempt to automatically fix any issues that can be automatically fixed, run `./tools/autofix.sh`.
+
+We also run the following static analysis tools in CI:
+
+- [Infer](https://fbinfer.com/) for C++ static analysis
+- [clang-tidy](https://clang.llvm.org/extra/clang-tidy/) for C++ lint (Not yet enabled. See [here](https://github.com/uber/neuropod/issues/353))
+
+These tools tend to be fairly slow so we don't currently provide a way to run them locally.
+
 ### Future additions
 
 We're also planning on adding the following configurations to the build matrix:
