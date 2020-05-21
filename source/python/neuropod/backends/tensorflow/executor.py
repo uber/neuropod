@@ -38,11 +38,14 @@ class TensorflowNeuropodExecutor(NeuropodExecutor):
                     tf.load_op_library(str(lib_path))
                     loaded_op_hashes.add(lib_hash)
 
+        gfile = tf.gfile if hasattr(tf, "gfile") else tf.io.gfile
         # Load the model
-        with tf.gfile.GFile(
+        with gfile.GFile(
             os.path.join(neuropod_path, "0", "data", "model.pb"), "rb"
         ) as f:
-            graph_def = tf.GraphDef()
+            graph_def = (
+                tf.GraphDef() if hasattr(tf, "GraphDef") else tf.compat.v1.GraphDef()
+            )
             graph_def.ParseFromString(f.read())
 
         # Load the TF specific config
@@ -68,7 +71,8 @@ class TensorflowNeuropodExecutor(NeuropodExecutor):
             ]
 
         # Create a session
-        self.sess = tf.Session(graph=self.graph)
+        session = tf.Session if hasattr(tf, "Session") else tf.compat.v1.Session
+        self.sess = session(graph=self.graph)
         self.sess.run(init_ops)
 
     def forward(self, inputs):

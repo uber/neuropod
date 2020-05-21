@@ -76,7 +76,16 @@ def create_keras_neuropod(
     tf_output_op_names = [
         tf_node_mapping[spec_el["name"]].op.name for spec_el in output_spec
     ]
-    frozen_graph_def = tf.graph_util.convert_variables_to_constants(
+
+    # Convert variables to constants is deprecated in Tensorflow 2.2
+    # https://www.tensorflow.org/api_docs/python/tf/compat/v1/graph_util/convert_variables_to_constants
+    convert_variables_to_constants = (
+        tf.graph_util.convert_variables_to_constants
+        if hasattr(tf.graph_util, "convert_variables_to_constants")
+        else tf.compat.v1.graph_util.convert_variables_to_constants
+    )
+
+    frozen_graph_def = convert_variables_to_constants(
         sess=sess, input_graph_def=graph_def, output_node_names=tf_output_op_names
     )
 

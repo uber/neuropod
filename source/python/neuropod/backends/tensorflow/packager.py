@@ -67,8 +67,9 @@ def create_tensorflow_neuropod(
         # Copy in the frozen graph
         shutil.copyfile(frozen_graph_path, os.path.join(neuropod_data_path, "model.pb"))
     elif graph_def is not None:
-        # Write out the frozen graph
-        tf.train.write_graph(graph_def, neuropod_data_path, "model.pb", as_text=False)
+        # Write out the frozen graph. tf.io.write_graph is an alias to tf.train.write_graph but is safer
+        # as it is also present in tensorflow 2.
+        tf.io.write_graph(graph_def, neuropod_data_path, "model.pb", as_text=False)
 
     # Make sure we have mappings for everything in the spec
     expected_keys = set()
