@@ -69,8 +69,8 @@ Neuropod has a set of tests implemented in C++ and a set of tests implemented in
 | | Location | Covers C++ Library | Covers Python Library |
 | --- | --- | :---: | :---: |
 | C++ Tests | `source/neuropod/tests/*` | x |  |
-| Python Tests | `source/neuropod/python/tests/test_*` | x | x |
-| GPU-only Python Tests | `source/neuropod/python/tests/gpu_test_*` | x | x |
+| Python Tests | `source/python/neuropod/tests/test_*` | x | x |
+| GPU-only Python Tests | `source/python/neuropod/tests/gpu_test_*` | x | x |
 
 The Python tests run against both the Python and C++ libraries by using python bindings. This means that many tests only need to be written in Python.
 

@@ -36,7 +36,7 @@ RUN if [ "${NEUROPOD_PYTHON_VERSION}" = "3.8" ] ; then sudo apt-get install -y "
 RUN mkdir -p /usr/src/source/python /usr/src/source/neuropod/python
 COPY build/install_python_deps.sh /usr/src/build/install_python_deps.sh
 COPY build/install_frameworks.py /usr/src/build/install_frameworks.py
-COPY source/python /usr/src/source/python
+COPY source/python/setup.py /usr/src/source/python/setup.py
 
 # Optional overrides
 ARG NEUROPOD_TENSORFLOW_VERSION

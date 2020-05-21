@@ -79,7 +79,7 @@ The following tensor types are supported:
 
 
 !!! note
-    TorchScript does not have support for string tensors so we represent them as lists of strings. Therefore TorchScript Neuropod models only support 1D string "tensors". See [here](https://github.com/uber/neuropod/blob/master/source/neuropod/python/tests/test_torchscript_strings.py) for example usage.
+    TorchScript does not have support for string tensors so we represent them as lists of strings. Therefore TorchScript Neuropod models only support 1D string "tensors". See [here](https://github.com/uber/neuropod/blob/master/source/python/neuropod/tests/test_torchscript_strings.py) for example usage.
 
 ## Creating tensors
 
