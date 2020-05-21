@@ -136,7 +136,7 @@ void PythonBridge::load_model_internal()
     const auto local_path = loader_->ensure_local();
 
     // Load the neuropod and save a reference to it
-    neuropod_ = stdx::make_unique<py::object>(load_neuropod(local_path));
+    neuropod_ = stdx::make_unique<py::object>(load_neuropod(local_path, true /* is_native */));
 }
 
 PythonBridge::~PythonBridge()

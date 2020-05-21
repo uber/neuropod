@@ -5,6 +5,10 @@
 ARG NEUROPOD_CUDA_VERSION=10.0
 FROM nvidia/cuda:${NEUROPOD_CUDA_VERSION}-cudnn7-runtime-ubuntu16.04 as neuropod-base
 
+# Use utf8
+ENV LC_ALL=C.UTF-8
+ENV LANG=C.UTF-8
+
 # We use sudo in the build scripts
 RUN apt-get update && apt-get install -y sudo
 
