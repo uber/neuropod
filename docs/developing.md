@@ -12,25 +12,17 @@ There are a few ways to build the project:
 The following sets up a local environment for building and testing:
 
 ```sh
-# Do everything in a virtualenv (optional)
-sudo pip install -U pip
-sudo pip install virtualenv
-virtualenv /tmp/neuropod_venv
-source /tmp/neuropod_venv/bin/activate
-
 # Install system dependencies (e.g. bazel)
 ./build/install_system_deps.sh
 
 # Install python dependencies (e.g. numpy)
+# Note: This creates a virtualenv for neuropod and installs all deps in it
 ./build/install_python_deps.sh
 ```
 
 After the above steps, you can run the following scripts:
 
 ```sh
-# Note: If you used a virtualenv above, make sure it's still activated
-# during these steps
-
 # Build
 ./build/build.sh
 
@@ -38,6 +30,9 @@ After the above steps, you can run the following scripts:
 ./build/test.sh
 # Or ./build/test_gpu.sh to run all tests
 ```
+
+!!! note
+    The above commands run all python code in the virtualenv created by `install_python_deps.sh`. You do not need to manually activate the virtualenv.
 
 ## In Docker (preferred)
 
