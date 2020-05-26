@@ -2,14 +2,12 @@
 set -e
 
 if [[ $(uname -s) == 'Darwin' ]]; then
-    # Install bazel
-    tmpdir=$(mktemp -d)
-    pushd $tmpdir
-    curl -sSL -o bazel.sh https://github.com/bazelbuild/bazel/releases/download/0.28.1/bazel-0.28.1-installer-darwin-x86_64.sh
-    chmod +x ./bazel.sh
-    ./bazel.sh
-    popd
-    rm -rf $tmpdir
+
+    # Get bazelisk if necessary
+    if [ ! -f "/usr/local/bin/bazel" ]; then
+        wget https://github.com/bazelbuild/bazelisk/releases/download/v1.4.0/bazelisk-darwin-amd64 -O /usr/local/bin/bazel
+        chmod +x /usr/local/bin/bazel
+    fi
 
     # Install libomp
     export HOMEBREW_NO_AUTO_UPDATE=1
@@ -33,15 +31,14 @@ else
     sudo add-apt-repository -y ppa:deadsnakes/ppa
     sudo apt-get update
 
-    # Install bazel
-    tmpdir=$(mktemp -d)
-    pushd $tmpdir
-    curl -sSL -o bazel.sh https://github.com/bazelbuild/bazel/releases/download/0.28.1/bazel-0.28.1-installer-linux-x86_64.sh
-    chmod +x ./bazel.sh
-    sudo ./bazel.sh
-    popd
-    rm -rf $tmpdir
+    # Get bazelisk if necessary
+    if [ ! -f "/usr/local/bin/bazel" ]; then
+        tmpdir=$(mktemp -d)
+        pushd $tmpdir
+        wget https://github.com/bazelbuild/bazelisk/releases/download/v1.4.0/bazelisk-linux-amd64 -O ./bazel
+        chmod +x ./bazel
+        sudo mv ./bazel /usr/local/bin/bazel
+        popd
+        rm -rf $tmpdir
+    fi
 fi
-
-# Run a bazel command to extract the bazel installation
-bazel version
