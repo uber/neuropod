@@ -12,17 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+package(
+    default_visibility = ["//visibility:public"],
+)
+
 cc_library(
-    name = "serialization",
-    hdrs = [
-        "ipc_serialization.hh",
+    name = "pfr",
+    hdrs = glob([
+        "include/boost/**",
+    ]),
+    includes = [
+        "include"
     ],
-    visibility = [
-        "//neuropod:__subpackages__",
-    ],
-    deps = [
-        "//neuropod/backends:neuropod_backend",
-        "@boost_repo//:boost",
-        "@pfr_repo//:pfr",
-    ],
+    visibility = ["//visibility:public"],
 )

@@ -34,7 +34,6 @@ cc_library(
     srcs = [
         "control_messages.cc",
         "ipc_control_channel.cc",
-        "ope_load_config.cc",
     ],
     hdrs = [
         "control_messages.hh",

@@ -18,6 +18,8 @@ limitations under the License.
 #include "neuropod/internal/error_utils.hh"
 #include "neuropod/internal/memory_utils.hh"
 
+#include <boost/pfr/precise.hpp>
+
 #include <istream>
 #include <ostream>
 #include <string>
@@ -62,18 +64,42 @@ inline void checked_read(std::istream &stream, Params &&... params)
 template <typename T>
 inline void ipc_serialize(std::ostream &out, const T &item)
 {
-    static_assert(std::is_integral<T>::value, "The ipc_serialize function must be specialized for the requested type");
+    constexpr bool is_integral  = std::is_integral<T>::value;
+    constexpr bool is_aggregate = std::is_aggregate<T>::value;
 
-    detail::checked_write(out, reinterpret_cast<const char *>(&item), sizeof(item));
+    static_assert(is_integral || is_aggregate, "The ipc_serialize function must be specialized for the requested type");
+
+    if constexpr (is_integral)
+    {
+        // Primitive types
+        detail::checked_write(out, reinterpret_cast<const char *>(&item), sizeof(item));
+    }
+    else if (is_aggregate)
+    {
+        // Structs
+        boost::pfr::for_each_field(item, [&](auto &field) { ipc_serialize(out, field); });
+    }
 }
 
 template <typename T>
 inline void ipc_deserialize(std::istream &in, T &item)
 {
-    static_assert(std::is_integral<T>::value,
+    constexpr bool is_integral  = std::is_integral<T>::value;
+    constexpr bool is_aggregate = std::is_aggregate<T>::value;
+
+    static_assert(is_integral || is_aggregate,
                   "The ipc_deserialize function must be specialized for the requested type");
 
-    detail::checked_read(in, reinterpret_cast<char *>(&item), sizeof(item));
+    if constexpr (is_integral)
+    {
+        // Primitive types
+        detail::checked_read(in, reinterpret_cast<char *>(&item), sizeof(item));
+    }
+    else if (is_aggregate)
+    {
+        // Structs
+        boost::pfr::for_each_field(item, [&](auto &field) { ipc_deserialize(in, field); });
+    }
 }
 
 // Specialization for bool

@@ -31,11 +31,4 @@ struct ope_load_config
     std::vector<BackendLoadSpec> default_backend_overrides;
 };
 
-// Serialization specializations for ope_load_config
-template <>
-void ipc_serialize(std::ostream &out, const ope_load_config &data);
-
-template <>
-void ipc_deserialize(std::istream &in, ope_load_config &data);
-
 } // namespace neuropod
