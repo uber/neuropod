@@ -271,8 +271,11 @@ std::unique_ptr<NeuropodValueMap> NeuropodBackend::infer(const NeuropodValueMap 
                        "`load_model_at_construction` was set to false and `load_model()` was not explicitly called");
     }
 
-    // Validate inputs
-    validate_tensors_against_specs(inputs, get_inputs(), "input spec");
+    if (!options_.disable_shape_and_type_checking)
+    {
+        // Validate inputs
+        validate_tensors_against_specs(inputs, get_inputs(), "input spec");
+    }
 
     // Seal the inputs
     auto sealed = sealer_->seal(inputs);
@@ -280,8 +283,11 @@ std::unique_ptr<NeuropodValueMap> NeuropodBackend::infer(const NeuropodValueMap 
     // Run inference
     auto out = infer_internal(sealed, requested_outputs);
 
-    // Validate outputs
-    validate_tensors_against_specs(*out, get_outputs(), "output spec");
+    if (!options_.disable_shape_and_type_checking)
+    {
+        // Validate outputs
+        validate_tensors_against_specs(*out, get_outputs(), "output spec");
+    }
 
     return out;
 }
