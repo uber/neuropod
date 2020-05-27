@@ -246,8 +246,9 @@ BackendFactoryFunction get_backend_for_type(const std::vector<BackendLoadSpec> &
     }
 
     // Don't have anything that matches
-    NEUROPOD_ERROR("Neuropod backend not found for type '{}' and version range '{}'! Was not able to load default "
-                   "backends either. Retry with log level TRACE for more information.",
+    NEUROPOD_ERROR("The model being loaded requires a Neuropod backend for type '{}' and version range '{}'. However, "
+                   "a backend satisfying these requirements was not found. See the installation instructions "
+                   "at https://neuropod.ai to install a backend. Retry with log level TRACE for more information.",
                    type,
                    target_version_range);
 }
