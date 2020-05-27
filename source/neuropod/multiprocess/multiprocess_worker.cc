@@ -57,8 +57,13 @@ void multiprocess_worker_loop(const std::string &control_queue_name)
                 ope_load_config config;
                 received.get(config);
 
+                // Override some options
+                auto &opts                      = config.opts;
+                opts.load_model_at_construction = true;
+                opts.use_ope                    = false;
+
                 // Load a neuropod
-                neuropod  = stdx::make_unique<Neuropod>(config.neuropod_path, config.default_backend_overrides);
+                neuropod  = stdx::make_unique<Neuropod>(config.neuropod_path, config.default_backend_overrides, opts);
                 allocator = neuropod->get_tensor_allocator();
                 inputs.clear();
                 control_channel.send_message(LOAD_SUCCESS);
