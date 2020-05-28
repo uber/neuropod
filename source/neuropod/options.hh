@@ -72,6 +72,9 @@ struct RuntimeOptions
     // immediately loading the model. If this is set to `false`, the model will
     // not be loaded until the `load_model` method is called on the Neuropod.
     bool load_model_at_construction = true;
+
+    // Whether or not to disable shape and type checking when running inference
+    bool disable_shape_and_type_checking = false;
 };
 
 } // namespace neuropod
