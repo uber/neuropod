@@ -16,7 +16,7 @@ source .neuropod_venv/bin/activate
 # Install deps for the python interface
 # (the -f flag tells pip where to find the torch nightly builds)
 pushd source/python
-pip install -U pip setuptools numpy coverage requests requests[security] mkdocs==1.0.4 mkdocs-material==4.6.0
+pip install -U pip setuptools numpy coverage requests[security] mkdocs==1.0.4 mkdocs-material==4.6.0
 python setup.py egg_info
 cat neuropod.egg-info/requires.txt | sed '/^\[/ d' | paste -sd " " - | xargs pip install
 popd
