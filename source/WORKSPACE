@@ -183,3 +183,11 @@ http_archive(
     strip_prefix = "cpp-semver-ff341259099465283bc3dc60fb5ede16776e1607",
     url = "https://github.com/easz/cpp-semver/archive/ff341259099465283bc3dc60fb5ede16776e1607.zip",
 )
+
+http_archive(
+    name = "pfr_repo",
+    build_file = "@//deps:BUILD.pfr",
+    sha256 = "92e0ffa3be49ffb21486e8e929dde599455fc1818054254bac832bcbc2c5491b",
+    strip_prefix = "magic_get-1.0.0",
+    url = "https://github.com/apolukhin/magic_get/archive/1.0.0.zip",
+)

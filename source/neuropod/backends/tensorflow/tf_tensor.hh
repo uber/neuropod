@@ -20,6 +20,7 @@ limitations under the License.
 #include "neuropod/internal/error_utils.hh"
 #include "neuropod/internal/logging.hh"
 #include "neuropod/internal/neuropod_tensor.hh"
+#include "tensorflow/core/common_runtime/dma_helper.h"
 #include "tensorflow/core/framework/tensor.h"
 #include "tensorflow/core/public/version.h"
 
@@ -104,14 +105,26 @@ protected:
     void *get_untyped_data_ptr()
     {
         // TODO(vip): make sure this tensor is contiguous
-        return const_cast<char *>(tensor_.tensor_data().data());
+        auto buf = tensorflow::DMAHelper::buffer(&tensor_);
+        if (buf != nullptr)
+        {
+            return buf->data();
+        }
+
+        return nullptr;
     }
 
     // Get a pointer to the underlying data
     const void *get_untyped_data_ptr() const
     {
         // TODO(vip): make sure this tensor is contiguous
-        return tensor_.tensor_data().data();
+        auto buf = tensorflow::DMAHelper::buffer(&tensor_);
+        if (buf != nullptr)
+        {
+            return buf->data();
+        }
+
+        return nullptr;
     }
 };
 
