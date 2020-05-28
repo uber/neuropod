@@ -17,6 +17,7 @@ limitations under the License.
 
 #include "neuropod/internal/backend_registration.hh"
 #include "neuropod/multiprocess/serialization/ipc_serialization.hh"
+#include "neuropod/options.hh"
 
 namespace neuropod
 {
@@ -29,6 +30,9 @@ struct ope_load_config
 
     // See the docs in `neuropod.hh`
     std::vector<BackendLoadSpec> default_backend_overrides;
+
+    // Options to pass to the worker process
+    RuntimeOptions opts;
 };
 
 } // namespace neuropod

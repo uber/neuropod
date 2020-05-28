@@ -190,6 +190,14 @@ public:
         load_config_.neuropod_path             = neuropod_path_;
         load_config_.default_backend_overrides = default_backend_overrides;
 
+        // Copy options into the load configuration
+        // Note: some of these options will be overridden in the worker process
+        load_config_.opts = options_;
+
+        // Since we're using CUDA_VISIBLE_DEVICES to set the appropriate device above,
+        // we'll just tell the worker to use GPU0
+        load_config_.opts.visible_device = Device::GPU0;
+
         if (options.load_model_at_construction)
         {
             load_model();
