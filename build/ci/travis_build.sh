@@ -13,7 +13,10 @@ if [[ $(uname -s) == 'Darwin' ]]; then
     export HOMEBREW_NO_AUTO_UPDATE=1
     brew unlink python
 
-    if [[ "${NEUROPOD_PYTHON_VERSION}" == "3.5" ]]; then
+    if [[ "${NEUROPOD_PYTHON_VERSION}" == "2.7" ]]; then
+        wget https://www.python.org/ftp/python/2.7.18/python-2.7.18-macosx10.9.pkg &> /dev/null
+        sudo installer -pkg python-2.7.18-macosx10.9.pkg -target /
+    elif [[ "${NEUROPOD_PYTHON_VERSION}" == "3.5" ]]; then
         wget https://www.python.org/ftp/python/3.5.4/python-3.5.4-macosx10.6.pkg &> /dev/null
         sudo installer -pkg python-3.5.4-macosx10.6.pkg -target /
     elif [[ "${NEUROPOD_PYTHON_VERSION}" == "3.6" ]]; then
