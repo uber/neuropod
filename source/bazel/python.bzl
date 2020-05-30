@@ -7,7 +7,7 @@ def _impl(repository_ctx):
 
     if IS_MAC:
         # Get the libdir
-        res = repository_ctx.execute(["python", "-c", "import os; from distutils import sysconfig; print(os.path.dirname(sysconfig.get_config_var('LIBDIR')))"])
+        res = repository_ctx.execute(["python" + version, "-c", "import os; from distutils import sysconfig; print(os.path.dirname(sysconfig.get_config_var('LIBDIR')))"])
         if res.return_code != 0:
             fail("Error getting python libdir: " + res.stderr)
 
