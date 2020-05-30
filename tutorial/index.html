@@ -1,0 +1,1126 @@
+
+
+
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      <meta http-equiv="x-ua-compatible" content="ie=edge">
+      
+      
+      
+      
+        <meta name="lang:clipboard.copy" content="Copy to clipboard">
+      
+        <meta name="lang:clipboard.copied" content="Copied to clipboard">
+      
+        <meta name="lang:search.language" content="en">
+      
+        <meta name="lang:search.pipeline.stopwords" content="True">
+      
+        <meta name="lang:search.pipeline.trimmer" content="True">
+      
+        <meta name="lang:search.result.none" content="No matching documents">
+      
+        <meta name="lang:search.result.one" content="1 matching document">
+      
+        <meta name="lang:search.result.other" content="# matching documents">
+      
+        <meta name="lang:search.tokenizer" content="[\s\-]+">
+      
+      <link rel="shortcut icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.0.4, mkdocs-material-4.6.0">
+    
+    
+      
+        <title>Basic Introduction - Neuropod</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/application.1b62728e.css">
+      
+      
+    
+    
+      <script src="../assets/javascripts/modernizr.268332fc.js"></script>
+    
+    
+      
+        <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700%7CRoboto+Mono&display=fallback">
+        <style>body,input{font-family:"Roboto","Helvetica Neue",Helvetica,Arial,sans-serif}code,kbd,pre{font-family:"Roboto Mono","Courier New",Courier,monospace}</style>
+      
+    
+    <link rel="stylesheet" href="../assets/fonts/material-icons.css">
+    
+    
+      <link rel="stylesheet" href="https://unpkg.com/mermaid@7.1.2/dist/mermaid.css">
+    
+    
+      
+        
+<script>
+  window.ga = window.ga || function() {
+    (ga.q = ga.q || []).push(arguments)
+  }
+  ga.l = +new Date
+  /* Setup integration and send page view */
+  ga("create", "UA-7627242-14", "auto")
+  ga("set", "anonymizeIp", true)
+  ga("send", "pageview")
+  /* Register handler to log search on blur */
+  document.addEventListener("DOMContentLoaded", () => {
+    if (document.forms.search) {
+      var query = document.forms.search.query
+      query.addEventListener("blur", function() {
+        if (this.value) {
+          var path = document.location.pathname;
+          ga("send", "pageview", path + "?q=" + this.value)
+        }
+      })
+    }
+  })
+</script>
+<script async src="https://www.google-analytics.com/analytics.js"></script>
+      
+    
+    
+  </head>
+  
+    <body dir="ltr">
+  
+    <svg class="md-svg">
+      <defs>
+        
+        
+      </defs>
+    </svg>
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" data-md-component="overlay" for="__drawer"></label>
+    
+      <a href="#neuropod-tutorial" tabindex="1" class="md-skip">
+        Skip to content
+      </a>
+    
+    
+      <header class="md-header" data-md-component="header">
+  <nav class="md-header-nav md-grid">
+    <div class="md-flex">
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <a href=".." title="Neuropod" class="md-header-nav__button md-logo">
+          
+            <i class="md-icon"></i>
+          
+        </a>
+      </div>
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <label class="md-icon md-icon--menu md-header-nav__button" for="__drawer"></label>
+      </div>
+      <div class="md-flex__cell md-flex__cell--stretch">
+        <div class="md-flex__ellipsis md-header-nav__title" data-md-component="title">
+          
+            <span class="md-header-nav__topic">
+              Neuropod
+            </span>
+            <span class="md-header-nav__topic">
+              
+                Basic Introduction
+              
+            </span>
+          
+        </div>
+      </div>
+      <div class="md-flex__cell md-flex__cell--shrink">
+        
+          <label class="md-icon md-icon--search md-header-nav__button" for="__search"></label>
+          
+<div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="query" data-md-state="active">
+      <label class="md-icon md-search__icon" for="__search"></label>
+      <button type="reset" class="md-icon md-search__icon" data-md-component="reset" tabindex="-1">
+        &#xE5CD;
+      </button>
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="result">
+          <div class="md-search-result__meta">
+            Type to start searching
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+        
+      </div>
+      
+    </div>
+  </nav>
+</header>
+    
+    <div class="md-container">
+      
+        
+      
+      
+      <main class="md-main" role="main">
+        <div class="md-main__inner md-grid" data-md-component="container">
+          
+            
+              <div class="md-sidebar md-sidebar--primary" data-md-component="navigation">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    <nav class="md-nav md-nav--primary" data-md-level="0">
+  <label class="md-nav__title md-nav__title--site" for="__drawer">
+    <a href=".." title="Neuropod" class="md-nav__button md-logo">
+      
+        <i class="md-icon"></i>
+      
+    </a>
+    Neuropod
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href=".." title="Welcome" class="md-nav__link">
+      Welcome
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../installing/" title="Installing" class="md-nav__link">
+      Installing
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+  
+
+
+  <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    
+      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-3" type="checkbox" id="nav-3" checked>
+    
+    <label class="md-nav__link" for="nav-3">
+      Tutorials
+    </label>
+    <nav class="md-nav" data-md-component="collapsible" data-md-level="1">
+      <label class="md-nav__title" for="nav-3">
+        Tutorials
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+  
+
+
+  <li class="md-nav__item md-nav__item--active">
+    
+    <input class="md-toggle md-nav__toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+    
+      
+    
+    
+      <label class="md-nav__link md-nav__link--active" for="__toc">
+        Basic Introduction
+      </label>
+    
+    <a href="./" title="Basic Introduction" class="md-nav__link md-nav__link--active">
+      Basic Introduction
+    </a>
+    
+      
+<nav class="md-nav md-nav--secondary">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">Table of contents</label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#package-a-model" class="md-nav__link">
+    Package a Model
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#tensorflow" class="md-nav__link">
+    TensorFlow
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#graphdef" class="md-nav__link">
+    GraphDef
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#path-to-a-frozen-graph" class="md-nav__link">
+    Path to a Frozen Graph
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pytorch" class="md-nav__link">
+    PyTorch
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#torchscript" class="md-nav__link">
+    TorchScript
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#keras" class="md-nav__link">
+    Keras
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#python" class="md-nav__link">
+    Python
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#run-inference" class="md-nav__link">
+    Run Inference
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#from-python" class="md-nav__link">
+    From Python
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#from-c" class="md-nav__link">
+    From C++
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#appendix" class="md-nav__link">
+    Appendix
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#example-problem-definitions" class="md-nav__link">
+    Example Problem Definitions
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+      
+      
+      
+      
+    </ul>
+  
+</nav>
+    
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-4" type="checkbox" id="nav-4">
+    
+    <label class="md-nav__link" for="nav-4">
+      Packaging API
+    </label>
+    <nav class="md-nav" data-md-component="collapsible" data-md-level="1">
+      <label class="md-nav__title" for="nav-4">
+        Packaging API
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../packagers/tensorflow/" title="TensorFlow" class="md-nav__link">
+      TensorFlow
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../packagers/pytorch/" title="PyTorch" class="md-nav__link">
+      PyTorch
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../packagers/torchscript/" title="TorchScript" class="md-nav__link">
+      TorchScript
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../packagers/keras/" title="Keras" class="md-nav__link">
+      Keras
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../pyguide/" title="Python Guide" class="md-nav__link">
+      Python Guide
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../cppguide/" title="C++ Guide" class="md-nav__link">
+      C++ Guide
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-7" type="checkbox" id="nav-7">
+    
+    <label class="md-nav__link" for="nav-7">
+      Advanced
+    </label>
+    <nav class="md-nav" data-md-component="collapsible" data-md-level="1">
+      <label class="md-nav__title" for="nav-7">
+        Advanced
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../advanced/efficient_tensor_creation/" title="Efficient Tensor Creation" class="md-nav__link">
+      Efficient Tensor Creation
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../advanced/ope/" title="Out-of-process Execution" class="md-nav__link">
+      Out-of-process Execution
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../developing/" title="Developing Neuropod" class="md-nav__link">
+      Developing Neuropod
+    </a>
+  </li>
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="toc">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+<nav class="md-nav md-nav--secondary">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">Table of contents</label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#package-a-model" class="md-nav__link">
+    Package a Model
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#tensorflow" class="md-nav__link">
+    TensorFlow
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#graphdef" class="md-nav__link">
+    GraphDef
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#path-to-a-frozen-graph" class="md-nav__link">
+    Path to a Frozen Graph
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pytorch" class="md-nav__link">
+    PyTorch
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#torchscript" class="md-nav__link">
+    TorchScript
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#keras" class="md-nav__link">
+    Keras
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#python" class="md-nav__link">
+    Python
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#run-inference" class="md-nav__link">
+    Run Inference
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#from-python" class="md-nav__link">
+    From Python
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#from-c" class="md-nav__link">
+    From C++
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#appendix" class="md-nav__link">
+    Appendix
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#example-problem-definitions" class="md-nav__link">
+    Example Problem Definitions
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+      
+      
+      
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          <div class="md-content">
+            <article class="md-content__inner md-typeset">
+              
+                
+                
+                <h1 id="neuropod-tutorial">Neuropod Tutorial<a class="headerlink" href="#neuropod-tutorial" title="Permanent link">&para;</a></h1>
+<p>In this tutorial, we’re going to build a simple Neuropod model for addition in TensorFlow, PyTorch, and TorchScript. We'll also show how to run inference from Python and C++.</p>
+<p>Almost all of the examples/code in this tutorial come from the Neuropod unit and integration tests. Please read through them for complete working examples.</p>
+<p>The Neuropod packaging and inference interfaces also have comprehensive docstrings and provide a more detailed usage of the API than this tutorial.</p>
+<p>Make sure to follow the instructions for <a href="../installing/">installing Neuropod</a> before continuing</p>
+<h2 id="package-a-model">Package a Model<a class="headerlink" href="#package-a-model" title="Permanent link">&para;</a></h2>
+<p>The first step for packaging a model is to define a “problem” (e.g. 2d object detection).</p>
+<p>A “problem” is composed of 4 things:</p>
+<ul>
+<li>an <code>input_spec</code><ul>
+<li>A list of dicts specifying the name, datatype, and shape of an input tensor</li>
+</ul>
+</li>
+<li>an <code>output_spec</code><ul>
+<li>A list of dicts specifying the name, datatype, and shape of an output tensor</li>
+</ul>
+</li>
+<li><code>test_input_data</code> <em>(optional)</em><ul>
+<li>If provided, Neuropod will run inference immediately after packaging to verify that the model was packaged correctly. Must be provided if <code>test_output_data</code> is provided</li>
+</ul>
+</li>
+<li><code>test_output_data</code> <em>(optional)</em><ul>
+<li>If provided, Neuropod will test that the output of inference with <code>test_input_data</code> matches <code>test_output_data</code></li>
+</ul>
+</li>
+</ul>
+<p>The shape of a tensor can include <code>None</code> in which case any value is acceptable. You can also use “symbols” in these shape definitions. Every instance of that symbol must resolve to the same value at runtime.</p>
+<p>For example, here’s a problem definition for our addition model:</p>
+<div class="codehilite"><pre><span></span><span class="n">INPUT_SPEC</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="c1"># A one dimensional tensor of any size with dtype float32</span>
+    <span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="s2">&quot;dtype&quot;</span><span class="p">:</span> <span class="s2">&quot;float32&quot;</span><span class="p">,</span> <span class="s2">&quot;shape&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;num_inputs&quot;</span><span class="p">,)},</span>
+    <span class="c1"># A one dimensional tensor of the same size with dtype float32</span>
+    <span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="s2">&quot;dtype&quot;</span><span class="p">:</span> <span class="s2">&quot;float32&quot;</span><span class="p">,</span> <span class="s2">&quot;shape&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;num_inputs&quot;</span><span class="p">,)},</span>
+<span class="p">]</span>
+
+<span class="n">OUTPUT_SPEC</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="c1"># The sum of the two tensors</span>
+    <span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;out&quot;</span><span class="p">,</span> <span class="s2">&quot;dtype&quot;</span><span class="p">:</span> <span class="s2">&quot;float32&quot;</span><span class="p">,</span> <span class="s2">&quot;shape&quot;</span><span class="p">:</span> <span class="p">(</span><span class="kc">None</span><span class="p">,)},</span>
+<span class="p">]</span>
+
+<span class="n">TEST_INPUT_DATA</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">),</span>
+    <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">),</span>
+<span class="p">}</span>
+
+<span class="n">TEST_EXPECTED_OUT</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;out&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+<span class="p">}</span>
+</pre></div>
+
+<p>The symbol <code>num_inputs</code> in the shapes of <code>x</code> and <code>y</code> must resolve to the same value at runtime.</p>
+<p>For a definition of a “real” problem, see the example problem definitions section in the appendix.</p>
+<p>Now that we have a problem defined, we’re going to see how to package a model in each of the currently supported DL frameworks.</p>
+<h3 id="tensorflow">TensorFlow<a class="headerlink" href="#tensorflow" title="Permanent link">&para;</a></h3>
+<p>There are two ways to package a TensorFlow model. One is with a <code>GraphDef</code> the other is with a path to a frozen graph. Both of these require a <code>node_name_mapping</code> that maps a tensor name in the problem definition (see above) to a node in the TensorFlow graph. See the examples below for more detail.</p>
+<h4 id="graphdef">GraphDef<a class="headerlink" href="#graphdef" title="Permanent link">&para;</a></h4>
+<p>If we have a function that returns a <code>GraphDef</code> like:</p>
+<div class="codehilite"><pre><span></span><span class="kn">import</span> <span class="nn">tensorflow</span> <span class="k">as</span> <span class="nn">tf</span>
+
+<span class="k">def</span> <span class="nf">create_tf_addition_model</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A simple addition model</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">g</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">Graph</span><span class="p">()</span>
+    <span class="k">with</span> <span class="n">g</span><span class="o">.</span><span class="n">as_default</span><span class="p">():</span>
+        <span class="k">with</span> <span class="n">tf</span><span class="o">.</span><span class="n">name_scope</span><span class="p">(</span><span class="s2">&quot;some_namespace&quot;</span><span class="p">):</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">placeholder</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;in_x&quot;</span><span class="p">)</span>
+            <span class="n">y</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">placeholder</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;in_y&quot;</span><span class="p">)</span>
+
+            <span class="n">out</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;out&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">g</span><span class="o">.</span><span class="n">as_graph_def</span><span class="p">()</span>
+</pre></div>
+
+<p>we can package the model as follows:</p>
+<div class="codehilite"><pre><span></span><span class="kn">from</span> <span class="nn">neuropod.packagers</span> <span class="kn">import</span> <span class="n">create_tensorflow_neuropod</span>
+
+<span class="n">create_tensorflow_neuropod</span><span class="p">(</span>
+    <span class="n">neuropod_path</span><span class="o">=</span><span class="n">neuropod_path</span><span class="p">,</span>
+    <span class="n">model_name</span><span class="o">=</span><span class="s2">&quot;addition_model&quot;</span><span class="p">,</span>
+    <span class="n">graph_def</span><span class="o">=</span><span class="n">create_tf_addition_model</span><span class="p">(),</span>
+    <span class="n">node_name_mapping</span><span class="o">=</span><span class="p">{</span>
+        <span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="s2">&quot;some_namespace/in_x:0&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="s2">&quot;some_namespace/in_y:0&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;out&quot;</span><span class="p">:</span> <span class="s2">&quot;some_namespace/out:0&quot;</span><span class="p">,</span>
+    <span class="p">},</span>
+    <span class="n">input_spec</span><span class="o">=</span><span class="n">addition_problem_definition</span><span class="o">.</span><span class="n">INPUT_SPEC</span><span class="p">,</span>
+    <span class="n">output_spec</span><span class="o">=</span><span class="n">addition_problem_definition</span><span class="o">.</span><span class="n">OUTPUT_SPEC</span><span class="p">,</span>
+    <span class="n">test_input_data</span><span class="o">=</span><span class="n">addition_problem_definition</span><span class="o">.</span><span class="n">TEST_INPUT_DATA</span><span class="p">,</span>
+    <span class="n">test_expected_out</span><span class="o">=</span><span class="n">addition_problem_definition</span><span class="o">.</span><span class="n">TEST_EXPECTED_OUT</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><code>create_tensorflow_neuropod</code> runs inference with the test data immediately after creating the neuropod. Raises a <code>ValueError</code> if the model output does not match the expected output.</p>
+</div>
+<h4 id="path-to-a-frozen-graph">Path to a Frozen Graph<a class="headerlink" href="#path-to-a-frozen-graph" title="Permanent link">&para;</a></h4>
+<p>If you already have a frozen graph, you can package the model like this:</p>
+<div class="codehilite"><pre><span></span><span class="kn">from</span> <span class="nn">neuropod.packagers</span> <span class="kn">import</span> <span class="n">create_tensorflow_neuropod</span>
+
+<span class="n">create_tensorflow_neuropod</span><span class="p">(</span>
+    <span class="n">neuropod_path</span><span class="o">=</span><span class="n">neuropod_path</span><span class="p">,</span>
+    <span class="n">model_name</span><span class="o">=</span><span class="s2">&quot;addition_model&quot;</span><span class="p">,</span>
+    <span class="n">frozen_graph_path</span><span class="o">=</span><span class="s2">&quot;/path/to/my/frozen.graph&quot;</span><span class="p">,</span>
+    <span class="n">node_name_mapping</span><span class="o">=</span><span class="p">{</span>
+        <span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="s2">&quot;some_namespace/in_x:0&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="s2">&quot;some_namespace/in_y:0&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;out&quot;</span><span class="p">:</span> <span class="s2">&quot;some_namespace/out:0&quot;</span><span class="p">,</span>
+    <span class="p">},</span>
+    <span class="n">input_spec</span><span class="o">=</span><span class="n">addition_problem_definition</span><span class="o">.</span><span class="n">INPUT_SPEC</span><span class="p">,</span>
+    <span class="n">output_spec</span><span class="o">=</span><span class="n">addition_problem_definition</span><span class="o">.</span><span class="n">OUTPUT_SPEC</span><span class="p">,</span>
+    <span class="n">test_input_data</span><span class="o">=</span><span class="n">addition_problem_definition</span><span class="o">.</span><span class="n">TEST_INPUT_DATA</span><span class="p">,</span>
+    <span class="n">test_expected_out</span><span class="o">=</span><span class="n">addition_problem_definition</span><span class="o">.</span><span class="n">TEST_EXPECTED_OUT</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><code>create_tensorflow_neuropod</code> runs inference with the test data immediately after creating the neuropod. Raises a <code>ValueError</code> if the model output does not match the expected output.</p>
+</div>
+<h3 id="pytorch">PyTorch<a class="headerlink" href="#pytorch" title="Permanent link">&para;</a></h3>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>Packaging a PyTorch model is a bit more complicated because you need python code and the weights in order to run the network.</p>
+<p>Converting your model to TorchScript is recommended if possible.</p>
+</div>
+<p>In order to create a PyTorch neuropod package, we need to follow a few guidelines:</p>
+<ul>
+<li>Absolute imports (e.g. <code>import torch</code>) are okay as long as your runtime environment has the package installed</li>
+<li>For Python 3, all other imports within your package must be relative</li>
+</ul>
+<p>This type of neuropod package is a bit less flexible than TensorFlow/TorchScript/Keras packages because absolute imports introduce a dependency on the runtime environment. This will be improved in a future release.</p>
+<p>Let's say our addition model looks like this (and is stored at <code>/my/model/code/dir/main.py</code>):</p>
+<div class="codehilite"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">import</span> <span class="nn">torch.nn</span> <span class="k">as</span> <span class="nn">nn</span>
+
+<span class="k">class</span> <span class="nc">AdditionModel</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+  <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+      <span class="k">return</span> <span class="p">{</span>
+          <span class="s2">&quot;out&quot;</span><span class="p">:</span> <span class="n">x</span> <span class="o">+</span> <span class="n">y</span>
+      <span class="p">}</span>
+
+<span class="k">def</span> <span class="nf">get_model</span><span class="p">(</span><span class="n">data_root</span><span class="p">):</span>
+  <span class="k">return</span> <span class="n">AdditionModel</span><span class="p">()</span>
+</pre></div>
+
+<p>In order to package it, we need 4 things:</p>
+<ul>
+<li>The paths to any data we want to store (e.g. the model weights)</li>
+<li>The path to the <code>python_root</code> of the code along with relative paths for any dirs within the <code>python_root</code> we want to package</li>
+<li>An entrypoint function that returns a model given a path to the packaged data. See the docstring for <code>create_pytorch_neuropod</code> for more details and examples.</li>
+<li>The dependencies of our model. These should be python packages.</li>
+</ul>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>See the API docs for <code>create_pytorch_neuropod</code> for detailed descriptions of every parameter</p>
+</div>
+<p>For our model:</p>
+<ul>
+<li>We don't need to store any data (because our model has no weights)</li>
+<li>Our python root is <code>/my/model/code/dir</code> and we want to store all the code in it</li>
+<li>Our entrypoint function is <code>get_model</code> and our entrypoint_package is <code>main</code> (because the code is in <code>main.py</code> in the python root)</li>
+</ul>
+<p>This translates to the following:</p>
+<div class="codehilite"><pre><span></span><span class="kn">from</span> <span class="nn">neuropod.packagers</span> <span class="kn">import</span> <span class="n">create_pytorch_neuropod</span>
+
+<span class="n">create_pytorch_neuropod</span><span class="p">(</span>
+    <span class="n">neuropod_path</span><span class="o">=</span><span class="n">neuropod_path</span><span class="p">,</span>
+    <span class="n">model_name</span><span class="o">=</span><span class="s2">&quot;addition_model&quot;</span><span class="p">,</span>
+    <span class="n">data_paths</span><span class="o">=</span><span class="p">[],</span>
+    <span class="n">code_path_spec</span><span class="o">=</span><span class="p">[{</span>
+        <span class="s2">&quot;python_root&quot;</span><span class="p">:</span> <span class="s1">&#39;/my/model/code/dir&#39;</span><span class="p">,</span>
+        <span class="s2">&quot;dirs_to_package&quot;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="s2">&quot;&quot;</span>  <span class="c1"># Package everything in the python_root</span>
+        <span class="p">],</span>
+    <span class="p">}],</span>
+    <span class="n">entrypoint_package</span><span class="o">=</span><span class="s2">&quot;main&quot;</span><span class="p">,</span>
+    <span class="n">entrypoint</span><span class="o">=</span><span class="s2">&quot;get_model&quot;</span><span class="p">,</span>
+    <span class="n">input_spec</span><span class="o">=</span><span class="n">addition_problem_definition</span><span class="o">.</span><span class="n">INPUT_SPEC</span><span class="p">,</span>
+    <span class="n">output_spec</span><span class="o">=</span><span class="n">addition_problem_definition</span><span class="o">.</span><span class="n">OUTPUT_SPEC</span><span class="p">,</span>
+    <span class="n">test_input_data</span><span class="o">=</span><span class="n">addition_problem_definition</span><span class="o">.</span><span class="n">TEST_INPUT_DATA</span><span class="p">,</span>
+    <span class="n">test_expected_out</span><span class="o">=</span><span class="n">addition_problem_definition</span><span class="o">.</span><span class="n">TEST_EXPECTED_OUT</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><code>create_pytorch_neuropod</code> runs inference with the test data immediately after creating the neuropod. Raises a <code>ValueError</code> if the model output does not match the expected output.</p>
+</div>
+<h3 id="torchscript">TorchScript<a class="headerlink" href="#torchscript" title="Permanent link">&para;</a></h3>
+<p>TorchScript is much easier to package than PyTorch (since we don't need to store any python code).</p>
+<p>If we have an addition model that looks like:</p>
+<div class="codehilite"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
+
+<span class="k">class</span> <span class="nc">AdditionModel</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">ScriptModule</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A simple addition model</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="nd">@torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">script_method</span>
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;out&quot;</span><span class="p">:</span> <span class="n">x</span> <span class="o">+</span> <span class="n">y</span>
+        <span class="p">}</span>
+</pre></div>
+
+<p>We can package it by running:</p>
+<div class="codehilite"><pre><span></span><span class="kn">from</span> <span class="nn">neuropod.packagers</span> <span class="kn">import</span> <span class="n">create_torchscript_neuropod</span>
+
+<span class="n">create_torchscript_neuropod</span><span class="p">(</span>
+    <span class="n">neuropod_path</span><span class="o">=</span><span class="n">neuropod_path</span><span class="p">,</span>
+    <span class="n">model_name</span><span class="o">=</span><span class="s2">&quot;addition_model&quot;</span><span class="p">,</span>
+    <span class="n">module</span><span class="o">=</span><span class="n">AdditionModel</span><span class="p">(),</span>
+    <span class="n">input_spec</span><span class="o">=</span><span class="n">addition_problem_definition</span><span class="o">.</span><span class="n">INPUT_SPEC</span><span class="p">,</span>
+    <span class="n">output_spec</span><span class="o">=</span><span class="n">addition_problem_definition</span><span class="o">.</span><span class="n">OUTPUT_SPEC</span><span class="p">,</span>
+    <span class="n">test_input_data</span><span class="o">=</span><span class="n">addition_problem_definition</span><span class="o">.</span><span class="n">TEST_INPUT_DATA</span><span class="p">,</span>
+    <span class="n">test_expected_out</span><span class="o">=</span><span class="n">addition_problem_definition</span><span class="o">.</span><span class="n">TEST_EXPECTED_OUT</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><code>create_torchscript_neuropod</code> runs inference with the test data immediately after creating the neuropod. Raises a <code>ValueError</code> if the model output does not match the expected output.</p>
+</div>
+<h3 id="keras">Keras<a class="headerlink" href="#keras" title="Permanent link">&para;</a></h3>
+<p>If we have a Keras addition model that looks like:</p>
+<div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">create_keras_addition_model</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A simple addition model</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">Input</span><span class="p">(</span><span class="n">batch_shape</span><span class="o">=</span><span class="p">(</span><span class="kc">None</span><span class="p">,),</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;x&quot;</span><span class="p">)</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">Input</span><span class="p">(</span><span class="n">batch_shape</span><span class="o">=</span><span class="p">(</span><span class="kc">None</span><span class="p">,),</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;y&quot;</span><span class="p">)</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="n">Add</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;out&quot;</span><span class="p">)([</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">])</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">Model</span><span class="p">(</span><span class="n">inputs</span><span class="o">=</span><span class="p">[</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">],</span> <span class="n">outputs</span><span class="o">=</span><span class="p">[</span><span class="n">out</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">model</span>
+</pre></div>
+
+<p>We can package it by running:</p>
+<div class="codehilite"><pre><span></span><span class="kn">from</span> <span class="nn">neuropod.packagers</span> <span class="kn">import</span> <span class="n">create_keras_neuropod</span>
+
+<span class="n">create_keras_neuropod</span><span class="p">(</span>
+    <span class="n">neuropod_path</span><span class="o">=</span><span class="n">neuropod_path</span><span class="p">,</span>
+    <span class="n">model_name</span><span class="o">=</span><span class="s2">&quot;addition_model&quot;</span><span class="p">,</span>
+    <span class="n">sess</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">get_session</span><span class="p">(),</span>
+    <span class="n">model</span><span class="o">=</span><span class="n">create_keras_addition_model</span><span class="p">(),</span>
+    <span class="n">input_spec</span><span class="o">=</span><span class="n">addition_problem_definition</span><span class="o">.</span><span class="n">INPUT_SPEC</span><span class="p">,</span>
+    <span class="n">output_spec</span><span class="o">=</span><span class="n">addition_problem_definition</span><span class="o">.</span><span class="n">OUTPUT_SPEC</span><span class="p">,</span>
+    <span class="n">test_input_data</span><span class="o">=</span><span class="n">addition_problem_definition</span><span class="o">.</span><span class="n">TEST_INPUT_DATA</span><span class="p">,</span>
+    <span class="n">test_expected_out</span><span class="o">=</span><span class="n">addition_problem_definition</span><span class="o">.</span><span class="n">TEST_EXPECTED_OUT</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><code>create_keras_neuropod</code> runs inference with the test data immediately after creating the neuropod. Raises a <code>ValueError</code> if the model output does not match the expected output.</p>
+</div>
+<h3 id="python">Python<a class="headerlink" href="#python" title="Permanent link">&para;</a></h3>
+<p>Packaging aribtrary Python code has the same interface as packaging PyTorch above.</p>
+<p>For an example, see the PyTorch section above and use <code>create_python_neuropod</code> instead of <code>create_pytorch_neuropod</code></p>
+<h2 id="run-inference">Run Inference<a class="headerlink" href="#run-inference" title="Permanent link">&para;</a></h2>
+<p>Inference is the exact same no matter what the underlying DL framework is</p>
+<h3 id="from-python">From Python<a class="headerlink" href="#from-python" title="Permanent link">&para;</a></h3>
+<div class="codehilite"><pre><span></span><span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">])</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">8</span><span class="p">])</span>
+
+<span class="k">with</span> <span class="n">load_neuropod</span><span class="p">(</span><span class="n">ADDITION_MODEL_PATH</span><span class="p">)</span> <span class="k">as</span> <span class="n">neuropod</span><span class="p">:</span>
+  <span class="n">results</span> <span class="o">=</span> <span class="n">neuropod</span><span class="o">.</span><span class="n">infer</span><span class="p">({</span><span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="n">x</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="n">y</span><span class="p">})</span>
+
+  <span class="c1"># array([6, 8, 10, 12])</span>
+  <span class="nb">print</span> <span class="n">results</span><span class="p">[</span><span class="s2">&quot;out&quot;</span><span class="p">]</span>
+</pre></div>
+
+<h3 id="from-c">From C++<a class="headerlink" href="#from-c" title="Permanent link">&para;</a></h3>
+<div class="codehilite"><pre><span></span><span class="cp">#include</span> <span class="cpf">&quot;neuropod/neuropod.hh&quot;</span><span class="cp"></span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="k">const</span> <span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int64_t</span><span class="o">&gt;</span> <span class="n">shape</span> <span class="o">=</span> <span class="p">{</span><span class="mi">4</span><span class="p">};</span>
+
+    <span class="c1">// To show two different ways of adding data, one of our inputs is an array</span>
+    <span class="c1">// and the other is a vector.</span>
+    <span class="k">const</span> <span class="kt">float</span><span class="p">[]</span>            <span class="n">x_data</span> <span class="o">=</span> <span class="p">{</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">};</span>
+    <span class="k">const</span> <span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">float</span><span class="o">&gt;</span> <span class="n">y_data</span> <span class="o">=</span> <span class="p">{</span><span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">8</span><span class="p">};</span>
+
+    <span class="c1">// Load the neuropod</span>
+    <span class="n">Neuropod</span> <span class="n">neuropod</span><span class="p">(</span><span class="n">ADDITION_MODEL_PATH</span><span class="p">);</span>
+
+    <span class="c1">// Add the input data using two different signatures of `copy_from`</span>
+    <span class="c1">// (one with a pointer and size, one with a vector)</span>
+    <span class="k">auto</span> <span class="n">x_tensor</span> <span class="o">=</span> <span class="n">neuropod</span><span class="p">.</span><span class="n">allocate_tensor</span><span class="o">&lt;</span><span class="kt">float</span><span class="o">&gt;</span><span class="p">(</span><span class="n">shape</span><span class="p">);</span>
+    <span class="n">x_tensor</span><span class="o">-&gt;</span><span class="n">copy_from</span><span class="p">(</span><span class="n">x_data</span><span class="p">,</span> <span class="mi">4</span><span class="p">);</span>
+
+    <span class="k">auto</span> <span class="n">y_tensor</span> <span class="o">=</span> <span class="n">neuropod</span><span class="p">.</span><span class="n">allocate_tensor</span><span class="o">&lt;</span><span class="kt">float</span><span class="o">&gt;</span><span class="p">(</span><span class="n">shape</span><span class="p">);</span>
+    <span class="n">y_tensor</span><span class="o">-&gt;</span><span class="n">copy_from</span><span class="p">(</span><span class="n">y_data</span><span class="p">);</span>
+
+    <span class="c1">// Run inference</span>
+    <span class="k">const</span> <span class="k">auto</span> <span class="n">output_data</span> <span class="o">=</span> <span class="n">neuropod</span><span class="p">.</span><span class="n">infer</span><span class="p">({</span>
+        <span class="p">{</span><span class="s">&quot;x&quot;</span><span class="p">,</span> <span class="n">x_tensor</span><span class="p">},</span>
+        <span class="p">{</span><span class="s">&quot;y&quot;</span><span class="p">,</span> <span class="n">y_tensor</span><span class="p">}</span>
+    <span class="p">});</span>
+
+    <span class="k">const</span> <span class="k">auto</span> <span class="n">out_tensor</span> <span class="o">=</span> <span class="n">output_data</span><span class="o">-&gt;</span><span class="n">at</span><span class="p">(</span><span class="s">&quot;out&quot;</span><span class="p">);</span>
+
+    <span class="c1">// {6, 8, 10, 12}</span>
+    <span class="k">const</span> <span class="k">auto</span> <span class="n">out_vector</span> <span class="o">=</span> <span class="n">out_tensor</span><span class="o">-&gt;</span><span class="n">as_typed_tensor</span><span class="o">&lt;</span><span class="kt">float</span><span class="o">&gt;</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">get_data_as_vector</span><span class="p">();</span>
+
+    <span class="c1">// {4}</span>
+    <span class="k">const</span> <span class="k">auto</span> <span class="n">out_shape</span>  <span class="o">=</span> <span class="n">out_tensor</span><span class="o">-&gt;</span><span class="n">get_dims</span><span class="p">();</span>
+<span class="p">}</span>
+</pre></div>
+
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This shows basic usage of the C++ API. For more flexible and memory-efficient usage, please see the <a href="../cppguide/">C++ API docs</a></p>
+</div>
+<h2 id="appendix">Appendix<a class="headerlink" href="#appendix" title="Permanent link">&para;</a></h2>
+<h3 id="example-problem-definitions">Example Problem Definitions<a class="headerlink" href="#example-problem-definitions" title="Permanent link">&para;</a></h3>
+<p>The problem definition for 2d object detection may look something like this:</p>
+<div class="codehilite"><pre><span></span><span class="n">INPUT_SPEC</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="c1"># BGR image</span>
+    <span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;image&quot;</span><span class="p">,</span> <span class="s2">&quot;dtype&quot;</span><span class="p">:</span> <span class="s2">&quot;uint8&quot;</span><span class="p">,</span> <span class="s2">&quot;shape&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">1200</span><span class="p">,</span> <span class="mi">1920</span><span class="p">,</span> <span class="mi">3</span><span class="p">)},</span>
+<span class="p">]</span>
+
+<span class="n">OUTPUT_SPEC</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="c1"># shape: (num_detections, 4): (xmin, ymin, xmax, ymax)</span>
+    <span class="c1"># These values are in units of pixels. The origin is the top left corner</span>
+    <span class="c1"># with positive X to the right and positive Y towards the bottom of the image</span>
+    <span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;boxes&quot;</span><span class="p">,</span> <span class="s2">&quot;dtype&quot;</span><span class="p">:</span> <span class="s2">&quot;float32&quot;</span><span class="p">,</span> <span class="s2">&quot;shape&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;num_detections&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">)},</span>
+
+    <span class="c1"># The list of classes that the network can output</span>
+    <span class="c1"># This must be some subset of [&#39;vehicle&#39;, &#39;person&#39;, &#39;motorcycle&#39;, &#39;bicycle&#39;]</span>
+    <span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;supported_object_classes&quot;</span><span class="p">,</span> <span class="s2">&quot;dtype&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span> <span class="s2">&quot;shape&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;num_classes&quot;</span><span class="p">,)},</span>
+
+    <span class="c1"># The probability of each class for each detection</span>
+    <span class="c1"># These should all be floats between 0 and 1</span>
+    <span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;object_class_probability&quot;</span><span class="p">,</span> <span class="s2">&quot;dtype&quot;</span><span class="p">:</span> <span class="s2">&quot;float32&quot;</span><span class="p">,</span> <span class="s2">&quot;shape&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;num_detections&quot;</span><span class="p">,</span> <span class="s2">&quot;num_classes&quot;</span><span class="p">)},</span>
+<span class="p">]</span>
+</pre></div>
+                
+                  
+                
+                
+              
+              
+                
+
+
+              
+            </article>
+          </div>
+        </div>
+      </main>
+      
+        
+<footer class="md-footer">
+  
+    <div class="md-footer-nav">
+      <nav class="md-footer-nav__inner md-grid">
+        
+          <a href="../installing/" title="Installing" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+            <div class="md-flex__cell md-flex__cell--shrink">
+              <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
+            </div>
+            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
+              <span class="md-flex__ellipsis">
+                <span class="md-footer-nav__direction">
+                  Previous
+                </span>
+                Installing
+              </span>
+            </div>
+          </a>
+        
+        
+          <a href="../packagers/tensorflow/" title="TensorFlow" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
+            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
+              <span class="md-flex__ellipsis">
+                <span class="md-footer-nav__direction">
+                  Next
+                </span>
+                TensorFlow
+              </span>
+            </div>
+            <div class="md-flex__cell md-flex__cell--shrink">
+              <i class="md-icon md-icon--arrow-forward md-footer-nav__button"></i>
+            </div>
+          </a>
+        
+      </nav>
+    </div>
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-footer-copyright">
+        
+        powered by
+        <a href="https://www.mkdocs.org">MkDocs</a>
+        and
+        <a href="https://squidfunk.github.io/mkdocs-material/">
+          Material for MkDocs</a>
+      </div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    
+      <script src="../assets/javascripts/application.808e90bb.js"></script>
+      
+      <script>app.initialize({version:"1.0.4",url:{base:".."}})</script>
+      
+        <script src="https://unpkg.com/mermaid@7.1.2/dist/mermaid.min.js"></script>
+      
+    
+  </body>
+</html>
