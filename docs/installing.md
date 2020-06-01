@@ -18,36 +18,36 @@ The following commands can be used to install the official backends:
 
 ```sh
 # Torch CPU
-pip install neuropod-backend-torchscript-1-1-0-cpu
-pip install neuropod-backend-torchscript-1-2-0-cpu
-pip install neuropod-backend-torchscript-1-3-0-cpu
-pip install neuropod-backend-torchscript-1-4-0-cpu
+pip install neuropod-backend-torchscript-1-1-0-cpu -f https://download.neuropod.ai/whl/stable.html
+pip install neuropod-backend-torchscript-1-2-0-cpu -f https://download.neuropod.ai/whl/stable.html
+pip install neuropod-backend-torchscript-1-3-0-cpu -f https://download.neuropod.ai/whl/stable.html
+pip install neuropod-backend-torchscript-1-4-0-cpu -f https://download.neuropod.ai/whl/stable.html
 
 # Torch GPU
-pip install neuropod-backend-torchscript-1-1-0-gpu-cuda-9-0
-pip install neuropod-backend-torchscript-1-2-0-gpu-cuda-10-0
-pip install neuropod-backend-torchscript-1-3-0-gpu-cuda-10-0
-pip install neuropod-backend-torchscript-1-4-0-gpu-cuda-10-0
-pip install neuropod-backend-torchscript-1-5-0-gpu-cuda-10-1
+pip install neuropod-backend-torchscript-1-1-0-gpu-cuda-9-0 -f https://download.neuropod.ai/whl/stable.html
+pip install neuropod-backend-torchscript-1-2-0-gpu-cuda-10-0 -f https://download.neuropod.ai/whl/stable.html
+pip install neuropod-backend-torchscript-1-3-0-gpu-cuda-10-0 -f https://download.neuropod.ai/whl/stable.html
+pip install neuropod-backend-torchscript-1-4-0-gpu-cuda-10-0 -f https://download.neuropod.ai/whl/stable.html
+pip install neuropod-backend-torchscript-1-5-0-gpu-cuda-10-1 -f https://download.neuropod.ai/whl/stable.html
 
 # TF CPU
-pip install neuropod-backend-tensorflow-1-12-0-cpu
-pip install neuropod-backend-tensorflow-1-13-1-cpu
-pip install neuropod-backend-tensorflow-1-14-0-cpu
-pip install neuropod-backend-tensorflow-1-15-0-cpu
+pip install neuropod-backend-tensorflow-1-12-0-cpu -f https://download.neuropod.ai/whl/stable.html
+pip install neuropod-backend-tensorflow-1-13-1-cpu -f https://download.neuropod.ai/whl/stable.html
+pip install neuropod-backend-tensorflow-1-14-0-cpu -f https://download.neuropod.ai/whl/stable.html
+pip install neuropod-backend-tensorflow-1-15-0-cpu -f https://download.neuropod.ai/whl/stable.html
 
 # TF GPU
-pip install neuropod-backend-tensorflow-1-12-0-gpu-cuda-9-0
-pip install neuropod-backend-tensorflow-1-13-1-gpu-cuda-10-0
-pip install neuropod-backend-tensorflow-1-14-0-gpu-cuda-10-0
-pip install neuropod-backend-tensorflow-1-15-0-gpu-cuda-10-0
+pip install neuropod-backend-tensorflow-1-12-0-gpu-cuda-9-0 -f https://download.neuropod.ai/whl/stable.html
+pip install neuropod-backend-tensorflow-1-13-1-gpu-cuda-10-0 -f https://download.neuropod.ai/whl/stable.html
+pip install neuropod-backend-tensorflow-1-14-0-gpu-cuda-10-0 -f https://download.neuropod.ai/whl/stable.html
+pip install neuropod-backend-tensorflow-1-15-0-gpu-cuda-10-0 -f https://download.neuropod.ai/whl/stable.html
 
 # Python
-pip install neuropod-backend-python-27
-pip install neuropod-backend-python-35
-pip install neuropod-backend-python-36
-pip install neuropod-backend-python-37
-pip install neuropod-backend-python-38
+pip install neuropod-backend-python-27 -f https://download.neuropod.ai/whl/stable.html
+pip install neuropod-backend-python-35 -f https://download.neuropod.ai/whl/stable.html
+pip install neuropod-backend-python-36 -f https://download.neuropod.ai/whl/stable.html
+pip install neuropod-backend-python-37 -f https://download.neuropod.ai/whl/stable.html
+pip install neuropod-backend-python-38 -f https://download.neuropod.ai/whl/stable.html
 ```
 
 Multiple backends can be installed for a given framework and Neuropod will select the correct one when loading a model.
