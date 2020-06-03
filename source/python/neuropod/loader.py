@@ -20,7 +20,7 @@ from neuropod.utils import zip_loader
 from neuropod.registry import _REGISTERED_BACKENDS
 from neuropod.utils.dtype_utils import maybe_convert_bindings_types
 
-# For #374, Set default value to sys.argv to fix https://bugs.python.org/issue32573
+# For #374, set default value to sys.argv to fix https://bugs.python.org/issue32573
 if not hasattr(sys, "argv") and (
     sys.version_info.major == 3 and sys.version_info.minor < 8
 ):
