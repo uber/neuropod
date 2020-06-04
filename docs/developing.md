@@ -132,3 +132,7 @@ We're also planning on adding the following configurations to the build matrix:
 **Configs:**
 
  - ASAN
+
+## Contributing
+
+See the contributing guide [here](https://github.com/uber/neuropod/blob/master/CONTRIBUTING.md)
