@@ -10,6 +10,8 @@ This guide walks through the Neuropod C++ API in detail and goes over many diffe
 The simplest way to load a neuropod is as follows:
 
 ```cpp
+#include "neuropod/neuropod.hh"
+
 Neuropod neuropod(PATH_TO_MY_MODEL);
 ```
 
@@ -96,6 +98,14 @@ Neuropod neuropod(PATH_TO_MY_MODEL);
 auto allocator = neuropod.get_tensor_allocator();
 ```
 
+For scenarios where a model isn't loaded (e.g. unit tests), you can use a generic tensor allocator:
+
+```cpp
+#include "neuropod/core/generic_tensor.hh"
+
+auto allocator = neuropod::get_generic_tensor_allocator();
+```
+
 ### Allocate new memory
 
 For this, we just need the dimensions and type of the tensor we want to allocate.
@@ -168,7 +178,8 @@ auto tensor = allocator->tensor_from_memory<uint8_t>(
     );
     ```
 
-TODO(vip): Add a utility function for wrapping a cv::Mat
+!!! note
+    Utilities for wrapping types from common libraries will be added in a future release.
 
 #### Eigen
 
@@ -182,6 +193,9 @@ auto eigen_map = neuropod::as_eigen(*tensor);
 ```
 
 See [the Eigen docs](https://eigen.tuxfamily.org/dox/group__TutorialMapClass.html) for more details.
+
+!!! note
+    If you're not using the features of Eigen and just need simple element access, use [accessors](#directly-setget-data) instead.
 
 ### Factory functions
 
