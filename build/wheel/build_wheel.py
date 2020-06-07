@@ -66,7 +66,7 @@ def package(package_name, tar_path, platform, platform_version):
         content = content.format(
             PACKAGE_NAME=package_name,
             # TODO(vip): Update this to get a version from a central location
-            NEUROPOD_VERSION="0.2.0rc2",
+            NEUROPOD_VERSION="0.2.0",
             SHARED_LIBRARY_NAME=shared_library_name,
             LIBS=str(members),
             PLATFORM=platform,
