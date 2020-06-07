@@ -13,6 +13,6 @@ bazel-source
 bazel-testlogs
 .vscode/
 .neuropod_venv/
-source/neuropod/python/libneuropod.so
-source/neuropod/python/neuropod_multiprocess_worker
-source/neuropod/python/neuropod_native.so
+source/python/neuropod/libneuropod.so
+source/python/neuropod/neuropod_multiprocess_worker
+source/python/neuropod/neuropod_native.so
