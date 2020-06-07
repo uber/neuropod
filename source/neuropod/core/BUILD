@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+load("@bazel_tools//tools/build_defs/pkg:pkg.bzl", "pkg_tar")
+
 cc_library(
     name = "core",
     hdrs = glob(["*.hh"]),
@@ -36,4 +38,14 @@ cc_library(
         "//neuropod/internal",
     ],
     alwayslink = True,
+)
+
+# Package all the header files
+pkg_tar(
+    name = "libneuropod_core_hdrs",
+    srcs = glob(["*.hh"]),
+    package_dir = "core/",
+    visibility = [
+        "//visibility:public",
+    ],
 )

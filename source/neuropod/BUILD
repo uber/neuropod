@@ -84,6 +84,7 @@ pkg_tar(
     package_dir = "include/neuropod/",
     deps = [
         "//neuropod/backends:libneuropod_backends_hdrs",
+        "//neuropod/core:libneuropod_core_hdrs",
         "//neuropod/internal:libneuropod_internal_hdrs",
         "//neuropod/serialization:libneuropod_serialization_hdrs",
     ],
