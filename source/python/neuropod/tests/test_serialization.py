@@ -37,7 +37,7 @@ class TestSerialization(unittest.TestCase):
             np.uint64,
             np.string_,
         ]
-        _TESTED_SHAPES = [(1,), (3,), (2, 3), (2, 3, 4)]
+        _TESTED_SHAPES = [(0,), (1,), (3,), (2, 3), (2, 3, 4)]
 
         # Used for testing NeuropodValueMap serialization
         counter = 0
