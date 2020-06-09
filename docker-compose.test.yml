@@ -105,4 +105,3 @@ services:
         NEUROPOD_TORCH_VERSION: 1.5.0
         NEUROPOD_PYTHON_VERSION: 3.8
 
-

@@ -34,7 +34,7 @@ if [[ $(uname -s) == 'Linux' ]]; then
     export TF_CXX=g++-4.8
 else
     # For building custom ops
-    export MACOSX_DEPLOYMENT_TARGET=10.13
+    export MACOSX_DEPLOYMENT_TARGET=10.15
 fi
 
 # Run python tests
