@@ -142,6 +142,13 @@ py::array tensor_to_numpy(std::shared_ptr<NeuropodTensor> value)
 
     if (tensor->get_tensor_type() == STRING_TENSOR)
     {
+        // Special case for empty string tensors because the pybind functions below don't correctly set the
+        // type of the resulting array in this case
+        if (tensor->get_num_elements() == 0)
+        {
+            return py::array_t<std::array<char, 1>>(tensor->get_dims());
+        }
+
         // This makes a copy
         auto arr = py::array(py::cast(tensor->as_typed_tensor<std::string>()->get_data_as_vector()));
         arr.resize(tensor->get_dims());
