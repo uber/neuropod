@@ -26,6 +26,6 @@ cc_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
-        "@python_repo//:python",
+        "@python_repo//:python_hdrs",
     ],
 )
