@@ -38,7 +38,7 @@ def _impl(repository_ctx):
             },
             "3.8-linux": {
                 "url": "https://github.com/VivekPanyam/python-prebuilts/releases/download/v0.0.1/python-3.8.2.tar.gz",
-                "sha256": "8a93f738894db779c282a02fb7a88e4911538e26ed834a23bb1bc9f3e2fe9e04",
+                "sha256": "be0917eadbe3dab44ed7370a20158148e37a270c77467ee888f7095e5ac79bfc",
             },
         }
 
