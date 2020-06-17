@@ -301,6 +301,7 @@ python -m ludwig.utils.neuropod_utils --ludwig_model_path <LUDWIG_OUTPUT_DIRECTO
 ```
 
 By default the package will be a ZIP file, but you can specify `--package_as_dir` if you prefer the output Neuropod package to be a directory.
+Also note that the Python version should be 3.7+.
 For more details check the [Ludwig User Guide](https://ludwig-ai.github.io/ludwig-docs/user_guide/#neuropod-export).
     
     
