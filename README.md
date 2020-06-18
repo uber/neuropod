@@ -4,7 +4,7 @@
 
 [Neuropod](https://github.com/uber/neuropod) is a library that provides a uniform interface to run deep learning models from multiple frameworks in C++ and Python. Neuropod makes it easy for researchers to build models in a framework of their choosing while also simplifying productionization of these models.
 
-It currently supports TensorFlow, PyTorch, TorchScript, and Keras.
+It currently supports TensorFlow, PyTorch, TorchScript, Keras and [Ludwig](http://ludwig.ai).
 
 ## Why use Neuropod?
 

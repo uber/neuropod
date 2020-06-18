@@ -285,6 +285,30 @@ create_keras_neuropod(
     `create_keras_neuropod` runs inference with the test data immediately after creating the neuropod. Raises a `ValueError` if the model output does not match the expected output.
 
 
+### Ludwig
+
+Ludwig contains a utility to export a model as a neuropod.
+If we train a Ludwig model like this:
+
+```
+ludwig train --data_csv <MY_DATA>PATH> --model_definition <MY_MODEL_DEFINITION> --output_directory <LUDWIG_OUTPUT_DIRECTORY>
+```
+
+We can package it as a neuropod by running:
+
+```
+python -m ludwig.utils.neuropod_utils --ludwig_model_path <LUDWIG_OUTPUT_DIRECTORY>/<MODEL_NAME>/model --neuropod_path <NEUROPOD_OUTPUT_PATH>
+```
+
+By default the package will be a ZIP file, but you can specify `--package_as_dir` if you prefer the output Neuropod package to be a directory.
+Also note that the Python version should be 3.7+.
+
+!!! note
+    Currently, running a Ludwig model requires having all of [Ludwig's dependencies](https://github.com/uber/ludwig/blob/master/requirements.txt) installed in your runtime environment (including additional dependencies for the datatypes used by the model). This will be improved in a future release.
+
+For more details check the [Ludwig User Guide](https://ludwig-ai.github.io/ludwig-docs/user_guide/#neuropod-export).
+    
+    
 ### Python
 
 Packaging aribtrary Python code has the same interface as packaging PyTorch above.
