@@ -50,6 +50,7 @@ cc_library(
         "//neuropod/bindings",
         "//neuropod/core",
         "//neuropod/internal",
+        "@python_repo//:python",
     ],
     alwayslink = True,
 )

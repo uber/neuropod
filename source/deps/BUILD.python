@@ -17,11 +17,7 @@ package(
 )
 
 cc_library(
-    name = "python",
-    srcs = select({
-        "@bazel_tools//src/conditions:darwin": ["lib/libpython{PYTHON_VERSION}.dylib"],
-        "//conditions:default": glob(["lib/libpython{PYTHON_VERSION}.so.1.0", "lib/libpython{PYTHON_VERSION}m.so.1.0"]),
-    }),
+    name = "python_hdrs",
     hdrs = glob([
         "include/python{PYTHON_VERSION}/**/*.h",
         "include/python{PYTHON_VERSION}m/**/*.h",
@@ -31,5 +27,15 @@ cc_library(
         "include/python{PYTHON_VERSION}m",
     ],
     defines = ["PYTHON_VERSION={PYTHON_VERSION}"],
+    visibility = ["//visibility:public"],
+)
+
+cc_library(
+    name = "python",
+    srcs = select({
+        "@bazel_tools//src/conditions:darwin": ["lib/libpython{PYTHON_VERSION}.dylib"],
+        "//conditions:default": glob(["lib/libpython{PYTHON_VERSION}.so.1.0", "lib/libpython{PYTHON_VERSION}m.so.1.0"]),
+    }),
+    deps = [":python_hdrs"],
     visibility = ["//visibility:public"],
 )
