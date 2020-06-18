@@ -287,14 +287,14 @@ create_keras_neuropod(
 
 ### Ludwig
 
-Ludwig contains a utility to export model to the Neuropod format.
+Ludwig contains a utility to export a model as a neuropod.
 If we train a Ludwig model like this:
 
 ```
 ludwig train --data_csv <MY_DATA>PATH> --model_definition <MY_MODEL_DEFINITION> --output_directory <LUDWIG_OUTPUT_DIRECTORY>
 ```
 
-We can package it as a Neuropod by running:
+We can package it as a neuropod by running:
 
 ```
 python -m ludwig.utils.neuropod_utils --ludwig_model_path <LUDWIG_OUTPUT_DIRECTORY>/<MODEL_NAME>/model --neuropod_path <NEUROPOD_OUTPUT_PATH>
@@ -302,6 +302,10 @@ python -m ludwig.utils.neuropod_utils --ludwig_model_path <LUDWIG_OUTPUT_DIRECTO
 
 By default the package will be a ZIP file, but you can specify `--package_as_dir` if you prefer the output Neuropod package to be a directory.
 Also note that the Python version should be 3.7+.
+
+!!! note
+    Currently, running a Ludwig model requires having all of [Ludwig's dependencies](https://github.com/uber/ludwig/blob/master/requirements.txt) installed in your runtime environment (including additional dependencies for the datatypes used by the model). This will be improved in a future release.
+
 For more details check the [Ludwig User Guide](https://ludwig-ai.github.io/ludwig-docs/user_guide/#neuropod-export).
     
     
