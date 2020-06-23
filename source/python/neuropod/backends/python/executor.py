@@ -27,9 +27,7 @@ from neuropod.backends.neuropod_executor import NeuropodExecutor
 from neuropod.utils.hash_utils import sha256sum
 
 # Workaround for https://bugs.python.org/issue32573
-if not hasattr(sys, "argv") and (
-    sys.version_info.major == 3 and sys.version_info.minor < 8
-):
+if not hasattr(sys, "argv"):
     sys.argv = [""]
 
 # Create the neuropod package symlink directory
