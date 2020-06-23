@@ -20,12 +20,6 @@ from neuropod.utils import zip_loader
 from neuropod.registry import _REGISTERED_BACKENDS
 from neuropod.utils.dtype_utils import maybe_convert_bindings_types
 
-# Workaround for https://bugs.python.org/issue32573
-if not hasattr(sys, "argv") and (
-    sys.version_info.major == 3 and sys.version_info.minor < 8
-):
-    sys.argv = [""]
-
 # Add the script's directory to the PATH so we can find the worker binary
 os.environ["PATH"] += ":" + os.path.dirname(os.path.realpath(__file__))
 
