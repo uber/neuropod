@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import os
-import sys
 from neuropod.backends import config_utils
 from neuropod.utils import zip_loader
 
