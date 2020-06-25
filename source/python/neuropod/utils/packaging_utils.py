@@ -12,22 +12,44 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import datetime
 import inspect
 import os
 import tempfile
+import time
 import shutil
 import zipfile
 
 from neuropod.backends import config_utils
 from neuropod.utils.eval_utils import save_test_data, load_and_test_neuropod
 
+# Set a consistent time on the files we're zipping so the hash of the zipfile is the same
+# if the content didn't change
+zip_date = datetime.datetime(year=2000, month=1, day=1, hour=0, minute=0, second=0)
+zip_modtime = time.mktime(zip_date.timetuple())
+
 
 def _zipdir(path, zf):
+    """
+    Zip all the files in a directory in a determinisitc order along with a constant timestamp
+    """
+    files_to_add = []
     for root, dirs, files in os.walk(path):
         for file in files:
             abspath = os.path.join(root, file)
             relpath = os.path.relpath(abspath, path)
-            zf.write(abspath, arcname=relpath)
+
+            files_to_add.append((relpath, abspath))
+
+    # Sort by the relative path
+    files_to_add.sort()
+
+    for relpath, abspath in files_to_add:
+        # Set the modification time to a deterministic value
+        os.utime(abspath, (zip_modtime, zip_modtime))
+
+        # Add to the zip file
+        zf.write(abspath, arcname=relpath)
 
 
 # A docstring common to all packagers

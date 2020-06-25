@@ -22,6 +22,7 @@ from testpath.tempdir import TemporaryDirectory
 
 from neuropod.packagers import create_pytorch_neuropod
 from neuropod.tests.utils import get_addition_model_spec
+from neuropod.utils.hash_utils import sha256sum
 
 ADDITION_MODEL_SOURCE = """
 import torch
@@ -105,6 +106,20 @@ class TestPytorchPackaging(unittest.TestCase):
                 self.package_simple_addition_model(
                     test_dir, do_fail=True, custom_ops=[self.custom_op_path]
                 )
+
+    def test_consistent_hash(self):
+        # Packages the same model twice and ensures it has the same hash
+        shas = []
+        for i in range(2):
+            with TemporaryDirectory() as test_dir:
+                self.package_simple_addition_model(
+                    test_dir, custom_ops=[self.custom_op_path, self.second_custom_op]
+                )
+
+                neuropod_path = os.path.join(test_dir, "test_neuropod")
+                shas.append(sha256sum(neuropod_path))
+
+        self.assertEqual(shas[0], shas[1])
 
 
 if __name__ == "__main__":
