@@ -26,6 +26,10 @@ import numpy as np
 from neuropod.backends.neuropod_executor import NeuropodExecutor
 from neuropod.utils.hash_utils import sha256sum
 
+# Workaround for https://bugs.python.org/issue32573
+if not hasattr(sys, "argv"):
+    sys.argv = [""]
+
 # Create the neuropod package symlink directory
 SYMLINKS_DIR = tempfile.mkdtemp(suffix=".neuropod_python_symlinks")
 open(os.path.join(SYMLINKS_DIR, "__init__.py"), "a").close()
