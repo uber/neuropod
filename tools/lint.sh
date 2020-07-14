@@ -34,10 +34,10 @@ python /tmp/run-clang-format.py -r .
 pushd python
 
 # Run black in check mode
-black --check -t py27 -t py35 -t py36 --diff neuropod
+black --check -t py27 -t py35 -t py36 --diff .
 
 # Run flake8
-flake8 neuropod
+flake8 .
 
 popd
 popd
