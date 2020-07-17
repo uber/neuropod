@@ -220,6 +220,22 @@ cc_library(
 )
 
 cc_test(
+    name = "test_c_api",
+    srcs = [
+        "test_c_api.cc",
+    ],
+    data = [
+        "//neuropod/tests/test_data",
+    ],
+    deps = [
+        "//neuropod:neuropod_impl",
+        "//neuropod/backends/tensorflow:tensorflow_backend",
+        "//neuropod/bindings/c:c_api",
+        "@gtest//:main",
+    ],
+)
+
+cc_test(
     name = "test_config_utils",
     srcs = [
         "test_config_utils.cc",

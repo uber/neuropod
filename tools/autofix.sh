@@ -14,7 +14,7 @@ fi
 pushd source
 
 # Reformat with clang-format
-find . -name "*.hh" -o -name "*.cc" | xargs -L1 clang-format -style=file -i
+find . -name "*.hh" -o -name "*.h" -o -name "*.cc" | xargs -L1 clang-format -style=file -i
 
 pushd python
 

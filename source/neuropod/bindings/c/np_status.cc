@@ -13,36 +13,34 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-// Inspired by the TensorFlow C API
-
-#pragma once
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-// Used for returning error messages across the C API boundary
-typedef struct NP_Status NP_Status;
+#include "neuropod/bindings/c/np_status_internal.h"
 
 // Used for creating and deleting new status messages
-NP_Status *NP_NewStatus();
-void       NP_DeleteStatus(NP_Status *status);
+NP_Status *NP_NewStatus()
+{
+    return new NP_Status();
+}
+
+void NP_DeleteStatus(NP_Status *status)
+{
+    delete status;
+}
 
 // Clear a status
-void NP_ClearStatus(NP_Status *status);
-
-// Possible status codes
-typedef enum NP_Code
+void NP_ClearStatus(NP_Status *status)
 {
-    NEUROPOD_OK    = 0,
-    NEUROPOD_ERROR = 1,
-} NP_Code;
+    status->code = NEUROPOD_OK;
+    status->message.clear();
+}
 
 // Used for getting details about a status
-NP_Code NP_GetCode(const NP_Status *status);
+NP_Code NP_GetCode(const NP_Status *status)
+{
+    return status->code;
+}
 
 // Get the error message (if any)
-const char *NP_GetMessage(const NP_Status *status);
-
-#ifdef __cplusplus
+const char *NP_GetMessage(const NP_Status *status)
+{
+    return status->message.c_str();
 }
-#endif
