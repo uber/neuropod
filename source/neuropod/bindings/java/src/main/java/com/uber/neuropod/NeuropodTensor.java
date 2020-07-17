@@ -1,0 +1,146 @@
+package com.uber.neuropod;
+
+import java.io.Serializable;
+import java.nio.*;
+import java.util.List;
+
+/**
+ * This class is used for holding tensor data. It has its underlying C++ NeuropodTensor
+ * object, should call close() function to free C++ side object when finish using the
+ * NeuropodTensor object.
+ * This object can be created by the Java side or by the C++ side(as an inference result).
+ */
+public class NeuropodTensor extends NativeClass implements Serializable {
+     /**
+      * Get the dims array which represnents the shape of a tensor.
+      *
+      * @return the shape array
+      */
+     public long[] getDims() {return null;}
+
+     /**
+      * Gets the number of elements of a tensor.
+      *
+      * @return the number of elements
+      */
+     public long getNumberOfElements() {return 0;}
+
+     /**
+      * Gets the type of a tensor
+      *
+      * @return the tensor type
+      */
+     public TensorType getTensorType() {return null;}
+
+     /**
+      * Flatten the tensor data and convert it to a long buffer.
+      * <p>
+      * Can only be used when the tensor is INT64_TENSOR. Will trigger
+      * a copy.
+      *
+      * @return the LongBuffer
+      */
+     public LongBuffer toLongBuffer() {return null;}
+
+     /**
+      * Flatten the tensor data and convert it to a int buffer.
+      * <p>
+      * Can only be used when the tensor is INT32_TENSOR. Will trigger
+      * a copy.
+      *
+      * @return the IntBuffer
+      */
+     public IntBuffer toIntBuffer() {return null;}
+
+     /**
+      * Flatten the tensor data and convert it to a float buffer.
+      * <p>
+      * Can only be used when the tensor is FLOAT_TENSOR. Will trigger
+      * a copy.
+      *
+      * @return the FloatBuffer
+      */
+     public FloatBuffer toFloatBuffer() {return null;}
+
+     /**
+      * Flatten the tensor data and convert it to a double buffer.
+      * <p>
+      * Can only be used when the tensor is DOUBLE_TENSOR. Will trigger
+      * a copy.
+      *
+      * @return the DoubleBuffer
+      */
+     public DoubleBuffer toDoubleBuffer() {return null;}
+
+     /**
+      * Flatten the tensor data and convert it to a string list.
+      * <p>
+      * Can only be used when the tensor is STRING_TENSOR. Will trigger
+      * a copy.
+      *
+      * @return the List
+      */
+     List<String> toStringList() {return null;}
+
+     /**
+      * Gets an int element at the given index.
+      * <p>
+      * Can only be used when the tensor is INT32_TENSOR.
+      * For example, to get an int element from a 3rd-order tensor,
+      * the user should call getInt(x, y, z)
+      *
+      * @param index the index array
+      * @return the int element
+      */
+     int getInt(long... index) {return 0;}
+
+     /**
+      * Gets a long element at the given index.
+      * <p>
+      * Can only be used when the tensor is INT64_TENSOR.
+      * For example, to get an long element from a 3rd-order tensor,
+      * the user should call getLong(x, y, z)
+      *
+      * @param index the index array
+      * @return the long element
+      */
+     long getLong(long... index) {return 0;}
+
+     /**
+      * Gets a double element at the given index.
+      * <p>
+      * Can only be used when the tensor is DOUBLE_TENSOR.
+      * For example, to get a double element from a 3rd-order tensor,
+      * the user should call getDouble(x, y, z)
+      *
+      * @param index the index array
+      * @return the double element
+      */
+     double getDouble(long... index) {return 0.0;}
+
+     /**
+      * Gets a float element at the given index.
+      * <p>
+      * Can only be used when the tensor is FLOAT_TENSOR.
+      * For example, to get a float element from a 3rd-order tensor,
+      * the user should call getFloat(x, y, z)
+      *
+      * @param index the index array
+      * @return the float element
+      */
+     float getFloat(long... index) {return 0.0f;}
+
+     /**
+      * Gets a string element at the given index.
+      * <p>
+      * Can only be used when the tensor is STRING_TENSOR.
+      * For example, to get a string element from a 3rd-order tensor,
+      * the user should call getString(x, y, z)
+      *
+      * @param index the index array
+      * @return the string element
+      */
+     String getString(long... index) {return "";}
+
+}
+
