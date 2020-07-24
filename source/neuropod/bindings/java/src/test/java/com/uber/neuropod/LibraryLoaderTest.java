@@ -15,19 +15,17 @@ limitations under the License.
 
 package com.uber.neuropod;
 
-/**
- * Which device the model uses. Use const int instead of enum to
- * support number greater than 7, or namely GPU8 or more GPUs
- */
-public class NeuropodDevice {
-    private NeuropodDevice() {}
-    public static final int CPU = -1;
-    public static final int GPU0 = 0;
-    public static final int GPU1 = 1;
-    public static final int GPU2 = 2;
-    public static final int GPU3 = 3;
-    public static final int GPU4 = 4;
-    public static final int GPU5 = 5;
-    public static final int GPU6 = 6;
-    public static final int GPU7 = 7;
+import static org.junit.Assert.*;
+
+public class LibraryLoaderTest {
+
+    @org.junit.Test
+    public void load() {
+        try {
+            LibraryLoader.load();
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            fail();
+        }
+    }
 }
