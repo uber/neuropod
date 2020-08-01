@@ -1,3 +1,18 @@
+/* Copyright (c) 2020 UATC, LLC
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 package com.uber.neuropod;
 
 import java.util.HashMap;
@@ -58,7 +73,7 @@ public enum TensorType {
 
     // These helper functions below are for supporting int to enum and enum to int conversion
     private int value;
-    private static Map map = new HashMap<>();
+    private static Map<Integer, TensorType> map = new HashMap<>();
 
     private TensorType(int value) {
         this.value = value;
@@ -71,7 +86,7 @@ public enum TensorType {
     }
 
     protected static TensorType valueOf(int dataType) {
-        return (TensorType) map.get(dataType);
+        return map.get(dataType);
     }
 
     protected int getValue() {

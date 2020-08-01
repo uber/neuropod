@@ -24,7 +24,8 @@ else
         unzip \
         curl \
         wget \
-        g++-4.8
+        g++-4.8 \
+        openjdk-8-jdk
 
     # Add a repo that includes newer python versions
     sudo apt-get install -y --no-install-recommends software-properties-common

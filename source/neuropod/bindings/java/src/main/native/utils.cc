@@ -13,18 +13,24 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package com.uber.neuropod;
+#include "utils.h"
 
-/**
- * All exceptions triggered in the C++ side of Neuropod
- */
-public class NeuropodJNIException extends RuntimeException {
-    /**
-     * Instantiates a new Neuropod jni exception.
-     *
-     * @param message the message
-     */
-    public NeuropodJNIException(String message) {
-        super(message);
-    }
+#include <string>
+
+#include <jni.h>
+
+namespace neuropod
+{
+namespace jni
+{
+
+std::string toString(JNIEnv *env, jstring target)
+{
+    const char *raw = env->GetStringUTFChars(target, NULL);
+    std::string res(raw);
+    env->ReleaseStringUTFChars(target, raw);
+    return res;
 }
+
+} // namespace jni
+} // namespace neuropod

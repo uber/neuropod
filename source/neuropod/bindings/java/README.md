@@ -1,9 +1,16 @@
 # The java api interface:
-1. To load a model:
+
+1. To build & to unit test:
+```
+bazel build //neuropod/bindings/java:neuropod_java_jar
+bazel test //neuropod/bindings/java:*
+```
+
+2. To load a model:
 ```
 Neuropod model = new Neuropod(modelPath);
 ```
-2. To prepare the input feature:
+3. To prepare the input feature:
 ```
 Map<String, NeuropodTensor> inputs = new HashMap<>();
 NeuropodTensorAllocator allocator = model.getTensorAllocator();
@@ -15,18 +22,18 @@ inputs.put("request_location_longitude",tensor2);
 tensor2.close();
 ...
 ```
-3. To do the inference job:
+4. To do the inference job:
 ```
 Map<String, NeuropodTensor> valueMap = neuropod.infer(inputs);
 ```
 
-4. To retrieve the results:
+5. To retrieve the results:
 ```
 NeuropodTensor output = valueMap.get(key);
 FloatBuffer res = output.toFloatBuffer();
 ```
 
-5. Don't forget to clean up the memory:
+6. Don't forget to clean up the memory:
 ```
 allocator.close();
 output.close();

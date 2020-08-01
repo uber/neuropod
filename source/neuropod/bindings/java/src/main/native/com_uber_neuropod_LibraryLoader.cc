@@ -13,18 +13,21 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package com.uber.neuropod;
+#include "com_uber_neuropod_LibraryLoader.h"
 
-/**
- * All exceptions triggered in the C++ side of Neuropod
- */
-public class NeuropodJNIException extends RuntimeException {
-    /**
-     * Instantiates a new Neuropod jni exception.
-     *
-     * @param message the message
-     */
-    public NeuropodJNIException(String message) {
-        super(message);
-    }
+#include "utils.h"
+
+#include <string>
+
+#include <jni.h>
+
+JNIEXPORT jboolean JNICALL Java_com_uber_neuropod_LibraryLoader_nativeIsLoaded(JNIEnv *, jclass)
+{
+    return JNI_TRUE;
+}
+
+JNIEXPORT void JNICALL Java_com_uber_neuropod_LibraryLoader_nativeExport(JNIEnv *env, jclass, jstring libPath)
+{
+    std::string oriPath = getenv("PATH");
+    setenv("PATH", (oriPath + ":" + neuropod::jni::toString(env, libPath)).c_str(), 1 /* Overwrite */);
 }
