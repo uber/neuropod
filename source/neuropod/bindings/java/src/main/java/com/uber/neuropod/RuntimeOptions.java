@@ -22,7 +22,7 @@ public class RuntimeOptions {
 
     /**
      * Is use ope.
-     *
+     * <p>
      * Whether or not to use out-of-process execution
      * (using shared memory to communicate between the processes)
      */
@@ -30,7 +30,7 @@ public class RuntimeOptions {
 
     /**
      * Is free memory every cycle.
-     *
+     * <p>
      * Internally, OPE(out-of-process execution) uses a shared memory allocator that reuses
      * blocks of memory if possible. Therefore memory isn't necessarily allocated during each
      * inference cycle as blocks may be reused.
@@ -46,7 +46,7 @@ public class RuntimeOptions {
 
     /**
      * The control queue name.
-     *
+     * <p>
      * This option can be used to run the neuropod in an existing worker process
      * If this string is empty, a new worker will be started.
      */
@@ -54,7 +54,7 @@ public class RuntimeOptions {
 
     /**
      * The visible device.
-     *
+     * <p>
      * Some devices are defined in the NeuropodDevice class. For machines with more
      * than 8 GPUs, passing in an index will also work (e.g. `9` for `GPU9`).
      * To attempt to run the model on CPU, set this to `NeuropodDevice.CPU`
@@ -63,7 +63,7 @@ public class RuntimeOptions {
 
     /**
      * Is load model at construction time.
-     *
+     * <p>
      * Sometimes, it's important to be able to instantiate a Neuropod without
      * immediately loading the model. If this is set to `false`, the model will
      * not be loaded until the `loadModel` method is called on the Neuropod.
@@ -72,7 +72,7 @@ public class RuntimeOptions {
 
     /**
      * Is disable shape and type checking.
-     *
+     * <p>
      * disableShapeAndTypeCheckingBoolean means whether or not to disable shape
      * and type checking when running inference.
      */
@@ -81,6 +81,61 @@ public class RuntimeOptions {
     /**
      * Instantiates a new Runtime options.
      */
-    public RuntimeOptions() {}
+    public RuntimeOptions() {
+    }
+
+    /**
+     * To native runtime options native.
+     *
+     * @return the native runtime options
+     */
+    RuntimeOptionsNative toNative() {
+        return new RuntimeOptionsNative(useOpe,
+                freeMemoryEveryCycle,
+                controlQueueName,
+                visibleDevice,
+                loadModelAtConstruction,
+                disableShapeAndTypeChecking);
+    }
+
+    /**
+     * The corresponding native type for RuntimeOptions. Is not exposed to user, only used inside other public
+     * method.
+     */
+    static class RuntimeOptionsNative extends NativeClass {
+        /**
+         * Instantiates a new Runtime options native.
+         *
+         * @param useOpe                      use ope
+         * @param freeMemoryEveryCycle        the free memory every cycle
+         * @param controlQueueName            the control queue name
+         * @param visibleDevice               the visible device
+         * @param loadModelAtConstruction     the load model at construction
+         * @param disableShapeAndTypeChecking the disable shape and type checking
+         */
+        RuntimeOptionsNative(boolean useOpe,
+                             boolean freeMemoryEveryCycle,
+                             String controlQueueName,
+                             int visibleDevice,
+                             boolean loadModelAtConstruction,
+                             boolean disableShapeAndTypeChecking) {
+            super(nativeCreate(useOpe,
+                    freeMemoryEveryCycle,
+                    controlQueueName,
+                    visibleDevice,
+                    loadModelAtConstruction,
+                    disableShapeAndTypeChecking));
+        }
+
+        static private native long nativeCreate(boolean useOpe,
+                                                boolean freeMemoeryEverySycle,
+                                                String controlQueueName,
+                                                int visibleDevice,
+                                                boolean loadModelAtConstruction,
+                                                boolean disableShapeAndTypeChecking);
+
+        @Override
+        protected native void nativeDelete(long handle);
+    }
 
 }

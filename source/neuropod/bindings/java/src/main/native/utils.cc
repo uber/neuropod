@@ -15,6 +15,10 @@ limitations under the License.
 
 #include "utils.h"
 
+#include "jclass_register.h"
+#include "neuropod/neuropod.hh"
+
+#include <stdexcept>
 #include <string>
 
 #include <jni.h>
@@ -30,6 +34,21 @@ std::string toString(JNIEnv *env, jstring target)
     std::string res(raw);
     env->ReleaseStringUTFChars(target, raw);
     return res;
+}
+
+jclass findClass(JNIEnv *env, const char *name)
+{
+    jclass ret = env->FindClass(name);
+    if (reinterpret_cast<jlong>(ret) == 0)
+    {
+        throw std::runtime_error(std::string("Class not found: ") + name);
+    }
+    return ret;
+}
+
+void throwJavaException(JNIEnv *env, const char *message)
+{
+    env->ThrowNew(com_uber_neuropod_NeuropodJNIException, message);
 }
 
 } // namespace jni

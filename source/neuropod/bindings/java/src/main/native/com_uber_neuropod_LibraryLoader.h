@@ -38,6 +38,13 @@ JNIEXPORT jboolean JNICALL Java_com_uber_neuropod_LibraryLoader_nativeIsLoaded(J
  */
 JNIEXPORT void JNICALL Java_com_uber_neuropod_LibraryLoader_nativeExport(JNIEnv *, jclass, jstring);
 
+/*
+ * Class:     com_uber_neuropod_LibraryLoader
+ * Method:    nativeSetTestMode
+ * Signature: (Z)V
+ */
+JNIEXPORT void JNICALL Java_com_uber_neuropod_LibraryLoader_nativeSetTestMode(JNIEnv *, jclass, jboolean);
+
 #ifdef __cplusplus
 }
 #endif

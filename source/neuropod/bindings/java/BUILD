@@ -129,6 +129,7 @@ cc_binary(
     deps = [
         ":copy_jni_hdr_lib",
         "//neuropod:neuropod_hdrs",
+        "//neuropod/tests:ope_overrides",
     ],
 )
 
@@ -138,7 +139,23 @@ java_test(
     javacopts = JAVACOPTS,
     test_class = "com.uber.neuropod.LibraryLoaderTest",
     deps = [
-        ":neuropod_java",
+        ":neuropod_java_jar",
+        "@junit",
+    ],
+)
+
+java_test(
+    name = "NeuropodTest",
+    srcs = ["src/test/java/com/uber/neuropod/NeuropodTest.java"],
+    data = [
+        "//neuropod/backends/tensorflow:libneuropod_tensorflow_backend.so",
+        "//neuropod/backends/torchscript:libneuropod_torchscript_backend.so",
+        "//neuropod/tests/test_data",
+    ],
+    javacopts = JAVACOPTS,
+    test_class = "com.uber.neuropod.NeuropodTest",
+    deps = [
+        ":neuropod_java_jar",
         "@junit",
     ],
 )

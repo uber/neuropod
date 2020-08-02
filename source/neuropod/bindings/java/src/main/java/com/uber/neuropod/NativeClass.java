@@ -18,6 +18,7 @@ package com.uber.neuropod;
 /**
  * This is a base class for all class with a binding to native class.
  * Need to call close() method after usage to free memory in C++ side.
+ * This class is not thread-safe.
  */
 abstract class NativeClass implements AutoCloseable {
     // Load native library
@@ -25,8 +26,60 @@ abstract class NativeClass implements AutoCloseable {
         LibraryLoader.load();
     }
 
+    // The pointer to the native object
+    private long nativeHandle;
+
+    /**
+     * Instantiates a new Native class.
+     */
+    public NativeClass() {
+    }
+
+    /**
+     * Instantiates a new Native class.
+     *
+     * @param handle the native handle
+     */
+    protected NativeClass(long handle) {
+        nativeHandle = handle;
+    }
+
+    /**
+     * Gets native handle.
+     *
+     * @return the native handle
+     */
+    protected final long getNativeHandle() {
+        if (nativeHandle == 0) {
+            throw new NeuropodJNIException("Deallocated Object!");
+        }
+        return nativeHandle;
+    }
+
+    /**
+     * Sets native handle.
+     *
+     * @param handle the handle
+     */
+    protected final void setNativeHandle(long handle) {
+        this.nativeHandle = handle;
+    }
+
+    /**
+     * Delete the underlying native class
+     *
+     * @param handle the handle
+     */
+    abstract protected void nativeDelete(long handle) throws NeuropodJNIException;
+
     @Override
-    public void close() throws Exception {
-        // Wrap the nativeDelete to close method so that we can do some common post-process here if needed.
+    public final void close() throws NeuropodJNIException {
+        // Wrap the nativeDelete to close method so that the IDE will have a warning
+        // if the object is not deleted, and will be auto deleted in a try catch block.
+        if (nativeHandle == 0) {
+            return;
+        }
+        this.nativeDelete(nativeHandle);
+        this.nativeHandle = 0;
     }
 }
