@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import os
+import numpy as np
 import unittest
 from testpath.tempdir import TemporaryDirectory
 
@@ -32,6 +33,16 @@ def get_model(_):
     assert hasattr(sys, 'argv'), "sys.argv should exist"
 
     return addition_model
+"""
+
+NONCONTIGUOUS_MODEL_SOURCE = """
+def split(x):
+    x1 = x[:, :2]
+    x2 = x[:, 2:]
+    return {'x1': x1, 'x2': x2}
+
+def get_model(_):
+    return split
 """
 
 
@@ -78,6 +89,40 @@ class TestPythonPackaging(unittest.TestCase):
         # Tests a case where the output does not match the expected output
         with self.assertRaises(ValueError):
             self.package_simple_addition_model(do_fail=True)
+
+    def test_noncontiguous_array(self):
+        x = np.arange(16).astype(np.int64).reshape(4, 4)
+
+        with TemporaryDirectory() as test_dir:
+            neuropod_path = os.path.join(test_dir, "test_neuropod")
+            model_code_dir = os.path.join(test_dir, "model_code")
+            os.makedirs(model_code_dir)
+
+            with open(os.path.join(model_code_dir, "splitter_model.py"), "w") as f:
+                f.write(NONCONTIGUOUS_MODEL_SOURCE)
+
+            create_python_neuropod(
+                neuropod_path=neuropod_path,
+                model_name="splitter",
+                data_paths=[],
+                code_path_spec=[
+                    {
+                        "python_root": model_code_dir,
+                        "dirs_to_package": [
+                            ""  # Package everything in the python_root
+                        ],
+                    }
+                ],
+                entrypoint_package="splitter_model",
+                entrypoint="get_model",
+                input_spec=[{"name": "x", "dtype": "int64", "shape": (4, 4)}],
+                output_spec=[
+                    {"name": "x1", "dtype": "int64", "shape": (4, 2)},
+                    {"name": "x2", "dtype": "int64", "shape": (4, 2)},
+                ],
+                test_input_data={"x": x},
+                test_expected_out={"x1": x[:, :2], "x2": x[:, 2:]},
+            )
 
 
 if __name__ == "__main__":

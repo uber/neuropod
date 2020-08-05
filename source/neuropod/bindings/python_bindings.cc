@@ -101,7 +101,16 @@ std::shared_ptr<NeuropodTensor> tensor_from_string_numpy(NeuropodTensorAllocator
 
 std::shared_ptr<NeuropodTensor> tensor_from_numpy(NeuropodTensorAllocator &allocator, py::array array)
 {
-    // TODO(vip): Make sure it's contiguous and aligned
+    // Make sure the array is contiguous and aligned
+    if (!(array.flags() & py::detail::npy_api::constants::NPY_ARRAY_C_CONTIGUOUS_) ||
+        !(array.flags() & py::detail::npy_api::constants::NPY_ARRAY_ALIGNED_))
+    {
+        SPDLOG_WARN("Expected numpy array to be contiguous and aligned; converting...");
+        array = py::array::ensure(array,
+                                  py::detail::npy_api::constants::NPY_ARRAY_C_CONTIGUOUS_ |
+                                      py::detail::npy_api::constants::NPY_ARRAY_ALIGNED_);
+    }
+
     auto ndims = array.ndim();
     auto dims  = array.shape();
     auto dtype = get_array_type(array);
