@@ -16,17 +16,39 @@ limitations under the License.
 #include "gtest/gtest.h"
 #include "neuropod/bindings/c/c_api.h"
 
+#include <string>
+#include <vector>
+
 TEST(test_c_api, basic)
 {
     NP_Neuropod *model;
     NP_Status *  status = NP_NewStatus();
 
-    // Load a model and get an allocator
+    // Load a model from a wrong path.
+    NP_LoadNeuropod("wrong_path", &model, status);
+    if (NP_GetCode(status) != NEUROPOD_ERROR)
+    {
+        // Throw an error here
+        FAIL() << "Error from C API expeted error during model loading: " << NP_GetMessage(status);
+    }
+
+    // Load a model and get an allocator.
     NP_LoadNeuropod("neuropod/tests/test_data/tf_addition_model/", &model, status);
     if (NP_GetCode(status) != NEUROPOD_OK)
     {
-        // Throw an error here
         FAIL() << "Error from C API during model loading: " << NP_GetMessage(status);
+    }
+
+    // Test model name.
+    if (NP_GetName(model) != std::string("addition_model"))
+    {
+        FAIL() << "Error from C API unexpected model name: " << NP_GetName(model);
+    }
+
+    // Test model platform.
+    if (NP_GetPlatform(model) != std::string("tensorflow"))
+    {
+        FAIL() << "Error from C API unexpected model name: " << NP_GetPlatform(model);
     }
 
     NP_TensorAllocator *allocator = NP_GetAllocator(model);
@@ -45,6 +67,16 @@ TEST(test_c_api, basic)
 
     // Create the input
     NP_NeuropodValueMap *inputs = NP_NewValueMap();
+    NP_NeuropodValueMap *outputs;
+
+    // Run inference with empty input that should fail.
+    NP_Infer(model, inputs, &outputs, status);
+    if (NP_GetCode(status) != NEUROPOD_ERROR)
+    {
+        FAIL() << "Error from C API error is expected during inference: " << NP_GetMessage(status);
+    }
+
+    // Insert tensors into inputs
     NP_InsertTensor(inputs, "x", x);
     NP_InsertTensor(inputs, "y", y);
 
@@ -55,19 +87,30 @@ TEST(test_c_api, basic)
     // Free the allocator
     NP_FreeAllocator(allocator);
 
-    // Run inference
-    NP_NeuropodValueMap *outputs;
+    // Run succcessful inference
     NP_Infer(model, inputs, &outputs, status);
     if (NP_GetCode(status) != NEUROPOD_OK)
     {
-        // Throw an error here
         FAIL() << "Error from C API during inference: " << NP_GetMessage(status);
     }
 
+    // The same inference but specify requested output.
+    const char *requested_output[] = {"out"};
+    NP_InferWithRequestedOutputs(model, inputs, 1, static_cast<const char **>(requested_output), &outputs, status);
+    if (NP_GetCode(status) != NEUROPOD_OK)
+    {
+        FAIL() << "Error from C API during inference: " << NP_GetMessage(status);
+    }
+
+    // Test model input and output configuration.
+    EXPECT_EQ(2, NP_GetNumInputs(model));
+    EXPECT_EQ(1, NP_GetNumOutputs(model));
+
     // Get the output and compare to the expected value
-    NP_NeuropodTensor *out      = NP_GetTensor(outputs, "out");
-    float *            out_data = reinterpret_cast<float *>(NP_GetData(out));
-    EXPECT_TRUE(std::equal(target, target + 4, out_data));
+    NP_NeuropodTensor *out       = NP_GetTensor(outputs, "out");
+    float *            out_data  = reinterpret_cast<float *>(NP_GetData(out));
+    size_t             nout_data = NP_GetNumElements(out);
+    EXPECT_TRUE(std::equal(out_data, out_data + nout_data, target));
 
     // Free the input and output maps
     NP_FreeValueMap(inputs);

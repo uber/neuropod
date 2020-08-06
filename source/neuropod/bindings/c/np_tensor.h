@@ -61,6 +61,9 @@ void *NP_GetData(NP_NeuropodTensor *tensor);
 // Returns nullptr if called on a string tensor
 const void *NP_GetDataReadOnly(const NP_NeuropodTensor *tensor);
 
+// Returns number of elements in tensor.
+size_t NP_GetNumElements(const NP_NeuropodTensor *tensor);
+
 // For string tensors, set the value of a specified element in the flattened tensor
 void NP_SetStringElement(NP_NeuropodTensor *tensor, size_t index, const char *item, NP_Status *status);
 
