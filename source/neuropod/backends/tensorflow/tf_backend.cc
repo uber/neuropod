@@ -93,7 +93,7 @@ void check_tf_status(const tensorflow::Status &status)
 }
 
 // Get TF session options given Neuropod RuntimeOptions
-tensorflow::SessionOptions get_tf_opts(const RuntimeOptions & /*unused*/)
+tensorflow::SessionOptions get_tf_opts(const RuntimeOptions &runtime_opts)
 {
     tensorflow::SessionOptions opts;
 
@@ -102,6 +102,26 @@ tensorflow::SessionOptions get_tf_opts(const RuntimeOptions & /*unused*/)
     gpu_opts->set_allow_growth(true);
     opts.config.set_allow_soft_placement(true);
     opts.config.set_log_device_placement(false);
+
+    // Set intra and inter op parallelism
+    // See https://github.com/tensorflow/tensorflow/blob/master/tensorflow/core/protobuf/config.proto
+    if (runtime_opts.experimental_intra_op_parallelism_threads != 0)
+    {
+        opts.config.set_intra_op_parallelism_threads(
+            static_cast<int32_t>(runtime_opts.experimental_intra_op_parallelism_threads));
+    }
+
+    if (runtime_opts.experimental_inter_op_parallelism_threads == 1)
+    {
+        // Only use the caller thread
+        opts.config.set_inter_op_parallelism_threads(-1);
+    }
+    else if (runtime_opts.experimental_inter_op_parallelism_threads > 1)
+    {
+        // The number in runtime_opts includes the caller thread
+        opts.config.set_inter_op_parallelism_threads(
+            static_cast<int32_t>(runtime_opts.experimental_inter_op_parallelism_threads) - 1);
+    }
 
     // Note: we can't use GPUOptions::visible_device_list as it is a per process setting
     //
