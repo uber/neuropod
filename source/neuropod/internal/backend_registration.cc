@@ -117,13 +117,15 @@ bool load_default_backend(const std::vector<BackendLoadSpec> &backends,
             const auto err = dlerror();
             if (err == nullptr)
             {
-                NEUROPOD_ERROR("Loading the default backend for type '{}' failed, but no error message was avaliable",
-                               type);
+                SPDLOG_TRACE("Loading the default backend for type '{}' failed, but no error message was avaliable",
+                             type);
             }
             else
             {
-                NEUROPOD_ERROR("Loading the default backend for type '{}' failed. Error from dlopen: {}", type, err);
+                SPDLOG_TRACE("Loading the default backend for type '{}' failed. Error from dlopen: {}", type, err);
             }
+
+            return false;
         }
         else
         {
