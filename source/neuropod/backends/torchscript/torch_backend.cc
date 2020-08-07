@@ -226,6 +226,21 @@ std::mutex                      loaded_op_mutex;
 TorchNeuropodBackend::TorchNeuropodBackend(const std::string &neuropod_path, const RuntimeOptions &options)
     : NeuropodBackendWithDefaultAllocator<TorchNeuropodTensor>(neuropod_path, options)
 {
+// inter and intra op parallelism settings only supported in Torch >= 1.2.0
+#if CAFFE2_NIGHTLY_VERSION >= 20190808
+    // Set intra and inter op parallelism
+    // See https://pytorch.org/docs/stable/notes/cpu_threading_torchscript_inference.html#runtime-api
+    if (options.experimental_inter_op_parallelism_threads != 0)
+    {
+        at::set_num_interop_threads(static_cast<int32_t>(options.experimental_inter_op_parallelism_threads));
+    }
+
+    if (options.experimental_intra_op_parallelism_threads != 0)
+    {
+        at::set_num_threads(static_cast<int32_t>(options.experimental_intra_op_parallelism_threads));
+    }
+#endif
+
     if (options.load_model_at_construction)
     {
         load_model();

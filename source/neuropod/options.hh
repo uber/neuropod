@@ -75,6 +75,23 @@ struct RuntimeOptions
 
     // Whether or not to disable shape and type checking when running inference
     bool disable_shape_and_type_checking = false;
+
+    // EXPERIMENTAL
+    // Set the intra and inter op parallelism for the underlying framework
+    // Within a given process, only the first usage of the below configuration is used
+    // See https://github.com/tensorflow/tensorflow/blob/master/tensorflow/core/protobuf/config.proto
+    // and https://pytorch.org/docs/stable/notes/cpu_threading_torchscript_inference.html#runtime-api
+    // for more details
+    // For true per-model control of these values, use out-of-process execution (see above)
+    // A value of 0 means system defined
+    // Note: for TorchScript, requires at least Torch 1.2.0
+    uint32_t experimental_intra_op_parallelism_threads = 0;
+
+    // EXPERIMENTAL
+    // A value of 0 means system defined
+    // Note: this count includes the caller thread
+    // Note: for TorchScript, requires at least Torch 1.2.0
+    uint32_t experimental_inter_op_parallelism_threads = 0;
 };
 
 } // namespace neuropod
