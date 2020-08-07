@@ -30,10 +30,11 @@ extern "C" {
 typedef struct NP_Neuropod NP_Neuropod;
 
 // Load a model given a path.
-// status is set if user provided a valid pointer.
+// status is required. Note that function sets it without the check on nullptr.
 void NP_LoadNeuropod(const char *neuropod_path, NP_Neuropod **model, NP_Status *status);
 
 // Runtime Options. See description of options at neuropod/options.hh
+#define QUEUENAME_MAX 256
 typedef struct NP_RuntimeOptions
 {
     // Whether or not to use out-of-process execution.
@@ -43,7 +44,7 @@ typedef struct NP_RuntimeOptions
     struct NP_OPEOptions
     {
         bool free_memory_every_cycle;
-        char control_queue_name[256];
+        char control_queue_name[QUEUENAME_MAX];
     } ope_options;
 
     // C enum that matches neuropod::NeuropodDevice
@@ -66,7 +67,7 @@ typedef struct NP_RuntimeOptions
 } NP_RuntimeOptions;
 
 // Load a model given a path and options.
-// status is set if user provided a valid pointer.
+// status is required. Note that function sets it without the check on nullptr.
 void NP_LoadNeuropodWithOpts(const char *             neuropod_path,
                              const NP_RuntimeOptions *options,
                              NP_Neuropod **           model,
@@ -76,16 +77,16 @@ void NP_LoadNeuropodWithOpts(const char *             neuropod_path,
 void NP_FreeNeuropod(NP_Neuropod *model);
 
 // Run inference.
-// status is set if user provided a valid pointer.
+// status is required. Note that function sets it without the check on nullptr.
 // Note: The caller is responsible for freeing the returned NP_NeuropodValueMap.
 // Number of elements in outputs is equal to NP_GetNumOutputs.
 void NP_Infer(NP_Neuropod *model, const NP_NeuropodValueMap *inputs, NP_NeuropodValueMap **outputs, NP_Status *status);
 
 // Run inference with a set of requested outputs.
 // requested_outputs should be array of char ptr containing the names of requested outputs.
-// noutputs is in/out param that specifies number of elements in requested_outputs and
+// noutputs is a sort of in/out param that specifies number of elements in requested_outputs and
 // number of elements in outputs after execution.
-// status is set if user provided a valid pointer.
+// status is required. Note that function sets it without the check on nullptr.
 // Note: The caller is responsible for freeing the returned NP_NeuropodValueMap.
 void NP_InferWithRequestedOutputs(NP_Neuropod *              model,
                                   const NP_NeuropodValueMap *inputs,

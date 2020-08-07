@@ -87,6 +87,14 @@ TEST(test_c_api, basic)
     // Free the allocator
     NP_FreeAllocator(allocator);
 
+    // Test that wrong requested_output fails.
+    const char *requested_output_wrong[] = {"out", "out_wrong"};
+    NP_InferWithRequestedOutputs(model, inputs, 2, requested_output_wrong, &outputs, status);
+    if (NP_GetCode(status) != NEUROPOD_ERROR)
+    {
+        FAIL() << "Error from C API during inference: " << NP_GetMessage(status);
+    }
+
     // Run succcessful inference
     NP_Infer(model, inputs, &outputs, status);
     if (NP_GetCode(status) != NEUROPOD_OK)
@@ -96,7 +104,7 @@ TEST(test_c_api, basic)
 
     // The same inference but specify requested output.
     const char *requested_output[] = {"out"};
-    NP_InferWithRequestedOutputs(model, inputs, 1, static_cast<const char **>(requested_output), &outputs, status);
+    NP_InferWithRequestedOutputs(model, inputs, 1, requested_output, &outputs, status);
     if (NP_GetCode(status) != NEUROPOD_OK)
     {
         FAIL() << "Error from C API during inference: " << NP_GetMessage(status);

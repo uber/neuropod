@@ -35,18 +35,12 @@ void NP_LoadNeuropodWithOpts(const char *             neuropod_path,
     {
         *model          = new NP_Neuropod();
         (*model)->model = std::make_unique<neuropod::Neuropod>(neuropod_path);
-        if (status != nullptr)
-        {
-            NP_ClearStatus(status);
-        }
+        NP_ClearStatus(status);
     }
     catch (std::exception &e)
     {
-        if (status != nullptr)
-        {
-            status->code    = NEUROPOD_ERROR;
-            status->message = e.what();
-        }
+        status->code    = NEUROPOD_ERROR;
+        status->message = e.what();
     }
 }
 
@@ -96,25 +90,24 @@ void NP_InferWithRequestedOutputs(NP_Neuropod *              model,
     try
     {
         // By default empty collection of requested_ouputs expected.
+        // Note that it copies C-strings (0-terminated) from given array.
+        // User must guarantee that noutputs and requested_outputs address valid data..
         std::vector<std::string> rout;
-        for (size_t i = 0; i < noutputs; ++i)
+        if (requested_outputs != nullptr)
         {
-            rout.push_back(requested_outputs[i]);
+            for (size_t i = 0; i < noutputs; ++i)
+            {
+                rout.push_back(requested_outputs[i]);
+            }
         }
         *outputs         = new NP_NeuropodValueMap();
         (*outputs)->data = std::move(*model->model->infer(inputs->data, rout));
-        if (status != nullptr)
-        {
-            NP_ClearStatus(status);
-        }
+        NP_ClearStatus(status);
     }
     catch (std::exception &e)
     {
-        if (status != nullptr)
-        {
-            status->code    = NEUROPOD_ERROR;
-            status->message = e.what();
-        }
+        status->code    = NEUROPOD_ERROR;
+        status->message = e.what();
     }
 }
 
