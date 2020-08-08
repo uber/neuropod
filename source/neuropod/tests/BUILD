@@ -222,8 +222,9 @@ cc_library(
 cc_test(
     name = "test_c_api",
     srcs = [
-        "test_c_api.cc",
+        "test_c_api.c",
     ],
+    copts = ["-std=c11"],
     data = [
         "//neuropod/tests/test_data",
     ],

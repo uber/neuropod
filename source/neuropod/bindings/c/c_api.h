@@ -23,6 +23,8 @@ limitations under the License.
 #include "neuropod/bindings/c/np_tensor_spec.h"
 #include "neuropod/bindings/c/np_valuemap.h"
 
+#include <stdbool.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -48,7 +50,7 @@ typedef struct NP_RuntimeOptions
     } ope_options;
 
     // C enum that matches neuropod::NeuropodDevice
-    typedef enum NP_Device
+    enum NP_Device
     {
         CPU  = -1,
         GPU0 = 0,
@@ -59,8 +61,7 @@ typedef struct NP_RuntimeOptions
         GPU5 = 5,
         GPU6 = 6,
         GPU7 = 7
-    } NP_Device;
-    NP_Device visible_device = GPU0;
+    } visible_device;
 
     bool load_model_at_construction;
     bool disable_shape_and_type_checking;

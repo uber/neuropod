@@ -13,45 +13,70 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#include "gtest/gtest.h"
+// Inspired by the TensorFlow C API c_test.
+
 #include "neuropod/bindings/c/c_api.h"
 
-#include <string>
-#include <vector>
+// This file exists just to verify that the header files above can build,
+// link, and run as "C" code.
 
-TEST(test_c_api, basic)
+#ifdef __cplusplus
+#error "This file should be compiled as C code, not as C++."
+#endif
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+static void CheckFailed(const char *expression, const char *filename, int line_number)
 {
-    NP_Neuropod *model;
-    NP_Status *  status = NP_NewStatus();
+    fprintf(stderr, "ERROR: CHECK failed: %s:%d: %s\n", filename, line_number, expression);
+    fflush(stderr);
+    abort();
+}
+
+// We use an extra level of macro indirection here to ensure that the
+// macro arguments get evaluated, so that in a call to CHECK(foo),
+// the call to STRINGIZE(condition) in the definition of the CHECK
+// macro results in the string "foo" rather than the string "condition".
+#define STRINGIZE(expression) STRINGIZE2(expression)
+#define STRINGIZE2(expression) #expression
+
+// Like assert(), but not dependent on NDEBUG.
+#define CHECK(condition) ((condition) ? (void) 0 : CheckFailed(STRINGIZE(condition), __FILE__, __LINE__))
+#define ASSERT_EQ(expected, actual) CHECK((expected) == (actual))
+#define ASSERT_NE(expected, actual) CHECK((expected) != (actual))
+#define ASSERT_STREQ(expected, actual) ASSERT_EQ(0, strcmp((expected), (actual)))
+
+static void TestLoadAndInference(void)
+{
+    NP_Neuropod *model = NULL;
+
+    NP_Status *status = NP_NewStatus();
 
     // Load a model from a wrong path.
     NP_LoadNeuropod("wrong_path", &model, status);
-    if (NP_GetCode(status) != NEUROPOD_ERROR)
-    {
-        // Throw an error here
-        FAIL() << "Error from C API expeted error during model loading: " << NP_GetMessage(status);
-    }
+    ASSERT_EQ(NP_GetCode(status), NEUROPOD_ERROR);
+    // Note that on this failure model is not null,
+    // because neuropod object was allocated.
+    ASSERT_NE(model, NULL);
+
+    // Free the model we loaded with error.
+    NP_FreeNeuropod(model);
 
     // Load a model and get an allocator.
     NP_LoadNeuropod("neuropod/tests/test_data/tf_addition_model/", &model, status);
-    if (NP_GetCode(status) != NEUROPOD_OK)
-    {
-        FAIL() << "Error from C API during model loading: " << NP_GetMessage(status);
-    }
+    ASSERT_EQ(NP_GetCode(status), NEUROPOD_OK);
+    ASSERT_NE(model, NULL);
 
     // Test model name.
-    if (NP_GetName(model) != std::string("addition_model"))
-    {
-        FAIL() << "Error from C API unexpected model name: " << NP_GetName(model);
-    }
+    ASSERT_STREQ(NP_GetName(model), "addition_model");
 
     // Test model platform.
-    if (NP_GetPlatform(model) != std::string("tensorflow"))
-    {
-        FAIL() << "Error from C API unexpected model name: " << NP_GetPlatform(model);
-    }
+    ASSERT_STREQ(NP_GetPlatform(model), "tensorflow");
 
     NP_TensorAllocator *allocator = NP_GetAllocator(model);
+    ASSERT_NE(allocator, NULL);
 
     // Create tensors
     int64_t            dims[] = {2, 2};
@@ -71,10 +96,7 @@ TEST(test_c_api, basic)
 
     // Run inference with empty input that should fail.
     NP_Infer(model, inputs, &outputs, status);
-    if (NP_GetCode(status) != NEUROPOD_ERROR)
-    {
-        FAIL() << "Error from C API error is expected during inference: " << NP_GetMessage(status);
-    }
+    ASSERT_EQ(NP_GetCode(status), NEUROPOD_ERROR);
 
     // Insert tensors into inputs
     NP_InsertTensor(inputs, "x", x);
@@ -90,35 +112,29 @@ TEST(test_c_api, basic)
     // Test that wrong requested_output fails.
     const char *requested_output_wrong[] = {"out", "out_wrong"};
     NP_InferWithRequestedOutputs(model, inputs, 2, requested_output_wrong, &outputs, status);
-    if (NP_GetCode(status) != NEUROPOD_ERROR)
-    {
-        FAIL() << "Error from C API during inference: " << NP_GetMessage(status);
-    }
+    ASSERT_EQ(NP_GetCode(status), NEUROPOD_ERROR);
 
     // Run succcessful inference
     NP_Infer(model, inputs, &outputs, status);
-    if (NP_GetCode(status) != NEUROPOD_OK)
-    {
-        FAIL() << "Error from C API during inference: " << NP_GetMessage(status);
-    }
+    ASSERT_EQ(NP_GetCode(status), NEUROPOD_OK);
 
     // The same inference but specify requested output.
     const char *requested_output[] = {"out"};
     NP_InferWithRequestedOutputs(model, inputs, 1, requested_output, &outputs, status);
-    if (NP_GetCode(status) != NEUROPOD_OK)
-    {
-        FAIL() << "Error from C API during inference: " << NP_GetMessage(status);
-    }
+    ASSERT_EQ(NP_GetCode(status), NEUROPOD_OK);
 
     // Test model input and output configuration.
-    EXPECT_EQ(2, NP_GetNumInputs(model));
-    EXPECT_EQ(1, NP_GetNumOutputs(model));
+    ASSERT_EQ(2, NP_GetNumInputs(model));
+    ASSERT_EQ(1, NP_GetNumOutputs(model));
 
     // Get the output and compare to the expected value
     NP_NeuropodTensor *out       = NP_GetTensor(outputs, "out");
-    float *            out_data  = reinterpret_cast<float *>(NP_GetData(out));
+    float *            out_data  = (float *) NP_GetData(out);
     size_t             nout_data = NP_GetNumElements(out);
-    EXPECT_TRUE(std::equal(out_data, out_data + nout_data, target));
+    for (size_t i = 0; i < nout_data; ++i)
+    {
+        ASSERT_EQ(out_data[i], target[i]);
+    }
 
     // Free the input and output maps
     NP_FreeValueMap(inputs);
@@ -132,4 +148,15 @@ TEST(test_c_api, basic)
 
     // Free the model we loaded
     NP_FreeNeuropod(model);
+}
+
+static void RunTests(void)
+{
+    TestLoadAndInference();
+}
+
+int main(void)
+{
+    RunTests();
+    return 0;
 }
