@@ -31,6 +31,47 @@ limitations under the License.
 
 using namespace neuropod::jni;
 
+namespace
+{
+jobject toJavaTensorSpecList(JNIEnv *env, const std::vector<neuropod::TensorSpec> &specs)
+{
+    jobject ret = env->NewObject(java_util_ArrayList, java_util_ArrayList_, specs.size());
+    for (const auto &tensorSpec : specs)
+    {
+        auto    type = getTensorTypeField(env, tensorTypeToString(tensorSpec.type).c_str());
+        jstring name = env->NewStringUTF(tensorSpec.name.c_str());
+        jobject dims = env->NewObject(java_util_ArrayList, java_util_ArrayList_, tensorSpec.dims.size());
+        for (const auto &dim : tensorSpec.dims)
+        {
+            // Dim is symbol
+            if (dim.value == -2)
+            {
+                jstring symbol = env->NewStringUTF(dim.symbol.c_str());
+                jobject javaDim =
+                    env->NewObject(com_uber_neuropod_Dimension, com_uber_neuropod_Dimension_symbol_, symbol);
+                env->CallBooleanMethod(dims, java_util_ArrayList_add, javaDim);
+                env->DeleteLocalRef(javaDim);
+                env->DeleteLocalRef(symbol);
+            }
+            else
+            {
+                jobject javaDim =
+                    env->NewObject(com_uber_neuropod_Dimension, com_uber_neuropod_Dimension_value_, dim.value);
+                env->CallBooleanMethod(dims, java_util_ArrayList_add, javaDim);
+                env->DeleteLocalRef(javaDim);
+            }
+        }
+        jobject javaTensorSpec =
+            env->NewObject(com_uber_neuropod_TensorSpec, com_uber_neuropod_TensorSpec_, name, type, dims);
+        env->CallBooleanMethod(ret, java_util_ArrayList_add, javaTensorSpec);
+        env->DeleteLocalRef(name);
+        env->DeleteLocalRef(dims);
+        env->DeleteLocalRef(type);
+    }
+    return ret;
+}
+} // namespace
+
 JNIEXPORT jlong JNICALL Java_com_uber_neuropod_Neuropod_nativeNew__Ljava_lang_String_2J(JNIEnv *env,
                                                                                         jclass,
                                                                                         jstring path,
@@ -108,6 +149,36 @@ JNIEXPORT jstring JNICALL Java_com_uber_neuropod_Neuropod_nativeGetPlatform(JNIE
     {
         auto model = reinterpret_cast<neuropod::Neuropod *>(handle);
         return env->NewStringUTF(model->get_platform().c_str());
+    }
+    catch (const std::exception &e)
+    {
+        throwJavaException(env, e.what());
+    }
+    return nullptr;
+}
+
+JNIEXPORT jobject JNICALL Java_com_uber_neuropod_Neuropod_nativeGetInputs(JNIEnv *env, jclass, jlong handle)
+{
+    try
+    {
+        auto model     = reinterpret_cast<neuropod::Neuropod *>(handle);
+        auto inputSpec = model->get_inputs();
+        return toJavaTensorSpecList(env, inputSpec);
+    }
+    catch (const std::exception &e)
+    {
+        throwJavaException(env, e.what());
+    }
+    return nullptr;
+}
+
+JNIEXPORT jobject JNICALL Java_com_uber_neuropod_Neuropod_nativeGetOutputs(JNIEnv *env, jclass, jlong handle)
+{
+    try
+    {
+        auto model   = reinterpret_cast<neuropod::Neuropod *>(handle);
+        auto outputs = model->get_outputs();
+        return toJavaTensorSpecList(env, outputs);
     }
     catch (const std::exception &e)
     {
