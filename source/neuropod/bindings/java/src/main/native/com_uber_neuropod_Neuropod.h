@@ -25,13 +25,6 @@ extern "C" {
 /*
  * Class:     com_uber_neuropod_Neuropod
  * Method:    nativeNew
- * Signature: (Ljava/lang/String;)J
- */
-JNIEXPORT jlong JNICALL Java_com_uber_neuropod_Neuropod_nativeNew__Ljava_lang_String_2(JNIEnv *, jclass, jstring);
-
-/*
- * Class:     com_uber_neuropod_Neuropod
- * Method:    nativeNew
  * Signature: (Ljava/lang/String;J)J
  */
 JNIEXPORT jlong JNICALL Java_com_uber_neuropod_Neuropod_nativeNew__Ljava_lang_String_2J(JNIEnv *,

@@ -32,6 +32,15 @@ std::string toString(JNIEnv *env, jstring target);
 // A wrapper for env->FindClass, will throw a cpp exception if the find fails.
 jclass findClass(JNIEnv *env, const char *name);
 
+// A wrapper for env->GetMethodID, will throw a cpp exception if the get fails.
+jmethodID getMethodID(JNIEnv *env, jclass clazz, const char *name, const char *sig);
+
+// Get the corresponding Java TensorType enum based on the given field name.
+jobject getTensorTypeField(JNIEnv *env, std::string fieldName);
+
+// Convert cpp tensor type to string
+std::string tensorTypeToString(TensorType type);
+
 // Throw a Java NeuropodJNIException exception after the JNI call have finished.
 // If there are multiple throwJavaException calls during a C++ function, only the
 // last one is effective.
