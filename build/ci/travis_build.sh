@@ -49,16 +49,22 @@ if [ "$TRAVIS_OS_NAME" = "linux" ]; then
     sudo apt-get install -y nodejs
 fi
 
-# Used for bazel caching to s3 in CI
-sudo npm install -g bazels3cache
+# Get and start a bazel cache
+if [ "$TRAVIS_OS_NAME" = "linux" ]; then
+    wget https://github.com/buchgr/bazel-remote/releases/download/v1.2.0/bazel-remote-1.2.0-linux-x86_64 -O /tmp/bazel-remote
+else
+    wget https://github.com/buchgr/bazel-remote/releases/download/v1.2.0/bazel-remote-1.2.0-darwin-x86_64 -O /tmp/bazel-remote
+fi
 
-# Start the S3 build cache
-export AWS_ACCESS_KEY_ID=$NEUROPOD_CACHE_ACCESS_KEY
-export AWS_SECRET_ACCESS_KEY=$NEUROPOD_CACHE_ACCESS_SECRET
-bazels3cache --bucket=neuropod-build-cache
+chmod +x /tmp/bazel-remote
+/tmp/bazel-remote --dir /tmp/bazel_cache --max_size 5 --port 7777 &> /dev/null &
+CACHE_PID=$!
 
 # Build with the remote cache
 ./build/build.sh --remote_http_cache=http://localhost:7777
 
 # Run tests
 ./build/test.sh
+
+# Shutdown the bazel cache
+kill $CACHE_PID

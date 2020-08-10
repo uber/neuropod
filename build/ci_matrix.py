@@ -26,6 +26,10 @@ TRAVIS_TEMPLATE = """
 dist: xenial
 language: minimal
 
+cache:
+  directories:
+    - /tmp/bazel_cache
+
 # Define a build matrix
 matrix:
   include:
