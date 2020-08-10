@@ -113,6 +113,8 @@ public class NeuropodTest {
         try (Neuropod model = new Neuropod(TF_MODEL_PATH, ope)) {
             try {
                 model.loadModel();
+                NeuropodTensorAllocator allocator = model.getTensorAllocator();
+                allocator.close();
             } catch (Exception e) {
                 System.out.println(e.getMessage());
                 fail();

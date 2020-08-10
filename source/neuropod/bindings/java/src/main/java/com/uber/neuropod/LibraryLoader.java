@@ -51,7 +51,7 @@ class LibraryLoader {
         if (isLoaded() || loadSharedLibrary() || loadEmbeddedLibrary()) {
             return;
         }
-        throw new UnsatisfiedLinkError("Load " + System.mapLibraryName(JNI_NAME) + " failed");
+        throw new UnsatisfiedLinkError("load " + System.mapLibraryName(JNI_NAME) + " failed");
     }
 
     // Load the jni library from the system library path
@@ -60,7 +60,7 @@ class LibraryLoader {
             System.loadLibrary(JNI_NAME);
             return true;
         } catch (UnsatisfiedLinkError e) {
-            LOGGER.log(Level.WARNING, "Try loading shared library failed, should be fine if using the " +
+            LOGGER.log(Level.WARNING, "try loading shared library failed, should be fine if using the " +
                     "library from a jar file: " + e.getMessage());
             return false;
         }
@@ -72,7 +72,7 @@ class LibraryLoader {
         // libraries to that path.
         String resPath = "/";
         if (getOS().equals("unsupported")) {
-            throw new NeuropodJNIException("Unsupported OS!");
+            throw new NeuropodJNIException("unsupported OS");
         }
         try {
             final File tempPath = Files.createTempDirectory(TEMP_DIRECTORY_NAME).toFile();

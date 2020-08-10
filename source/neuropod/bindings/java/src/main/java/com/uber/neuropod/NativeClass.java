@@ -51,7 +51,7 @@ abstract class NativeClass implements AutoCloseable {
      */
     protected final long getNativeHandle() {
         if (nativeHandle == 0) {
-            throw new NeuropodJNIException("Deallocated Object!");
+            throw new NeuropodJNIException("deallocated object");
         }
         return nativeHandle;
     }

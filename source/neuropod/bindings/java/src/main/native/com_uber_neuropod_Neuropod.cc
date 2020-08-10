@@ -26,6 +26,7 @@ limitations under the License.
 #include <memory>
 #include <sstream>
 #include <string>
+#include <vector>
 
 #include <jni.h>
 
@@ -185,4 +186,32 @@ JNIEXPORT jobject JNICALL Java_com_uber_neuropod_Neuropod_nativeGetOutputs(JNIEn
         throwJavaException(env, e.what());
     }
     return nullptr;
+}
+
+JNIEXPORT jlong JNICALL Java_com_uber_neuropod_Neuropod_nativeGetAllocator(JNIEnv *env, jclass, jlong handle)
+{
+    try
+    {
+        auto model = reinterpret_cast<neuropod::Neuropod *>(handle);
+        return reinterpret_cast<jlong>(toHeap(model->get_tensor_allocator()));
+    }
+    catch (const std::exception &e)
+    {
+        throwJavaException(env, e.what());
+    }
+    return reinterpret_cast<jlong>(nullptr);
+}
+
+JNIEXPORT jlong JNICALL Java_com_uber_neuropod_Neuropod_nativeGetGenericAllocator(JNIEnv *env, jclass)
+{
+    try
+    {
+        std::shared_ptr<neuropod::NeuropodTensorAllocator> allocator = neuropod::get_generic_tensor_allocator();
+        return reinterpret_cast<jlong>(toHeap(allocator));
+    }
+    catch (const std::exception &e)
+    {
+        throwJavaException(env, e.what());
+    }
+    return reinterpret_cast<jlong>(nullptr);
 }

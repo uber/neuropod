@@ -17,6 +17,7 @@ limitations under the License.
 
 #include "neuropod/neuropod.hh"
 
+#include <memory>
 #include <string>
 
 #include <jni.h>
@@ -40,6 +41,13 @@ jobject getTensorTypeField(JNIEnv *env, std::string fieldName);
 
 // Convert cpp tensor type to string
 std::string tensorTypeToString(TensorType type);
+
+// Copy a shared_ptr to heap
+template <typename T>
+std::shared_ptr<T> *toHeap(std::shared_ptr<T> ptr)
+{
+    return new std::shared_ptr<T>(ptr);
+}
 
 // Throw a Java NeuropodJNIException exception after the JNI call have finished.
 // If there are multiple throwJavaException calls during a C++ function, only the

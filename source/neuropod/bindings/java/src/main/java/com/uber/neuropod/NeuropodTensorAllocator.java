@@ -16,7 +16,10 @@ limitations under the License.
 package com.uber.neuropod;
 
 import java.nio.*;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * The factory type for NeuropodTensor, can be obtained from a neuropod model or as a generic allocator.
@@ -27,20 +30,40 @@ public class NeuropodTensorAllocator extends NativeClass {
         super(handle);
     }
 
+    private static final Set<TensorType> SUPPORTED_TENSOR_TYPES = new HashSet<>(Arrays.asList(
+            TensorType.INT32_TENSOR,
+            TensorType.INT64_TENSOR,
+            TensorType.DOUBLE_TENSOR,
+            TensorType.FLOAT_TENSOR));
+
     /**
      * Create a NeuropodTensor based on given ByteBuffer, dims array and tensorType. The created tensor
-     * will have the input tensorType
+     * will have the input tensorType.
      * <p>
-     * Will not trigger a copy if the buffer is a direct bytebuffer in native order and the backend of
-     * the allocator does not have alignment requirement. Otherwise it will trigger a copy.
+     * For the sake of performance we require that the input buffer is direct, native and not read-only
+     * because in this case Java virtual machine will perform native I/O operations directly upon it.
+     * A direct byte buffer may be created by invoking the allocateDirect factory method of this class.
+     * Will not trigger a copy.
      *
      * @param byteBuffer the buffer that contains tensor data
      * @param dims       the shape of the tensor
      * @param tensorType the tensor type
      * @return the created NeuropodTensor
      */
-    NeuropodTensor create(ByteBuffer byteBuffer, long[] dims, TensorType tensorType) {
-        return null;
+    public NeuropodTensor tensorFromMemory(ByteBuffer byteBuffer, long[] dims, TensorType tensorType) {
+        if (!SUPPORTED_TENSOR_TYPES.contains(tensorType)) {
+            throw new NeuropodJNIException("unsupported tensor type: " + tensorType.name());
+        }
+        if (!byteBuffer.isDirect()) {
+            throw new NeuropodJNIException("the input byteBuffer is not direct");
+        }
+        if (byteBuffer.order() != ByteOrder.nativeOrder()) {
+            throw new NeuropodJNIException("the input byteBuffer is not in a native order");
+        }
+        if (byteBuffer.isReadOnly()) {
+            throw new NeuropodJNIException("the input byteBuffer is read-only");
+        }
+        return createTensorFromBuffer(byteBuffer, dims, tensorType);
     }
 
     /**
@@ -116,6 +139,18 @@ public class NeuropodTensorAllocator extends NativeClass {
     NeuropodTensor create(List<String> stringList, long[] dims) {
         return null;
     }
+
+    private NeuropodTensor createTensorFromBuffer(ByteBuffer buffer, long[] dims, TensorType tensorType) {
+        NeuropodTensor tensor = new NeuropodTensor();
+        tensor.buffer = buffer;
+        tensor.setNativeHandle(nativeAllocate(dims, tensorType.getValue(), tensor.buffer, super.getNativeHandle()));
+        return tensor;
+    }
+
+    private static native long nativeAllocate(long[] dims,
+                                              int tensorType,
+                                              ByteBuffer buffer,
+                                              long allocatorHandle) throws NeuropodJNIException;
 
     @Override
     protected native void nativeDelete(long handle) throws NeuropodJNIException;
