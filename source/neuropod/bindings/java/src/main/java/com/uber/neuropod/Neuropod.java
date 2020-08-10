@@ -21,15 +21,22 @@ import java.util.Map;
 /**
  * This class holds the information of a Neuropod model. It has its underlying C++ Neuropod
  * object, should call close() function to free the C++ side object when finish using the Neuopod object
+ * This class is not thread-safe.
  */
 public class Neuropod extends NativeClass {
+
+    protected Neuropod(long nativeHandle) {
+        super(nativeHandle);
+    }
 
     /**
      * Load a model from the file path and use default options
      *
      * @param neuropodPath the neuropod model path
      */
-    public Neuropod(String neuropodPath) {}
+    public Neuropod(String neuropodPath) throws NeuropodJNIException {
+        super.setNativeHandle(nativeNew(neuropodPath, 0));
+    }
 
     /**
      * Load a model from the file path and use provided runtime options
@@ -37,7 +44,11 @@ public class Neuropod extends NativeClass {
      * @param neuropodPath the neuropod model path
      * @param options      the runtime options
      */
-    public Neuropod(String neuropodPath, RuntimeOptions options) { }
+    public Neuropod(String neuropodPath, RuntimeOptions options) throws NeuropodJNIException {
+        RuntimeOptions.RuntimeOptionsNative nativeOptions = options.toNative();
+        super.setNativeHandle(nativeNew(neuropodPath, nativeOptions.getNativeHandle()));
+        nativeOptions.close();
+    }
 
     /**
      * Gets the model name.
@@ -45,7 +56,7 @@ public class Neuropod extends NativeClass {
      * @return the name
      */
     public String getName() {
-        return null;
+        return nativeGetName(super.getNativeHandle());
     }
 
     /**
@@ -54,9 +65,8 @@ public class Neuropod extends NativeClass {
      * @return the platform
      */
     public String getPlatform() {
-        return null;
+        return nativeGetPlatform(super.getNativeHandle());
     }
-
 
     /**
      * Perform the inference calculation on the given input data
@@ -64,7 +74,7 @@ public class Neuropod extends NativeClass {
      * @param inputs the inputs
      * @return the inference result
      */
-    public Map<String, NeuropodTensor> infer(Map<String,NeuropodTensor> inputs) {
+    public Map<String, NeuropodTensor> infer(Map<String, NeuropodTensor> inputs) {
         return null;
     }
 
@@ -72,7 +82,7 @@ public class Neuropod extends NativeClass {
      * Perform the inference calculation on the given input data, only get output tensor
      * with the keys specified by requestOutputs.
      *
-     * @param inputs         the inputs
+     * @param inputs           the inputs
      * @param requestedOutputs only tensor with these keys will be output
      * @return the inference result
      */
@@ -101,7 +111,9 @@ public class Neuropod extends NativeClass {
     /**
      * Load model. Used when setLoadModelAtConstruction is set to false in RuntimeOptions
      */
-    public void loadModel() {}
+    public void loadModel() {
+        nativeLoadModel(super.getNativeHandle());
+    }
 
     /**
      * Gets a tensor allocator based on the backend of the model.
@@ -116,4 +128,15 @@ public class Neuropod extends NativeClass {
      * @return the generic tensor allocator
      */
     public static NeuropodTensorAllocator getGenericTensorAllocator() {return null;}
+
+    static private native long nativeNew(String filePath, long optionHandle);
+
+    static private native void nativeLoadModel(long modelHandle);
+
+    static private native String nativeGetName(long modelHandle);
+
+    static private native String nativeGetPlatform(long modelHandle);
+
+    @Override
+    protected native void nativeDelete(long handle);
 }

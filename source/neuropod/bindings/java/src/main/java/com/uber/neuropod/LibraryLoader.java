@@ -138,7 +138,13 @@ class LibraryLoader {
         }
     }
 
+    protected static void setTestMode(boolean mode) {
+        nativeSetTestMode(mode);
+    }
+
     private static native boolean nativeIsLoaded();
 
     private static native void nativeExport(String path);
+
+    private static native void nativeSetTestMode(boolean mode);
 }

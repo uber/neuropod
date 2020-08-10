@@ -23,11 +23,11 @@ public class Dimension {
      * The Value. -1 means None/null, any value is OK
      * -2 means this is a symbol (see below)
      */
-    long value;
+    private long value;
     /**
      * The name of this symbol (if it is a symbol).
      */
-    String symbol;
+    private String symbol;
 
     /**
      * Instantiates a new Dimension by given value

@@ -23,6 +23,10 @@ import java.util.List;
  * Should call close method when finish using it.
  */
 public class NeuropodTensorAllocator extends NativeClass {
+    protected NeuropodTensorAllocator(long handle) {
+        super(handle);
+    }
+
     /**
      * Create a NeuropodTensor based on given ByteBuffer, dims array and tensorType. The created tensor
      * will have the input tensorType
@@ -112,4 +116,7 @@ public class NeuropodTensorAllocator extends NativeClass {
     NeuropodTensor create(List<String> stringList, long[] dims) {
         return null;
     }
+
+    @Override
+    protected native void nativeDelete(long handle) throws NeuropodJNIException;
 }

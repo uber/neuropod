@@ -15,6 +15,7 @@ limitations under the License.
 
 #include "com_uber_neuropod_LibraryLoader.h"
 
+#include "jclass_register.h"
 #include "utils.h"
 
 #include <string>
@@ -30,4 +31,9 @@ JNIEXPORT void JNICALL Java_com_uber_neuropod_LibraryLoader_nativeExport(JNIEnv 
 {
     std::string oriPath = getenv("PATH");
     setenv("PATH", (oriPath + ":" + neuropod::jni::toString(env, libPath)).c_str(), 1 /* Overwrite */);
+}
+
+JNIEXPORT void JNICALL Java_com_uber_neuropod_LibraryLoader_nativeSetTestMode(JNIEnv *, jclass, jboolean mode)
+{
+    neuropod::jni::isTestMode = mode == JNI_TRUE;
 }

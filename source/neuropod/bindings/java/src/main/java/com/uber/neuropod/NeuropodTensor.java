@@ -157,5 +157,7 @@ public class NeuropodTensor extends NativeClass implements Serializable {
       */
      String getString(long... index) {return "";}
 
+    @Override
+    protected void nativeDelete(long handle) throws NeuropodJNIException {}
 }
 

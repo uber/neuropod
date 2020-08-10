@@ -15,10 +15,6 @@ limitations under the License.
 
 #pragma once
 
-#include "neuropod/neuropod.hh"
-
-#include <string>
-
 #include <jni.h>
 
 namespace neuropod
@@ -26,16 +22,8 @@ namespace neuropod
 namespace jni
 {
 
-// Convert jstring to cpp string
-std::string toString(JNIEnv *env, jstring target);
+extern jclass com_uber_neuropod_NeuropodJNIException;
 
-// A wrapper for env->FindClass, will throw a cpp exception if the find fails.
-jclass findClass(JNIEnv *env, const char *name);
-
-// Throw a Java NeuropodJNIException exception after the JNI call have finished.
-// If there are multiple throwJavaException calls during a C++ function, only the
-// last one is effective.
-void throwJavaException(JNIEnv *env, const char *message);
-
+extern bool isTestMode;
 } // namespace jni
 } // namespace neuropod
