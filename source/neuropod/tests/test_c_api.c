@@ -28,6 +28,9 @@ limitations under the License.
 #include <stdlib.h>
 #include <string.h>
 
+// gtest is used in C++ tests but it doesn't have C interfaces. Instead use
+// ASSERT helpers implemented in Tensorflow C test to address the same problem
+// https://github.com/tensorflow/tensorflow/blob/master/tensorflow/lite/c/c_test.c
 static void CheckFailed(const char *expression, const char *filename, int line_number)
 {
     fprintf(stderr, "ERROR: CHECK failed: %s:%d: %s\n", filename, line_number, expression);
@@ -109,16 +112,94 @@ static void TestLoadAndInference(void)
     // Free the allocator
     NP_FreeAllocator(allocator);
 
+    // Run succcessful inference.
+    NP_Infer(model, inputs, &outputs, status);
+    ASSERT_EQ(NP_GetCode(status), NEUROPOD_OK);
+
+    // Test model input and output configuration.
+    ASSERT_EQ(2, NP_GetNumInputs(model));
+    ASSERT_EQ(1, NP_GetNumOutputs(model));
+
+    // Get the output and compare to the expected value
+    NP_NeuropodTensor *out       = NP_GetTensor(outputs, "out");
+    float *            out_data  = (float *) NP_GetData(out);
+    size_t             nout_data = NP_GetNumElements(out);
+    for (size_t i = 0; i < nout_data; ++i)
+    {
+        ASSERT_EQ(out_data[i], target[i]);
+    }
+
+    // Free the input and output maps
+    NP_FreeValueMap(inputs);
+    NP_FreeValueMap(outputs);
+
+    // Decrement the output tensor refcount
+    NP_FreeTensor(out);
+
+    // Delete the status
+    NP_DeleteStatus(status);
+
+    // Free the model we loaded
+    NP_FreeNeuropod(model);
+}
+
+static void TestLoadAndInferenceWithOptions(void)
+{
+    NP_Neuropod *model = NULL;
+
+    NP_Status *status = NP_NewStatus();
+
+    // Load a model with runtime options. Change defaults.
+    NP_RuntimeOptions opts                   = NP_DefaultRuntimeOptions();
+    opts.use_ope                             = true;
+    opts.ope_options.free_memory_every_cycle = true;
+    opts.visible_device                      = GPU7;
+    NP_LoadNeuropodWithOpts("neuropod/tests/test_data/tf_addition_model/", &opts, &model, status);
+    ASSERT_EQ(NP_GetCode(status), NEUROPOD_OK);
+    ASSERT_NE(model, NULL);
+
+    // Test model name.
+    ASSERT_STREQ(NP_GetName(model), "addition_model");
+
+    // Test model platform.
+    ASSERT_STREQ(NP_GetPlatform(model), "tensorflow");
+
+    NP_TensorAllocator *allocator = NP_GetAllocator(model);
+    ASSERT_NE(allocator, NULL);
+
+    // Create tensors
+    int64_t            dims[] = {2, 2};
+    NP_NeuropodTensor *x      = NP_AllocateTensor(allocator, sizeof(dims) / sizeof(int64_t), dims, FLOAT_TENSOR);
+    NP_NeuropodTensor *y      = NP_AllocateTensor(allocator, sizeof(dims) / sizeof(int64_t), dims, FLOAT_TENSOR);
+
+    // Copy in data
+    const float x_data[] = {1, 2, 3, 4};
+    const float y_data[] = {7, 8, 9, 10};
+    const float target[] = {8, 10, 12, 14};
+    memcpy(NP_GetData(x), x_data, sizeof(x_data));
+    memcpy(NP_GetData(y), y_data, sizeof(y_data));
+
+    // Create the input
+    NP_NeuropodValueMap *inputs = NP_NewValueMap();
+    NP_NeuropodValueMap *outputs;
+
+    // Insert tensors into inputs
+    NP_InsertTensor(inputs, "x", x);
+    NP_InsertTensor(inputs, "y", y);
+
+    // Free the input tensors
+    NP_FreeTensor(x);
+    NP_FreeTensor(y);
+
+    // Free the allocator
+    NP_FreeAllocator(allocator);
+
     // Test that wrong requested_output fails.
     const char *requested_output_wrong[] = {"out", "out_wrong"};
     NP_InferWithRequestedOutputs(model, inputs, 2, requested_output_wrong, &outputs, status);
     ASSERT_EQ(NP_GetCode(status), NEUROPOD_ERROR);
 
-    // Run succcessful inference
-    NP_Infer(model, inputs, &outputs, status);
-    ASSERT_EQ(NP_GetCode(status), NEUROPOD_OK);
-
-    // The same inference but specify requested output.
+    // Run succcessful inference and  specify requested output.
     const char *requested_output[] = {"out"};
     NP_InferWithRequestedOutputs(model, inputs, 1, requested_output, &outputs, status);
     ASSERT_EQ(NP_GetCode(status), NEUROPOD_OK);
@@ -153,6 +234,7 @@ static void TestLoadAndInference(void)
 static void RunTests(void)
 {
     TestLoadAndInference();
+    TestLoadAndInferenceWithOptions();
 }
 
 int main(void)

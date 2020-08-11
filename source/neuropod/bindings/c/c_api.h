@@ -32,7 +32,6 @@ extern "C" {
 typedef struct NP_Neuropod NP_Neuropod;
 
 // Load a model given a path.
-// status is required. Note that function sets it without the check on nullptr.
 void NP_LoadNeuropod(const char *neuropod_path, NP_Neuropod **model, NP_Status *status);
 
 // Runtime Options. See description of options at neuropod/options.hh
@@ -67,8 +66,11 @@ typedef struct NP_RuntimeOptions
     bool disable_shape_and_type_checking;
 } NP_RuntimeOptions;
 
+// Creates default runtime options that used implicitly when load model w/o options.
+// This can be useful if need to use default option except some flags.
+NP_RuntimeOptions NP_DefaultRuntimeOptions();
+
 // Load a model given a path and options.
-// status is required. Note that function sets it without the check on nullptr.
 void NP_LoadNeuropodWithOpts(const char *             neuropod_path,
                              const NP_RuntimeOptions *options,
                              NP_Neuropod **           model,
@@ -78,7 +80,6 @@ void NP_LoadNeuropodWithOpts(const char *             neuropod_path,
 void NP_FreeNeuropod(NP_Neuropod *model);
 
 // Run inference.
-// status is required. Note that function sets it without the check on nullptr.
 // Note: The caller is responsible for freeing the returned NP_NeuropodValueMap.
 // Number of elements in outputs is equal to NP_GetNumOutputs.
 void NP_Infer(NP_Neuropod *model, const NP_NeuropodValueMap *inputs, NP_NeuropodValueMap **outputs, NP_Status *status);
@@ -87,7 +88,6 @@ void NP_Infer(NP_Neuropod *model, const NP_NeuropodValueMap *inputs, NP_Neuropod
 // requested_outputs should be array of char ptr containing the names of requested outputs.
 // noutputs is a sort of in/out param that specifies number of elements in requested_outputs and
 // number of elements in outputs after execution.
-// status is required. Note that function sets it without the check on nullptr.
 // Note: The caller is responsible for freeing the returned NP_NeuropodValueMap.
 void NP_InferWithRequestedOutputs(NP_Neuropod *              model,
                                   const NP_NeuropodValueMap *inputs,
