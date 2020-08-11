@@ -18,17 +18,21 @@ limitations under the License.
 #include "neuropod/bindings/c/np_tensor_internal.h"
 #include "neuropod/internal/neuropod_tensor_raw_data_access.hh"
 
-// For non-string tensors, get a pointer to the underlying data
-// Returns nullptr if called on a string tensor
 void *NP_GetData(NP_NeuropodTensor *tensor)
 {
     return neuropod::internal::NeuropodTensorRawDataAccess::get_untyped_data_ptr(*tensor->tensor->as_tensor());
 }
 
-// Releases a tensor. The memory might not be deallocated immediately if the tensor is still
-// referenced by a value-map object or used by an infer operation.
-// This should be called on every tensor returned by the C API.
-// See the notes in `np_valuemap.h` and `np_tensor_allocator.h` for more detail.
+const void *NP_GetDataReadOnly(const NP_NeuropodTensor *tensor)
+{
+    return neuropod::internal::NeuropodTensorRawDataAccess::get_untyped_data_ptr(*tensor->tensor->as_tensor());
+}
+
+size_t NP_GetNumElements(const NP_NeuropodTensor *tensor)
+{
+    return tensor->tensor->as_tensor()->get_num_elements();
+}
+
 void NP_FreeTensor(NP_NeuropodTensor *tensor)
 {
     delete tensor;
