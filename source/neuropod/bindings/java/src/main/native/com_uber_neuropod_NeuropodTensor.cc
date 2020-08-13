@@ -26,6 +26,38 @@ JNIEXPORT void JNICALL Java_com_uber_neuropod_NeuropodTensor_nativeDoDelete(JNIE
     }
 }
 
+JNIEXPORT jobject JNICALL Java_com_uber_neuropod_NeuropodTensor_nativeGetBuffer(JNIEnv *env, jclass, jlong nativeHandle)
+{
+    try
+    {
+        auto neuropodTensor =
+            (*reinterpret_cast<std::shared_ptr<neuropod::NeuropodValue> *>(nativeHandle))->as_tensor();
+        auto tensorType = neuropodTensor->get_tensor_type();
+        switch (tensorType)
+        {
+        case neuropod::FLOAT_TENSOR: {
+            return createDirectBuffer<float>(env, neuropodTensor);
+        }
+        case neuropod::DOUBLE_TENSOR: {
+            return createDirectBuffer<double>(env, neuropodTensor);
+        }
+        case neuropod::INT32_TENSOR: {
+            return createDirectBuffer<int32_t>(env, neuropodTensor);
+        }
+        case neuropod::INT64_TENSOR: {
+            return createDirectBuffer<int64_t>(env, neuropodTensor);
+        }
+        default:
+            throw std::runtime_error(std::string("Unsupported tensor type: ") + tensorTypeToString(tensorType));
+        }
+    }
+    catch (const std::exception &e)
+    {
+        throwJavaException(env, e.what());
+    }
+    return nullptr;
+}
+
 JNIEXPORT jlongArray JNICALL Java_com_uber_neuropod_NeuropodTensor_nativeGetDims(JNIEnv *env, jclass, jlong handle)
 {
     try

@@ -83,6 +83,13 @@ JNIEXPORT jlong JNICALL Java_com_uber_neuropod_Neuropod_nativeGetGenericAllocato
 
 /*
  * Class:     com_uber_neuropod_Neuropod
+ * Method:    nativeInfer
+ * Signature: ([Ljava/lang/Object;Ljava/util/List;J)Ljava/util/Map;
+ */
+JNIEXPORT jobject JNICALL Java_com_uber_neuropod_Neuropod_nativeInfer(JNIEnv *, jclass, jobjectArray, jobject, jlong);
+
+/*
+ * Class:     com_uber_neuropod_Neuropod
  * Method:    nativeDelete
  * Signature: (J)V
  */
