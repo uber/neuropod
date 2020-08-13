@@ -120,14 +120,18 @@ public class Neuropod extends NativeClass {
      *
      * @return the tensor allocator
      */
-    public NeuropodTensorAllocator getTensorAllocator() {return null;}
+    public NeuropodTensorAllocator getTensorAllocator() {
+        return new NeuropodTensorAllocator(nativeGetAllocator(super.getNativeHandle()));
+    }
 
     /**
      * Gets a generic tensor allocator.
      *
      * @return the generic tensor allocator
      */
-    public static NeuropodTensorAllocator getGenericTensorAllocator() {return null;}
+    public static NeuropodTensorAllocator getGenericTensorAllocator() {
+        return new NeuropodTensorAllocator(nativeGetGenericAllocator());
+    }
 
     private static native long nativeNew(String filePath, long optionHandle);
 
@@ -140,6 +144,10 @@ public class Neuropod extends NativeClass {
     private static native List<TensorSpec> nativeGetInputs(long modelHandle);
 
     private static native List<TensorSpec> nativeGetOutputs(long modelHandle);
+
+    private static native long nativeGetAllocator(long modelHandle);
+
+    private static native long nativeGetGenericAllocator();
 
     @Override
     protected native void nativeDelete(long handle);

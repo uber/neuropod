@@ -164,3 +164,17 @@ java_test(
         "@junit",
     ],
 )
+
+java_test(
+    name = "NeuropodTensorAllocatorTest",
+    srcs = ["src/test/java/com/uber/neuropod/NeuropodTensorAllocatorTest.java"],
+    data = [
+        "//neuropod/tests/test_data",
+    ],
+    javacopts = JAVACOPTS,
+    test_class = "com.uber.neuropod.NeuropodTensorAllocatorTest",
+    deps = [
+        ":neuropod_java_jar",
+        "@junit",
+    ],
+)

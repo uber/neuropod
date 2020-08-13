@@ -26,36 +26,59 @@ import java.util.List;
  * This object can be created by the Java side or by the C++ side(as an inference result).
  */
 public class NeuropodTensor extends NativeClass implements Serializable {
-     /**
-      * Get the dims array which represnents the shape of a tensor.
-      *
-      * @return the shape array
-      */
-     public long[] getDims() {return null;}
 
-     /**
-      * Gets the number of elements of a tensor.
-      *
-      * @return the number of elements
-      */
-     public long getNumberOfElements() {return 0;}
+    protected ByteBuffer buffer;
 
-     /**
-      * Gets the type of a tensor
-      *
-      * @return the tensor type
-      */
-     public TensorType getTensorType() {return null;}
+    private final boolean isFromJava;
 
-     /**
-      * Flatten the tensor data and convert it to a long buffer.
-      * <p>
-      * Can only be used when the tensor is INT64_TENSOR. Will trigger
-      * a copy.
-      *
-      * @return the LongBuffer
-      */
-     public LongBuffer toLongBuffer() {return null;}
+    // Constructor for NeuropodTensor created in Java side.
+    protected NeuropodTensor() {
+        isFromJava = true;
+    }
+
+    /**
+     * Get the dims array which represnents the shape of a tensor.
+     *
+     * @return the shape array
+     */
+    public long[] getDims() {
+        return nativeGetDims(super.getNativeHandle());
+    }
+
+    /**
+     * Gets the number of elements of a tensor.
+     *
+     * @return the number of elements
+     */
+    public long getNumberOfElements() {
+        return nativeGetNumberOfElements(super.getNativeHandle());
+    }
+
+    /**
+     * Gets the type of a tensor
+     *
+     * @return the tensor type
+     */
+    public TensorType getTensorType() {
+        return nativeGetTensorType(super.getNativeHandle());
+    }
+
+    /**
+     * Flatten the tensor data and convert it to a long buffer.
+     * <p>
+     * Can only be used when the tensor is INT64_TENSOR. Will trigger
+     * a copy if the tensor is created by infer method. Otherwise will
+     * not trigger a copy.
+     *
+     * @return the IntBuffer
+     */
+    public LongBuffer toLongBuffer() {
+        checkType(TensorType.INT64_TENSOR);
+        if (isFromJava) {
+            return buffer.asLongBuffer();
+        }
+        return null;
+    }
 
      /**
       * Flatten the tensor data and convert it to a int buffer.
@@ -155,9 +178,27 @@ public class NeuropodTensor extends NativeClass implements Serializable {
       * @param index the index array
       * @return the string element
       */
-     String getString(long... index) {return "";}
+     String getString(long... index) {return "";} // Not implemented yet
+
+    private void checkType(TensorType type) {
+        if (getTensorType() != type) {
+            throw new NeuropodJNIException("TensorType mismatch! Expected " +
+                    type.name() + ", found " + getTensorType().name());
+
+        }
+    }
 
     @Override
-    protected void nativeDelete(long handle) throws NeuropodJNIException {}
-}
+    protected void nativeDelete(long handle) throws NeuropodJNIException {
+        nativeDoDelete(handle);
+        this.buffer = null;
+    }
 
+    private static native void nativeDoDelete(long handle) throws NeuropodJNIException;
+
+    private static native long[] nativeGetDims(long nativeHandle) throws NeuropodJNIException;
+
+    private static native TensorType nativeGetTensorType(long nativeHandle) throws NeuropodJNIException;
+
+    private static native long nativeGetNumberOfElements(long nativeHandle) throws NeuropodJNIException;
+}
