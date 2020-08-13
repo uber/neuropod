@@ -49,6 +49,10 @@ std::shared_ptr<T> *toHeap(std::shared_ptr<T> ptr)
     return new std::shared_ptr<T>(ptr);
 }
 
+// Create a direct buffer for the tensor data
+template <typename T>
+jobject createDirectBuffer(JNIEnv *env, NeuropodTensor *tensor);
+
 // Throw a Java NeuropodJNIException exception after the JNI call have finished.
 // If there are multiple throwJavaException calls during a C++ function, only the
 // last one is effective.
@@ -56,3 +60,4 @@ void throwJavaException(JNIEnv *env, const char *message);
 
 } // namespace jni
 } // namespace neuropod
+#include "utils_impl.h"

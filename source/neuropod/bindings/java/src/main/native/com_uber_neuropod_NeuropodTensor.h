@@ -31,6 +31,13 @@ JNIEXPORT void JNICALL Java_com_uber_neuropod_NeuropodTensor_nativeDoDelete(JNIE
 
 /*
  * Class:     com_uber_neuropod_NeuropodTensor
+ * Method:    nativeGetBuffer
+ * Signature: (J)Ljava/nio/ByteBuffer;
+ */
+JNIEXPORT jobject JNICALL Java_com_uber_neuropod_NeuropodTensor_nativeGetBuffer(JNIEnv *, jclass, jlong);
+
+/*
+ * Class:     com_uber_neuropod_NeuropodTensor
  * Method:    nativeGetDims
  * Signature: (J)[J
  */

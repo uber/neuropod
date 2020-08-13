@@ -19,9 +19,10 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.FloatBuffer;
+import java.util.*;
 
 import static org.junit.Assert.*;
 
@@ -29,6 +30,7 @@ public class NeuropodTest {
     private Neuropod model;
     private static final String TF_MODEL_PATH = "neuropod/tests/test_data/tf_addition_model/";
     private static final String TORCHSCRIPT_MODEL_PATH = "neuropod/tests/test_data/torchscript_addition_model_single_output/";
+    private static final double EPSILON = 1E-6;
 
     @Before
     public void setUp() throws Exception {
@@ -120,6 +122,45 @@ public class NeuropodTest {
                 fail();
             }
         }
+    }
+
+    @Test
+    public void infer() {
+        NeuropodTensorAllocator allocator = model.getTensorAllocator();
+        Map<String, NeuropodTensor> inputs = new HashMap<>();
+        TensorType type = TensorType.FLOAT_TENSOR;
+
+        ByteBuffer bufferX = ByteBuffer.allocateDirect(type.getBytesPerElement() * 2).order(ByteOrder.nativeOrder());
+        FloatBuffer floatBufferX = bufferX.asFloatBuffer();
+        floatBufferX.put(1.0f);
+        floatBufferX.put(2.0f);
+        NeuropodTensor tensorX = allocator.tensorFromMemory(bufferX, new long[]{1L, 2L},type);
+        inputs.put("x", tensorX);
+
+        ByteBuffer bufferY = ByteBuffer.allocateDirect(type.getBytesPerElement() * 2).order(ByteOrder.nativeOrder());
+        FloatBuffer floatBufferY = bufferY.asFloatBuffer();
+        floatBufferY.put(3.0f);
+        floatBufferY.put(4.0f);
+        NeuropodTensor tensorY = allocator.tensorFromMemory(bufferY, new long[]{1L, 2L},type);
+        inputs.put("y", tensorY);
+
+        Map<String, NeuropodTensor> res = model.infer(inputs);
+
+        assertTrue(res.containsKey("out"));
+        NeuropodTensor out = res.get("out");
+        FloatBuffer outBuffer = out.toFloatBuffer();
+
+        assertArrayEquals(new long[]{1L, 2L}, out.getDims());
+        assertEquals(2, out.getNumberOfElements());
+        assertEquals(TensorType.FLOAT_TENSOR, out.getTensorType());
+
+        assertEquals(4.0f , outBuffer.get(0), EPSILON);
+        assertEquals(6.0f , outBuffer.get(1), EPSILON);
+
+        out.close();
+        tensorX.close();
+        tensorY.close();
+        allocator.close();
     }
 
     @After
