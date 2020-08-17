@@ -20,7 +20,7 @@ limitations under the License.
 
 NP_TensorType NP_GetType(const NP_NeuropodTensor *tensor)
 {
-   return static_cast<NP_TensorType>(tensor->tensor->as_tensor()->get_tensor_type());
+    return static_cast<NP_TensorType>(tensor->tensor->as_tensor()->get_tensor_type());
 }
 
 void *NP_GetData(NP_NeuropodTensor *tensor)

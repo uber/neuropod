@@ -21,6 +21,7 @@ limitations under the License.
 #include "neuropod/bindings/c/np_status_internal.h"
 #include "neuropod/bindings/c/np_tensor_allocator_internal.h"
 #include "neuropod/bindings/c/np_valuemap_internal.h"
+#include "neuropod/core/generic_tensor.hh"
 
 #include <exception>
 #include <string>
@@ -135,5 +136,12 @@ NP_TensorAllocator *NP_GetAllocator(NP_Neuropod *model)
 {
     auto out       = new NP_TensorAllocator();
     out->allocator = model->model->get_tensor_allocator();
+    return out;
+}
+
+NP_TensorAllocator *NP_GetGenericAllocator()
+{
+    auto out       = new NP_TensorAllocator();
+    out->allocator = neuropod::get_generic_tensor_allocator();
     return out;
 }

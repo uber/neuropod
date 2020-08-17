@@ -125,10 +125,11 @@ static void TestLoadAndInference(void)
 
     // Get the output and compare to the expected value
     NP_NeuropodTensor *out       = NP_GetTensor(outputs, "out");
-    ASSERT_EQ(NP_GetType(out), FLOAT_TENSOR);
-
     float *            out_data  = (float *) NP_GetData(out);
     size_t             nout_data = NP_GetNumElements(out);
+
+    ASSERT_EQ(NP_GetType(out), FLOAT_TENSOR);
+
     for (size_t i = 0; i < nout_data; ++i)
     {
         ASSERT_EQ(out_data[i], target[i]);
@@ -236,10 +237,31 @@ static void TestLoadAndInferenceWithOptions(void)
     NP_FreeNeuropod(model);
 }
 
+static void TestTensorGetters(void)
+{
+    NP_TensorAllocator *allocator = NP_GetGenericAllocator();
+    ASSERT_NE(allocator, NULL);
+
+    // Create tensors with different types and test it.
+    int64_t            dims[] = {2, 2};
+    NP_NeuropodTensor *x      = NP_AllocateTensor(allocator, sizeof(dims) / sizeof(int64_t), dims, FLOAT_TENSOR);
+    NP_NeuropodTensor *y      = NP_AllocateTensor(allocator, sizeof(dims) / sizeof(int64_t), dims, DOUBLE_TENSOR);
+    NP_NeuropodTensor *z      = NP_AllocateTensor(allocator, sizeof(dims) / sizeof(int64_t), dims, STRING_TENSOR);
+
+    ASSERT_EQ(NP_GetType(x), FLOAT_TENSOR);
+    ASSERT_EQ(NP_GetType(y), DOUBLE_TENSOR);
+    ASSERT_EQ(NP_GetType(z), STRING_TENSOR);
+
+    NP_FreeTensor(x);
+    NP_FreeTensor(y);
+    NP_FreeTensor(z);
+}
+
 static void RunTests(void)
 {
     TestLoadAndInference();
     TestLoadAndInferenceWithOptions();
+    TestTensorGetters();
 }
 
 int main(void)

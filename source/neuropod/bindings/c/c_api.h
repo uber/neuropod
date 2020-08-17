@@ -122,6 +122,10 @@ NP_TensorSpec *NP_GetOutputSpec(NP_Neuropod *model, size_t index);
 // Note: The caller is responsible for freeing the returned TensorAllocator
 NP_TensorAllocator *NP_GetAllocator(NP_Neuropod *model);
 
+// Get a generic allocator to allocate generic tensors that is usefull for tests.
+// Note: The caller is responsible for freeing the returned TensorAllocator
+NP_TensorAllocator *NP_GetGenericAllocator();
+
 #ifdef __cplusplus
 }
 #endif
