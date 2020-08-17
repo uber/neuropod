@@ -255,6 +255,8 @@ static void TestTensorGetters(void)
     NP_FreeTensor(x);
     NP_FreeTensor(y);
     NP_FreeTensor(z);
+
+    NP_FreeAllocator(allocator);
 }
 
 static void RunTests(void)
