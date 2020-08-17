@@ -105,6 +105,9 @@ static void TestLoadAndInference(void)
     NP_InsertTensor(inputs, "x", x);
     NP_InsertTensor(inputs, "y", y);
 
+    ASSERT_EQ(NP_GetType(x), FLOAT_TENSOR);
+    ASSERT_EQ(NP_GetType(y), FLOAT_TENSOR);
+
     // Free the input tensors
     NP_FreeTensor(x);
     NP_FreeTensor(y);
@@ -122,6 +125,8 @@ static void TestLoadAndInference(void)
 
     // Get the output and compare to the expected value
     NP_NeuropodTensor *out       = NP_GetTensor(outputs, "out");
+    ASSERT_EQ(NP_GetType(out), FLOAT_TENSOR);
+
     float *            out_data  = (float *) NP_GetData(out);
     size_t             nout_data = NP_GetNumElements(out);
     for (size_t i = 0; i < nout_data; ++i)
