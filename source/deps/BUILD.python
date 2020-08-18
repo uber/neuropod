@@ -16,15 +16,21 @@ package(
     default_visibility = ["//visibility:public"],
 )
 
+exports_files(["python.tar.gz"])
+
 cc_library(
     name = "python_hdrs",
     hdrs = glob([
-        "include/python{PYTHON_VERSION}/**/*.h",
-        "include/python{PYTHON_VERSION}m/**/*.h",
+        "Python.framework/Versions/Current/include/python{PYTHON_VERSION}/**/*.h",
+        "Python.framework/Versions/Current/include/python{PYTHON_VERSION}m/**/*.h",
+        "opt/python{PYTHON_VERSION}/include/python{PYTHON_VERSION}/**/*.h",
+        "opt/python{PYTHON_VERSION}/include/python{PYTHON_VERSION}m/**/*.h",
     ]),
     includes = [
-        "include/python{PYTHON_VERSION}",
-        "include/python{PYTHON_VERSION}m",
+        "Python.framework/Versions/Current/include/python{PYTHON_VERSION}",
+        "Python.framework/Versions/Current/include/python{PYTHON_VERSION}m",
+        "opt/python{PYTHON_VERSION}/include/python{PYTHON_VERSION}",
+        "opt/python{PYTHON_VERSION}/include/python{PYTHON_VERSION}m",
     ],
     defines = ["PYTHON_VERSION={PYTHON_VERSION}"],
     visibility = ["//visibility:public"],
@@ -33,8 +39,8 @@ cc_library(
 cc_library(
     name = "python",
     srcs = select({
-        "@bazel_tools//src/conditions:darwin": ["lib/libpython{PYTHON_VERSION}.dylib"],
-        "//conditions:default": glob(["lib/libpython{PYTHON_VERSION}.so.1.0", "lib/libpython{PYTHON_VERSION}m.so.1.0"]),
+        "@bazel_tools//src/conditions:darwin": ["Python.framework/Versions/Current/lib/libpython{PYTHON_VERSION}.dylib"],
+        "//conditions:default": glob(["usr/lib/libpython{PYTHON_VERSION}.so.1.0", "usr/lib/libpython{PYTHON_VERSION}m.so.1.0"]),
     }),
     deps = [":python_hdrs"],
     visibility = ["//visibility:public"],

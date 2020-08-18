@@ -357,9 +357,6 @@ cc_test(
     deps = [
         ":neuropod_test_utils",
         "//neuropod:neuropod_impl",
-        "//neuropod/backends/python_bridge",
-        "//neuropod/backends/tensorflow:tensorflow_backend",
-        "//neuropod/backends/torchscript:torch_backend",
         "//neuropod/multiprocess",
     ],
 )
