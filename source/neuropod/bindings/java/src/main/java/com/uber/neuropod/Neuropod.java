@@ -75,7 +75,7 @@ public class Neuropod extends NativeClass {
      * @return the inference result
      */
     public Map<String, NeuropodTensor> infer(Map<String, NeuropodTensor> inputs) {
-        return null;
+        return infer(inputs, null);
     }
 
     /**
@@ -87,7 +87,7 @@ public class Neuropod extends NativeClass {
      * @return the inference result
      */
     public Map<String, NeuropodTensor> infer(Map<String, NeuropodTensor> inputs, List<String> requestedOutputs) {
-        return null;
+        return nativeInfer(inputs.entrySet().toArray(), requestedOutputs, super.getNativeHandle());
     }
 
     /**
@@ -148,6 +148,9 @@ public class Neuropod extends NativeClass {
     private static native long nativeGetAllocator(long modelHandle);
 
     private static native long nativeGetGenericAllocator();
+
+    private static native Map<String, NeuropodTensor> nativeInfer(Object[] inputs, List<String> requestedOutputs,
+                                                                  long modelHandle);
 
     @Override
     protected native void nativeDelete(long handle);

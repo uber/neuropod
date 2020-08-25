@@ -29,11 +29,21 @@ public class NeuropodTensor extends NativeClass implements Serializable {
 
     protected ByteBuffer buffer;
 
+    // This flag is used to separate NeuropodTensor that is created as Input (from java)
+    // or Output (from JNI as result of inference). This is necessary because tensor buffer
+    // is allocated differently and it is not safe to expose data directly to user.
     private final boolean isFromJava;
 
     // Constructor for NeuropodTensor created in Java side.
     protected NeuropodTensor() {
         isFromJava = true;
+    }
+
+    // Constructor for NeuropodTensor created in C++ side.
+    protected NeuropodTensor(long handle) {
+        super(handle);
+        isFromJava = false;
+        buffer = nativeGetBuffer(handle).order(ByteOrder.nativeOrder());
     }
 
     /**
@@ -77,7 +87,28 @@ public class NeuropodTensor extends NativeClass implements Serializable {
         if (isFromJava) {
             return buffer.asLongBuffer();
         }
-        return null;
+        LongBuffer ret = LongBuffer.allocate((int)getNumberOfElements()).put(buffer.asLongBuffer());
+        ret.rewind();
+        return ret;
+    }
+
+    /**
+     * Flatten the tensor data and convert it to a float buffer.
+     * <p>
+     * Can only be used when the tensor is FLOAT_TENSOR. Will trigger
+     * a copy if the tensor is created by infer method. Otherwise will
+     * not trigger a copy.
+     *
+     * @return the FloatBuffer
+     */
+    public FloatBuffer toFloatBuffer() {
+        checkType(TensorType.FLOAT_TENSOR);
+        if (isFromJava) {
+            return buffer.asFloatBuffer();
+        }
+        FloatBuffer ret = FloatBuffer.allocate((int)getNumberOfElements()).put(buffer.asFloatBuffer());
+        ret.rewind();
+        return ret;
     }
 
      /**
@@ -89,16 +120,6 @@ public class NeuropodTensor extends NativeClass implements Serializable {
       * @return the IntBuffer
       */
      public IntBuffer toIntBuffer() {return null;}
-
-     /**
-      * Flatten the tensor data and convert it to a float buffer.
-      * <p>
-      * Can only be used when the tensor is FLOAT_TENSOR. Will trigger
-      * a copy.
-      *
-      * @return the FloatBuffer
-      */
-     public FloatBuffer toFloatBuffer() {return null;}
 
      /**
       * Flatten the tensor data and convert it to a double buffer.
@@ -188,6 +209,11 @@ public class NeuropodTensor extends NativeClass implements Serializable {
         }
     }
 
+    // Easier for the JNI side to call methods of super class.
+    private long getHandle() {
+        return super.getNativeHandle();
+    }
+
     @Override
     protected void nativeDelete(long handle) throws NeuropodJNIException {
         nativeDoDelete(handle);
@@ -201,4 +227,6 @@ public class NeuropodTensor extends NativeClass implements Serializable {
     private static native TensorType nativeGetTensorType(long nativeHandle) throws NeuropodJNIException;
 
     private static native long nativeGetNumberOfElements(long nativeHandle) throws NeuropodJNIException;
+
+    private static native ByteBuffer nativeGetBuffer(long nativeHandle);
 }
