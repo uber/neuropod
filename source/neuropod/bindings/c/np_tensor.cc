@@ -18,6 +18,13 @@ limitations under the License.
 #include "neuropod/bindings/c/np_tensor_internal.h"
 #include "neuropod/internal/neuropod_tensor_raw_data_access.hh"
 
+void NP_GetDims(const NP_NeuropodTensor *tensor, size_t *num_dims, const int64_t **dims)
+{
+    auto dimsCollection = tensor->tensor->as_tensor()->get_dims();
+    *num_dims           = dimsCollection.size();
+    *dims               = dimsCollection.data();
+}
+
 NP_TensorType NP_GetType(const NP_NeuropodTensor *tensor)
 {
     return static_cast<NP_TensorType>(tensor->tensor->as_tensor()->get_tensor_type());
