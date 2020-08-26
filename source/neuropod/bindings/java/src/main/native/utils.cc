@@ -35,7 +35,7 @@ std::string toString(JNIEnv *env, jstring target)
     const char *raw = env->GetStringUTFChars(target, nullptr);
     if (raw == nullptr)
     {
-        throw std::runtime_error("unexpected null pointer to string buffer");
+        throw std::runtime_error("unexpected null pointer in toString");
     }
 
     std::string res(raw);

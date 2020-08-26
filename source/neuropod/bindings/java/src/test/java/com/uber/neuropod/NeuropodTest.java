@@ -246,7 +246,7 @@ public class NeuropodTest {
 
         try
         {
-           // Try failuer if provide invalid output.
+           // Add unexpected "requested output" that should cause a failure.
            requestedOutputs.add("out_wrong");
            Map<String, NeuropodTensor> res3 = model.infer(inputs, requestedOutputs);
            Assert.fail("Expected exception on wrong requested output");

@@ -76,9 +76,9 @@ public class NeuropodTensor extends NativeClass implements Serializable {
     /**
      * Flatten the tensor data and convert it to a long buffer.
      * <p>
-     * Can only be used when the tensor is INT64_TENSOR. Will trigger
-     * a copy if the tensor is created by infer method. Otherwise will
-     * not trigger a copy.
+     * Can only be used when the tensor is INT64_TENSOR.
+     *
+     * Note: It returns a buffer that is valid even after Tensor is closed.
      *
      * @return the IntBuffer
      */
@@ -95,9 +95,9 @@ public class NeuropodTensor extends NativeClass implements Serializable {
     /**
      * Flatten the tensor data and convert it to a float buffer.
      * <p>
-     * Can only be used when the tensor is FLOAT_TENSOR. Will trigger
-     * a copy if the tensor is created by infer method. Otherwise will
-     * not trigger a copy.
+     * Can only be used when the tensor is FLOAT_TENSOR.
+     *
+     * Note: It returns a buffer that is valid even after Tensor is closed.
      *
      * @return the FloatBuffer
      */
@@ -124,8 +124,9 @@ public class NeuropodTensor extends NativeClass implements Serializable {
      /**
       * Flatten the tensor data and convert it to a double buffer.
       * <p>
-      * Can only be used when the tensor is DOUBLE_TENSOR. Will trigger
-      * a copy.
+      * Can only be used when the tensor is DOUBLE_TENSOR.
+      *
+      * Note: It returns a buffer that is valid even after Tensor is closed.
       *
       * @return the DoubleBuffer
       */

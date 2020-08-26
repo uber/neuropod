@@ -260,13 +260,12 @@ JNIEXPORT jobject JNICALL Java_com_uber_neuropod_Neuropod_nativeInfer(
         auto inferredMap = model->infer(nativeMap, requestedOutputs);
 
         // Put data to Java Map
-        auto  ret     = env->NewObject(java_util_HashMap, java_util_HashMap_);
-        auto &entries = *inferredMap;
-        for (auto &entry : entries)
+        auto ret = env->NewObject(java_util_HashMap, java_util_HashMap_);
+        for (auto &entry : *inferredMap)
         {
             jobject javaTensor = env->NewObject(com_uber_neuropod_NeuropodTensor,
                                                 com_uber_neuropod_NeuropodTensor_,
-                                                reinterpret_cast<jlong>(toHeap((entry.second))));
+                                                reinterpret_cast<jlong>(toHeap(entry.second)));
             env->CallObjectMethod(ret, java_util_HashMap_put, env->NewStringUTF(entry.first.c_str()), javaTensor);
             env->DeleteLocalRef(javaTensor);
         }
