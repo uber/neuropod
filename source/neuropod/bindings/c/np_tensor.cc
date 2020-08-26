@@ -22,9 +22,9 @@ void NP_GetDims(const NP_NeuropodTensor *tensor, size_t *num_dims, const int64_t
 {
     // get_dims returnis reference to internal tensor's dims collection.
     // Use pointer to its data that is valid as long as tensor is valid.
-    auto &dims_collection = tensor->tensor->as_tensor()->get_dims();
-    *num_dims             = dims_collection.size();
-    *dims                 = dims_collection.data();
+    const auto &dims_collection = tensor->tensor->as_tensor()->get_dims();
+    *num_dims                   = dims_collection.size();
+    *dims                       = dims_collection.data();
 }
 
 NP_TensorType NP_GetType(const NP_NeuropodTensor *tensor)
