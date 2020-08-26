@@ -20,8 +20,8 @@ limitations under the License.
 
 void NP_GetDims(const NP_NeuropodTensor *tensor, size_t *num_dims, const int64_t **dims)
 {
-    // get_dims return refernce to internal tensor's vector.
-    // We return a pointer to it that is valid while tensor is valid.
+    // get_dims returnis reference to internal tensor's dims collection.
+    // Use pointer to its data that is valid as long as tensor is valid.
     auto &dims_collection = tensor->tensor->as_tensor()->get_dims();
     *num_dims             = dims_collection.size();
     *dims                 = dims_collection.data();
