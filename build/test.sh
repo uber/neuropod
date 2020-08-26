@@ -35,7 +35,7 @@ NEUROPOD_LOG_LEVEL=TRACE NEUROPOD_RUN_NATIVE_TESTS=true python -m unittest disco
 popd
 
 # Run native and java tests
-python ../build/run_lang_tests.py
+python ../build/run_bazel_tests.py
 popd
 
 # Maybe upload a release
