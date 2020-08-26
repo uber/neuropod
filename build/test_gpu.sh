@@ -52,7 +52,7 @@ NEUROPOD_LOG_LEVEL=TRACE NEUROPOD_RUN_NATIVE_TESTS=true python -m unittest disco
 popd
 
 # Run native tests
-python ../build/run_cpp_tests.py --run-gpu-tests
+python ../build/run_lang_tests.py --run-gpu-tests
 popd
 
 # Maybe upload a release

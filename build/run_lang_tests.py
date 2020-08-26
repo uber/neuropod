@@ -50,16 +50,20 @@ def make_test(test_target, tags):
 
 if __name__ == '__main__':
     # Parse args
-    parser = argparse.ArgumentParser(description='Run C++ Neuropod tests')
+    parser = argparse.ArgumentParser(description='Run Neuropod tests')
+
+    # --lang flag allows cc, java. Default is empty that means all.
+    parser.add_argument('--lang', action='store', default="")
     parser.add_argument('--run-gpu-tests', action='store_true')
     args = parser.parse_args()
 
-    # Get all the bazel test targets
-    cpp_tests = []
-    cpp_tests_xml = subprocess.check_output(['bazel', 'query', 'kind(".*_test rule", //...)', '--output=xml'])
+    # Get all the bazel test targets that match lang argument
+    lang_tests = []
+    kind_pattern = 'kind(".*{lang}_test rule", //...)'.format(lang=args.lang)
+    lang_tests_xml = subprocess.check_output(['bazel', 'query', kind_pattern, '--output=xml'])
 
     # Parse the xml
-    root = ET.fromstring(cpp_tests_xml)
+    root = ET.fromstring(lang_tests_xml)
     for child in root:
 
         # Get tags (if any)
@@ -70,11 +74,11 @@ if __name__ == '__main__':
                 for tag in prop:
                     tags.append(tag.attrib["value"])
 
-        cpp_tests.append((child.attrib["name"], tags))
+        lang_tests.append((child.attrib["name"], tags))
 
 
     # Generate unittests for each bazel test target
-    for test_target, tags in cpp_tests:
+    for test_target, tags in lang_tests:
         # Skip GPU tests by default
         if "gpu" in tags and not args.run_gpu_tests:
             continue
