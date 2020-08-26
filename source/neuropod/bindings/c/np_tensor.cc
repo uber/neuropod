@@ -20,9 +20,11 @@ limitations under the License.
 
 void NP_GetDims(const NP_NeuropodTensor *tensor, size_t *num_dims, const int64_t **dims)
 {
-    auto dimsCollection = tensor->tensor->as_tensor()->get_dims();
-    *num_dims           = dimsCollection.size();
-    *dims               = dimsCollection.data();
+    // get_dims return refernce to internal tensor's vector.
+    // We return a pointer to it that is valid while tensor is valid.
+    auto &dims_collection = tensor->tensor->as_tensor()->get_dims();
+    *num_dims             = dims_collection.size();
+    *dims                 = dims_collection.data();
 }
 
 NP_TensorType NP_GetType(const NP_NeuropodTensor *tensor)

@@ -253,11 +253,11 @@ static void TestTensorGetters(void)
     ASSERT_EQ(DOUBLE_TENSOR, NP_GetType(y));
     ASSERT_EQ(STRING_TENSOR, NP_GetType(z));
 
-    size_t test_num_dims;
+    size_t         test_num_dims;
     const int64_t *test_dims;
     NP_GetDims(x, &test_num_dims, &test_dims);
 
-    ASSERT_EQ(sizeof(dims)/sizeof(dims[0]), test_num_dims);
+    ASSERT_EQ(sizeof(dims) / sizeof(dims[0]), test_num_dims);
     ASSERT_ARRAYEQ(&dims[0], test_dims, test_num_dims);
 
     NP_FreeTensor(x);
