@@ -21,7 +21,7 @@ wget https://raw.githubusercontent.com/Sarcasm/run-clang-format/de6e8ca07d171a7f
 # Install pip, black, and flake8
 wget https://bootstrap.pypa.io/get-pip.py
 python3.6 get-pip.py
-python3.6 -m pip install black flake8
+python3.6 -m pip install black==19.10b0 flake8
 
 # Get buildifier (for linting bazel files)
 wget https://github.com/bazelbuild/buildtools/releases/download/2.2.1/buildifier -O /tmp/buildifier
