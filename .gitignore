@@ -1,4 +1,3 @@
-*.coverage*
 *.profraw
 *.pyc
 source/compile_commands.json
