@@ -50,6 +50,7 @@ static void CheckFailed(const char *expression, const char *filename, int line_n
 #define ASSERT_EQ(expected, actual) CHECK((expected) == (actual))
 #define ASSERT_NE(expected, actual) CHECK((expected) != (actual))
 #define ASSERT_STREQ(expected, actual) ASSERT_EQ(0, strcmp((expected), (actual)))
+#define ASSERT_ARRAYEQ(expected, actual, size) ASSERT_EQ(0, memcmp((expected), (actual), size))
 
 static void TestLoadAndInference(void)
 {
@@ -248,9 +249,16 @@ static void TestTensorGetters(void)
     NP_NeuropodTensor *y      = NP_AllocateTensor(allocator, sizeof(dims) / sizeof(int64_t), dims, DOUBLE_TENSOR);
     NP_NeuropodTensor *z      = NP_AllocateTensor(allocator, sizeof(dims) / sizeof(int64_t), dims, STRING_TENSOR);
 
-    ASSERT_EQ(NP_GetType(x), FLOAT_TENSOR);
-    ASSERT_EQ(NP_GetType(y), DOUBLE_TENSOR);
-    ASSERT_EQ(NP_GetType(z), STRING_TENSOR);
+    ASSERT_EQ(FLOAT_TENSOR, NP_GetType(x));
+    ASSERT_EQ(DOUBLE_TENSOR, NP_GetType(y));
+    ASSERT_EQ(STRING_TENSOR, NP_GetType(z));
+
+    size_t         test_num_dims;
+    const int64_t *test_dims;
+    NP_GetDims(x, &test_num_dims, &test_dims);
+
+    ASSERT_EQ(sizeof(dims) / sizeof(dims[0]), test_num_dims);
+    ASSERT_ARRAYEQ(&dims[0], test_dims, test_num_dims);
 
     NP_FreeTensor(x);
     NP_FreeTensor(y);
