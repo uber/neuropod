@@ -31,13 +31,13 @@ namespace jni
 std::string toString(JNIEnv *env, jstring target);
 
 // A wrapper for env->FindClass, will throw a cpp exception if the find fails.
-jclass findClass(JNIEnv *env, const char *name);
+jclass findClass(JNIEnv *env, const std::string &name);
 
 // A wrapper for env->GetMethodID, will throw a cpp exception if the get fails.
-jmethodID getMethodID(JNIEnv *env, jclass clazz, const char *name, const char *sig);
+jmethodID getMethodID(JNIEnv *env, jclass clazz, const std::string &name, const std::string &sig);
 
 // Get the corresponding Java TensorType enum based on the given field name.
-jobject getTensorTypeField(JNIEnv *env, std::string fieldName);
+jobject getTensorTypeField(JNIEnv *env, const std::string &fieldName);
 
 // Convert cpp tensor type to string
 std::string tensorTypeToString(TensorType type);
@@ -49,10 +49,15 @@ std::shared_ptr<T> *toHeap(std::shared_ptr<T> ptr)
     return new std::shared_ptr<T>(ptr);
 }
 
+// Create a direct buffer for the tensor data
+template <typename T>
+jobject createDirectBuffer(JNIEnv *env, NeuropodTensor *tensor);
+
 // Throw a Java NeuropodJNIException exception after the JNI call have finished.
 // If there are multiple throwJavaException calls during a C++ function, only the
 // last one is effective.
-void throwJavaException(JNIEnv *env, const char *message);
+void throwJavaException(JNIEnv *env, const std::string &message);
 
 } // namespace jni
 } // namespace neuropod
+#include "utils_impl.h"
