@@ -149,16 +149,53 @@ java_test(
 )
 
 java_test(
-    name = "NeuropodTest",
-    srcs = ["src/test/java/com/uber/neuropod/NeuropodTest.java"],
+    name = "TFAdditionTest",
+    srcs = [
+        "src/test/java/com/uber/neuropod/NeuropodAdditionTest.java",
+        "src/test/java/com/uber/neuropod/TFAdditionTest.java",
+    ],
     data = [
         "//neuropod/backends/tensorflow:libneuropod_tensorflow_backend.so",
+        "//neuropod/tests/test_data",
+    ],
+    javacopts = JAVACOPTS,
+    tags = ["requires_path"],
+    test_class = "com.uber.neuropod.TFAdditionTest",
+    deps = [
+        ":neuropod_java_jar",
+        "@junit",
+    ],
+)
+
+java_test(
+    name = "TorchscriptAdditionTest",
+    srcs = [
+        "src/test/java/com/uber/neuropod/NeuropodAdditionTest.java",
+        "src/test/java/com/uber/neuropod/TorchscriptAdditionTest.java",
+    ],
+    data = [
         "//neuropod/backends/torchscript:libneuropod_torchscript_backend.so",
         "//neuropod/tests/test_data",
     ],
     javacopts = JAVACOPTS,
     tags = ["requires_path"],
-    test_class = "com.uber.neuropod.NeuropodTest",
+    test_class = "com.uber.neuropod.TorchscriptAdditionTest",
+    deps = [
+        ":neuropod_java_jar",
+        "@junit",
+    ],
+)
+
+java_test(
+    name = "DifferentFeaturesTest",
+    srcs = ["src/test/java/com/uber/neuropod/DifferentFeaturesTest.java"],
+    data = [
+        "//neuropod/backends/torchscript:libneuropod_torchscript_backend.so",
+        "//neuropod/tests/test_data",
+    ],
+    javacopts = JAVACOPTS,
+    tags = ["requires_path"],
+    test_class = "com.uber.neuropod.DifferentFeaturesTest",
     deps = [
         ":neuropod_java_jar",
         "@junit",
