@@ -5,7 +5,10 @@
 #include "utils.h"
 
 #include <exception>
+#include <functional>
 #include <memory>
+#include <stdexcept>
+#include <string>
 
 #include <jni.h>
 
@@ -56,7 +59,7 @@ JNIEXPORT jobject JNICALL Java_com_uber_neuropod_NeuropodTensor_nativeGetBuffer(
             return createDirectBuffer<int64_t>(env, neuropodTensor);
         }
         default:
-            throw std::runtime_error("Unsupported tensor type: " + tensor_type_to_string(tensorType));
+            throw std::runtime_error("unsupported tensor type: " + tensor_type_to_string(tensorType));
         }
     }
     catch (const std::exception &e)
@@ -123,4 +126,91 @@ JNIEXPORT jlong JNICALL Java_com_uber_neuropod_NeuropodTensor_nativeGetNumberOfE
         throw_java_exception(env, e.what());
     }
     return 0;
+}
+
+JNIEXPORT jobject JNICALL Java_com_uber_neuropod_NeuropodTensor_nativeToStringList(JNIEnv *env,
+                                                                                   jclass,
+                                                                                   jlong nativeHandle)
+{
+    try
+    {
+        auto neuropodTensor =
+            (*reinterpret_cast<std::shared_ptr<neuropod::NeuropodValue> *>(nativeHandle))->as_tensor();
+        auto tensorType = neuropodTensor->get_tensor_type();
+        if (tensorType != neuropod::STRING_TENSOR)
+        {
+            throw std::runtime_error("unexpected tensor type, should be STRING_TENSOR but found:" +
+                                     tensorTypeToString(tensorType));
+        }
+
+        auto    size = neuropodTensor->get_num_elements();
+        jobject ret  = env->NewObject(java_util_ArrayList, java_util_ArrayList_, size);
+        if (!ret)
+        {
+            throw std::runtime_error("out of memory: cannot create ArrayList");
+        }
+
+        auto typedTensor = neuropodTensor->as_typed_tensor<std::string>();
+
+        std::function<void(string_accessor_type *)> mapFunc = [env, ret](string_accessor_type *elem) {
+            // StringProxy supports conversion to std:string.
+            std::string tmpStr(*elem);
+            jstring     convertedElem = env->NewStringUTF(tmpStr.c_str());
+            env->CallBooleanMethod(ret, java_util_ArrayList_add, convertedElem);
+            env->DeleteLocalRef(convertedElem);
+        };
+
+        auto dims = typedTensor->get_dims();
+        switch (dims.size())
+        {
+        case 1:
+            mapStringTensor(typedTensor->accessor<1>(), mapFunc, dims);
+            break;
+        case 2:
+            mapStringTensor(typedTensor->accessor<2>(), mapFunc, dims);
+            break;
+        case 3:
+            mapStringTensor(typedTensor->accessor<3>(), mapFunc, dims);
+            break;
+        case 4:
+            mapStringTensor(typedTensor->accessor<4>(), mapFunc, dims);
+            break;
+        default:
+            // Here copy data twice
+            const auto &elementList = typedTensor->get_data_as_vector();
+            for (const auto &elem : elementList)
+            {
+                jstring convertedElem = env->NewStringUTF(elem.c_str());
+                env->CallBooleanMethod(ret, java_util_ArrayList_add, convertedElem);
+                env->DeleteLocalRef(convertedElem);
+            }
+        }
+        return ret;
+    }
+    catch (const std::exception &e)
+    {
+        throwJavaException(env, e.what());
+    }
+    return nullptr;
+}
+
+JNIEXPORT jstring JNICALL Java_com_uber_neuropod_NeuropodTensor_nativeGetString(JNIEnv *env,
+                                                                                jclass,
+                                                                                jlong index,
+                                                                                jlong handle)
+{
+    try
+    {
+        auto stringTensor = (*reinterpret_cast<std::shared_ptr<neuropod::NeuropodValue> *>(handle))
+                                ->as_tensor()
+                                ->as_typed_tensor<std::string>();
+        const auto &       strList = stringTensor->get_data_as_vector();
+        const std::string &elem    = strList[index];
+        return env->NewStringUTF(elem.c_str());
+    }
+    catch (const std::exception &e)
+    {
+        throwJavaException(env, e.what());
+    }
+    return nullptr;
 }

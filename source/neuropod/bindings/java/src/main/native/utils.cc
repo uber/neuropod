@@ -18,8 +18,10 @@ limitations under the License.
 #include "jclass_register.h"
 #include "neuropod/neuropod.hh"
 
+#include <sstream>
 #include <stdexcept>
 #include <string>
+#include <vector>
 
 #include <jni.h>
 
@@ -83,6 +85,15 @@ std::string tensor_type_to_string(TensorType type)
 void throw_java_exception(JNIEnv *env, const std::string &message)
 {
     env->ThrowNew(com_uber_neuropod_NeuropodJNIException, message.c_str());
+}
+
+std::vector<int64_t> jlongArrayToVector(JNIEnv *env, jlongArray origin)
+{
+    jsize                shapeSize = env->GetArrayLength(origin);
+    jlong *              arr       = env->GetLongArrayElements(origin, 0);
+    std::vector<int64_t> shapes(arr, arr + shapeSize);
+    env->ReleaseLongArrayElements(origin, arr, JNI_ABORT);
+    return shapes;
 }
 
 } // namespace neuropod::jni

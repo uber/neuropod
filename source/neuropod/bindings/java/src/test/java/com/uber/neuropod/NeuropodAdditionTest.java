@@ -25,6 +25,7 @@ import java.nio.DoubleBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.nio.LongBuffer;
+
 import java.util.*;
 
 import static org.junit.Assert.*;
@@ -132,10 +133,7 @@ public class NeuropodAdditionTest {
        typedBuffer.put(1.0f);
        typedBuffer.put(2.0f);
        NeuropodTensor tensor = allocator.tensorFromMemory(buffer, new long[]{1L, 2L}, type);
-
-       // TBD: will be implemented next.
-       // assertNotNull(tensor.toDoubleBuffer());
-       assertNull(tensor.toDoubleBuffer());
+       assertNotNull(tensor.toDoubleBuffer());
 
        assertArrayEquals(new long[]{1L, 2L}, tensor.getDims());
        assertEquals(2, tensor.getNumberOfElements());
@@ -156,10 +154,7 @@ public class NeuropodAdditionTest {
        typedBuffer.put(1);
        typedBuffer.put(2);
        NeuropodTensor tensor = allocator.tensorFromMemory(buffer, new long[]{1L, 2L}, type);
-
-       // TBD: will be implemented next.
-       // assertNotNull(tensor.toIntBuffer());
-       assertNull(tensor.toIntBuffer());
+       assertNotNull(tensor.toIntBuffer());
 
        assertArrayEquals(new long[]{1L, 2L}, tensor.getDims());
        assertEquals(2, tensor.getNumberOfElements());
@@ -187,6 +182,22 @@ public class NeuropodAdditionTest {
        assertEquals(TensorType.INT64_TENSOR, tensor.getTensorType());
 
        tensor.close();
+       allocator.close();
+    }
+
+    @Test
+    public void InputStringTensor() {
+       NeuropodTensorAllocator allocator = model.getTensorAllocator();
+
+       TensorType type = TensorType.STRING_TENSOR;
+
+       // Note that for String Tensor we can't use low level allocator's method tensorFromMemory
+       // that accepts direct ByteBuffer as input. It throws exception "unsupported tensor type"
+       // and intentionally prevents using it for String Tensors.
+
+       // Allocator provides create/copyFrom methods to create String Tensors in a safe way.
+       // TBD: Complete test when it is available.
+
        allocator.close();
     }
 
