@@ -17,8 +17,10 @@ limitations under the License.
 
 #include "neuropod/neuropod.hh"
 
+#include <functional>
 #include <memory>
 #include <string>
+#include <vector>
 
 #include <jni.h>
 
@@ -57,6 +59,21 @@ jobject createDirectBuffer(JNIEnv *env, NeuropodTensor *tensor);
 // If there are multiple throwJavaException calls during a C++ function, only the
 // last one is effective.
 void throwJavaException(JNIEnv *env, const std::string &message);
+
+using string_accessor_type =
+    StringProxy<TypedNeuropodTensor<std::basic_string<char, std::char_traits<char>, std::allocator<char>>>>;
+
+std::vector<int64_t> jlongArrayToVector(JNIEnv *env, jlongArray arr);
+
+template <size_t N>
+void atStringTensor(neuropod::TensorAccessor<neuropod::TypedNeuropodTensor<std::string> &, N> accessor,
+                    const std::function<void(string_accessor_type *)> &                       func,
+                    const std::vector<int64_t>                                                targetDim);
+
+template <size_t N>
+void mapStringTensor(neuropod::TensorAccessor<neuropod::TypedNeuropodTensor<std::string> &, N> accessor,
+                     const std::function<void(string_accessor_type *)> &                       func,
+                     const std::vector<int64_t>                                                dims);
 
 } // namespace jni
 } // namespace neuropod

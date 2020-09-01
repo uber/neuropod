@@ -17,6 +17,7 @@ package com.uber.neuropod;
 
 import java.io.Serializable;
 import java.nio.*;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -87,7 +88,7 @@ public class NeuropodTensor extends NativeClass implements Serializable {
         if (isFromJava) {
             return buffer.asLongBuffer();
         }
-        LongBuffer ret = LongBuffer.allocate((int)getNumberOfElements()).put(buffer.asLongBuffer());
+        LongBuffer ret = LongBuffer.allocate((int) getNumberOfElements()).put(buffer.asLongBuffer());
         ret.rewind();
         return ret;
     }
@@ -106,108 +107,185 @@ public class NeuropodTensor extends NativeClass implements Serializable {
         if (isFromJava) {
             return buffer.asFloatBuffer();
         }
-        FloatBuffer ret = FloatBuffer.allocate((int)getNumberOfElements()).put(buffer.asFloatBuffer());
+        FloatBuffer ret = FloatBuffer.allocate((int) getNumberOfElements()).put(buffer.asFloatBuffer());
         ret.rewind();
         return ret;
     }
 
-     /**
-      * Flatten the tensor data and convert it to a int buffer.
-      * <p>
-      * Can only be used when the tensor is INT32_TENSOR. Will trigger
-      * a copy.
-      *
-      * @return the IntBuffer
-      */
-     public IntBuffer toIntBuffer() {return null;}
+    /**
+     * Flatten the tensor data and convert it to a int buffer.
+     * <p>
+     * Can only be used when the tensor is INT32_TENSOR.
+     *
+     * Note: It returns a buffer that is valid even after Tensor is closed.
+     *
+     * @return the IntBuffer
+     */
+    public IntBuffer toIntBuffer() {
+        checkType(TensorType.INT32_TENSOR);
+        if (isFromJava) {
+            return buffer.asIntBuffer();
+        }
+        IntBuffer ret = IntBuffer.allocate((int) getNumberOfElements()).put(buffer.asIntBuffer());
+        ret.rewind();
+        return ret;
+    }
 
-     /**
-      * Flatten the tensor data and convert it to a double buffer.
-      * <p>
-      * Can only be used when the tensor is DOUBLE_TENSOR.
-      *
-      * Note: It returns a buffer that is valid even after Tensor is closed.
-      *
-      * @return the DoubleBuffer
-      */
-     public DoubleBuffer toDoubleBuffer() {return null;}
+    /**
+     * Flatten the tensor data and convert it to a double buffer.
+     * <p>
+     * Can only be used when the tensor is DOUBLE_TENSOR.
+     *
+     * Note: It returns a buffer that is valid even after Tensor is closed.
+     *
+     * @return the DoubleBuffer
+     */
+    public DoubleBuffer toDoubleBuffer() {
+        checkType(TensorType.DOUBLE_TENSOR);
+        if (isFromJava) {
+            return buffer.asDoubleBuffer();
+        }
+        DoubleBuffer ret = DoubleBuffer.allocate((int) getNumberOfElements()).put(buffer.asDoubleBuffer());
+        ret.rewind();
+        return ret;
+    }
 
-     /**
-      * Flatten the tensor data and convert it to a string list.
-      * <p>
-      * Can only be used when the tensor is STRING_TENSOR. Will trigger
-      * a copy.
-      *
-      * @return the List
-      */
-     List<String> toStringList() {return null;}
+    /**
+     * Get the underlying raw memory data of the tensor.
+     * <p>
+     * WARNING: The returned buffer will be invalid once the tensor is closed.
+     * It should not be called after the tensor has been closed.
+     *
+     * @return the ByteBuffer
+     */
 
-     /**
-      * Gets an int element at the given index.
-      * <p>
-      * Can only be used when the tensor is INT32_TENSOR.
-      * For example, to get an int element from a 3rd-order tensor,
-      * the user should call getInt(x, y, z)
-      *
-      * @param index the index array
-      * @return the int element
-      */
-     int getInt(long... index) {return 0;}
+    public ByteBuffer getByteBuffer() {
+        return buffer;
+    }
 
-     /**
-      * Gets a long element at the given index.
-      * <p>
-      * Can only be used when the tensor is INT64_TENSOR.
-      * For example, to get an long element from a 3rd-order tensor,
-      * the user should call getLong(x, y, z)
-      *
-      * @param index the index array
-      * @return the long element
-      */
-     long getLong(long... index) {return 0;}
+    /**
+     * Flatten the tensor data and convert it to a string list.
+     * <p>
+     * Can only be used when the tensor is STRING_TENSOR.
+     *
+     * Note: It returns list of Strings that is valid even after Tensor is closed.
+     *
+     * @return the List
+     */
+    public List<String> toStringList() {
+        checkType(TensorType.STRING_TENSOR);
+        return nativeToStringList(super.getNativeHandle());
+    }
 
-     /**
-      * Gets a double element at the given index.
-      * <p>
-      * Can only be used when the tensor is DOUBLE_TENSOR.
-      * For example, to get a double element from a 3rd-order tensor,
-      * the user should call getDouble(x, y, z)
-      *
-      * @param index the index array
-      * @return the double element
-      */
-     double getDouble(long... index) {return 0.0;}
+    /**
+     * Gets an int element at the given index.
+     * <p>
+     * Can only be used when the tensor is INT32_TENSOR.
+     * For example, to get an int element from a 3rd-order tensor,
+     * the user should call getInt(x, y, z)
+     *
+     * @param index the index array
+     * @return the int element
+     */
+    public int getInt(long... index) {
+        checkType(TensorType.INT32_TENSOR);
+        long pos = toPos(index);
+        return buffer.asIntBuffer().get((int) pos);
+    }
 
-     /**
-      * Gets a float element at the given index.
-      * <p>
-      * Can only be used when the tensor is FLOAT_TENSOR.
-      * For example, to get a float element from a 3rd-order tensor,
-      * the user should call getFloat(x, y, z)
-      *
-      * @param index the index array
-      * @return the float element
-      */
-     float getFloat(long... index) {return 0.0f;}
+    /**
+     * Gets a long element at the given index.
+     * <p>
+     * Can only be used when the tensor is INT64_TENSOR.
+     * For example, to get an long element from a 3rd-order tensor,
+     * the user should call getLong(x, y, z)
+     *
+     * @param index the index array
+     * @return the long element
+     */
+    public long getLong(long... index) {
+        checkType(TensorType.INT64_TENSOR);
+        long pos = toPos(index);
+        return buffer.asLongBuffer().get((int) pos);
+    }
 
-     /**
-      * Gets a string element at the given index.
-      * <p>
-      * Can only be used when the tensor is STRING_TENSOR.
-      * For example, to get a string element from a 3rd-order tensor,
-      * the user should call getString(x, y, z)
-      *
-      * @param index the index array
-      * @return the string element
-      */
-     String getString(long... index) {return "";} // Not implemented yet
+    /**
+     * Gets a double element at the given index.
+     * <p>
+     * Can only be used when the tensor is DOUBLE_TENSOR.
+     * For example, to get a double element from a 3rd-order tensor,
+     * the user should call getDouble(x, y, z)
+     *
+     * @param index the index array
+     * @return the double element
+     */
+    public double getDouble(long... index) {
+        checkType(TensorType.DOUBLE_TENSOR);
+        long pos = toPos(index);
+        return buffer.asDoubleBuffer().get((int) pos);
+    }
+
+    /**
+     * Gets a float element at the given index.
+     * <p>
+     * Can only be used when the tensor is FLOAT_TENSOR.
+     * For example, to get a float element from a 3rd-order tensor,
+     * the user should call getFloat(x, y, z)
+     *
+     * @param index the index array
+     * @return the float element
+     */
+    public float getFloat(long... index) {
+        checkType(TensorType.FLOAT_TENSOR);
+        long pos = toPos(index);
+        return buffer.asFloatBuffer().get((int) pos);
+    }
+
+    /**
+     * Gets a string element at the given index.
+     * <p>
+     * Can only be used when the tensor is STRING_TENSOR.
+     * For example, to get a string element from a 3rd-order tensor,
+     * the user should call getString(x, y, z)
+     *
+     * @param index the index array
+     * @return the string element
+     */
+    public String getString(long... index) {
+        checkType(TensorType.STRING_TENSOR);
+        long pos = toPos(index);
+        return nativeGetString(pos, super.getNativeHandle());
+    }
 
     private void checkType(TensorType type) {
         if (getTensorType() != type) {
-            throw new NeuropodJNIException("TensorType mismatch! Expected " +
+            throw new NeuropodJNIException("tensorType mismatch, expected " +
                     type.name() + ", found " + getTensorType().name());
 
         }
+    }
+
+    private long toPos(long[] index) {
+        long[] dims = getDims();
+        if (index.length != dims.length) {
+            throw new java.lang.IndexOutOfBoundsException("trying to access index "
+                    + Arrays.toString(index) + ", but the actual dims is " + Arrays.toString(dims));
+        }
+
+        long pos = 0;
+        long acc = 1;
+        for (int i = dims.length - 1; i >= 0; i--) {
+            if (index[i] >= dims[i]) {
+                throw new java.lang.IndexOutOfBoundsException("trying to access index "
+                        + Arrays.toString(index) + ", but the actual dims is " + Arrays.toString(dims));
+            }
+            pos += index[i] * acc;
+            if (i != 0) {
+                acc *= dims[i];
+            }
+        }
+
+        return pos;
     }
 
     // Easier for the JNI side to call methods of super class.
@@ -230,4 +308,8 @@ public class NeuropodTensor extends NativeClass implements Serializable {
     private static native long nativeGetNumberOfElements(long nativeHandle) throws NeuropodJNIException;
 
     private static native ByteBuffer nativeGetBuffer(long nativeHandle);
+
+    private static native List<String> nativeToStringList(long handle) throws NeuropodJNIException;
+
+    private static native String nativeGetString(long pos, long modelHandle);
 }
