@@ -33,5 +33,5 @@ popd
 # bazel coverage configured to create a combined LCOV coverage report for java code.
 # codecov supports Lcov TXT and so .txt file. Copy and rename it accordingly.
 pushd source
-cp bazel-out/_coverage/_coverage_report.dat ./_coverage_report.txt
+cp -f ./bazel-source/bazel-out/_coverage/_coverage_report.dat ./_coverage_report.txt
 popd
