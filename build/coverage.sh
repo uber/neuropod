@@ -29,3 +29,9 @@ bazel query 'kind("cc_binary|cc_test", ...)' | sed 's/\/\//-object bazel-bin\//g
 bazel query 'kind("cc_binary|cc_test", ...)' | sed 's/\/\//-object bazel-bin\//g' |  sed 's/:/\//g' | paste -sd ' ' | xargs ./bazel-source/external/llvm_toolchain/bin/llvm-cov show -instr-profile=/tmp/neuropod_coverage/code.profdata -ignore-filename-regex="(external|tests)" > coverage.txt
 sed -i 's+/proc/self/cwd/+source/+g' coverage.txt
 popd
+
+# bazel coverage configured to create a combined LCOV coverage report for java code.
+# codecov supports Lcov TXT and so .txt file. Copy and rename it accordingly.
+pushd source
+cp bazel-out/_coverage/_coverage_report.dat ./_coverage_report.txt
+popd
