@@ -31,7 +31,7 @@ sed -i 's+/proc/self/cwd/+source/+g' coverage.txt
 popd
 
 # bazel coverage configured to create a combined LCOV coverage report for java code.
-# codecov supports Lcov TXT and so .txt file. Copy and rename it accordingly.
+# codecov supports Lcov TXT and so .txt file. Copy and rename it acc:ordingly.
 pushd source
-cp -f ./bazel-source/bazel-out/_coverage/_coverage_report.dat ./_coverage_report.txt
+[[ -f ./bazel-source/bazel-out/_coverage/_coverage_report.dat ]] && cp -f ./bazel-source/bazel-out/_coverage/_coverage_report.dat ./_coverage_report.txt
 popd
