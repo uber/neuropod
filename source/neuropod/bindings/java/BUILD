@@ -187,15 +187,15 @@ java_test(
 )
 
 java_test(
-    name = "DifferentFeaturesTest",
-    srcs = ["src/test/java/com/uber/neuropod/DifferentFeaturesTest.java"],
+    name = "TensorSpecTest",
+    srcs = ["src/test/java/com/uber/neuropod/TensorSpecTest.java"],
     data = [
         "//neuropod/backends/torchscript:libneuropod_torchscript_backend.so",
         "//neuropod/tests/test_data",
     ],
     javacopts = JAVACOPTS,
     tags = ["requires_path"],
-    test_class = "com.uber.neuropod.DifferentFeaturesTest",
+    test_class = "com.uber.neuropod.TensorSpecTest",
     deps = [
         ":neuropod_java_jar",
         "@junit",

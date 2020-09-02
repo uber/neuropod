@@ -22,7 +22,7 @@ import java.util.*;
 
 import static org.junit.Assert.*;
 
-public class DifferentFeaturesTest {
+public class TensorSpecTest {
     @Before
     public void setUp() throws Exception {
         LibraryLoader.load();
