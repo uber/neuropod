@@ -60,3 +60,13 @@ if [[ $(uname -s) == 'Linux' ]]; then
 fi
 
 popd
+
+# Use a naive substring searching to check if coverage is requested.
+if [[ $@ == *'--config=coverage'* ]]; then
+    # generate coverage for Java
+    pushd source
+    # Set PATH for Java tests
+    export PATH=$PATH:`pwd`/bazel-bin/neuropod/multiprocess/
+    bazel coverage --collect_code_coverage --instrument_test_targets --instrumentation_filter='/java[/:]' --combined_report=lcov --coverage_report_generator=@bazel_tools//tools/test/CoverageOutputGenerator/java/com/google/devtools/coverageoutputgenerator:Main //neuropod/bindings/java/...
+    popd
+fi
