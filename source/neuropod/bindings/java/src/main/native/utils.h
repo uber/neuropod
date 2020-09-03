@@ -68,12 +68,12 @@ std::vector<int64_t> jlongArrayToVector(JNIEnv *env, jlongArray arr);
 template <size_t N>
 void atStringTensor(neuropod::TensorAccessor<neuropod::TypedNeuropodTensor<std::string> &, N> accessor,
                     const std::function<void(string_accessor_type *)> &                       func,
-                    const std::vector<int64_t>                                                targetDim);
+                    const std::vector<int64_t> &                                              targetDim);
 
 template <size_t N>
 void mapStringTensor(neuropod::TensorAccessor<neuropod::TypedNeuropodTensor<std::string> &, N> accessor,
                      const std::function<void(string_accessor_type *)> &                       func,
-                     const std::vector<int64_t>                                                dims);
+                     const std::vector<int64_t> &                                              dims);
 
 } // namespace jni
 } // namespace neuropod
