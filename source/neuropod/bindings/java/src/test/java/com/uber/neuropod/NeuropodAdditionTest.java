@@ -17,7 +17,6 @@ package com.uber.neuropod;
 
 import org.junit.After;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 
 import java.nio.ByteBuffer;
@@ -30,25 +29,28 @@ import java.util.*;
 
 import static org.junit.Assert.*;
 
-public class NeuropodTest {
-    private Neuropod model;
-    private static final String TF_MODEL_PATH = "neuropod/tests/test_data/tf_addition_model/";
-    private static final String TORCHSCRIPT_MODEL_PATH = "neuropod/tests/test_data/torchscript_addition_model_single_output/";
+// Ignoring base class becuase derived will run test.
+public class NeuropodAdditionTest {
+    protected Neuropod model;
+    // Model path should be set by derived class before setUp.
+    protected String model_path;
+
+    // Platform should be set by derived class to (tensorflow, torchscript).
+    protected String platform;
 
     // When asserting float and double, juint4 requires an additional delta value. Float and double are not precise.
     // If the absolute difference between the expected value and the actual value is smaller than this delta value,
     // junit4 will think they are the same value even they do not equal to each other.
     private static final double EPSILON = 1E-6;
 
-    @Before
-    public void setUp() throws Exception {
+    protected void prepareEnvironment() throws Exception {
         LibraryLoader.load();
         // Set the test mode to true to use override library path
         LibraryLoader.setTestMode(true);
         RuntimeOptions opts = new RuntimeOptions();
         // TODO(weijiad): For now OPE is required to use the Java bindings
         opts.useOpe = true;
-        model = new Neuropod(TF_MODEL_PATH, opts);
+        model = new Neuropod(model_path, opts);
     }
 
     @Test
@@ -58,15 +60,15 @@ public class NeuropodTest {
             model.close();
         } catch (Exception e) {
             System.out.println(e.getMessage());
-            fail();
+            fail("Exception is not expected");
         }
+
         try {
             model.getName();
+            fail("Exception is expected because model is closed already");
         } catch (Exception e) {
             System.out.println(e.getMessage());
-            return;
         }
-        fail();
     }
 
     @Test
@@ -78,7 +80,7 @@ public class NeuropodTest {
     @Test
     public void getPlatform() {
         String platform = model.getPlatform();
-        assertEquals("tensorflow", platform);
+        assertEquals(this.platform, platform);
     }
 
     @Test
@@ -102,25 +104,12 @@ public class NeuropodTest {
     }
 
     @Test
-    public void getOutputsTestSymbol() {
-        RuntimeOptions opts = new RuntimeOptions();
-        // TODO(weijiad): For now OPE is required to use the Java bindings
-        opts.useOpe = true;
-        try (Neuropod torchModel = new Neuropod(TORCHSCRIPT_MODEL_PATH, opts)) {
-            Set<TensorSpec> outputs = new HashSet<>(torchModel.getOutputs());
-            Set<TensorSpec> expected = new HashSet<>(Arrays.asList(
-                    new TensorSpec("out", TensorType.FLOAT_TENSOR,
-                            Arrays.asList(new Dimension("batch_size"), new Dimension(-1)))));
-        }
-    }
-
-    @Test
     public void loadModel() {
         RuntimeOptions ope = new RuntimeOptions();
         // TODO(weijiad): For now OPE is required to use the Java bindings
         ope.useOpe = true;
         ope.loadModelAtConstruction = false;
-        try (Neuropod model = new Neuropod(TF_MODEL_PATH, ope)) {
+        try (Neuropod model = new Neuropod(model_path, ope)) {
             try {
                 model.loadModel();
                 NeuropodTensorAllocator allocator = model.getTensorAllocator();
@@ -244,20 +233,48 @@ public class NeuropodTest {
         Map<String, NeuropodTensor> res2 = model.infer(inputs, requestedOutputs);
         assertEquals(1, res2.size());
 
+        tensorX.close();
+        tensorY.close();
+        allocator.close();
+    }
+
+    @Test
+    public void inferWithUnexpectedRequestedOutput() {
+        // Note that TF performs validation of requested output at the very begining.
+        // Hence it doesn't need valid Input in this test because it supposed to fail before it tests Input.
+        // But Torchscript is trying to use input and only then detects wrong requested output.
+        // This is why we build valid Input here even we don't care about input/output value really.
+        NeuropodTensorAllocator allocator = model.getTensorAllocator();
+        TensorType type = TensorType.FLOAT_TENSOR;
+        ByteBuffer buffer = ByteBuffer.allocateDirect(type.getBytesPerElement() * 2).order(ByteOrder.nativeOrder());
+        FloatBuffer floatBuffer = buffer.asFloatBuffer();
+        floatBuffer.put(1.0f);
+        NeuropodTensor tensor = allocator.tensorFromMemory(buffer, new long[]{1L, 1L}, type);
+
+        Map<String, NeuropodTensor> inputs = new HashMap<>();
+        inputs.put("x", tensor);
+        inputs.put("y", tensor);
+
         try
         {
+           // Inference with requested outputs.
+           List<String> requestedOutputs = new ArrayList<String>();
+           requestedOutputs.add("out");
            // Add unexpected "requested output" that should cause a failure.
            requestedOutputs.add("out_wrong");
-           Map<String, NeuropodTensor> res3 = model.infer(inputs, requestedOutputs);
+           Map<String, NeuropodTensor> res = model.infer(inputs, requestedOutputs);
            Assert.fail("Expected exception on wrong requested output");
         }
         catch (Exception expected)
         {
-           assertTrue(expected.getMessage().contains("Node out_wrong not found in node_name_mapping"));
+           // Note that TF and Torchscript returns different exception message.
+           // TF: Node out_wrong not found in node_name_mapping
+           // Torchscript: Tried to request a tensor that does not exist: out_wrong
+           // Test that message contains out_wrong name.
+           assertTrue(expected.getMessage(), expected.getMessage().contains("out_wrong"));
         }
 
-        tensorX.close();
-        tensorY.close();
+        tensor.close();
         allocator.close();
     }
 
