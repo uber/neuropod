@@ -36,7 +36,7 @@ jobject createDirectBuffer(JNIEnv *env, NeuropodTensor *tensor)
 template <size_t N>
 void mapStringTensor(neuropod::TensorAccessor<neuropod::TypedNeuropodTensor<std::string> &, N> accessor,
                      const std::function<void(string_accessor_type *)> &                       func,
-                     const std::vector<int64_t>                                                dims)
+                     const std::vector<int64_t> &                                              dims)
 {
     for (int i = 0; i < dims[N - 1]; i++)
     {
@@ -49,7 +49,7 @@ void mapStringTensor(neuropod::TensorAccessor<neuropod::TypedNeuropodTensor<std:
 template <>
 inline void mapStringTensor(neuropod::TensorAccessor<neuropod::TypedNeuropodTensor<std::string> &, 1> accessor,
                             const std::function<void(string_accessor_type *)> &                       func,
-                            const std::vector<int64_t>                                                dims)
+                            const std::vector<int64_t> &                                              dims)
 {
     for (int i = 0; i < dims[0]; i++)
     {
@@ -63,7 +63,7 @@ inline void mapStringTensor(neuropod::TensorAccessor<neuropod::TypedNeuropodTens
 template <size_t N>
 void atStringTensor(neuropod::TensorAccessor<neuropod::TypedNeuropodTensor<std::string> &, N> accessor,
                     const std::function<void(string_accessor_type *)> &                       func,
-                    const std::vector<int64_t>                                                targetDim)
+                    const std::vector<int64_t> &                                              targetDim)
 {
     atStringTensor(accessor[targetDim[N - 1]], func, targetDim);
 }
@@ -71,7 +71,7 @@ void atStringTensor(neuropod::TensorAccessor<neuropod::TypedNeuropodTensor<std::
 template <>
 inline void atStringTensor(neuropod::TensorAccessor<neuropod::TypedNeuropodTensor<std::string> &, 1> accessor,
                            const std::function<void(string_accessor_type *)> &                       func,
-                           const std::vector<int64_t>                                                targetDim)
+                           const std::vector<int64_t> &                                              targetDim)
 {
     auto elementAcc = accessor[targetDim[0]];
     func(&elementAcc);
