@@ -20,7 +20,7 @@ import java.util.Map;
 
 /**
  * This class holds the information of a Neuropod model. It has its underlying C++ Neuropod
- * object, should call close() function to free the C++ side object when finish using the Neuopod object
+ * object, should call close() function to free the C++ side object when finish using the Neuropod object
  * This class is not thread-safe.
  */
 public class Neuropod extends NativeClass {
