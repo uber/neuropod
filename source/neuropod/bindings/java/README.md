@@ -42,5 +42,5 @@ model.close();
 ```
 
 Note: Using [try-with-resources](https://docs.oracle.com/javase/tutorial/essential/exceptions/tryResourceClose.html) can help improve exception safety of your code.
-This is useful in case of multiple Tensor allocations because:
-"Resources are initialized in left-to-right order. If a resource fails to initialize (that is, its initialize expression throws an exception), then all resources initialized so far by the try-with-resources statement are closed."
+This is useful in case of multiple Tensor allocations, as explained at https://docs.oracle.com/javase/specs/jls/se8/html/jls-14.html#jls-14.20.3
+"Resources are initialized in left-to-right order. If a resource fails to initialize (that is, its initializer expression throws an exception), then all resources initialized so far by the try-with-resources statement are closed."
