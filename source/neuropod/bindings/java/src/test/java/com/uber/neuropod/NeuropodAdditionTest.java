@@ -21,10 +21,7 @@ import org.junit.Test;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.nio.DoubleBuffer;
 import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
-import java.nio.LongBuffer;
 
 import java.util.*;
 
@@ -120,85 +117,6 @@ public class NeuropodAdditionTest {
                 fail();
             }
         }
-    }
-
-    @Test
-    public void InputDoubleTensor() {
-       NeuropodTensorAllocator allocator = model.getTensorAllocator();
-
-       TensorType type = TensorType.DOUBLE_TENSOR;
-       ByteBuffer buffer = ByteBuffer.allocateDirect(type.getBytesPerElement() * 2).order(ByteOrder.nativeOrder());
-
-       DoubleBuffer typedBuffer = buffer.asDoubleBuffer();
-       typedBuffer.put(1.0f);
-       typedBuffer.put(2.0f);
-       NeuropodTensor tensor = allocator.tensorFromMemory(buffer, new long[]{1L, 2L}, type);
-       assertNotNull(tensor.toDoubleBuffer());
-
-       assertArrayEquals(new long[]{1L, 2L}, tensor.getDims());
-       assertEquals(2, tensor.getNumberOfElements());
-       assertEquals(TensorType.DOUBLE_TENSOR, tensor.getTensorType());
-
-       tensor.close();
-       allocator.close();
-    }
-
-    @Test
-    public void InputIntTensor() {
-       NeuropodTensorAllocator allocator = model.getTensorAllocator();
-
-       TensorType type = TensorType.INT32_TENSOR;
-       ByteBuffer buffer = ByteBuffer.allocateDirect(type.getBytesPerElement() * 2).order(ByteOrder.nativeOrder());
-
-       IntBuffer typedBuffer = buffer.asIntBuffer();
-       typedBuffer.put(1);
-       typedBuffer.put(2);
-       NeuropodTensor tensor = allocator.tensorFromMemory(buffer, new long[]{1L, 2L}, type);
-       assertNotNull(tensor.toIntBuffer());
-
-       assertArrayEquals(new long[]{1L, 2L}, tensor.getDims());
-       assertEquals(2, tensor.getNumberOfElements());
-       assertEquals(TensorType.INT32_TENSOR, tensor.getTensorType());
-
-       tensor.close();
-       allocator.close();
-    }
-
-    @Test
-    public void InputLongTensor() {
-       NeuropodTensorAllocator allocator = model.getTensorAllocator();
-
-       TensorType type = TensorType.INT64_TENSOR;
-       ByteBuffer buffer = ByteBuffer.allocateDirect(type.getBytesPerElement() * 2).order(ByteOrder.nativeOrder());
-
-       LongBuffer typedBuffer = buffer.asLongBuffer();
-       typedBuffer.put(1);
-       typedBuffer.put(2);
-       NeuropodTensor tensor = allocator.tensorFromMemory(buffer, new long[]{1L, 2L}, type);
-       assertNotNull(tensor.toLongBuffer());
-
-       assertArrayEquals(new long[]{1L, 2L}, tensor.getDims());
-       assertEquals(2, tensor.getNumberOfElements());
-       assertEquals(TensorType.INT64_TENSOR, tensor.getTensorType());
-
-       tensor.close();
-       allocator.close();
-    }
-
-    @Test
-    public void InputStringTensor() {
-       NeuropodTensorAllocator allocator = model.getTensorAllocator();
-
-       TensorType type = TensorType.STRING_TENSOR;
-
-       // Note that for String Tensor we can't use low level allocator's method tensorFromMemory
-       // that accepts direct ByteBuffer as input. It throws exception "unsupported tensor type"
-       // and intentionally prevents using it for String Tensors.
-
-       // Allocator provides create/copyFrom methods to create String Tensors in a safe way.
-       // TBD: Complete test when it is available.
-
-       allocator.close();
     }
 
     @Test

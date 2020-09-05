@@ -51,10 +51,7 @@ JNIEXPORT jlong JNICALL Java_com_uber_neuropod_NeuropodTensorAllocator_nativeAll
         auto allocator = *reinterpret_cast<std::shared_ptr<neuropod::NeuropodTensorAllocator> *>(handle);
 
         // Prepare shape
-        jsize                size = env->GetArrayLength(dims);
-        jlong *              arr  = env->GetLongArrayElements(dims, 0);
-        std::vector<int64_t> shapes(arr, arr + size);
-        env->ReleaseLongArrayElements(dims, arr, JNI_ABORT);
+        std::vector<int64_t> shapes = jlongArrayToVector(env, dims);
         // Prepare Buffer
         auto                    globalBufferRef = env->NewGlobalRef(buffer);
         auto                    bufferAddress   = env->GetDirectBufferAddress(buffer);
@@ -86,6 +83,59 @@ JNIEXPORT jlong JNICALL Java_com_uber_neuropod_NeuropodTensorAllocator_nativeAll
             throw std::runtime_error("unsupported tensor type");
         }
         return reinterpret_cast<jlong>(toHeap(tensor));
+    }
+    catch (const std::exception &e)
+    {
+        throwJavaException(env, e.what());
+    }
+    return reinterpret_cast<jlong>(nullptr);
+}
+
+JNIEXPORT jlong JNICALL Java_com_uber_neuropod_NeuropodTensorAllocator_nativeCreateStringTensor(
+    JNIEnv *env, jclass, jobject data, jlongArray dims, jlong allocatorHandle)
+{
+    try
+    {
+        auto allocator = *reinterpret_cast<std::shared_ptr<neuropod::NeuropodTensorAllocator> *>(allocatorHandle);
+
+        // Prepare shape and then allocate tensor.
+        std::vector<int64_t>                        shapes     = jlongArrayToVector(env, dims);
+        auto                                        tensor     = allocator->allocate_tensor<std::string>(shapes);
+        jlong                                       currentPos = 0;
+        std::function<void(string_accessor_type *)> mapFunc    = [env, data, &currentPos](string_accessor_type *elem) {
+            jstring element = static_cast<jstring>(env->CallObjectMethod(data, java_util_ArrayList_get, currentPos++));
+            *elem           = toString(env, element);
+            env->DeleteLocalRef(element);
+        };
+        switch (shapes.size())
+        {
+        case 1:
+            mapStringTensor(tensor->accessor<1>(), mapFunc, shapes);
+            break;
+        case 2:
+            mapStringTensor(tensor->accessor<2>(), mapFunc, shapes);
+            break;
+        case 3:
+            mapStringTensor(tensor->accessor<3>(), mapFunc, shapes);
+            break;
+        case 4:
+            mapStringTensor(tensor->accessor<4>(), mapFunc, shapes);
+            break;
+        default:
+            // This function copy data twice
+            jlong                    size = env->CallIntMethod(data, java_util_ArrayList_size);
+            std::vector<std::string> intermediate(size);
+            for (jlong i = 0; i < size; ++i)
+            {
+                jstring element = static_cast<jstring>(env->CallObjectMethod(data, java_util_ArrayList_get, i));
+                intermediate[i] = toString(env, element);
+                env->DeleteLocalRef(element);
+            }
+            tensor->copy_from(intermediate);
+        }
+
+        std::shared_ptr<neuropod::NeuropodValue> ret = tensor;
+        return reinterpret_cast<jlong>(toHeap(ret));
     }
     catch (const std::exception &e)
     {

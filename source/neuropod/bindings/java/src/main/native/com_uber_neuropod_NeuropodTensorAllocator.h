@@ -32,6 +32,14 @@ Java_com_uber_neuropod_NeuropodTensorAllocator_nativeAllocate(JNIEnv *, jclass, 
 
 /*
  * Class:     com_uber_neuropod_NeuropodTensorAllocator
+ * Method:    nativeCreateStringTensor
+ * Signature: (Ljava/util/List;[JJ)J
+ */
+JNIEXPORT jlong JNICALL
+Java_com_uber_neuropod_NeuropodTensorAllocator_nativeCreateStringTensor(JNIEnv *, jclass, jobject, jlongArray, jlong);
+
+/*
+ * Class:     com_uber_neuropod_NeuropodTensorAllocator
  * Method:    nativeDelete
  * Signature: (J)V
  */
