@@ -365,6 +365,25 @@ cc_test(
 )
 
 cc_test(
+    name = "test_ope_multiple_instances",
+    srcs = [
+        "test_ope_multiple_instances.cc",
+    ],
+    data = [
+        "//neuropod/backends/python_bridge:libneuropod_pythonbridge_backend.so",
+    ],
+    tags = [
+        "no_trace_logging",
+        "requires_path",
+    ],
+    deps = [
+        ":neuropod_test_utils",
+        "//neuropod:neuropod_impl",
+        "//neuropod/multiprocess",
+    ],
+)
+
+cc_test(
     name = "test_internal_neuropod_tensor",
     srcs = [
         "test_internal_neuropod_tensor.cc",
