@@ -192,9 +192,10 @@ public:
                       const SHMBlockID &          block_id)
         : TypedNeuropodTensor<std::string>(copy_and_strip_last_dim(dims)), write_buffer_(this->get_num_elements())
     {
-        auto base_ptr =
-            stdx::make_unique<SHMNeuropodTensor<uint8_t>>(dims, std::move(block), data, block_id)->get_raw_data_ptr();
-        auto max_len = dims[dims.size() - 1];
+        auto byte_block = stdx::make_unique<SHMNeuropodTensor<uint8_t>>(dims, std::move(block), data, block_id);
+
+        auto base_ptr = byte_block->get_raw_data_ptr();
+        auto max_len  = dims[dims.size() - 1];
 
         // Copy into our local buffer
         auto numel = get_num_elements();
