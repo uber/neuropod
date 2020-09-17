@@ -51,7 +51,10 @@ Neuropod::Neuropod(const std::string &                 neuropod_path,
 }
 
 // Load the model config and use the backend that was provided by the user
-Neuropod::Neuropod(const std::string &neuropod_path, std::shared_ptr<NeuropodBackend> backend) : backend_(backend) {}
+Neuropod::Neuropod(const std::string &neuropod_path, std::shared_ptr<NeuropodBackend> backend)
+    : backend_(std::move(backend))
+{
+}
 
 Neuropod::~Neuropod() = default;
 

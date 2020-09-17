@@ -21,10 +21,9 @@ limitations under the License.
 
 #include <jni.h>
 
-namespace neuropod
+namespace neuropod::jni
 {
-namespace jni
-{
+
 // java_util_ArrayList is used to preset TesnorSpec data.
 jclass    java_util_ArrayList;
 jmethodID java_util_ArrayList_;
@@ -60,12 +59,15 @@ jclass com_uber_neuropod_NeuropodJNIException;
 jint JNI_VERSION = JNI_VERSION_1_8;
 
 bool isTestMode = false;
-} // namespace jni
-} // namespace neuropod
 
+} // namespace neuropod::jni
+
+// TODO(vkuzmin): fix this
+// NOLINTNEXTLINE(google-build-using-namespace)
 using namespace neuropod::jni;
 
 // This function is called when the JNI is loaded.
+// NOLINTNEXTLINE(readability-identifier-naming): Ignore function case for Java API methods
 jint JNI_OnLoad(JavaVM *vm, void *reserved)
 {
     // Obtain the JNIEnv from the VM and confirm JNI_VERSION
@@ -78,56 +80,57 @@ jint JNI_OnLoad(JavaVM *vm, void *reserved)
     // Move this exception class out of try catch block to avoid unexpected error when throw a java exception and the
     // exception type is wrong
     com_uber_neuropod_NeuropodJNIException =
-        static_cast<jclass>(env->NewGlobalRef(findClass(env, "com/uber/neuropod/NeuropodJNIException")));
+        static_cast<jclass>(env->NewGlobalRef(find_class(env, "com/uber/neuropod/NeuropodJNIException")));
     try
     {
-        java_util_ArrayList      = static_cast<jclass>(env->NewGlobalRef(findClass(env, "java/util/ArrayList")));
-        java_util_ArrayList_     = getMethodID(env, java_util_ArrayList, "<init>", "(I)V");
-        java_util_ArrayList_add  = getMethodID(env, java_util_ArrayList, "add", "(Ljava/lang/Object;)Z");
-        java_util_ArrayList_get  = getMethodID(env, java_util_ArrayList, "get", "(I)Ljava/lang/Object;");
-        java_util_ArrayList_size = getMethodID(env, java_util_ArrayList, "size", "()I");
+        java_util_ArrayList      = static_cast<jclass>(env->NewGlobalRef(find_class(env, "java/util/ArrayList")));
+        java_util_ArrayList_     = get_method_id(env, java_util_ArrayList, "<init>", "(I)V");
+        java_util_ArrayList_add  = get_method_id(env, java_util_ArrayList, "add", "(Ljava/lang/Object;)Z");
+        java_util_ArrayList_get  = get_method_id(env, java_util_ArrayList, "get", "(I)Ljava/lang/Object;");
+        java_util_ArrayList_size = get_method_id(env, java_util_ArrayList, "size", "()I");
 
-        java_util_HashMap  = static_cast<jclass>(env->NewGlobalRef(findClass(env, "java/util/HashMap")));
-        java_util_HashMap_ = getMethodID(env, java_util_HashMap, "<init>", "()V");
+        java_util_HashMap  = static_cast<jclass>(env->NewGlobalRef(find_class(env, "java/util/HashMap")));
+        java_util_HashMap_ = get_method_id(env, java_util_HashMap, "<init>", "()V");
         java_util_HashMap_put =
-            getMethodID(env, java_util_HashMap, "put", "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;");
+            get_method_id(env, java_util_HashMap, "put", "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;");
 
-        java_util_Map_Entry          = static_cast<jclass>(env->NewGlobalRef(findClass(env, "java/util/Map$Entry")));
-        java_util_Map_Entry_getKey   = getMethodID(env, java_util_Map_Entry, "getKey", "()Ljava/lang/Object;");
-        java_util_Map_Entry_getValue = getMethodID(env, java_util_Map_Entry, "getValue", "()Ljava/lang/Object;");
+        java_util_Map_Entry          = static_cast<jclass>(env->NewGlobalRef(find_class(env, "java/util/Map$Entry")));
+        java_util_Map_Entry_getKey   = get_method_id(env, java_util_Map_Entry, "getKey", "()Ljava/lang/Object;");
+        java_util_Map_Entry_getValue = get_method_id(env, java_util_Map_Entry, "getValue", "()Ljava/lang/Object;");
 
         com_uber_neuropod_TensorSpec =
-            static_cast<jclass>(env->NewGlobalRef(findClass(env, "com/uber/neuropod/TensorSpec")));
+            static_cast<jclass>(env->NewGlobalRef(find_class(env, "com/uber/neuropod/TensorSpec")));
         com_uber_neuropod_TensorSpec_ =
-            getMethodID(env,
-                        com_uber_neuropod_TensorSpec,
-                        "<init>",
-                        "(Ljava/lang/String;Lcom/uber/neuropod/TensorType;Ljava/util/List;)V");
+            get_method_id(env,
+                          com_uber_neuropod_TensorSpec,
+                          "<init>",
+                          "(Ljava/lang/String;Lcom/uber/neuropod/TensorType;Ljava/util/List;)V");
 
         com_uber_neuropod_Dimension =
-            static_cast<jclass>(env->NewGlobalRef(findClass(env, "com/uber/neuropod/Dimension")));
-        com_uber_neuropod_Dimension_value_ = getMethodID(env, com_uber_neuropod_Dimension, "<init>", "(J)V");
+            static_cast<jclass>(env->NewGlobalRef(find_class(env, "com/uber/neuropod/Dimension")));
+        com_uber_neuropod_Dimension_value_ = get_method_id(env, com_uber_neuropod_Dimension, "<init>", "(J)V");
         com_uber_neuropod_Dimension_symbol_ =
-            getMethodID(env, com_uber_neuropod_Dimension, "<init>", "(Ljava/lang/String;)V");
+            get_method_id(env, com_uber_neuropod_Dimension, "<init>", "(Ljava/lang/String;)V");
 
         com_uber_neuropod_TensorType =
-            static_cast<jclass>(env->NewGlobalRef(findClass(env, "com/uber/neuropod/TensorType")));
+            static_cast<jclass>(env->NewGlobalRef(find_class(env, "com/uber/neuropod/TensorType")));
 
         com_uber_neuropod_NeuropodTensor =
-            static_cast<jclass>(env->NewGlobalRef(findClass(env, "com/uber/neuropod/NeuropodTensor")));
-        com_uber_neuropod_NeuropodTensor_ = getMethodID(env, com_uber_neuropod_NeuropodTensor, "<init>", "(J)V");
+            static_cast<jclass>(env->NewGlobalRef(find_class(env, "com/uber/neuropod/NeuropodTensor")));
+        com_uber_neuropod_NeuropodTensor_ = get_method_id(env, com_uber_neuropod_NeuropodTensor, "<init>", "(J)V");
         com_uber_neuropod_NeuropodTensor_getHandle =
-            getMethodID(env, com_uber_neuropod_NeuropodTensor, "getHandle", "()J");
+            get_method_id(env, com_uber_neuropod_NeuropodTensor, "getHandle", "()J");
     }
     catch (const std::exception &e)
     {
-        throwJavaException(env, e.what());
+        throw_java_exception(env, e.what());
     }
     // Return the JNI Version as required by method
     return JNI_VERSION;
 }
 
 // This function is called when the JNI is unloaded.
+// NOLINTNEXTLINE(readability-identifier-naming): Ignore function case for Java API methods
 void JNI_OnUnload(JavaVM *vm, void *reserved)
 {
     // Obtain the JNIEnv from the VM

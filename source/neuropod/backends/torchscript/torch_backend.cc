@@ -167,7 +167,7 @@ void insert_value_in_output(NeuropodValueMap & output,
 #endif
 
         // if tensor_type string or no tensor_type and empty list or list containing actual string
-        if ((has_type && tensor_type == TensorType::STRING_TENSOR) || (!has_type && list.size() == 0) ||
+        if ((has_type && tensor_type == TensorType::STRING_TENSOR) || (!has_type && list.empty()) ||
             (!has_type && list[0].isString()))
         {
             // Make a TorchNeuropodTensor
@@ -286,10 +286,8 @@ torch::Device TorchNeuropodBackend::get_torch_device(NeuropodDeviceType target_d
     {
         return torch::kCPU;
     }
-    else
-    {
-        return torch::Device(torch::kCUDA, options_.visible_device);
-    }
+
+    return torch::Device(torch::kCUDA, options_.visible_device);
 }
 
 // Run inference
@@ -433,6 +431,7 @@ std::unique_ptr<NeuropodValueMap> TorchNeuropodBackend::infer_internal(const Neu
         if (is_named_tuple)
         {
             // This is a named tuple
+            // NOLINTNEXTLINE(modernize-loop-convert): Can't always use a range based loop here
             for (int i = 0; i < elems.size(); i++)
             {
                 insert_value_in_output(*to_return, GET_NAME(i), elems.at(i));

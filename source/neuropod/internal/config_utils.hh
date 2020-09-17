@@ -55,7 +55,7 @@ struct Dimension
 // A struct that stores a specification for a tensor
 struct TensorSpec
 {
-    TensorSpec(const std::string &name, const std::vector<Dimension> dims, const TensorType type);
+    TensorSpec(std::string name, std::vector<Dimension> dims, const TensorType type);
     ~TensorSpec();
 
     const std::string            name;

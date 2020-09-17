@@ -274,7 +274,7 @@ TensorflowNeuropodBackend::~TensorflowNeuropodBackend()
 int64_t TensorflowNeuropodBackend::get_callable(const std::map<std::string, tensorflow::Tensor> &tensor_feeds,
                                                 const std::map<std::string, std::string> &       tensor_fetches)
 {
-    tensorflow::Session::CallableHandle handle;
+    tensorflow::Session::CallableHandle handle{};
 
     const auto cache_key     = get_handle_cache_key(tensor_feeds, tensor_fetches);
     auto       cached_handle = callable_handle_cache_.find(cache_key);
@@ -335,7 +335,7 @@ std::unique_ptr<NeuropodValueMap> TensorflowNeuropodBackend::infer_internal(
     std::map<std::string, tensorflow::Tensor> tensor_feeds;
 
     // Get the set of outputs we want to compute
-    const auto &output_names = requested_outputs.size() > 0 ? requested_outputs : output_names_;
+    const auto &output_names = !requested_outputs.empty() ? requested_outputs : output_names_;
 
     // Transform neuropod output names to node names in the graph
     for (const auto &name : output_names)

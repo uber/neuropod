@@ -28,9 +28,9 @@ namespace neuropod
 namespace
 {
 
-typedef int   cudaError_t;
-typedef int   nvmlReturn_t;
-typedef void *nvmlDevice_t;
+using cudaError_t  = int;
+using nvmlReturn_t = int;
+using nvmlDevice_t = void *;
 
 // __host__​__device__​cudaError_t cudaGetDeviceCount ( int* count )
 cudaError_t (*cudaGetDeviceCount)(int *);

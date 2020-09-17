@@ -21,7 +21,7 @@ namespace neuropod
 // Used to print out the enum names rather than just a number
 std::ostream &operator<<(std::ostream &out, const TensorType value)
 {
-    const char *s = 0;
+    const char *s = nullptr;
 #define GENERATE_CASE(item) \
     case (item):            \
         s = #item;          \

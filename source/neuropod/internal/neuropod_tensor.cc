@@ -48,7 +48,7 @@ std::vector<int64_t> compute_strides(const std::vector<int64_t> &dims)
 size_t compute_num_elements(const std::vector<int64_t> &dims)
 {
     // Get the number of elements in the tensor by multiplying all the dims together
-    return std::accumulate(dims.begin(), dims.end(), 1, std::multiplies<int64_t>());
+    return std::accumulate(dims.begin(), dims.end(), 1, std::multiplies<>());
 }
 
 } // namespace
@@ -154,13 +154,25 @@ void NeuropodTensor::assure_device_cpu() const
 NeuropodTensor *NeuropodValue::as_tensor()
 {
     assure_tensor();
-    return static_cast<NeuropodTensor *>(this);
+    auto ten = dynamic_cast<NeuropodTensor *>(this);
+    if (ten == nullptr)
+    {
+        NEUROPOD_ERROR("Casting NeuropodValue to tensor failed");
+    }
+
+    return ten;
 }
 
 const NeuropodTensor *NeuropodValue::as_tensor() const
 {
     assure_tensor();
-    return static_cast<const NeuropodTensor *>(this);
+    auto ten = dynamic_cast<const NeuropodTensor *>(this);
+    if (ten == nullptr)
+    {
+        NEUROPOD_ERROR("Casting NeuropodValue to tensor failed");
+    }
+
+    return ten;
 }
 
 template <typename T>

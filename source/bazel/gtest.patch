@@ -1,0 +1,148 @@
+This patch fixes `clang-tidy` issues within gtest
+
+diff --git googlemock/include/gmock/gmock-function-mocker.h googlemock/include/gmock/gmock-function-mocker.h
+index 7140a289478..eaab64cc909 100644
+--- googlemock/include/gmock/gmock-function-mocker.h
++++ googlemock/include/gmock/gmock-function-mocker.h
+@@ -132,7 +132,7 @@ using internal::FunctionMocker;
+ #define GMOCK_INTERNAL_MOCK_METHOD_IMPL(_N, _MethodName, _Constness,           \
+                                         _Override, _Final, _NoexceptSpec,      \
+                                         _CallType, _Signature)                 \
+-  typename ::testing::internal::Function<GMOCK_PP_REMOVE_PARENS(               \
++  [[maybe_unused]] typename ::testing::internal::Function<GMOCK_PP_REMOVE_PARENS(\
+       _Signature)>::Result                                                     \
+   GMOCK_INTERNAL_EXPAND(_CallType)                                             \
+       _MethodName(GMOCK_PP_REPEAT(GMOCK_INTERNAL_PARAMETER, _Signature, _N))   \
+@@ -143,14 +143,14 @@ using internal::FunctionMocker;
+     return GMOCK_MOCKER_(_N, _Constness, _MethodName)                          \
+         .Invoke(GMOCK_PP_REPEAT(GMOCK_INTERNAL_FORWARD_ARG, _Signature, _N));  \
+   }                                                                            \
+-  ::testing::MockSpec<GMOCK_PP_REMOVE_PARENS(_Signature)> gmock_##_MethodName( \
++  [[maybe_unused]] ::testing::MockSpec<GMOCK_PP_REMOVE_PARENS(_Signature)> gmock_##_MethodName(\
+       GMOCK_PP_REPEAT(GMOCK_INTERNAL_MATCHER_PARAMETER, _Signature, _N))       \
+       GMOCK_PP_IF(_Constness, const, ) {                                       \
+     GMOCK_MOCKER_(_N, _Constness, _MethodName).RegisterOwner(this);            \
+     return GMOCK_MOCKER_(_N, _Constness, _MethodName)                          \
+         .With(GMOCK_PP_REPEAT(GMOCK_INTERNAL_MATCHER_ARGUMENT, , _N));         \
+   }                                                                            \
+-  ::testing::MockSpec<GMOCK_PP_REMOVE_PARENS(_Signature)> gmock_##_MethodName( \
++  [[maybe_unused]] ::testing::MockSpec<GMOCK_PP_REMOVE_PARENS(_Signature)> gmock_##_MethodName(\
+       const ::testing::internal::WithoutMatchers&,                             \
+       GMOCK_PP_IF(_Constness, const, )::testing::internal::Function<           \
+           GMOCK_PP_REMOVE_PARENS(_Signature)>*) const _NoexceptSpec {          \
+diff --git googletest/include/gtest/gtest-param-test.h googletest/include/gtest/gtest-param-test.h
+--- googletest/include/gtest/gtest-param-test.h
++++ googletest/include/gtest/gtest-param-test.h
+@@ -412,7 +412,7 @@
+ }
+
+ #define TEST_P(test_suite_name, test_name)                                     \
+-  class GTEST_TEST_CLASS_NAME_(test_suite_name, test_name)                     \
++  class GTEST_TEST_CLASS_NAME_(test_suite_name, test_name) /* NOLINT */        \
+       : public test_suite_name {                                               \
+    public:                                                                     \
+     GTEST_TEST_CLASS_NAME_(test_suite_name, test_name)() {}                    \
+diff --git googletest/include/gtest/internal/gtest-internal.h googletest/include/gtest/internal/gtest-internal.h
+index 27326608..84a24ee2 100644
+--- googletest/include/gtest/internal/gtest-internal.h
++++ googletest/include/gtest/internal/gtest-internal.h
+@@ -1331,7 +1331,7 @@ class NeverThrown {
+     gtest_msg.value += " with description \"";                                 \
+     gtest_msg.value += e.what();                                               \
+     gtest_msg.value += "\".";                                                  \
+-    goto GTEST_CONCAT_TOKEN_(gtest_label_testthrow_, __LINE__);                \
++    goto GTEST_CONCAT_TOKEN_(gtest_label_testthrow_, __LINE__);/* NOLINT */    \
+   }
+
+ #else  // GTEST_HAS_EXCEPTIONS
+@@ -1354,13 +1354,13 @@ class NeverThrown {
+       gtest_msg.value = "Expected: " #statement                             \
+                         " throws an exception of type " #expected_exception \
+                         ".\n  Actual: it throws a different type.";         \
+-      goto GTEST_CONCAT_TOKEN_(gtest_label_testthrow_, __LINE__);           \
++      goto GTEST_CONCAT_TOKEN_(gtest_label_testthrow_, __LINE__);/* NOLINT */\
+     }                                                                       \
+     if (!gtest_caught_expected) {                                           \
+       gtest_msg.value = "Expected: " #statement                             \
+                         " throws an exception of type " #expected_exception \
+                         ".\n  Actual: it throws nothing.";                  \
+-      goto GTEST_CONCAT_TOKEN_(gtest_label_testthrow_, __LINE__);           \
++      goto GTEST_CONCAT_TOKEN_(gtest_label_testthrow_, __LINE__);/* NOLINT */\
+     }                                                                       \
+   } else /*NOLINT*/                                                         \
+     GTEST_CONCAT_TOKEN_(gtest_label_testthrow_, __LINE__)                   \
+@@ -1375,7 +1375,7 @@ class NeverThrown {
+     gtest_msg.value += " with description \"";                    \
+     gtest_msg.value += e.what();                                  \
+     gtest_msg.value += "\".";                                     \
+-    goto GTEST_CONCAT_TOKEN_(gtest_label_testnothrow_, __LINE__); \
++    goto GTEST_CONCAT_TOKEN_(gtest_label_testnothrow_, __LINE__);/* NOLINT */\
+   }
+
+ #else  // GTEST_HAS_EXCEPTIONS
+@@ -1393,7 +1393,7 @@ class NeverThrown {
+     GTEST_TEST_NO_THROW_CATCH_STD_EXCEPTION_() \
+     catch (...) { \
+       gtest_msg.value = "it throws."; \
+-      goto GTEST_CONCAT_TOKEN_(gtest_label_testnothrow_, __LINE__); \
++      goto GTEST_CONCAT_TOKEN_(gtest_label_testnothrow_, __LINE__);/* NOLINT */\
+     } \
+   } else \
+     GTEST_CONCAT_TOKEN_(gtest_label_testnothrow_, __LINE__): \
+@@ -1411,7 +1411,7 @@ class NeverThrown {
+       gtest_caught_any = true; \
+     } \
+     if (!gtest_caught_any) { \
+-      goto GTEST_CONCAT_TOKEN_(gtest_label_testanythrow_, __LINE__); \
++      goto GTEST_CONCAT_TOKEN_(gtest_label_testanythrow_, __LINE__); /* NOLINT */ \
+     } \
+   } else \
+     GTEST_CONCAT_TOKEN_(gtest_label_testanythrow_, __LINE__): \
+@@ -1437,7 +1437,7 @@ class NeverThrown {
+     ::testing::internal::HasNewFatalFailureHelper gtest_fatal_failure_checker; \
+     GTEST_SUPPRESS_UNREACHABLE_CODE_WARNING_BELOW_(statement); \
+     if (gtest_fatal_failure_checker.has_new_fatal_failure()) { \
+-      goto GTEST_CONCAT_TOKEN_(gtest_label_testnofatal_, __LINE__); \
++      goto GTEST_CONCAT_TOKEN_(gtest_label_testnofatal_, __LINE__); /* NOLINT */ \
+     } \
+   } else \
+     GTEST_CONCAT_TOKEN_(gtest_label_testnofatal_, __LINE__): \
+diff --git googletest/include/gtest/internal/gtest-death-test-internal.h googletest/include/gtest/internal/gtest-death-test-internal.h
+index cd957817..45bed6c0 100644
+--- googletest/include/gtest/internal/gtest-death-test-internal.h
++++ googletest/include/gtest/internal/gtest-death-test-internal.h
+@@ -191,7 +191,7 @@
+   try { \
+     GTEST_SUPPRESS_UNREACHABLE_CODE_WARNING_BELOW_(statement); \
+   } catch (const ::std::exception& gtest_exception) { \
+-    fprintf(\
++    fprintf( /* NOLINT(cppcoreguidelines-pro-type-vararg) */ \
+         stderr, \
+         "\n%s: Caught std::exception-derived exception escaping the " \
+         "death test statement. Exception message: %s\n", \
+@@ -219,14 +219,14 @@
+             #statement,                                                        \
+             ::testing::internal::MakeDeathTestMatcher(regex_or_matcher),       \
+             __FILE__, __LINE__, &gtest_dt)) {                                  \
+-      goto GTEST_CONCAT_TOKEN_(gtest_label_, __LINE__);                        \
++      goto GTEST_CONCAT_TOKEN_(gtest_label_, __LINE__); /* NOLINT(cppcoreguidelines-avoid-goto, hicpp-avoid-goto) */ \
+     }                                                                          \
+     if (gtest_dt != nullptr) {                                                 \
+       std::unique_ptr< ::testing::internal::DeathTest> gtest_dt_ptr(gtest_dt); \
+       switch (gtest_dt->AssumeRole()) {                                        \
+         case ::testing::internal::DeathTest::OVERSEE_TEST:                     \
+           if (!gtest_dt->Passed(predicate(gtest_dt->Wait()))) {                \
+-            goto GTEST_CONCAT_TOKEN_(gtest_label_, __LINE__);                  \
++            goto GTEST_CONCAT_TOKEN_(gtest_label_, __LINE__); /* NOLINT(cppcoreguidelines-avoid-goto, hicpp-avoid-goto) */ \
+           }                                                                    \
+           break;                                                               \
+         case ::testing::internal::DeathTest::EXECUTE_TEST: {                   \
+@@ -236,8 +236,6 @@
+           gtest_dt->Abort(::testing::internal::DeathTest::TEST_DID_NOT_DIE);   \
+           break;                                                               \
+         }                                                                      \
+-        default:                                                               \
+-          break;                                                               \
+       }                                                                        \
+     }                                                                          \
+   } else                                                                       \

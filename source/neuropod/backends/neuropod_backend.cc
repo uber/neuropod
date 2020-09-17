@@ -61,10 +61,8 @@ std::shared_ptr<NeuropodValue> Sealer::seal(const std::string &name, const std::
     {
         return value->as_tensor()->to(device_it->second);
     }
-    else
-    {
-        NEUROPOD_ERROR("Tried to seal a tensor with name '{}', but could not find it in the spec", name);
-    }
+
+    NEUROPOD_ERROR("Tried to seal a tensor with name '{}', but could not find it in the spec", name);
 }
 
 NeuropodValueMap Sealer::seal(const NeuropodValueMap &inputs)
@@ -141,7 +139,7 @@ void validate_tensors_against_specs(const NeuropodValueMap &       tensors,
                 // Any value of dim is okay
                 continue;
             }
-            else if (expected.value > 0)
+            else if (expected.value > 0) // NOLINT(readability-else-after-return)
             {
                 // Check that we have the expected number of items
                 if (dim != expected.value)
@@ -208,7 +206,7 @@ void validate_tensors_against_specs(const NeuropodValueMap &       tensors,
         }
     }
 
-    if (unexpected_tensors.size() > 0)
+    if (!unexpected_tensors.empty())
     {
         // Throw an error
         NEUROPOD_ERROR("Tensor name(s) '{}' are not found in the {}", unexpected_tensors, debug_spec_name);
@@ -217,10 +215,10 @@ void validate_tensors_against_specs(const NeuropodValueMap &       tensors,
 
 NeuropodBackend::~NeuropodBackend() = default;
 
-NeuropodBackend::NeuropodBackend(const std::string &neuropod_path, const RuntimeOptions &options)
+NeuropodBackend::NeuropodBackend(const std::string &neuropod_path, RuntimeOptions options)
     : model_config_(load_model_config(neuropod_path)),
       neuropod_path_(neuropod_path),
-      options_(options),
+      options_(std::move(options)),
       sealer_(stdx::make_unique<Sealer>(get_device_mapping(*model_config_, options_)))
 {
     loader_ = get_loader(neuropod_path);
@@ -296,7 +294,7 @@ std::unique_ptr<NeuropodValueMap> NeuropodBackend::infer_internal(const Neuropod
                                                                   const std::vector<std::string> &requested_outputs)
 {
     // We're not doing any filtering
-    if (requested_outputs.size() == 0)
+    if (requested_outputs.empty())
     {
         return infer_internal(inputs);
     }

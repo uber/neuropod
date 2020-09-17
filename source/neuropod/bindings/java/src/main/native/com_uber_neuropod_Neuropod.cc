@@ -31,16 +31,19 @@ limitations under the License.
 
 #include <jni.h>
 
+// TODO(vkuzmin): fix this
+// NOLINTNEXTLINE(google-build-using-namespace)
 using namespace neuropod::jni;
 
 namespace
 {
+
 jobject toJavaTensorSpecList(JNIEnv *env, const std::vector<neuropod::TensorSpec> &specs)
 {
     jobject ret = env->NewObject(java_util_ArrayList, java_util_ArrayList_, specs.size());
     for (const auto &tensorSpec : specs)
     {
-        auto    type = getTensorTypeField(env, tensorTypeToString(tensorSpec.type).c_str());
+        auto    type = get_tensor_type_field(env, tensor_type_to_string(tensorSpec.type));
         jstring name = env->NewStringUTF(tensorSpec.name.c_str());
         jobject dims = env->NewObject(java_util_ArrayList, java_util_ArrayList_, tensorSpec.dims.size());
         for (const auto &dim : tensorSpec.dims)
@@ -72,10 +75,12 @@ jobject toJavaTensorSpecList(JNIEnv *env, const std::vector<neuropod::TensorSpec
     }
     return ret;
 }
+
 } // namespace
 
+// NOLINTNEXTLINE(readability-identifier-naming): Ignore function case for Java API methods
 JNIEXPORT jlong JNICALL Java_com_uber_neuropod_Neuropod_nativeNew__Ljava_lang_String_2J(JNIEnv *env,
-                                                                                        jclass,
+                                                                                        jclass /* unused */,
                                                                                         jstring path,
                                                                                         jlong   optHandle)
 {
@@ -86,7 +91,7 @@ JNIEXPORT jlong JNICALL Java_com_uber_neuropod_Neuropod_nativeNew__Ljava_lang_St
         {
             opts = *reinterpret_cast<neuropod::RuntimeOptions *>(optHandle);
         }
-        auto                convertedPath = toString(env, path);
+        auto                convertedPath = to_string(env, path);
         neuropod::Neuropod *ret           = nullptr;
         if (isTestMode)
         {
@@ -100,11 +105,12 @@ JNIEXPORT jlong JNICALL Java_com_uber_neuropod_Neuropod_nativeNew__Ljava_lang_St
     }
     catch (const std::exception &e)
     {
-        throwJavaException(env, e.what());
+        throw_java_exception(env, e.what());
     }
     return reinterpret_cast<jlong>(nullptr);
 }
 
+// NOLINTNEXTLINE(readability-identifier-naming): Ignore function case for Java API methods
 JNIEXPORT void JNICALL Java_com_uber_neuropod_Neuropod_nativeDelete(JNIEnv *env, jobject obj, jlong handle)
 {
     try
@@ -114,10 +120,11 @@ JNIEXPORT void JNICALL Java_com_uber_neuropod_Neuropod_nativeDelete(JNIEnv *env,
     }
     catch (const std::exception &e)
     {
-        throwJavaException(env, e.what());
+        throw_java_exception(env, e.what());
     }
 }
 
+// NOLINTNEXTLINE(readability-identifier-naming): Ignore function case for Java API methods
 JNIEXPORT void JNICALL Java_com_uber_neuropod_Neuropod_nativeLoadModel(JNIEnv *env, jclass, jlong handle)
 {
     try
@@ -127,10 +134,11 @@ JNIEXPORT void JNICALL Java_com_uber_neuropod_Neuropod_nativeLoadModel(JNIEnv *e
     }
     catch (const std::exception &e)
     {
-        throwJavaException(env, e.what());
+        throw_java_exception(env, e.what());
     }
 }
 
+// NOLINTNEXTLINE(readability-identifier-naming): Ignore function case for Java API methods
 JNIEXPORT jstring JNICALL Java_com_uber_neuropod_Neuropod_nativeGetName(JNIEnv *env, jclass, jlong handle)
 {
     try
@@ -140,11 +148,12 @@ JNIEXPORT jstring JNICALL Java_com_uber_neuropod_Neuropod_nativeGetName(JNIEnv *
     }
     catch (const std::exception &e)
     {
-        throwJavaException(env, e.what());
+        throw_java_exception(env, e.what());
     }
     return nullptr;
 }
 
+// NOLINTNEXTLINE(readability-identifier-naming): Ignore function case for Java API methods
 JNIEXPORT jstring JNICALL Java_com_uber_neuropod_Neuropod_nativeGetPlatform(JNIEnv *env, jclass, jlong handle)
 {
     try
@@ -154,11 +163,12 @@ JNIEXPORT jstring JNICALL Java_com_uber_neuropod_Neuropod_nativeGetPlatform(JNIE
     }
     catch (const std::exception &e)
     {
-        throwJavaException(env, e.what());
+        throw_java_exception(env, e.what());
     }
     return nullptr;
 }
 
+// NOLINTNEXTLINE(readability-identifier-naming): Ignore function case for Java API methods
 JNIEXPORT jobject JNICALL Java_com_uber_neuropod_Neuropod_nativeGetInputs(JNIEnv *env, jclass, jlong handle)
 {
     try
@@ -169,11 +179,12 @@ JNIEXPORT jobject JNICALL Java_com_uber_neuropod_Neuropod_nativeGetInputs(JNIEnv
     }
     catch (const std::exception &e)
     {
-        throwJavaException(env, e.what());
+        throw_java_exception(env, e.what());
     }
     return nullptr;
 }
 
+// NOLINTNEXTLINE(readability-identifier-naming): Ignore function case for Java API methods
 JNIEXPORT jobject JNICALL Java_com_uber_neuropod_Neuropod_nativeGetOutputs(JNIEnv *env, jclass, jlong handle)
 {
     try
@@ -184,11 +195,12 @@ JNIEXPORT jobject JNICALL Java_com_uber_neuropod_Neuropod_nativeGetOutputs(JNIEn
     }
     catch (const std::exception &e)
     {
-        throwJavaException(env, e.what());
+        throw_java_exception(env, e.what());
     }
     return nullptr;
 }
 
+// NOLINTNEXTLINE(readability-identifier-naming): Ignore function case for Java API methods
 JNIEXPORT jlong JNICALL Java_com_uber_neuropod_Neuropod_nativeGetAllocator(JNIEnv *env, jclass, jlong handle)
 {
     try
@@ -198,11 +210,12 @@ JNIEXPORT jlong JNICALL Java_com_uber_neuropod_Neuropod_nativeGetAllocator(JNIEn
     }
     catch (const std::exception &e)
     {
-        throwJavaException(env, e.what());
+        throw_java_exception(env, e.what());
     }
     return reinterpret_cast<jlong>(nullptr);
 }
 
+// NOLINTNEXTLINE(readability-identifier-naming): Ignore function case for Java API methods
 JNIEXPORT jlong JNICALL Java_com_uber_neuropod_Neuropod_nativeGetGenericAllocator(JNIEnv *env, jclass)
 {
     try
@@ -212,11 +225,12 @@ JNIEXPORT jlong JNICALL Java_com_uber_neuropod_Neuropod_nativeGetGenericAllocato
     }
     catch (const std::exception &e)
     {
-        throwJavaException(env, e.what());
+        throw_java_exception(env, e.what());
     }
     return reinterpret_cast<jlong>(nullptr);
 }
 
+// NOLINTNEXTLINE(readability-identifier-naming): Ignore function case for Java API methods
 JNIEXPORT jobject JNICALL Java_com_uber_neuropod_Neuropod_nativeInfer(
     JNIEnv *env, jclass, jobjectArray entryArray, jobject requestedOutputsJava, jlong modelHandle)
 {
@@ -231,7 +245,7 @@ JNIEXPORT jobject JNICALL Java_com_uber_neuropod_Neuropod_nativeInfer(
             {
                 jstring element =
                     static_cast<jstring>(env->CallObjectMethod(requestedOutputsJava, java_util_ArrayList_get, i));
-                requestedOutputs.emplace_back(toString(env, element));
+                requestedOutputs.emplace_back(to_string(env, element));
                 env->DeleteLocalRef(element);
             }
         }
@@ -243,7 +257,7 @@ JNIEXPORT jobject JNICALL Java_com_uber_neuropod_Neuropod_nativeInfer(
         {
             jobject     entry = env->GetObjectArrayElement(entryArray, i);
             std::string key =
-                toString(env, static_cast<jstring>(env->CallObjectMethod(entry, java_util_Map_Entry_getKey)));
+                to_string(env, static_cast<jstring>(env->CallObjectMethod(entry, java_util_Map_Entry_getKey)));
             jobject value        = env->CallObjectMethod(entry, java_util_Map_Entry_getValue);
             jlong   tensorHandle = env->CallLongMethod(value, com_uber_neuropod_NeuropodTensor_getHandle);
             if (tensorHandle == 0)
@@ -273,7 +287,7 @@ JNIEXPORT jobject JNICALL Java_com_uber_neuropod_Neuropod_nativeInfer(
     }
     catch (const std::exception &e)
     {
-        throwJavaException(env, e.what());
+        throw_java_exception(env, e.what());
     }
     return nullptr;
 }

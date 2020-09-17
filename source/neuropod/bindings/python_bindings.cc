@@ -102,6 +102,7 @@ std::shared_ptr<NeuropodTensor> tensor_from_string_numpy(NeuropodTensorAllocator
 std::shared_ptr<NeuropodTensor> tensor_from_numpy(NeuropodTensorAllocator &allocator, py::array array)
 {
     // Make sure the array is contiguous and aligned
+    // NOLINTNEXTLINE(readability-implicit-bool-conversion, hicpp-signed-bitwise)
     if (!(array.flags() & py::detail::npy_api::constants::NPY_ARRAY_C_CONTIGUOUS_) ||
         !(array.flags() & py::detail::npy_api::constants::NPY_ARRAY_ALIGNED_))
     {
@@ -127,15 +128,14 @@ std::shared_ptr<NeuropodTensor> tensor_from_numpy(NeuropodTensorAllocator &alloc
     // Create a vector with the shape info
     std::vector<int64_t> shape(&dims[0], &dims[ndims]);
 
-    if (dtype != STRING_TENSOR)
-    {
-        // Wrap the data from the numpy array
-        return allocator.tensor_from_memory(shape, dtype, data, deleter);
-    }
-    else
+    // Handle string tensors
+    if (dtype == STRING_TENSOR)
     {
         return tensor_from_string_numpy(allocator, array, shape);
     }
+
+    // Wrap the data from the numpy array
+    return allocator.tensor_from_memory(shape, dtype, data, deleter);
 }
 
 py::array tensor_to_numpy(std::shared_ptr<NeuropodTensor> value)
@@ -149,6 +149,7 @@ py::array tensor_to_numpy(std::shared_ptr<NeuropodTensor> value)
         NEUROPOD_ERROR("Error converting value to tensor");
     }
 
+    // Handle string tensors
     if (tensor->get_tensor_type() == STRING_TENSOR)
     {
         // Special case for empty string tensors because the pybind functions below don't correctly set the
@@ -163,17 +164,15 @@ py::array tensor_to_numpy(std::shared_ptr<NeuropodTensor> value)
         arr.resize(tensor->get_dims());
         return arr;
     }
-    else
-    {
-        auto dims = tensor->get_dims();
-        auto data = internal::NeuropodTensorRawDataAccess::get_untyped_data_ptr(*tensor);
 
-        // Make sure we don't deallocate the tensor until the numpy array is deallocated
-        auto deleter        = [value](void *unused) {};
-        auto deleter_handle = register_deleter(deleter, nullptr);
-        auto capsule        = py::capsule(deleter_handle, [](void *handle) { run_deleter(handle); });
-        return py::array(get_py_type(*tensor), dims, data, capsule);
-    }
+    auto dims = tensor->get_dims();
+    auto data = internal::NeuropodTensorRawDataAccess::get_untyped_data_ptr(*tensor);
+
+    // Make sure we don't deallocate the tensor until the numpy array is deallocated
+    auto deleter        = [value](void *unused) {};
+    auto deleter_handle = register_deleter(deleter, nullptr);
+    auto capsule        = py::capsule(deleter_handle, [](void *handle) { run_deleter(handle); });
+    return py::array(get_py_type(*tensor), dims, data, capsule);
 }
 
 NeuropodValueMap from_numpy_dict(NeuropodTensorAllocator &allocator, py::dict &items)

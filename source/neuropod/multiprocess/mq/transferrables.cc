@@ -21,10 +21,7 @@ limitations under the License.
 #include <unordered_map>
 #include <vector>
 
-namespace neuropod
-{
-
-namespace detail
+namespace neuropod::detail
 {
 
 TransferrableController::TransferrableController() = default;
@@ -64,6 +61,4 @@ size_t TransferrableController::size()
     return in_transit_.size();
 }
 
-} // namespace detail
-
-} // namespace neuropod
+} // namespace neuropod::detail

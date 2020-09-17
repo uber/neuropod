@@ -17,10 +17,7 @@ limitations under the License.
 
 #include "neuropod/internal/neuropod_tensor.hh"
 
-namespace neuropod
-{
-
-namespace internal
+namespace neuropod::internal
 {
 
 void *NeuropodTensorRawDataAccess::get_untyped_data_ptr(NeuropodTensor &tensor)
@@ -38,5 +35,4 @@ size_t NeuropodTensorRawDataAccess::get_bytes_per_element(const NeuropodTensor &
     return tensor.get_bytes_per_element();
 }
 
-} // namespace internal
-} // namespace neuropod
+} // namespace neuropod::internal

@@ -20,7 +20,7 @@ namespace neuropod
 namespace
 {
 
-struct deleter_wrapper
+struct DeleterWrapper
 {
     // A user provided deleter function to run
     Deleter deleter;
@@ -39,7 +39,7 @@ void run_deleter(void *handle)
     }
 
     // Run the deleter and then delete the wrapper
-    auto wrapper = static_cast<deleter_wrapper *>(handle);
+    auto wrapper = static_cast<DeleterWrapper *>(handle);
     wrapper->deleter(wrapper->data);
     delete wrapper;
 }
@@ -48,7 +48,7 @@ void *register_deleter(const Deleter &deleter, void *data)
 {
     // Create a new wrapper and return a handle
     // This is deleted in `run_deleter`
-    return new deleter_wrapper({deleter, data});
+    return new DeleterWrapper({deleter, data});
 }
 
 } // namespace neuropod

@@ -17,10 +17,7 @@ limitations under the License.
 
 #include "neuropod/internal/error_utils.hh"
 
-namespace neuropod
-{
-
-namespace detail
+namespace neuropod::detail
 {
 
 void throw_error_hh(const char *file, int line, const char *function, const std::string &message)
@@ -39,6 +36,4 @@ void throw_error_hh(
     throw_error(file, line, function, message, size1, size2);
 }
 
-} // namespace detail
-
-} // namespace neuropod
+} // namespace neuropod::detail

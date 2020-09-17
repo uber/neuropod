@@ -261,9 +261,9 @@ protected:
 // Note: the specialization is for `shared_ptr<NeuropodValue>`, but we check internally
 // that the item is a SHMNeuropodTensor
 template <>
-void ipc_serialize(std::ostream &out, const std::shared_ptr<NeuropodValue> &data);
+void ipc_serialize(std::ostream &out, const std::shared_ptr<NeuropodValue> &item);
 
 template <>
-void ipc_deserialize(std::istream &in, std::shared_ptr<NeuropodValue> &data);
+void ipc_deserialize(std::istream &in, std::shared_ptr<NeuropodValue> &item);
 
 } // namespace neuropod
