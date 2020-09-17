@@ -33,13 +33,13 @@ std::vector<int64_t> compute_strides(const std::vector<int64_t> &dims)
     std::vector<int64_t> out(dims.size());
 
     int64_t running_product = 1;
-    for (int i = out.size() - 1; i >= 0; i--)
+    for (size_t i = out.size(); i > 0; i--)
     {
         // Set the stride
-        out[i] = running_product;
+        out[i - 1] = running_product;
 
         // Update the running product
-        running_product *= dims[i];
+        running_product *= dims[i - 1];
     }
 
     return out;
@@ -48,7 +48,7 @@ std::vector<int64_t> compute_strides(const std::vector<int64_t> &dims)
 size_t compute_num_elements(const std::vector<int64_t> &dims)
 {
     // Get the number of elements in the tensor by multiplying all the dims together
-    return std::accumulate(dims.begin(), dims.end(), 1, std::multiplies<>());
+    return static_cast<size_t>(std::accumulate(dims.begin(), dims.end(), 1, std::multiplies<>()));
 }
 
 } // namespace
@@ -116,7 +116,7 @@ bool NeuropodTensor::operator==(const NeuropodTensor &other) const
         const auto numel = get_num_elements();
         const auto t1    = as_typed_tensor<std::string>();
         const auto t2    = other.as_typed_tensor<std::string>();
-        for (int i = 0; i < numel; i++)
+        for (size_t i = 0; i < numel; i++)
         {
             if ((*t1)[i] != (*t2)[i])
             {

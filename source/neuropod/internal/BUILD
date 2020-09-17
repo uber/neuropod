@@ -13,8 +13,9 @@
 # limitations under the License.
 
 load("@bazel_tools//tools/build_defs/pkg:pkg.bzl", "pkg_tar")
+load("//bazel:cc.bzl", "neuropod_cc_library")
 
-cc_library(
+neuropod_cc_library(
     name = "internal",
     hdrs = glob(["*.hh"]),
     visibility = [
@@ -27,7 +28,7 @@ cc_library(
     ],
 )
 
-cc_library(
+neuropod_cc_library(
     name = "impl",
     srcs = glob(["*.cc"]),
     linkopts = ["-ldl"],
@@ -48,7 +49,7 @@ cc_library(
     alwayslink = True,
 )
 
-cc_library(
+neuropod_cc_library(
     name = "blocking_spsc_queue",
     hdrs = [
         "blocking_spsc_queue.hh",

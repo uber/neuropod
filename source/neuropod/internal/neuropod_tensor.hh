@@ -155,7 +155,7 @@ public:
 
     NeuropodTensor(const NeuropodTensor &) = delete;
 
-    virtual ~NeuropodTensor() {}
+    virtual ~NeuropodTensor() override {}
 
     friend std::ostream &operator<<(std::ostream &out, const NeuropodTensor &tensor)
     {
@@ -283,7 +283,7 @@ protected:
     }
 
     // TODO(vip): make this pure virtual once we have implementations for all backends
-    virtual std::shared_ptr<NeuropodValue> to_internal(NeuropodDevice device) { return this->shared_from_this(); }
+    virtual std::shared_ptr<NeuropodValue> to_internal(NeuropodDevice /*unused*/) { return this->shared_from_this(); }
 
     // Get the strides of the tensor
     const std::vector<int64_t> &get_strides() const { return strides_; }
@@ -494,7 +494,7 @@ public:
         std::vector<std::string> out(numel);
 
         // Copy the data in
-        for (int i = 0; i < numel; i++)
+        for (size_t i = 0; i < numel; i++)
         {
             out[i] = get(i);
         }
@@ -545,17 +545,17 @@ protected:
     virtual void        set(size_t index, const std::string &value) = 0;
 
     // We can't get a raw pointer from a string tensor
-    void *get_untyped_data_ptr() { NEUROPOD_ERROR_HH("`get_untyped_data_ptr` is not supported for string tensors"); };
+    void *get_untyped_data_ptr() { NEUROPOD_ERROR_HH("`get_untyped_data_ptr` is not supported for string tensors"); }
 
     const void *get_untyped_data_ptr() const
     {
         NEUROPOD_ERROR_HH("`get_untyped_data_ptr` is not supported for string tensors");
-    };
+    }
 
     size_t get_bytes_per_element() const
     {
         NEUROPOD_ERROR_HH("`get_bytes_per_element` is not supported for string tensors");
-    };
+    }
 };
 
 // Utility to make a tensor of a specific type
@@ -571,8 +571,6 @@ std::unique_ptr<NeuropodTensor> make_tensor(TensorType tensor_type, Params &&...
     switch (tensor_type)
     {
         FOR_EACH_TYPE_MAPPING_INCLUDING_STRING(MAKE_TENSOR)
-    default:
-        NEUROPOD_ERROR_HH("Unsupported tensor type: {}", tensor_type);
     }
 }
 
@@ -583,8 +581,8 @@ std::unique_ptr<NeuropodTensor> make_tensor_no_string(TensorType tensor_type, Pa
     switch (tensor_type)
     {
         FOR_EACH_TYPE_MAPPING_EXCEPT_STRING(MAKE_TENSOR)
-    default:
-        NEUROPOD_ERROR_HH("Unsupported tensor type: {}", tensor_type);
+    case STRING_TENSOR:
+        NEUROPOD_ERROR_HH("`make_tensor_no_string` does not support type STRING_TENSOR");
     }
 }
 

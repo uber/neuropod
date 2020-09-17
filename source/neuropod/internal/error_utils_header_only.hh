@@ -32,7 +32,7 @@ namespace detail
 // An error macro for use in user-facing header files. This is done to avoid
 // having the release packages depend on fmt and spdlog being in the user's environment
 // See error_utils.hh for more
-#define NEUROPOD_ERROR_HH(...) neuropod::detail::throw_error_hh(__FILE__, __LINE__, __PRETTY_FUNCTION__, __VA_ARGS__);
+#define NEUROPOD_ERROR_HH(...) neuropod::detail::throw_error_hh(__FILE__, __LINE__, __PRETTY_FUNCTION__, __VA_ARGS__)
 
 } // namespace detail
 

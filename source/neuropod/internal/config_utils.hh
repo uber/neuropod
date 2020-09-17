@@ -39,7 +39,6 @@ struct Dimension
 {
     Dimension(int64_t value);
     Dimension(std::string symbol);
-    ~Dimension();
 
     bool operator==(const Dimension &other) const;
 
@@ -56,7 +55,6 @@ struct Dimension
 struct TensorSpec
 {
     TensorSpec(std::string name, std::vector<Dimension> dims, const TensorType type);
-    ~TensorSpec();
 
     const std::string            name;
     const std::vector<Dimension> dims;
