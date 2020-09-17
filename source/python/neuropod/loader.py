@@ -37,12 +37,14 @@ def load_installed_backends():
         "neuropod-backend-torchscript-1-3-0-cpu",
         "neuropod-backend-torchscript-1-4-0-cpu",
         "neuropod-backend-torchscript-1-5-0-cpu",
+        "neuropod-backend-torchscript-1-6-0-cpu",
         # Torch GPU
         "neuropod-backend-torchscript-1-1-0-gpu-cuda-9-0",
         "neuropod-backend-torchscript-1-2-0-gpu-cuda-10-0",
         "neuropod-backend-torchscript-1-3-0-gpu-cuda-10-0",
         "neuropod-backend-torchscript-1-4-0-gpu-cuda-10-0",
         "neuropod-backend-torchscript-1-5-0-gpu-cuda-10-1",
+        "neuropod-backend-torchscript-1-6-0-gpu-cuda-10-1",
         # TF CPU
         "neuropod-backend-tensorflow-1-12-0-cpu",
         "neuropod-backend-tensorflow-1-13-1-cpu",

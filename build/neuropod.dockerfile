@@ -24,7 +24,7 @@ COPY source/bazel/BUILD /usr/src/source/bazel/BUILD
 RUN cd source && bazel sync
 
 # The python version to use. Should be set to `2.7`, `3.5`, etc.
-ARG NEUROPOD_PYTHON_VERSION=2.7
+ARG NEUROPOD_PYTHON_VERSION=3.8
 ENV NEUROPOD_PYTHON_VERSION=$NEUROPOD_PYTHON_VERSION
 
 # Install python
@@ -40,8 +40,8 @@ COPY build/install_frameworks.py /usr/src/build/install_frameworks.py
 COPY source/python/setup.py /usr/src/source/python/setup.py
 
 # Optional overrides
-ARG NEUROPOD_TENSORFLOW_VERSION
-ARG NEUROPOD_TORCH_VERSION
+ARG NEUROPOD_TENSORFLOW_VERSION=2.2.0
+ARG NEUROPOD_TORCH_VERSION=1.6.0
 ARG NEUROPOD_IS_GPU
 ARG NEUROPOD_CUDA_VERSION
 

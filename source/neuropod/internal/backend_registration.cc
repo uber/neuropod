@@ -63,12 +63,16 @@ const std::vector<BackendLoadSpec> default_backend_for_type = {
     {"torchscript", "1.2.0", "libneuropod_torchscript_backend.so"},
     {"torchscript", "1.3.0", "libneuropod_torchscript_backend.so"},
     {"torchscript", "1.4.0", "libneuropod_torchscript_backend.so"},
+    {"torchscript", "1.5.0", "libneuropod_torchscript_backend.so"},
+    {"torchscript", "1.6.0", "libneuropod_torchscript_backend.so"},
 
     // Torch GPU
     {"torchscript", "1.1.0", "libneuropod_torchscript_backend.so"},
     {"torchscript", "1.2.0", "libneuropod_torchscript_backend.so"},
     {"torchscript", "1.3.0", "libneuropod_torchscript_backend.so"},
     {"torchscript", "1.4.0", "libneuropod_torchscript_backend.so"},
+    {"torchscript", "1.5.0", "libneuropod_torchscript_backend.so"},
+    {"torchscript", "1.6.0", "libneuropod_torchscript_backend.so"},
 
     // TF CPU
     {"tensorflow", "1.12.0", "libneuropod_tensorflow_backend.so"},
