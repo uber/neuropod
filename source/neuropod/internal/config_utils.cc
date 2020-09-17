@@ -112,16 +112,14 @@ std::vector<Dimension> get_dims_from_json(const Json::Value &json_shape)
 
         return out;
     }
-    else
-    {
-        throw_neuropod_config_error("'shape' must be an array. Please check your config file");
-    }
+
+    throw_neuropod_config_error("'shape' must be an array. Please check your config file");
 }
 
 } // namespace
 
 Dimension::Dimension(int64_t value) : value(value) {}
-Dimension::Dimension(std::string symbol) : value(-2), symbol(symbol) {}
+Dimension::Dimension(std::string symbol) : value(-2), symbol(std::move(symbol)) {}
 Dimension::~Dimension() = default;
 
 bool Dimension::operator==(const Dimension &other) const
@@ -135,8 +133,8 @@ bool Dimension::operator==(const Dimension &other) const
     return false;
 }
 
-TensorSpec::TensorSpec(const std::string &name, const std::vector<Dimension> dims, const TensorType type)
-    : name(name), dims(dims), type(type)
+TensorSpec::TensorSpec(std::string name, std::vector<Dimension> dims, const TensorType type)
+    : name(std::move(name)), dims(std::move(dims)), type(type)
 {
 }
 

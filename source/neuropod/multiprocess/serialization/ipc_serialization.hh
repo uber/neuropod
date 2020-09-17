@@ -200,13 +200,13 @@ inline void ipc_deserialize(std::istream &in, std::vector<T> &item)
 
 // Specialization for unordered_map
 template <typename K, typename V>
-inline void ipc_serialize(std::ostream &out, const std::unordered_map<K, V> &data)
+inline void ipc_serialize(std::ostream &out, const std::unordered_map<K, V> &item)
 {
     // Write the number of items
-    size_t num_items = data.size();
+    size_t num_items = item.size();
     ipc_serialize(out, num_items);
 
-    for (const auto &entry : data)
+    for (const auto &entry : item)
     {
         // Write the key
         ipc_serialize(out, entry.first);
@@ -217,7 +217,7 @@ inline void ipc_serialize(std::ostream &out, const std::unordered_map<K, V> &dat
 }
 
 template <typename K, typename V>
-inline void ipc_deserialize(std::istream &in, std::unordered_map<K, V> &data)
+inline void ipc_deserialize(std::istream &in, std::unordered_map<K, V> &item)
 {
     // Read the number of items
     size_t num_items;
@@ -232,7 +232,7 @@ inline void ipc_deserialize(std::istream &in, std::unordered_map<K, V> &data)
         // Read the value
         V value;
         ipc_deserialize(in, value);
-        data[key] = std::move(value);
+        item[key] = std::move(value);
     }
 }
 

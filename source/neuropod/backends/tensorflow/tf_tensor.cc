@@ -29,6 +29,7 @@ namespace tensorflow
 class TensorCApi
 {
 public:
+    // NOLINTNEXTLINE(readability-identifier-naming): Friend function declaration within TF names it this way
     static Tensor MakeTensor(DataType type, const TensorShape &shape, TensorBuffer *buf)
     {
         return Tensor(type, shape, buf);
@@ -37,10 +38,7 @@ public:
 
 } // namespace tensorflow
 
-namespace neuropod
-{
-
-namespace detail
+namespace neuropod::detail
 {
 
 namespace
@@ -96,8 +94,8 @@ public:
 void *get_next_aligned_offset(void *base)
 {
     // We want to find an offset such that the data will be 64 byte aligned
-    uint64_t base_address   = reinterpret_cast<uint64_t>(base);
-    size_t   aligned_offset = 64 - (base_address % 64);
+    auto   base_address   = reinterpret_cast<uint64_t>(base);
+    size_t aligned_offset = 64 - (base_address % 64);
     return reinterpret_cast<void *>(base_address + aligned_offset);
 }
 
@@ -159,6 +157,4 @@ void create_tensor_from_existing_memory(const std::vector<int64_t> &dims,
     tensor = tensorflow::TensorCApi::MakeTensor(type, detail::get_tf_shape(dims), buf);
 }
 
-} // namespace detail
-
-} // namespace neuropod
+} // namespace neuropod::detail

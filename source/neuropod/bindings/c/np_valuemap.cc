@@ -17,12 +17,14 @@ limitations under the License.
 #include "neuropod/bindings/c/np_valuemap_internal.h"
 
 // Create a new NeuropodValueMap
+// NOLINTNEXTLINE(readability-identifier-naming): Ignore function case for C API methods
 NP_NeuropodValueMap *NP_NewValueMap()
 {
     return new NP_NeuropodValueMap();
 }
 
 // Free a NeuropodValueMap
+// NOLINTNEXTLINE(readability-identifier-naming): Ignore function case for C API methods
 void NP_FreeValueMap(NP_NeuropodValueMap *nvm)
 {
     delete nvm;
@@ -32,6 +34,7 @@ void NP_FreeValueMap(NP_NeuropodValueMap *nvm)
 // Overwrites any existing tensors with the same name
 // Note: this does not transfer ownership and the caller is still responsible for calling NP_FreeTensor on
 // `tensor`
+// NOLINTNEXTLINE(readability-identifier-naming): Ignore function case for C API methods
 void NP_InsertTensor(NP_NeuropodValueMap *nvm, const char *name, NP_NeuropodTensor *tensor)
 {
     nvm->data[name] = tensor->tensor;
@@ -40,6 +43,7 @@ void NP_InsertTensor(NP_NeuropodValueMap *nvm, const char *name, NP_NeuropodTens
 // Given a NP_NeuropodValueMap, find a tensor with name `name` and return it
 // If such a tensor is not found, returns nullptr
 // Note: the caller is responsible for calling NP_FreeTensor on the returned tensor
+// NOLINTNEXTLINE(readability-identifier-naming): Ignore function case for C API methods
 NP_NeuropodTensor *NP_GetTensor(const NP_NeuropodValueMap *nvm, const char *name)
 {
     auto &map  = nvm->data;
@@ -56,6 +60,7 @@ NP_NeuropodTensor *NP_GetTensor(const NP_NeuropodValueMap *nvm, const char *name
 }
 
 // Removes a specified tensor from the provided map (if it exists)
+// NOLINTNEXTLINE(readability-identifier-naming): Ignore function case for C API methods
 void NP_RemoveTensor(NP_NeuropodValueMap *nvm, const char *name)
 {
     nvm->data.erase(name);

@@ -18,12 +18,12 @@ limitations under the License.
 #include "neuropod/bindings/python_bindings.hh"
 #include "neuropod/internal/error_utils.hh"
 
+#include <cstdlib>
 #include <exception>
 #include <sstream>
 #include <vector>
 
 #include <dlfcn.h>
-#include <stdlib.h>
 
 namespace neuropod
 {
@@ -52,7 +52,7 @@ void set_python_path(const std::vector<std::string> &paths_to_add)
 // Initialize python if necessary and make sure we don't lock the GIL
 std::unique_ptr<py::gil_scoped_release> maybe_initialize()
 {
-    if (Py_IsInitialized())
+    if (Py_IsInitialized()) // NOLINT(readability-implicit-bool-conversion)
     {
         return nullptr;
     }
@@ -87,7 +87,7 @@ std::unique_ptr<py::gil_scoped_release> maybe_initialize()
     // If we have a virtualenv, use it
     if (auto venv_path = std::getenv("VIRTUAL_ENV"))
     {
-        setenv("PYTHONHOME", venv_path, true);
+        setenv("PYTHONHOME", venv_path, true); // NOLINT(readability-implicit-bool-conversion)
     }
 
     // Start the interpreter
@@ -101,7 +101,7 @@ std::unique_ptr<py::gil_scoped_release> maybe_initialize()
 // Handle interpreter startup and shutdown
 // If we initialized the interpreter, make sure we don't have a lock on the GIL by storing a
 // py::gil_scoped_release
-static auto gil_release = maybe_initialize();
+auto gil_release = maybe_initialize();
 
 } // namespace
 
@@ -159,10 +159,10 @@ std::unique_ptr<NeuropodValueMap> PythonBridge::infer_internal(const NeuropodVal
     py::dict model_inputs = to_numpy_dict(const_cast<NeuropodValueMap &>(inputs));
 
     // Run inference
-    py::dict model_outputs_raw = neuropod_->attr("infer")(model_inputs).cast<py::dict>();
+    auto model_outputs_raw = neuropod_->attr("infer")(model_inputs).cast<py::dict>();
 
     // Postprocess for python 3
-    py::dict model_outputs = (*maybe_convert_bindings_types_)(model_outputs_raw).cast<py::dict>();
+    auto model_outputs = (*maybe_convert_bindings_types_)(model_outputs_raw).cast<py::dict>();
 
     // Get the outputs
     auto outputs = from_numpy_dict(*get_tensor_allocator(), model_outputs);

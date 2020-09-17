@@ -30,9 +30,9 @@ limitations under the License.
 #include <boost/uuid/uuid_io.hpp>
 #include <sys/wait.h>
 
+#include <csignal>
 #include <vector>
 
-#include <signal.h>
 #include <spawn.h>
 
 extern char **environ;
@@ -50,7 +50,7 @@ std::unordered_map<std::string, std::string> get_env_map()
     for (char **current = environ; *current; current++)
     {
         std::string item = *current;
-        const auto  pos  = item.find("=");
+        const auto  pos  = item.find('=');
         if (pos == std::string::npos)
         {
             // No `=` found
@@ -71,7 +71,7 @@ pid_t start_worker_process(const std::string &control_queue_name, std::vector<st
 {
     pid_t child_pid;
     char *argv[] = {
-        const_cast<char *>("neuropod_multiprocess_worker"), const_cast<char *>(control_queue_name.c_str()), NULL};
+        const_cast<char *>("neuropod_multiprocess_worker"), const_cast<char *>(control_queue_name.c_str()), nullptr};
 
     // Setup the environment
 
@@ -86,7 +86,7 @@ pid_t start_worker_process(const std::string &control_queue_name, std::vector<st
     }
 
     // Spawn a process
-    const auto status = posix_spawnp(&child_pid, "neuropod_multiprocess_worker", NULL, NULL, argv, env_arr);
+    const auto status = posix_spawnp(&child_pid, "neuropod_multiprocess_worker", nullptr, nullptr, argv, env_arr);
     if (status != 0)
     {
         NEUROPOD_ERROR("Failed to start the worker process. Failed with code: {} - {}", status, strerror(status));
@@ -204,7 +204,7 @@ public:
         }
     }
 
-    ~MultiprocessNeuropodBackend()
+    ~MultiprocessNeuropodBackend() override
     {
         // We only need to clean up all of this if we started the worker process
         if (child_pid_ > 0)
@@ -244,7 +244,7 @@ public:
 protected:
     // Run inference
     std::unique_ptr<NeuropodValueMap> infer_internal(const NeuropodValueMap &        inputs,
-                                                     const std::vector<std::string> &requested_outputs)
+                                                     const std::vector<std::string> &requested_outputs) override
     {
         // Add inputs
         control_channel_.send_message_move(ADD_INPUT, std::move(inputs));
@@ -283,7 +283,7 @@ protected:
         return to_return;
     }
 
-    void load_model_internal()
+    void load_model_internal() override
     {
         // Send a message to load the model
         control_channel_.send_message(LOAD_NEUROPOD, load_config_);
@@ -312,19 +312,16 @@ std::unique_ptr<NeuropodBackend> load_neuropod_ope(const std::string &          
         return stdx::make_unique<MultiprocessNeuropodBackend>(
             neuropod_path, options, free_memory_every_cycle, default_backend_overrides);
     }
-    else
-    {
-        if (!default_backend_overrides.empty())
-        {
-            // For now, we can't provide overrides and use an existing worker
-            NEUROPOD_ERROR("`default_backend_overrides` cannot be specified when using an existing worker (i.e. when "
-                           "`control_queue_name` is not empty)");
-        }
 
-        // Use an existing worker
-        return stdx::make_unique<MultiprocessNeuropodBackend>(
-            neuropod_path, control_queue_name, free_memory_every_cycle);
+    if (!default_backend_overrides.empty())
+    {
+        // For now, we can't provide overrides and use an existing worker
+        NEUROPOD_ERROR("`default_backend_overrides` cannot be specified when using an existing worker (i.e. when "
+                       "`control_queue_name` is not empty)");
     }
+
+    // Use an existing worker
+    return stdx::make_unique<MultiprocessNeuropodBackend>(neuropod_path, control_queue_name, free_memory_every_cycle);
 }
 
 } // namespace neuropod

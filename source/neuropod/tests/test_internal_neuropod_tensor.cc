@@ -211,7 +211,7 @@ TEST(test_value_equality, non_tensor_error)
     {
     public:
         SomeNonTensorValue() : neuropod::NeuropodValue(false) {}
-        ~SomeNonTensorValue() = default;
+        ~SomeNonTensorValue() override = default;
 
         SET_SERIALIZE_TAG("something");
     };

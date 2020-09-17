@@ -16,17 +16,20 @@ limitations under the License.
 #include "neuropod/bindings/c/np_status_internal.h"
 
 // Used for creating and deleting new status messages
+// NOLINTNEXTLINE(readability-identifier-naming): Ignore function case for C API methods
 NP_Status *NP_NewStatus()
 {
     return new NP_Status();
 }
 
+// NOLINTNEXTLINE(readability-identifier-naming): Ignore function case for C API methods
 void NP_DeleteStatus(NP_Status *status)
 {
     delete status;
 }
 
 // Clear a status
+// NOLINTNEXTLINE(readability-identifier-naming): Ignore function case for C API methods
 void NP_ClearStatus(NP_Status *status)
 {
     status->code = NEUROPOD_OK;
@@ -34,12 +37,14 @@ void NP_ClearStatus(NP_Status *status)
 }
 
 // Used for getting details about a status
+// NOLINTNEXTLINE(readability-identifier-naming): Ignore function case for C API methods
 NP_Code NP_GetCode(const NP_Status *status)
 {
     return status->code;
 }
 
 // Get the error message (if any)
+// NOLINTNEXTLINE(readability-identifier-naming): Ignore function case for C API methods
 const char *NP_GetMessage(const NP_Status *status)
 {
     return status->message.c_str();

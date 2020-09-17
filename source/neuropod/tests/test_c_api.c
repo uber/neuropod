@@ -52,6 +52,7 @@ static void CheckFailed(const char *expression, const char *filename, int line_n
 #define ASSERT_STREQ(expected, actual) ASSERT_EQ(0, strcmp((expected), (actual)))
 #define ASSERT_ARRAYEQ(expected, actual, size) ASSERT_EQ(0, memcmp((expected), (actual), size))
 
+// NOLINTNEXTLINE(readability-identifier-naming): Ignore function case for C API methods
 static void TestLoadAndInference(void)
 {
     NP_Neuropod *model = NULL;
@@ -150,6 +151,7 @@ static void TestLoadAndInference(void)
     NP_FreeNeuropod(model);
 }
 
+// NOLINTNEXTLINE(readability-identifier-naming): Ignore function case for C API methods
 static void TestLoadAndInferenceWithOptions(void)
 {
     NP_Neuropod *model = NULL;
@@ -238,6 +240,7 @@ static void TestLoadAndInferenceWithOptions(void)
     NP_FreeNeuropod(model);
 }
 
+// NOLINTNEXTLINE(readability-identifier-naming): Ignore function case for C API methods
 static void TestTensorGetters(void)
 {
     NP_TensorAllocator *allocator = NP_GetGenericAllocator();
@@ -267,6 +270,7 @@ static void TestTensorGetters(void)
     NP_FreeAllocator(allocator);
 }
 
+// NOLINTNEXTLINE(readability-identifier-naming): Ignore function case for C API methods
 static void RunTests(void)
 {
     TestLoadAndInference();

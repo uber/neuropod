@@ -27,6 +27,7 @@ limitations under the License.
 #include <string>
 #include <vector>
 
+// NOLINTNEXTLINE(readability-identifier-naming): Ignore function case for C API methods
 void NP_LoadNeuropodWithOpts(const char *             neuropod_path,
                              const NP_RuntimeOptions *options,
                              NP_Neuropod **           model,
@@ -45,6 +46,7 @@ void NP_LoadNeuropodWithOpts(const char *             neuropod_path,
     }
 }
 
+// NOLINTNEXTLINE(readability-identifier-naming): Ignore function case for C API methods
 NP_RuntimeOptions NP_DefaultRuntimeOptions()
 {
     // Use C++ runtime options object to set default values.
@@ -65,22 +67,26 @@ NP_RuntimeOptions NP_DefaultRuntimeOptions()
     return options;
 }
 
+// NOLINTNEXTLINE(readability-identifier-naming): Ignore function case for C API methods
 void NP_LoadNeuropod(const char *neuropod_path, NP_Neuropod **model, NP_Status *status)
 {
     const auto &options = NP_DefaultRuntimeOptions();
     NP_LoadNeuropodWithOpts(neuropod_path, &options, model, status);
 }
 
+// NOLINTNEXTLINE(readability-identifier-naming): Ignore function case for C API methods
 void NP_FreeNeuropod(NP_Neuropod *model)
 {
     delete model;
 }
 
+// NOLINTNEXTLINE(readability-identifier-naming): Ignore function case for C API methods
 void NP_Infer(NP_Neuropod *model, const NP_NeuropodValueMap *inputs, NP_NeuropodValueMap **outputs, NP_Status *status)
 {
     NP_InferWithRequestedOutputs(model, inputs, 0, nullptr, outputs, status);
 }
 
+// NOLINTNEXTLINE(readability-identifier-naming): Ignore function case for C API methods
 void NP_InferWithRequestedOutputs(NP_Neuropod *              model,
                                   const NP_NeuropodValueMap *inputs,
                                   size_t                     noutputs,
@@ -98,7 +104,7 @@ void NP_InferWithRequestedOutputs(NP_Neuropod *              model,
         {
             for (size_t i = 0; i < noutputs; ++i)
             {
-                rout.push_back(requested_outputs[i]);
+                rout.emplace_back(requested_outputs[i]);
             }
         }
         *outputs         = new NP_NeuropodValueMap();
@@ -112,26 +118,31 @@ void NP_InferWithRequestedOutputs(NP_Neuropod *              model,
     }
 }
 
+// NOLINTNEXTLINE(readability-identifier-naming): Ignore function case for C API methods
 const char *NP_GetName(NP_Neuropod *model)
 {
     return model->model->get_name().c_str();
 }
 
+// NOLINTNEXTLINE(readability-identifier-naming): Ignore function case for C API methods
 const char *NP_GetPlatform(NP_Neuropod *model)
 {
     return model->model->get_platform().c_str();
 }
 
+// NOLINTNEXTLINE(readability-identifier-naming): Ignore function case for C API methods
 size_t NP_GetNumInputs(NP_Neuropod *model)
 {
     return model->model->get_inputs().size();
 }
 
+// NOLINTNEXTLINE(readability-identifier-naming): Ignore function case for C API methods
 size_t NP_GetNumOutputs(NP_Neuropod *model)
 {
     return model->model->get_outputs().size();
 }
 
+// NOLINTNEXTLINE(readability-identifier-naming): Ignore function case for C API methods
 NP_TensorAllocator *NP_GetAllocator(NP_Neuropod *model)
 {
     auto out       = new NP_TensorAllocator();
@@ -139,6 +150,7 @@ NP_TensorAllocator *NP_GetAllocator(NP_Neuropod *model)
     return out;
 }
 
+// NOLINTNEXTLINE(readability-identifier-naming): Ignore function case for C API methods
 NP_TensorAllocator *NP_GetGenericAllocator()
 {
     auto out       = new NP_TensorAllocator();

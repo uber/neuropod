@@ -93,11 +93,10 @@ private:
 
 public:
     // Allocate a new block of shared memory
-    RawSHMBlock(size_t size_bytes)
-    {
+    explicit RawSHMBlock(size_t size_bytes)
         // Generate a uuid
-        uuid_ = uuid_generator();
-
+        : uuid_(uuid_generator())
+    {
         // Create a block of shared memory
         shm_ = stdx::make_unique<ipc::shared_memory_object>(
             ipc::create_only, get_key_from_uuid(uuid_).c_str(), ipc::read_write);
@@ -118,11 +117,10 @@ public:
     }
 
     // Load an existing block of shared memory from a handle
-    RawSHMBlock(const RawSHMHandleInternal *handle)
-    {
+    explicit RawSHMBlock(const RawSHMHandleInternal *handle)
         // Extract the UUID
-        uuid_ = handle->uuid;
-
+        : uuid_(handle->uuid)
+    {
         // Get the shm_key
         const auto shm_key = get_key_from_uuid(uuid_);
 

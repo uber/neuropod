@@ -37,12 +37,11 @@ TEST(test_ope_multiple_instances, multithreaded)
 
     // Start worker threads to run inference
     std::vector<std::thread> workers;
-    for (size_t idx = 0; idx < models.size(); idx++)
+    workers.reserve(models.size());
+    for (auto &model : models)
     {
-        workers.emplace_back([idx, &models]() {
-            // Every thread uses a dedicated instance
-            auto &model = models.at(idx);
-
+        // Every thread uses a dedicated instance
+        workers.emplace_back([&model]() {
             // Shape and target information to validate output
             const std::vector<int64_t>     shape  = {3};
             const std::vector<std::string> target = {"apple sauce", "banana pudding", "carrot cake"};
@@ -61,8 +60,8 @@ TEST(test_ope_multiple_instances, multithreaded)
                 // Check that the output data matches expected
                 const auto out_tensor = output_data->at("out")->as_typed_tensor<std::string>();
 
-                const auto out_vector = out_tensor->get_data_as_vector();
-                const auto out_shape  = out_tensor->get_dims();
+                const auto  out_vector = out_tensor->get_data_as_vector();
+                const auto &out_shape  = out_tensor->get_dims();
 
                 // Check that the output data matches
                 EXPECT_EQ(out_vector.size(), 3);

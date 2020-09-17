@@ -42,16 +42,16 @@ private:
     std::string neuropod_path_;
 
 public:
-    LocalLoader(const std::string &neuropod_path) : neuropod_path_(neuropod_path) {}
+    explicit LocalLoader(std::string neuropod_path) : neuropod_path_(std::move(neuropod_path)) {}
 
-    ~LocalLoader() = default;
+    ~LocalLoader() override = default;
 
-    std::unique_ptr<std::istream> get_istream_for_file(const std::string &path)
+    std::unique_ptr<std::istream> get_istream_for_file(const std::string &path) override
     {
         return stdx::make_unique<std::ifstream>(get_file_path(path));
     }
 
-    std::string get_file_path(const std::string &path)
+    std::string get_file_path(const std::string &path) override
     {
         // Sanity check for non relative paths
         // TODO(vip): Add more robust checking. This check is just to prevent accidentally
@@ -64,7 +64,7 @@ public:
         return fs::absolute(neuropod_path_) / path;
     }
 
-    std::string ensure_local() { return neuropod_path_; }
+    std::string ensure_local() override { return neuropod_path_; }
 };
 
 // Loads a neuropod from a zipfile
@@ -80,9 +80,9 @@ private:
     std::string tempdir_;
 
 public:
-    ZipLoader(const std::string neuropod_path) : unzipper_(neuropod_path), did_unzip_(false) {}
+    explicit ZipLoader(const std::string neuropod_path) : unzipper_(neuropod_path), did_unzip_(false) {}
 
-    ~ZipLoader()
+    ~ZipLoader() override
     {
         if (did_unzip_)
         {
@@ -91,14 +91,14 @@ public:
         }
     }
 
-    std::unique_ptr<std::istream> get_istream_for_file(const std::string &path)
+    std::unique_ptr<std::istream> get_istream_for_file(const std::string &path) override
     {
         auto out = stdx::make_unique<std::stringstream>();
         unzipper_.extractEntryToStream(path, *out);
         return out;
     }
 
-    std::string get_file_path(const std::string &path)
+    std::string get_file_path(const std::string &path) override
     {
         // Sanity check for non relative paths
         // TODO(vip): Add more robust checking. This check is just to prevent accidentally
@@ -108,20 +108,17 @@ public:
             NEUROPOD_ERROR("paths passed to get_file_path must be relative");
         }
 
-        if (did_unzip_)
-        {
-            return fs::absolute(tempdir_) / path;
-        }
-        else
+        if (!did_unzip_)
         {
             // TODO(vip): only extract the requested file
             // This extracts the entire archive
             ensure_local();
-            return get_file_path(path);
         }
+
+        return fs::absolute(tempdir_) / path;
     }
 
-    std::string ensure_local()
+    std::string ensure_local() override
     {
         // Create a tempdir
         char tempdir[] = "/tmp/neuropod_tmp_XXXXXX";
@@ -169,10 +166,8 @@ std::unique_ptr<NeuropodLoader> get_loader(const std::string &neuropod_path)
     {
         return stdx::make_unique<LocalLoader>(neuropod_path);
     }
-    else
-    {
-        return stdx::make_unique<ZipLoader>(neuropod_path);
-    }
+
+    return stdx::make_unique<ZipLoader>(neuropod_path);
 }
 
 } // namespace neuropod

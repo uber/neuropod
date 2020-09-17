@@ -36,10 +36,10 @@ std::shared_ptr<NeuropodTensor> tensor_from_id(const SHMBlockID &block_id)
 // Note: the specialization is for `shared_ptr<NeuropodValue>`, but we check internally
 // that the item is a SHMNeuropodTensor
 template <>
-void ipc_serialize(std::ostream &out, const std::shared_ptr<NeuropodValue> &data)
+void ipc_serialize(std::ostream &out, const std::shared_ptr<NeuropodValue> &item)
 {
     // Cast to a `NativeDataContainer`
-    auto container = std::dynamic_pointer_cast<NativeDataContainer<SHMBlockID>>(data);
+    auto container = std::dynamic_pointer_cast<NativeDataContainer<SHMBlockID>>(item);
     if (!container)
     {
         NEUROPOD_ERROR("ipc_serialize only works with NeuropodValueMaps containing SHMNeuropodTensors. The "
@@ -53,14 +53,14 @@ void ipc_serialize(std::ostream &out, const std::shared_ptr<NeuropodValue> &data
 }
 
 template <>
-void ipc_deserialize(std::istream &in, std::shared_ptr<NeuropodValue> &data)
+void ipc_deserialize(std::istream &in, std::shared_ptr<NeuropodValue> &item)
 {
     // Read the block ID
     SHMBlockID block_id;
     detail::checked_read(in, reinterpret_cast<char *>(block_id.data()), block_id.size());
 
     // Load the tensor
-    data = tensor_from_id(block_id);
+    item = tensor_from_id(block_id);
 }
 
 } // namespace neuropod

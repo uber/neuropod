@@ -51,7 +51,7 @@ public:
 class NeuropodBackend
 {
 public:
-    NeuropodBackend(const std::string &neuropod_path, const RuntimeOptions &options);
+    NeuropodBackend(const std::string &neuropod_path, RuntimeOptions options);
     virtual ~NeuropodBackend();
 
     // Returns an allocator that can allocate tensors compatible with this backend

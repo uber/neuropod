@@ -56,7 +56,7 @@ FOR_EACH_TYPE_MAPPING_INCLUDING_STRING(GET_TENSOR_TYPE_FN)
 #define SET_SERIALIZE_TAG(tag)                                    \
     /* Used by the MAKE_SERIALIZABLE macro */                     \
     static std::string get_static_serialize_tag() { return tag; } \
-    std::string        get_serialize_tag() const { return tag; }
+    std::string        get_serialize_tag() const override { return tag; }
 
 } // namespace
 

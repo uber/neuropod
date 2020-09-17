@@ -9,9 +9,14 @@
 
 #include <jni.h>
 
+// TODO(vkuzmin): fix this
+// NOLINTNEXTLINE(google-build-using-namespace)
 using namespace neuropod::jni;
 
-JNIEXPORT void JNICALL Java_com_uber_neuropod_NeuropodTensor_nativeDoDelete(JNIEnv *env, jobject, jlong handle)
+// NOLINTNEXTLINE(readability-identifier-naming): Ignore function case for Java API methods
+JNIEXPORT void JNICALL Java_com_uber_neuropod_NeuropodTensor_nativeDoDelete(JNIEnv *env,
+                                                                            jobject /*unused*/,
+                                                                            jlong handle)
 {
     try
     {
@@ -22,11 +27,14 @@ JNIEXPORT void JNICALL Java_com_uber_neuropod_NeuropodTensor_nativeDoDelete(JNIE
     }
     catch (const std::exception &e)
     {
-        throwJavaException(env, e.what());
+        throw_java_exception(env, e.what());
     }
 }
 
-JNIEXPORT jobject JNICALL Java_com_uber_neuropod_NeuropodTensor_nativeGetBuffer(JNIEnv *env, jclass, jlong nativeHandle)
+// NOLINTNEXTLINE(readability-identifier-naming): Ignore function case for Java API methods
+JNIEXPORT jobject JNICALL Java_com_uber_neuropod_NeuropodTensor_nativeGetBuffer(JNIEnv *env,
+                                                                                jclass /*unused*/,
+                                                                                jlong nativeHandle)
 {
     try
     {
@@ -48,17 +56,20 @@ JNIEXPORT jobject JNICALL Java_com_uber_neuropod_NeuropodTensor_nativeGetBuffer(
             return createDirectBuffer<int64_t>(env, neuropodTensor);
         }
         default:
-            throw std::runtime_error("Unsupported tensor type: " + tensorTypeToString(tensorType));
+            throw std::runtime_error("Unsupported tensor type: " + tensor_type_to_string(tensorType));
         }
     }
     catch (const std::exception &e)
     {
-        throwJavaException(env, e.what());
+        throw_java_exception(env, e.what());
     }
     return nullptr;
 }
 
-JNIEXPORT jlongArray JNICALL Java_com_uber_neuropod_NeuropodTensor_nativeGetDims(JNIEnv *env, jclass, jlong handle)
+// NOLINTNEXTLINE(readability-identifier-naming): Ignore function case for Java API methods
+JNIEXPORT jlongArray JNICALL Java_com_uber_neuropod_NeuropodTensor_nativeGetDims(JNIEnv *env,
+                                                                                 jclass /*unused*/,
+                                                                                 jlong handle)
 {
     try
     {
@@ -74,28 +85,32 @@ JNIEXPORT jlongArray JNICALL Java_com_uber_neuropod_NeuropodTensor_nativeGetDims
     }
     catch (const std::exception &e)
     {
-        throwJavaException(env, e.what());
+        throw_java_exception(env, e.what());
     }
     return nullptr;
 }
 
-JNIEXPORT jobject JNICALL Java_com_uber_neuropod_NeuropodTensor_nativeGetTensorType(JNIEnv *env, jclass, jlong handle)
+// NOLINTNEXTLINE(readability-identifier-naming): Ignore function case for Java API methods
+JNIEXPORT jobject JNICALL Java_com_uber_neuropod_NeuropodTensor_nativeGetTensorType(JNIEnv *env,
+                                                                                    jclass /*unused*/,
+                                                                                    jlong handle)
 {
     try
     {
         auto tensor = (*reinterpret_cast<std::shared_ptr<neuropod::NeuropodValue> *>(handle))->as_tensor();
         auto type   = tensor->as_tensor()->get_tensor_type();
-        return getTensorTypeField(env, tensorTypeToString(type).c_str());
+        return get_tensor_type_field(env, tensor_type_to_string(type));
     }
     catch (const std::exception &e)
     {
-        throwJavaException(env, e.what());
+        throw_java_exception(env, e.what());
     }
     return nullptr;
 }
 
+// NOLINTNEXTLINE(readability-identifier-naming): Ignore function case for Java API methods
 JNIEXPORT jlong JNICALL Java_com_uber_neuropod_NeuropodTensor_nativeGetNumberOfElements(JNIEnv *env,
-                                                                                        jclass,
+                                                                                        jclass /*unused*/,
                                                                                         jlong handle)
 {
     try
@@ -105,7 +120,7 @@ JNIEXPORT jlong JNICALL Java_com_uber_neuropod_NeuropodTensor_nativeGetNumberOfE
     }
     catch (const std::exception &e)
     {
-        throwJavaException(env, e.what());
+        throw_java_exception(env, e.what());
     }
     return 0;
 }

@@ -127,12 +127,10 @@ bool load_default_backend(const std::vector<BackendLoadSpec> &backends,
 
             return false;
         }
-        else
-        {
-            // Successfully loaded the backend
-            SPDLOG_TRACE("Successfully loaded default backend '{}'", sopath);
-            return true;
-        }
+
+        // Successfully loaded the backend
+        SPDLOG_TRACE("Successfully loaded default backend '{}'", sopath);
+        return true;
     }
 
     return false;

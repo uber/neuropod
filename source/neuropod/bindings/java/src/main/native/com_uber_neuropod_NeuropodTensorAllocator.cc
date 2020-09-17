@@ -28,7 +28,10 @@ limitations under the License.
 
 using namespace neuropod::jni;
 
-JNIEXPORT void JNICALL Java_com_uber_neuropod_NeuropodTensorAllocator_nativeDelete(JNIEnv *env, jobject, jlong handle)
+// NOLINTNEXTLINE(readability-identifier-naming): Ignore function case for Java API methods
+JNIEXPORT void JNICALL Java_com_uber_neuropod_NeuropodTensorAllocator_nativeDelete(JNIEnv *env,
+                                                                                   jobject /* unused */,
+                                                                                   jlong handle)
 {
     try
     {
@@ -39,12 +42,13 @@ JNIEXPORT void JNICALL Java_com_uber_neuropod_NeuropodTensorAllocator_nativeDele
     }
     catch (const std::exception &e)
     {
-        neuropod::jni::throwJavaException(env, e.what());
+        neuropod::jni::throw_java_exception(env, e.what());
     }
 }
 
+// NOLINTNEXTLINE(readability-identifier-naming): Ignore function case for Java API methods
 JNIEXPORT jlong JNICALL Java_com_uber_neuropod_NeuropodTensorAllocator_nativeAllocate(
-    JNIEnv *env, jclass, jlongArray dims, jint typeNumber, jobject buffer, jlong handle)
+    JNIEnv *env, jclass /* unused */, jlongArray dims, jint typeNumber, jobject buffer, jlong handle)
 {
     try
     {
@@ -52,7 +56,7 @@ JNIEXPORT jlong JNICALL Java_com_uber_neuropod_NeuropodTensorAllocator_nativeAll
 
         // Prepare shape
         jsize                size = env->GetArrayLength(dims);
-        jlong *              arr  = env->GetLongArrayElements(dims, 0);
+        jlong *              arr  = env->GetLongArrayElements(dims, nullptr);
         std::vector<int64_t> shapes(arr, arr + size);
         env->ReleaseLongArrayElements(dims, arr, JNI_ABORT);
         // Prepare Buffer
@@ -89,7 +93,7 @@ JNIEXPORT jlong JNICALL Java_com_uber_neuropod_NeuropodTensorAllocator_nativeAll
     }
     catch (const std::exception &e)
     {
-        throwJavaException(env, e.what());
+        throw_java_exception(env, e.what());
     }
     return reinterpret_cast<jlong>(nullptr);
 }

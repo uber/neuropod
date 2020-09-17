@@ -27,8 +27,8 @@ int item_counter = 0;
 struct Item
 {
     Item() { item_counter++; }
-    Item(const Item &) { item_counter++; }
-    Item(Item &&) { item_counter++; }
+    Item(const Item & /*unused*/) { item_counter++; }
+    Item(Item && /*unused*/) { item_counter++; }
 
     ~Item() { item_counter--; }
 };

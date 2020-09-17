@@ -17,6 +17,7 @@ limitations under the License.
 #include "neuropod/bindings/c/np_tensor_internal.h"
 
 // Free an allocator
+// NOLINTNEXTLINE(readability-identifier-naming): Ignore function case for C API methods
 void NP_FreeAllocator(NP_TensorAllocator *allocator)
 {
     delete allocator;
@@ -24,6 +25,7 @@ void NP_FreeAllocator(NP_TensorAllocator *allocator)
 
 // Allocate a tensor with a specified type and shape
 // Note: the caller is responsible for calling NP_FreeTensor on the returned tensor
+// NOLINTNEXTLINE(readability-identifier-naming): Ignore function case for C API methods
 NP_NeuropodTensor *NP_AllocateTensor(NP_TensorAllocator *allocator, size_t num_dims, int64_t *dims, NP_TensorType type)
 {
     std::vector<int64_t> d(dims, dims + num_dims);

@@ -23,19 +23,17 @@ limitations under the License.
 
 #include <jni.h>
 
-namespace neuropod
-{
-namespace jni
+namespace neuropod::jni
 {
 
 const std::string TENSOR_TYPE = "Lcom/uber/neuropod/TensorType;";
 
-std::string toString(JNIEnv *env, jstring target)
+std::string to_string(JNIEnv *env, jstring target)
 {
     const char *raw = env->GetStringUTFChars(target, nullptr);
     if (raw == nullptr)
     {
-        throw std::runtime_error("unexpected null pointer in toString");
+        throw std::runtime_error("unexpected null pointer in to_string");
     }
 
     std::string res(raw);
@@ -43,7 +41,7 @@ std::string toString(JNIEnv *env, jstring target)
     return res;
 }
 
-jclass findClass(JNIEnv *env, const std::string &name)
+jclass find_class(JNIEnv *env, const std::string &name)
 {
     jclass ret = env->FindClass(name.c_str());
     if (reinterpret_cast<jlong>(ret) == 0)
@@ -53,7 +51,7 @@ jclass findClass(JNIEnv *env, const std::string &name)
     return ret;
 }
 
-jmethodID getMethodID(JNIEnv *env, jclass clazz, const std::string &name, const std::string &sig)
+jmethodID get_method_id(JNIEnv *env, jclass clazz, const std::string &name, const std::string &sig)
 {
     jmethodID ret = env->GetMethodID(clazz, name.c_str(), sig.c_str());
     if (reinterpret_cast<jlong>(ret) == 0)
@@ -63,7 +61,7 @@ jmethodID getMethodID(JNIEnv *env, jclass clazz, const std::string &name, const 
     return ret;
 }
 
-jobject getTensorTypeField(JNIEnv *env, const std::string &fieldName)
+jobject get_tensor_type_field(JNIEnv *env, const std::string &fieldName)
 {
     jfieldID field = env->GetStaticFieldID(com_uber_neuropod_TensorType, fieldName.c_str(), TENSOR_TYPE.c_str());
     if (reinterpret_cast<jlong>(field) == 0)
@@ -73,7 +71,7 @@ jobject getTensorTypeField(JNIEnv *env, const std::string &fieldName)
     return env->GetStaticObjectField(com_uber_neuropod_TensorType, field);
 }
 
-std::string tensorTypeToString(TensorType type)
+std::string tensor_type_to_string(TensorType type)
 {
     std::string       typeString;
     std::stringstream ss;
@@ -82,10 +80,9 @@ std::string tensorTypeToString(TensorType type)
     return typeString;
 }
 
-void throwJavaException(JNIEnv *env, const std::string &message)
+void throw_java_exception(JNIEnv *env, const std::string &message)
 {
     env->ThrowNew(com_uber_neuropod_NeuropodJNIException, message.c_str());
 }
 
-} // namespace jni
-} // namespace neuropod
+} // namespace neuropod::jni

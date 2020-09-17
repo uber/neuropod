@@ -19,7 +19,7 @@ limitations under the License.
 #include "benchmark/benchmark.h"
 #include "neuropod/multiprocess/shm/shm_allocator.hh"
 
-#include <string.h>
+#include <cstring>
 
 namespace
 {
@@ -73,7 +73,7 @@ static void benchmark_malloc(benchmark::State &state)
     for (auto _ : state)
     {
         // Allocate some memory
-        auto data = malloc(num_bytes);
+        auto data = malloc(num_bytes); // NOLINT(cppcoreguidelines-no-malloc)
 
         // Copy in data
         memcpy(data, some_image_data, num_bytes);
@@ -82,7 +82,7 @@ static void benchmark_malloc(benchmark::State &state)
         benchmark::DoNotOptimize(data);
 
         // Free it
-        free(data);
+        free(data); // NOLINT(cppcoreguidelines-no-malloc)
     }
 }
 BENCHMARK(benchmark_malloc);

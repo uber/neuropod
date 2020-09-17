@@ -106,12 +106,12 @@ TEST(test_config_utils, invalid_spec_shape_element)
 
 TEST(test_config_utils, invalid_device)
 {
-    std::istringstream config(replace("\"x\": \"GPU\"", "\"x\": \"TPU\""));
+    std::istringstream config(replace(R"("x": "GPU")", R"("x": "TPU")"));
     EXPECT_THROW(neuropod::load_model_config(config), std::runtime_error);
 }
 
 TEST(test_config_utils, device_cpu)
 {
-    std::istringstream config(replace("\"x\": \"GPU\"", "\"x\": \"CPU\""));
+    std::istringstream config(replace(R"("x": "GPU")", R"("x": "CPU")"));
     neuropod::load_model_config(config);
 }
