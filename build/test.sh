@@ -1,5 +1,5 @@
 #!/bin/bash
-set -e
+set -ex
 
 # Use the virtualenv
 source .neuropod_venv/bin/activate
@@ -35,7 +35,17 @@ NEUROPOD_LOG_LEVEL=TRACE NEUROPOD_RUN_NATIVE_TESTS=true python -m unittest disco
 popd
 
 # Run native and java tests
-python ../build/run_bazel_tests.py
+export PATH=$PATH:`pwd`/bazel-bin/neuropod/multiprocess/
+
+# CPU tests with trace logging
+bazel test "$@" --test_lang_filters="-java" --test_tag_filters="-gpu,-no_trace_logging" --test_env="NEUROPOD_LOG_LEVEL=TRACE" //...
+
+# CPU tests without trace logging
+bazel test "$@" --test_lang_filters="-java" --test_tag_filters="-gpu,no_trace_logging" //...
+
+# Java CPU tests
+bazel test "$@" --combined_report=lcov --test_lang_filters="java" --test_tag_filters="-gpu" //...
+
 popd
 
 # Maybe upload a release

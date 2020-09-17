@@ -1,8 +1,8 @@
 # Always optimize
 build --copt='-O3'
 
-# Pass python virtual envs through to the test runner
-build --test_env=VIRTUAL_ENV
+# Don't pass env vars to the build
+build --incompatible_strict_action_env
 
 # Use an internal toolchain to isolate the build from system libraries
 build --crosstool_top=@llvm_toolchain//:toolchain
@@ -21,10 +21,22 @@ build --cxxopt='-D_GLIBCXX_USE_CXX11_ABI=0'
 build --extra_toolchains=@bazel_tools//tools/python:autodetecting_toolchain_nonstrict
 
 # Build with coverage info
-build:coverage --copt='-fprofile-instr-generate' --copt='-fcoverage-mapping' --linkopt='-fprofile-instr-generate' --linkopt='-fcoverage-mapping'
+build:coverage --copt='-fprofile-instr-generate' --copt='-fcoverage-mapping' --linkopt='-fprofile-instr-generate' --linkopt='-fcoverage-mapping' --run_under=//tools/coverage:run_under
+
+# Java coverage settings
+build:coverage --collect_code_coverage --instrumentation_filter='//neuropod/bindings/java:neuropod_java(_jar)?'
+
+# Don't cache test results if we're running a coverage build
+build:coverage --nocache_test_results
 
 # Use ASAN
 build:asan -c dbg --copt='-fsanitize=address' --copt='-fno-omit-frame-pointer' --linkopt='-fsanitize=address' --test_env=ASAN_OPTIONS --test_env=ASAN_SYMBOLIZER_PATH
 
 # For profiling builds
 build:profile -c dbg --copt='-fno-omit-frame-pointer'
+
+# Print out errors on test failures
+test --test_output=errors
+
+# Pass certain env vars through to tests
+test --test_env=VIRTUAL_ENV --test_env=LLVM_PROFILE_FILE --test_env=COVERAGE_PROCESS_START --test_env=PATH --test_env=PYTHONPATH --test_env=LD_LIBRARY_PATH

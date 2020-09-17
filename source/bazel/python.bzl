@@ -72,7 +72,9 @@ def _impl(repository_ctx):
 
 python_repository = repository_rule(
     implementation = _impl,
-    local = True,
+    environ = [
+        "NEUROPOD_PYTHON_VERSION",
+    ],
     attrs = {
         "build_file_template": attr.string(mandatory = True),
     },
