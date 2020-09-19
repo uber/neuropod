@@ -186,12 +186,12 @@ void TensorflowNeuropodBackend::load_model_internal()
 
     // Create a buffer of the right size
     graph_stream->seekg(0, graph_stream->end);
-    std::streamsize   graph_length = graph_stream->tellg();
+    auto              graph_length = static_cast<size_t>(graph_stream->tellg());
     std::vector<char> buffer(graph_length);
 
     // Read into the buffer
     graph_stream->seekg(0, graph_stream->beg);
-    graph_stream->read(buffer.data(), graph_length);
+    graph_stream->read(buffer.data(), static_cast<std::streamsize>(graph_length));
     if (graph_stream->fail())
     {
         NEUROPOD_ERROR("Error reading TensorFlow GraphDef for neuropod {}", neuropod_path_);

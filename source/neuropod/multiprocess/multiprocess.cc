@@ -76,17 +76,18 @@ pid_t start_worker_process(const std::string &control_queue_name, std::vector<st
     // Setup the environment
 
     // Null terminated char * array
-    char *env_arr[env.size() + 1];
+    std::vector<char *> env_arr(env.size() + 1);
     env_arr[env.size()] = nullptr;
 
     // Set the env
-    for (int i = 0; i < env.size(); i++)
+    for (size_t i = 0; i < env.size(); i++)
     {
         env_arr[i] = const_cast<char *>(env[i].c_str());
     }
 
     // Spawn a process
-    const auto status = posix_spawnp(&child_pid, "neuropod_multiprocess_worker", nullptr, nullptr, argv, env_arr);
+    const auto status =
+        posix_spawnp(&child_pid, "neuropod_multiprocess_worker", nullptr, nullptr, argv, env_arr.data());
     if (status != 0)
     {
         NEUROPOD_ERROR("Failed to start the worker process. Failed with code: {} - {}", status, strerror(status));

@@ -11,8 +11,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+load("//bazel:cc.bzl", "neuropod_cc_library")
 
-cc_library(
+neuropod_cc_library(
     name = "serialization",
     hdrs = [
         "ipc_serialization.hh",

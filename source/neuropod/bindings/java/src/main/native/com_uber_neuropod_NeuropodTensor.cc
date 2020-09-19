@@ -75,12 +75,12 @@ JNIEXPORT jlongArray JNICALL Java_com_uber_neuropod_NeuropodTensor_nativeGetDims
     {
         auto       tensor = (*reinterpret_cast<std::shared_ptr<neuropod::NeuropodValue> *>(handle))->as_tensor();
         auto       dims   = tensor->as_tensor()->get_dims();
-        jlongArray result = env->NewLongArray(dims.size());
+        jlongArray result = env->NewLongArray(static_cast<jsize>(dims.size()));
         if (!result)
         {
             throw std::runtime_error("out of memory");
         }
-        env->SetLongArrayRegion(result, 0, dims.size(), reinterpret_cast<jlong *>(dims.data()));
+        env->SetLongArrayRegion(result, 0, static_cast<jsize>(dims.size()), reinterpret_cast<jlong *>(dims.data()));
         return result;
     }
     catch (const std::exception &e)
@@ -116,7 +116,7 @@ JNIEXPORT jlong JNICALL Java_com_uber_neuropod_NeuropodTensor_nativeGetNumberOfE
     try
     {
         auto tensor = (*reinterpret_cast<std::shared_ptr<neuropod::NeuropodValue> *>(handle))->as_tensor();
-        return tensor->get_num_elements();
+        return static_cast<jlong>(tensor->get_num_elements());
     }
     catch (const std::exception &e)
     {

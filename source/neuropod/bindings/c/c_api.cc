@@ -28,10 +28,10 @@ limitations under the License.
 #include <vector>
 
 // NOLINTNEXTLINE(readability-identifier-naming): Ignore function case for C API methods
-void NP_LoadNeuropodWithOpts(const char *             neuropod_path,
-                             const NP_RuntimeOptions *options,
-                             NP_Neuropod **           model,
-                             NP_Status *              status)
+void NP_LoadNeuropodWithOpts(const char *neuropod_path,
+                             const NP_RuntimeOptions * /*unused*/,
+                             NP_Neuropod **model,
+                             NP_Status *   status)
 {
     try
     {

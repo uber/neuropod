@@ -35,15 +35,15 @@ namespace
 {
 
 #if CAFFE2_NIGHTLY_VERSION >= 20200115
-#define MAKE_DICT(name, type) torch::Dict<std::string, type> name;
+#define MAKE_DICT(name, type) torch::Dict<std::string, type> name
 #elif CAFFE2_NIGHTLY_VERSION >= 20191010
-#define MAKE_DICT(name, type) c10::impl::GenericDict name(c10::AnyType::get(), c10::AnyType::get());
+#define MAKE_DICT(name, type) c10::impl::GenericDict name(c10::AnyType::get(), c10::AnyType::get())
 #elif CAFFE2_NIGHTLY_VERSION >= 20190717
-#define MAKE_DICT(name, type) c10::impl::GenericDict name((c10::impl::deprecatedUntypedDict()));
+#define MAKE_DICT(name, type) c10::impl::GenericDict name((c10::impl::deprecatedUntypedDict()))
 #elif CAFFE2_NIGHTLY_VERSION >= 20190601
-#define MAKE_DICT(name, type) auto name = c10::make_dict<torch::jit::IValue, torch::jit::IValue>();
+#define MAKE_DICT(name, type) auto name = c10::make_dict<torch::jit::IValue, torch::jit::IValue>()
 #else
-#define MAKE_DICT(name, type) torch::ivalue::UnorderedMap name;
+#define MAKE_DICT(name, type) torch::ivalue::UnorderedMap name
 #endif
 
 #if CAFFE2_NIGHTLY_VERSION >= 20190717
@@ -55,11 +55,11 @@ namespace
 #if CAFFE2_NIGHTLY_VERSION >= 20190601
 #define KEY(elem) (elem.key())
 #define VALUE(elem) (elem.value())
-#define DICT_INSERT(dict, key, value) dict.insert(key, value);
+#define DICT_INSERT(dict, key, value) dict.insert(key, value)
 #else
 #define KEY(elem) (elem.first)
 #define VALUE(elem) (elem.second)
-#define DICT_INSERT(dict, key, value) dict[key] = value;
+#define DICT_INSERT(dict, key, value) dict[key] = value
 #endif
 
 std::shared_ptr<torch::jit::script::Module> load_model_from_path(std::istream &                  graph_stream,
@@ -133,8 +133,8 @@ void insert_value_in_output(NeuropodValueMap & output,
         auto tensor = value.toTensor().to(torch::kCPU);
 
         // Get the type and make a TorchNeuropodTensor
-        auto tensor_type     = get_neuropod_type_from_torch_type(tensor.scalar_type());
-        auto neuropod_tensor = make_tensor<TorchNeuropodTensor>(tensor_type, tensor);
+        auto neuropod_tensor_type = get_neuropod_type_from_torch_type(tensor.scalar_type());
+        auto neuropod_tensor      = make_tensor<TorchNeuropodTensor>(neuropod_tensor_type, tensor);
 
         // Add it to our output
         auto &to_set = output[name];
@@ -287,7 +287,7 @@ torch::Device TorchNeuropodBackend::get_torch_device(NeuropodDeviceType target_d
         return torch::kCPU;
     }
 
-    return torch::Device(torch::kCUDA, options_.visible_device);
+    return torch::Device(torch::kCUDA, static_cast<short>(options_.visible_device));
 }
 
 // Run inference
@@ -381,7 +381,7 @@ std::unique_ptr<NeuropodValueMap> TorchNeuropodBackend::infer_internal(const Neu
                     schema);
             }
 
-            torch_inputs.at(arg_index.value() - (has_class_type ? 1 : 0)) = input_data;
+            torch_inputs.at(static_cast<size_t>(arg_index.value() - (has_class_type ? 1 : 0))) = input_data;
         }
     }
 
@@ -432,7 +432,7 @@ std::unique_ptr<NeuropodValueMap> TorchNeuropodBackend::infer_internal(const Neu
         {
             // This is a named tuple
             // NOLINTNEXTLINE(modernize-loop-convert): Can't always use a range based loop here
-            for (int i = 0; i < elems.size(); i++)
+            for (size_t i = 0; i < elems.size(); i++)
             {
                 insert_value_in_output(*to_return, GET_NAME(i), elems.at(i));
             }

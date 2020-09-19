@@ -28,3 +28,6 @@ build:asan -c dbg --copt='-fsanitize=address' --copt='-fno-omit-frame-pointer' -
 
 # For profiling builds
 build:profile -c dbg --copt='-fno-omit-frame-pointer'
+
+# Build with warnings as errors in CI
+build:ci --copt='-Werror'

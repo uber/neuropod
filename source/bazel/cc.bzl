@@ -17,6 +17,12 @@ _warnings = [
     # We're okay with these for now, but should refactor to remove if we can
     "-Wno-global-constructors",
     "-Wno-exit-time-destructors",
+
+    # It's okay if we use `default` in switch statements
+    "-Wno-switch-enum",
+
+    # Flexible array members
+    "-Wno-c99-extensions",
 ]
 
 _test_warnings = _warnings + [

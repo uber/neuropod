@@ -12,7 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-cc_library(
+load("//bazel:cc.bzl", "neuropod_cc_library")
+
+neuropod_cc_library(
     name = "c_api",
     srcs = glob(["*.cc"]),
     hdrs = glob(["*.h"]),

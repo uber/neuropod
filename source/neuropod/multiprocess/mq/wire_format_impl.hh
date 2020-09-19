@@ -108,13 +108,13 @@ void serialize_payload(const Payload &payload, WireFormat<UserPayloadType> &data
     ipc_serialize(ss, payload);
 
     // Set the size
-    auto size_bytes   = ss.tellp();
-    data.payload_size = size_bytes;
+    auto size_bytes   = static_cast<size_t>(ss.tellp());
+    data.payload_size = static_cast<uint32_t>(size_bytes);
 
     if (size_bytes <= sizeof(data.payload))
     {
         // We can store this message inline
-        ss.read(data.payload, size_bytes);
+        ss.read(data.payload, static_cast<std::streamsize>(size_bytes));
         data.is_inline = true;
     }
     else
@@ -126,7 +126,7 @@ void serialize_payload(const Payload &payload, WireFormat<UserPayloadType> &data
         auto block = shm_allocator.allocate_shm(size_bytes, block_id);
 
         // Write the serialized message into the block
-        ss.read(static_cast<char *>(block.get()), size_bytes);
+        ss.read(static_cast<char *>(block.get()), static_cast<std::streamsize>(size_bytes));
 
         // Copy the block id into the message
         memcpy(data.payload_id, block_id.data(), sizeof(data.payload_id));

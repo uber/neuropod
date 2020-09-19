@@ -25,7 +25,7 @@ limitations under the License.
 namespace detail
 {
 
-std::string get_cwd()
+static std::string get_cwd()
 {
     char buf[FILENAME_MAX];
     getcwd(buf, FILENAME_MAX);

@@ -12,7 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-cc_binary(
+load("//bazel:cc.bzl", "neuropod_cc_binary", "neuropod_cc_library")
+
+neuropod_cc_binary(
     name = "neuropod_native.so",
     srcs = [
         "neuropod_native.cc",
@@ -31,7 +33,7 @@ cc_binary(
     ],
 )
 
-cc_library(
+neuropod_cc_library(
     name = "bindings",
     srcs = [
         "python_bindings.cc",

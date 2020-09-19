@@ -81,7 +81,7 @@ public:
 
     void FillAllocationDescription(tensorflow::AllocationDescription *proto) const override
     {
-        tensorflow::int64 rb = size();
+        auto rb = static_cast<tensorflow::int64>(size());
         proto->set_requested_bytes(rb);
         proto->set_allocator_name(tensorflow::cpu_allocator()->Name());
     }
@@ -116,11 +116,11 @@ tensorflow::TensorShape get_tf_shape(const std::vector<int64_t> &dims)
 // Convert shapes
 std::vector<int64_t> get_dims(const tensorflow::Tensor &tensor)
 {
-    int                  num_dims = tensor.dims();
+    auto                 num_dims = static_cast<size_t>(tensor.dims());
     std::vector<int64_t> shape(num_dims);
-    for (int i = 0; i < num_dims; i++)
+    for (size_t i = 0; i < num_dims; i++)
     {
-        shape[i] = tensor.dim_size(i);
+        shape[i] = tensor.dim_size(static_cast<int>(i));
     }
 
     return shape;
