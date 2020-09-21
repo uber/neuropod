@@ -42,6 +42,6 @@ template <typename... Params>
 // A helper macro that lets us do things like
 // NEUROPOD_ERROR("Expected value {}, but got {}", a, b);
 // This will log the error message and then throw an exception
-#define NEUROPOD_ERROR(...) neuropod::detail::throw_error(__FILE__, __LINE__, __PRETTY_FUNCTION__, __VA_ARGS__);
+#define NEUROPOD_ERROR(...) neuropod::detail::throw_error(__FILE__, __LINE__, __PRETTY_FUNCTION__, __VA_ARGS__)
 
 } // namespace neuropod

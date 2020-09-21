@@ -203,11 +203,13 @@ BackendFactoryFunction get_backend_for_type(const std::vector<BackendLoadSpec> &
 {
     init_registrar_if_needed();
 
-    // Attempt to find a registered backend that matches
-    auto retval = find_registered_backend(type, target_version_range);
-    if (retval != nullptr)
     {
-        return retval;
+        // Attempt to find a registered backend that matches
+        auto retval = find_registered_backend(type, target_version_range);
+        if (retval != nullptr)
+        {
+            return retval;
+        }
     }
 
     // Check to see if we've already loaded a backend for `type`

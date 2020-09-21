@@ -71,8 +71,8 @@ std::shared_ptr<NeuropodTensor> deserialize_tensor(boost::archive::binary_iarchi
     return out;
 }
 
-} // namespace
-
 MAKE_SERIALIZABLE(NeuropodTensor, serialize_tensor, deserialize_tensor);
+
+} // namespace
 
 } // namespace neuropod

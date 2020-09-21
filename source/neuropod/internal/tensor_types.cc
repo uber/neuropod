@@ -25,7 +25,7 @@ std::ostream &operator<<(std::ostream &out, const TensorType value)
 #define GENERATE_CASE(item) \
     case (item):            \
         s = #item;          \
-        break;
+        break
     switch (value)
     {
         GENERATE_CASE(FLOAT_TENSOR);

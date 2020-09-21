@@ -118,9 +118,8 @@ std::vector<Dimension> get_dims_from_json(const Json::Value &json_shape)
 
 } // namespace
 
-Dimension::Dimension(int64_t value) : value(value) {}
-Dimension::Dimension(std::string symbol) : value(-2), symbol(std::move(symbol)) {}
-Dimension::~Dimension() = default;
+Dimension::Dimension(int64_t v) : value(v) {}
+Dimension::Dimension(std::string s) : value(-2), symbol(std::move(s)) {}
 
 bool Dimension::operator==(const Dimension &other) const
 {
@@ -133,12 +132,10 @@ bool Dimension::operator==(const Dimension &other) const
     return false;
 }
 
-TensorSpec::TensorSpec(std::string name, std::vector<Dimension> dims, const TensorType type)
-    : name(std::move(name)), dims(std::move(dims)), type(type)
+TensorSpec::TensorSpec(std::string n, std::vector<Dimension> d, const TensorType t)
+    : name(std::move(n)), dims(std::move(d)), type(t)
 {
 }
-
-TensorSpec::~TensorSpec() = default;
 
 std::unique_ptr<ModelConfig> load_model_config(const std::string &neuropod_path)
 {
@@ -239,16 +236,16 @@ std::unique_ptr<ModelConfig> load_model_config(std::istream &input_stream)
     {
         const Json::Value &device_mapping = obj["input_tensor_device"];
         const auto         names          = device_mapping.getMemberNames();
-        for (const auto &name : names)
+        for (const auto &tensor_name : names)
         {
-            const auto type = device_mapping[name].asString();
+            const auto type = device_mapping[tensor_name].asString();
             if (type == "GPU")
             {
-                input_tensor_device[name] = DeviceType::GPU;
+                input_tensor_device[tensor_name] = DeviceType::GPU;
             }
             else if (type == "CPU")
             {
-                input_tensor_device[name] = DeviceType::CPU;
+                input_tensor_device[tensor_name] = DeviceType::CPU;
             }
             else
             {
