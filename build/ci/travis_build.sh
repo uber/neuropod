@@ -61,10 +61,10 @@ chmod +x /tmp/bazel-remote
 CACHE_PID=$!
 
 # Build with the remote cache
-./build/build.sh --remote_http_cache=http://localhost:7777
+./build/build.sh --config=ci --remote_http_cache=http://localhost:7777
 
 # Run tests
-./build/test.sh --remote_http_cache=http://localhost:7777
+./build/test.sh --config=ci --remote_http_cache=http://localhost:7777
 
 # Shutdown the bazel cache
 kill $CACHE_PID

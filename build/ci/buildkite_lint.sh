@@ -12,7 +12,7 @@ export AWS_SECRET_ACCESS_KEY=$NEUROPOD_CACHE_ACCESS_SECRET
 bazels3cache --bucket=neuropod-build-cache
 
 # Build with the remote cache
-./build/build.sh --remote_http_cache=http://localhost:7777
+./build/build.sh --config=ci --remote_http_cache=http://localhost:7777
 
 # Install lint deps
 ./build/ci/install_lint_deps.sh
