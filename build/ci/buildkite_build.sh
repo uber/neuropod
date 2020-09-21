@@ -15,13 +15,17 @@ bazels3cache --bucket=neuropod-build-cache
 if [[ -z "${BUILDKITE_TAG}" ]]; then
     # No tag so build with coverage
     ./build/build.sh --config=coverage --remote_http_cache=http://localhost:7777
+
+    # Run tests
+    ./build/test.sh --config=coverage --remote_http_cache=http://localhost:7777
 else
     # This is a release
     ./build/build.sh --remote_http_cache=http://localhost:7777
+
+    # Run tests
+    ./build/test.sh --remote_http_cache=http://localhost:7777
 fi
 
-# Run tests
-./build/test.sh
 
 if [[ -z "${BUILDKITE_TAG}" ]]; then
     # Run coverage

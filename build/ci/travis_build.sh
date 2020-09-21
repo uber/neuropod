@@ -64,7 +64,7 @@ CACHE_PID=$!
 ./build/build.sh --remote_http_cache=http://localhost:7777
 
 # Run tests
-./build/test.sh
+./build/test.sh --remote_http_cache=http://localhost:7777
 
 # Shutdown the bazel cache
 kill $CACHE_PID
