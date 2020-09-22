@@ -62,7 +62,7 @@ JNIEXPORT jlong JNICALL Java_com_uber_neuropod_NeuropodTensorAllocator_nativeAll
         // Prepare Buffer
         auto                    globalBufferRef = env->NewGlobalRef(buffer);
         auto                    bufferAddress   = env->GetDirectBufferAddress(buffer);
-        const neuropod::Deleter deleter         = [globalBufferRef, env](void *unused) mutable {
+        const neuropod::Deleter deleter         = [globalBufferRef, env](void * /*unused*/) mutable {
             env->DeleteGlobalRef(globalBufferRef);
         };
         std::shared_ptr<neuropod::NeuropodValue> tensor;

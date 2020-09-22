@@ -111,7 +111,9 @@ RuntimeOptions get_options_from_kwargs(py::kwargs &kwargs)
 {
     RuntimeOptions options;
 
-    for (const auto &item : kwargs)
+    // Note: 'item' is always a copy because the range of type 'py::kwargs' does not return a reference
+    // Explicitly not using a reference type
+    for (const auto item : kwargs)
     {
         const auto  key   = item.first.cast<std::string>();
         const auto &value = item.second;

@@ -73,16 +73,16 @@ std::shared_ptr<NeuropodTensor> tensor_from_string_numpy(NeuropodTensorAllocator
                                                          std::vector<int64_t> &   shape)
 {
     // Unfortunately, for strings, we need to copy all the data in the tensor
-    auto tensor  = allocator.allocate_tensor<std::string>(shape);
-    int  max_len = array.itemsize();
-    int  numel   = tensor->get_num_elements();
+    auto   tensor  = allocator.allocate_tensor<std::string>(shape);
+    auto   max_len = static_cast<size_t>(array.itemsize());
+    size_t numel   = tensor->get_num_elements();
 
     // Get a pointer to the underlying data
     char *data = static_cast<char *>(array.mutable_data());
 
     std::vector<std::string> out;
     std::string              chars_to_strip("\0", 1);
-    for (int i = 0; i < numel * max_len; i += max_len)
+    for (size_t i = 0; i < numel * max_len; i += max_len)
     {
         std::string item(data + i, max_len);
 
@@ -120,7 +120,7 @@ std::shared_ptr<NeuropodTensor> tensor_from_numpy(NeuropodTensorAllocator &alloc
     // Capture the array in our deleter so it doesn't get deallocated
     // until we're done
     auto to_delete = std::make_shared<py::array>(array);
-    auto deleter   = [to_delete](void *unused) mutable {
+    auto deleter   = [to_delete](void * /*unused*/) mutable {
         py::gil_scoped_acquire gil;
         to_delete.reset();
     };
@@ -169,7 +169,7 @@ py::array tensor_to_numpy(std::shared_ptr<NeuropodTensor> value)
     auto data = internal::NeuropodTensorRawDataAccess::get_untyped_data_ptr(*tensor);
 
     // Make sure we don't deallocate the tensor until the numpy array is deallocated
-    auto deleter        = [value](void *unused) {};
+    auto deleter        = [value](void * /*unused*/) {};
     auto deleter_handle = register_deleter(deleter, nullptr);
     auto capsule        = py::capsule(deleter_handle, [](void *handle) { run_deleter(handle); });
     return py::array(get_py_type(*tensor), dims, data, capsule);

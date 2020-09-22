@@ -111,7 +111,7 @@ JNIEXPORT jlong JNICALL Java_com_uber_neuropod_Neuropod_nativeNew__Ljava_lang_St
 }
 
 // NOLINTNEXTLINE(readability-identifier-naming): Ignore function case for Java API methods
-JNIEXPORT void JNICALL Java_com_uber_neuropod_Neuropod_nativeDelete(JNIEnv *env, jobject obj, jlong handle)
+JNIEXPORT void JNICALL Java_com_uber_neuropod_Neuropod_nativeDelete(JNIEnv *env, jobject /*unused*/, jlong handle)
 {
     try
     {

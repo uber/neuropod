@@ -56,7 +56,7 @@ jmethodID com_uber_neuropod_NeuropodTensor_getHandle;
 
 jclass com_uber_neuropod_NeuropodJNIException;
 
-jint JNI_VERSION = JNI_VERSION_1_8;
+constexpr jint JNI_VERSION = JNI_VERSION_1_8;
 
 bool isTestMode = false;
 
@@ -68,7 +68,7 @@ using namespace neuropod::jni;
 
 // This function is called when the JNI is loaded.
 // NOLINTNEXTLINE(readability-identifier-naming): Ignore function case for Java API methods
-jint JNI_OnLoad(JavaVM *vm, void *reserved)
+jint JNI_OnLoad(JavaVM *vm, void * /*unused*/)
 {
     // Obtain the JNIEnv from the VM and confirm JNI_VERSION
     JNIEnv *env;
@@ -131,7 +131,7 @@ jint JNI_OnLoad(JavaVM *vm, void *reserved)
 
 // This function is called when the JNI is unloaded.
 // NOLINTNEXTLINE(readability-identifier-naming): Ignore function case for Java API methods
-void JNI_OnUnload(JavaVM *vm, void *reserved)
+void JNI_OnUnload(JavaVM *vm, void * /*unused*/)
 {
     // Obtain the JNIEnv from the VM
     JNIEnv *env;
