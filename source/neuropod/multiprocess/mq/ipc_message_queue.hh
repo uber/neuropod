@@ -55,8 +55,6 @@ private:
     QueueMessage(std::shared_ptr<detail::WireFormat<UserPayloadType>> data) : data_(std::move(data)) {}
 
 public:
-    ~QueueMessage() = default;
-
     // Get a payload of type `Payload` from this message
     template <typename Payload>
     void get(Payload &out)

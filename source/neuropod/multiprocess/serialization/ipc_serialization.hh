@@ -33,20 +33,20 @@ namespace detail
 {
 
 // Utilities for checked reads and writes to and from streams
-template <typename... Params>
-inline void checked_write(std::ostream &stream, Params &&... params)
+template <typename T>
+inline void checked_write(std::ostream &stream, T &&t, size_t len)
 {
-    stream.write(std::forward<Params>(params)...);
+    stream.write(std::forward<T>(t), static_cast<std::streamsize>(len));
     if (!stream)
     {
         NEUROPOD_ERROR("Writing to stream failed during IPC serialization");
     }
 }
 
-template <typename... Params>
-inline void checked_read(std::istream &stream, Params &&... params)
+template <typename T>
+inline void checked_read(std::istream &stream, T &&t, size_t len)
 {
-    stream.read(std::forward<Params>(params)...);
+    stream.read(std::forward<T>(t), static_cast<std::streamsize>(len));
     if (!stream)
     {
         NEUROPOD_ERROR("Reading from stream failed during IPC serialization");
@@ -190,7 +190,7 @@ inline void ipc_deserialize(std::istream &in, std::vector<T> &item)
     ipc_deserialize(in, size);
 
     // Get the content
-    for (int i = 0; i < size; i++)
+    for (size_t i = 0; i < size; i++)
     {
         T elem;
         ipc_deserialize(in, elem);
@@ -223,7 +223,7 @@ inline void ipc_deserialize(std::istream &in, std::unordered_map<K, V> &item)
     size_t num_items;
     ipc_deserialize(in, num_items);
 
-    for (int i = 0; i < num_items; i++)
+    for (size_t i = 0; i < num_items; i++)
     {
         // Read the key
         K key;

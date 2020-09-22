@@ -29,7 +29,7 @@ namespace detail
 extern std::atomic_uint64_t msg_counter;
 
 // The max size for the send and recv control queues
-constexpr auto MAX_QUEUE_SIZE = 20;
+constexpr size_t MAX_QUEUE_SIZE = 20;
 
 template <typename UserPayloadType>
 inline std::unique_ptr<ipc::message_queue> make_queue(const std::string &control_queue_name_, const std::string &suffix)

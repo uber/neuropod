@@ -12,7 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-cc_library(
+load("//bazel:cc.bzl", "neuropod_cc_binary", "neuropod_cc_library")
+
+neuropod_cc_library(
     name = "shm_tensor",
     srcs = [
         "shm_tensor.cc",
@@ -29,7 +31,7 @@ cc_library(
     ],
 )
 
-cc_library(
+neuropod_cc_library(
     name = "ipc_control_channel",
     srcs = [
         "control_messages.cc",
@@ -49,7 +51,7 @@ cc_library(
     ],
 )
 
-cc_library(
+neuropod_cc_library(
     name = "multiprocess_worker",
     srcs = [
         "multiprocess_worker.cc",
@@ -68,7 +70,7 @@ cc_library(
     ],
 )
 
-cc_binary(
+neuropod_cc_binary(
     name = "neuropod_multiprocess_worker",
     srcs = [
         "multiprocess_worker_main.cc",
@@ -87,7 +89,7 @@ cc_binary(
     ],
 )
 
-cc_library(
+neuropod_cc_library(
     name = "multiprocess",
     hdrs = [
         "multiprocess.hh",
@@ -103,7 +105,7 @@ cc_library(
     ],
 )
 
-cc_library(
+neuropod_cc_library(
     name = "impl",
     srcs = [
         "multiprocess.cc",
