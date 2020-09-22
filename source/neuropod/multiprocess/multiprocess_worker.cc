@@ -13,6 +13,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+#include "neuropod/multiprocess/multiprocess_worker.hh"
+
 #include "neuropod/internal/logging.hh"
 #include "neuropod/multiprocess/control_messages.hh"
 #include "neuropod/multiprocess/ipc_control_channel.hh"

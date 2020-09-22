@@ -134,7 +134,7 @@ public:
 
     const void *get_untyped_data_ptr() const { return data_->data; }
 
-    SHMBlockID get_native_data() { return block_id_; };
+    SHMBlockID get_native_data() { return block_id_; }
 };
 
 std::shared_ptr<NeuropodTensor> tensor_from_id(const SHMBlockID &block_id);
@@ -186,20 +186,20 @@ public:
 
     // Load an existing tensor
     // See tensor_from_id
-    SHMNeuropodTensor(const std::vector<int64_t> &dims,
-                      std::shared_ptr<void>       block,
-                      shm_tensor *                data,
-                      const SHMBlockID &          block_id)
+    [[maybe_unused]] SHMNeuropodTensor(const std::vector<int64_t> &dims,
+                                       std::shared_ptr<void>       block,
+                                       shm_tensor *                data,
+                                       const SHMBlockID &          block_id)
         : TypedNeuropodTensor<std::string>(copy_and_strip_last_dim(dims)), write_buffer_(this->get_num_elements())
     {
         auto byte_block = stdx::make_unique<SHMNeuropodTensor<uint8_t>>(dims, std::move(block), data, block_id);
 
         auto base_ptr = byte_block->get_raw_data_ptr();
-        auto max_len  = dims[dims.size() - 1];
+        auto max_len  = static_cast<size_t>(dims[dims.size() - 1]);
 
         // Copy into our local buffer
         auto numel = get_num_elements();
-        for (int i = 0; i < numel; i++)
+        for (size_t i = 0; i < numel; i++)
         {
             auto pos     = base_ptr + i * max_len;
             auto wrapper = reinterpret_cast<string_wrapper *>(pos);
@@ -226,7 +226,7 @@ public:
 
         // Add it to dims
         auto dims_copy = get_dims();
-        dims_copy.push_back(max_len);
+        dims_copy.push_back(static_cast<int64_t>(max_len));
 
         // TODO(vip): We can optimize this
         last_shm_block_ = stdx::make_unique<SHMNeuropodTensor<uint8_t>>(dims_copy);
@@ -239,7 +239,7 @@ public:
             auto wrapper = reinterpret_cast<string_wrapper *>(pos);
 
             // Set the item size
-            wrapper->length = item.size();
+            wrapper->length = static_cast<int64_t>(item.size());
 
             // Copy in the data
             std::copy(item.begin(), item.end(), wrapper->data);
@@ -249,7 +249,7 @@ public:
         }
 
         return last_shm_block_->get_native_data();
-    };
+    }
 
 protected:
     std::string get(size_t index) const { return write_buffer_.at(index); }

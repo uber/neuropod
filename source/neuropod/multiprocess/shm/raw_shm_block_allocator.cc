@@ -69,7 +69,8 @@ thread_local boost::uuids::random_generator uuid_generator;
 
 // A unique handle for a Raw SHM block
 // This is currently just a UUID
-struct __attribute__((__packed__)) RawSHMHandleInternal
+// Note: Make sure to add `__attribute__((__packed__))` if adding more fields to this struct
+struct RawSHMHandleInternal
 {
     boost::uuids::uuid uuid;
 };
@@ -102,7 +103,7 @@ public:
             ipc::create_only, get_key_from_uuid(uuid_).c_str(), ipc::read_write);
 
         // Set the size
-        shm_->truncate(sizeof(RawSHMBlockInternal) + size_bytes);
+        shm_->truncate(static_cast<ipc::offset_t>(sizeof(RawSHMBlockInternal) + size_bytes));
 
         // Map into memory
         region_ = stdx::make_unique<ipc::mapped_region>(*shm_, ipc::read_write);
@@ -210,7 +211,7 @@ std::shared_ptr<void> RawSHMBlockAllocator::allocate_shm(size_t size_bytes, RawS
 
     // Create a shared pointer to the underlying data with a custom deleter
     // that keeps the block alive
-    return std::shared_ptr<void>(block->get_data(), [block](void *unused) {});
+    return std::shared_ptr<void>(block->get_data(), [block](void * /*unused*/) {});
 }
 
 std::shared_ptr<void> RawSHMBlockAllocator::load_shm(const RawSHMHandle &handle)
@@ -220,7 +221,7 @@ std::shared_ptr<void> RawSHMBlockAllocator::load_shm(const RawSHMHandle &handle)
 
     // Create a shared pointer to the underlying data with a custom deleter
     // that keeps the block alive
-    return std::shared_ptr<void>(block->get_data(), [block](void *unused) {});
+    return std::shared_ptr<void>(block->get_data(), [block](void * /*unused*/) {});
 }
 
 } // namespace neuropod
