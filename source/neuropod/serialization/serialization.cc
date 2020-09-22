@@ -88,7 +88,7 @@ std::shared_ptr<NeuropodValue> deserialize(boost::archive::binary_iarchive &ar, 
 
 void serialize(boost::archive::binary_oarchive &out, const NeuropodValueMap &item)
 {
-    int num_items = item.size();
+    auto num_items = static_cast<int>(item.size());
     out << num_items;
 
     for (const auto &pair : item)

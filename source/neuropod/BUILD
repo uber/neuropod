@@ -13,8 +13,9 @@
 # limitations under the License.
 
 load("@bazel_tools//tools/build_defs/pkg:pkg.bzl", "pkg_tar")
+load("//bazel:cc.bzl", "neuropod_cc_binary", "neuropod_cc_library")
 
-cc_library(
+neuropod_cc_library(
     name = "neuropod_hdrs",
     hdrs = [
         "neuropod.hh",
@@ -31,7 +32,7 @@ cc_library(
     ],
 )
 
-cc_library(
+neuropod_cc_library(
     name = "options",
     hdrs = ["options.hh"],
     visibility = [
@@ -39,7 +40,7 @@ cc_library(
     ],
 )
 
-cc_binary(
+neuropod_cc_binary(
     name = "libneuropod.so",
     linkopts = select({
         "@bazel_tools//src/conditions:darwin": ["-Wl,-rpath,@loader_path"],
@@ -55,7 +56,7 @@ cc_binary(
     ],
 )
 
-cc_library(
+neuropod_cc_library(
     name = "neuropod_impl",
     srcs = [
         "neuropod.cc",

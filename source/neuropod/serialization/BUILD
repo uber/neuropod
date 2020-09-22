@@ -13,8 +13,9 @@
 # limitations under the License.
 
 load("@bazel_tools//tools/build_defs/pkg:pkg.bzl", "pkg_tar")
+load("//bazel:cc.bzl", "neuropod_cc_library")
 
-cc_library(
+neuropod_cc_library(
     name = "serialization",
     hdrs = [
         "serialization.hh",
@@ -27,7 +28,7 @@ cc_library(
     ],
 )
 
-cc_library(
+neuropod_cc_library(
     name = "impl",
     srcs = [
         "serialization.cc",
