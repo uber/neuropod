@@ -129,7 +129,7 @@ void validate_tensors_against_specs(const NeuropodValueMap &       tensors,
         }
 
         // Validate the shape
-        for (int i = 0; i < spec.dims.size(); i++)
+        for (size_t i = 0; i < spec.dims.size(); i++)
         {
             auto dim      = tensor->get_dims()[i];
             auto expected = spec.dims[i];
@@ -318,7 +318,7 @@ std::unique_ptr<NeuropodValueMap> NeuropodBackend::infer_internal(const Neuropod
     return out;
 }
 
-std::unique_ptr<NeuropodValueMap> NeuropodBackend::infer_internal(const NeuropodValueMap &inputs)
+std::unique_ptr<NeuropodValueMap> NeuropodBackend::infer_internal(const NeuropodValueMap & /*unused*/)
 {
     NEUROPOD_ERROR("Backend implementations must provide a `infer_internal` implementation");
 }

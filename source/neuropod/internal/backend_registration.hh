@@ -74,8 +74,11 @@ BackendFactoryFunction get_backend_for_type(const std::vector<BackendLoadSpec> &
 
 // A macro to easily define a backend
 // Example: REGISTER_NEUROPOD_BACKEND(SomeTensorflowBackend, "tensorflow", "1.13.1")
-#define REGISTER_NEUROPOD_BACKEND(CLS, type, version) \
-    bool is_registered_##CLS = register_backend(#CLS, type, version, createNeuropodBackend<CLS>);
+#define REGISTER_NEUROPOD_BACKEND(CLS, type, version)                                             \
+    namespace                                                                                     \
+    {                                                                                             \
+    bool is_registered_##CLS = register_backend(#CLS, type, version, createNeuropodBackend<CLS>); \
+    }
 
 // Utility macros
 #define STR_HELPER(x) #x
