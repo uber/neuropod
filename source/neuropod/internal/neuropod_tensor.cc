@@ -17,10 +17,23 @@ limitations under the License.
 
 #include "neuropod/internal/error_utils.hh"
 
+#include <algorithm>
+
 namespace neuropod
 {
 
 namespace
+{
+
+size_t compute_num_elements(const std::vector<int64_t> &dims)
+{
+    // Get the number of elements in the tensor by multiplying all the dims together
+    return std::accumulate(dims.begin(), dims.end(), static_cast<size_t>(1), std::multiplies<>());
+}
+
+} // namespace
+
+namespace detail
 {
 
 std::vector<int64_t> compute_strides(const std::vector<int64_t> &dims)
@@ -45,17 +58,6 @@ std::vector<int64_t> compute_strides(const std::vector<int64_t> &dims)
     return out;
 }
 
-size_t compute_num_elements(const std::vector<int64_t> &dims)
-{
-    // Get the number of elements in the tensor by multiplying all the dims together
-    return static_cast<size_t>(std::accumulate(dims.begin(), dims.end(), 1, std::multiplies<>()));
-}
-
-} // namespace
-
-namespace detail
-{
-
 void throw_error_hh(const char *file, int line, const char *function, const std::string &message, TensorType type)
 {
     throw_error(file, line, function, message, type);
@@ -73,7 +75,7 @@ NeuropodTensor::NeuropodTensor(TensorType tensor_type, const std::vector<int64_t
     : NeuropodValue(true),
       tensor_type_(tensor_type),
       dims_(dims),
-      strides_(compute_strides(dims)),
+      strides_(detail::compute_strides(dims)),
       num_elements_(compute_num_elements(dims)),
       device_(device)
 {
@@ -148,6 +150,27 @@ void NeuropodTensor::assure_device_cpu() const
     {
         NEUROPOD_ERROR("Tried to perform an operation on a tensor that expected the tensor to be on CPU. Tensor: {}",
                        *this);
+    }
+}
+
+void NeuropodTensor::assure_view_compatible_shape(const std::vector<int64_t> &requested_dims) const
+{
+    // Make sure all provided dimensions are positive
+    if (!std::all_of(requested_dims.begin(), requested_dims.end(), [](int64_t i) { return i > 0; }))
+    {
+        NEUROPOD_ERROR("All dimensions provided to `view` must be positive");
+    }
+
+    // Compute the total number of elements
+    auto new_num_elements = compute_num_elements(requested_dims);
+    auto num_elements     = get_num_elements();
+
+    if (new_num_elements != num_elements)
+    {
+        NEUROPOD_ERROR("The requested view dimensions are not compatible with the tensor. Requested num "
+                       "elements: {}. Actual num elements: {}",
+                       new_num_elements,
+                       num_elements);
     }
 }
 
