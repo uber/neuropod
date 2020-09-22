@@ -160,26 +160,26 @@ public:
     void copy_from(const std::vector<std::string> &data)
     {
         auto flat = tensor_.flat<StringType>();
-        if (data.size() != flat.size())
+        if (data.size() != static_cast<size_t>(flat.size()))
         {
             NEUROPOD_ERROR("Supplied vector size ({}) does not match size of tensor ({})", data.size(), flat.size());
         }
 
-        for (int i = 0; i < data.size(); i++)
+        for (size_t i = 0; i < data.size(); i++)
         {
-            flat(i) = data[i];
+            flat(static_cast<long>(i)) = data[i];
         }
     }
 
     tensorflow::Tensor &get_native_data() { return tensor_; }
 
 protected:
-    std::string get(size_t index) const { return tensor_.flat<StringType>()(index); }
+    std::string get(size_t index) const { return tensor_.flat<StringType>()(static_cast<long>(index)); }
 
     void set(size_t index, const std::string &value)
     {
-        auto flat   = tensor_.flat<StringType>();
-        flat(index) = value;
+        auto flat                      = tensor_.flat<StringType>();
+        flat(static_cast<long>(index)) = value;
     }
 };
 

@@ -14,8 +14,9 @@
 
 load("@bazel_tools//tools/build_defs/pkg:pkg.bzl", "pkg_tar")
 load("//bazel:copy_libs.bzl", "copy_libs")
+load("//bazel:cc.bzl", "neuropod_cc_binary", "neuropod_cc_library")
 
-cc_binary(
+neuropod_cc_binary(
     name = "libneuropod_tensorflow_backend.so",
     srcs = [
         "//neuropod:libneuropod.so",
@@ -37,7 +38,7 @@ cc_binary(
     ],
 )
 
-cc_library(
+neuropod_cc_library(
     name = "tensorflow_backend",
     srcs = [
         "tf_backend.cc",
