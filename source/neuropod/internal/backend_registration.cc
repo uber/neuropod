@@ -146,6 +146,20 @@ BackendFactoryFunction find_registered_backend(const std::string &type, const st
         {
             return it->second.factory;
         }
+        else
+        {
+            SPDLOG_TRACE("Version '{}' for backend '{}' does not satisfy the requested version range '{}'",
+                         it->second.version,
+                         type,
+                         target_version_range);
+        }
+    }
+    else
+    {
+        SPDLOG_TRACE("Unable to find backend for type '{}' in backend registry which contains '{}' elements address {:p}",
+                     type,
+                     registered_backends_by_type->size(),
+                     (void*)registered_backends_by_type.get());
     }
 
     return nullptr;
@@ -193,6 +207,13 @@ bool register_backend(const std::string &    name,
     }
 
     registered_backends_by_type->insert(std::make_pair(type, info));
+
+    SPDLOG_DEBUG("Finished registering backend {} with type {} and version {} registered backend size {} at address {:p}",
+                 name,
+                 type,
+                 version,
+                 registered_backends_by_type->size(),
+                 (void*)registered_backends_by_type.get());
 
     return true;
 }
