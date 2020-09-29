@@ -159,7 +159,7 @@ BackendFactoryFunction find_registered_backend(const std::string &type, const st
         SPDLOG_TRACE("Unable to find backend for type '{}' in backend registry which contains '{}' elements address {:p}",
                      type,
                      registered_backends_by_type->size(),
-                     const_cast<string*>(registered_backends_by_type.get()));
+                     static_cast<void*>(registered_backends_by_type.get()));
     }
 
     return nullptr;
@@ -213,7 +213,7 @@ bool register_backend(const std::string &    name,
                  type,
                  version,
                  registered_backends_by_type->size(),
-                 const_cast<string*>(registered_backends_by_type.get()));
+                 static_cast<void*>(registered_backends_by_type.get()));
 
     return true;
 }
