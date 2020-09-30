@@ -156,10 +156,9 @@ BackendFactoryFunction find_registered_backend(const std::string &type, const st
     }
     else
     {
-        SPDLOG_TRACE("Unable to find backend for type '{}' in backend registry which contains '{}' elements address {:p}",
+        SPDLOG_TRACE("Unable to find backend for type '{}' in backend registry which contains '{}' elements.",
                      type,
-                     registered_backends_by_type->size(),
-                     static_cast<void*>(registered_backends_by_type.get()));
+                     registered_backends_by_type->size());
     }
 
     return nullptr;
@@ -200,20 +199,12 @@ bool register_backend(const std::string &    name,
     // Using OPE overcomes this problem
     if (registered_backends_by_type->find(type) != registered_backends_by_type->end())
     {
-        NEUROPOD_ERROR(
-            "Attempted to register a backend for type '{}', but one was already loaded. If you are trying "
-            "to use multiple versions of the same framework, you must use OPE. See the docs at https://neuropod.ai",
-            type);
+        NEUROPOD_ERROR("Attempted to register a backend for type '{}', but one was already loaded. If you are trying "
+                       "to use multiple versions of the same framework, you must use OPE. See the docs at https://neuropod.ai",
+                       type);
     }
 
     registered_backends_by_type->insert(std::make_pair(type, info));
-
-    SPDLOG_DEBUG("Finished registering backend {} with type {} and version {} registered backend size {} at address {:p}",
-                 name,
-                 type,
-                 version,
-                 registered_backends_by_type->size(),
-                 static_cast<void*>(registered_backends_by_type.get()));
 
     return true;
 }
