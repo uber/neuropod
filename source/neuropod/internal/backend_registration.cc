@@ -199,9 +199,10 @@ bool register_backend(const std::string &    name,
     // Using OPE overcomes this problem
     if (registered_backends_by_type->find(type) != registered_backends_by_type->end())
     {
-        NEUROPOD_ERROR("Attempted to register a backend for type '{}', but one was already loaded. If you are trying "
-                       "to use multiple versions of the same framework, you must use OPE. See the docs at https://neuropod.ai",
-                       type);
+        NEUROPOD_ERROR(
+            "Attempted to register a backend for type '{}', but one was already loaded. If you are trying "
+            "to use multiple versions of the same framework, you must use OPE. See the docs at https://neuropod.ai",
+            type);
     }
 
     registered_backends_by_type->insert(std::make_pair(type, info));
