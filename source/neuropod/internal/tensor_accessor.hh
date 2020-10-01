@@ -15,6 +15,8 @@ limitations under the License.
 
 #pragma once
 
+#include <vector>
+
 namespace neuropod
 {
 
@@ -28,6 +30,8 @@ private:
     int64_t   index_;
 
 public:
+    using value_type = decltype((*accessor_)[index_]);
+
     AccessorIterator(Accessor *accessor, int64_t index = 0) : accessor_(accessor), index_(index) {}
 
     AccessorIterator<Accessor> &operator++()
@@ -164,4 +168,43 @@ public:
     auto end() const -> decltype(get_iterator(this, dims_[0])) { return get_iterator(this, dims_[0]); }
 };
 
+// A struct that wraps a TensorAccessor along with dims and strides
+// This is generally used for "viewing" a tensor with dims other than the original.
+// The restrictions of TensorAccessor above apply here, but additionally, any returned
+// TensorAccessors are only valid as long as the TensorView is still in scope
+template <typename Container, size_t N>
+class TensorView
+{
+private:
+    std::vector<int64_t>         dims_;
+    std::vector<int64_t>         strides_;
+    TensorAccessor<Container, N> accessor_;
+
+public:
+    TensorView(Container data, std::vector<int64_t> dims, std::vector<int64_t> strides)
+        : dims_(std::move(dims)), strides_(std::move(strides)), accessor_(data, dims_.data(), strides_.data())
+    {
+    }
+
+    decltype(auto) operator[](int64_t i) const { return accessor_[i]; }
+
+    auto begin() const { return accessor_.begin(); }
+    auto end() const { return accessor_.end(); }
+
+    // To get direct access to an accessor for the entire view
+    auto accessor() const { return accessor_; }
+};
+
 } // namespace neuropod
+
+namespace std
+{
+
+// Need to specialize `std::iterator_traits` for `AccessorIterator`
+template <typename T>
+struct iterator_traits<neuropod::AccessorIterator<T>>
+{
+    using value_type = typename neuropod::AccessorIterator<T>::value_type;
+};
+
+} // namespace std

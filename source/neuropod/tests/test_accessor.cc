@@ -166,4 +166,64 @@ TEST(test_accessor, test_string_write)
         auto actual = tensor->get_data_as_vector();
         EXPECT_EQ(expected, actual);
     }
+
+    // Get a flat view
+    {
+        auto actual = tensor->flat();
+        EXPECT_TRUE(std::equal(expected.begin(), expected.end(), actual.begin()));
+    }
+}
+
+TEST(test_accessor, view_read)
+{
+    auto allocator = neuropod::get_generic_tensor_allocator();
+
+    auto tensor = allocator->arange<int32_t>(15);
+
+    auto view = tensor->view(3, 5);
+    {
+        for (int i = 0; i < 3; i++)
+        {
+            for (int j = 0; j < 5; j++)
+            {
+                EXPECT_EQ(view[i][j], i * 5 + j);
+            }
+        }
+    }
+}
+
+TEST(test_accessor, view_write)
+{
+    auto allocator = neuropod::get_generic_tensor_allocator();
+
+    auto tensor = allocator->arange<int32_t>(15);
+
+    auto view = tensor->view(3, 5);
+    {
+        for (int i = 0; i < 3; i++)
+        {
+            for (int j = 0; j < 5; j++)
+            {
+                view[i][j] = i * 5 + j;
+            }
+        }
+    }
+
+    std::vector<int32_t> expected(15);
+    std::iota(expected.begin(), expected.end(), 0);
+
+    EXPECT_EQ(expected, tensor->get_data_as_vector());
+}
+
+TEST(test_accessor, view_dims)
+{
+    auto allocator = neuropod::get_generic_tensor_allocator();
+
+    auto tensor1 = allocator->allocate_tensor<float>({3, 5});
+
+    // All dims passed to view must be positive
+    EXPECT_THROW(tensor1->view(-1, -2), std::runtime_error);
+
+    // Total number of elements must match
+    EXPECT_THROW(tensor1->view(4, 2), std::runtime_error);
 }

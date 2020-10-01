@@ -69,6 +69,9 @@ namespace detail
 [[noreturn]] void throw_error_hh(
     const char *file, int line, const char *function, const std::string &message, TensorType type1, TensorType type2);
 
+// Utility to compute strides given a vector of dimensions
+std::vector<int64_t> compute_strides(const std::vector<int64_t> &dims);
+
 } // namespace detail
 
 // Forward declare NeuropodTensor
@@ -265,6 +268,24 @@ protected:
 
     void assure_device_cpu() const;
 
+    // Check that requested_dims is compatible with the current tensor
+    void assure_view_compatible_shape(const std::vector<int64_t> &requested_dims) const;
+
+    template <typename Container, typename... Dim>
+    auto view_helper(Container data, Dim... requested_dims) const
+    {
+        this->assure_device_cpu();
+        std::vector<int64_t> new_dims = {requested_dims...};
+
+        // Check that the requested dims are compatible with this tensor
+        assure_view_compatible_shape(new_dims);
+
+        // Create and return a tensor view
+        constexpr size_t num_dims    = sizeof...(requested_dims);
+        auto             new_strides = detail::compute_strides(new_dims);
+        return TensorView<Container, num_dims>(data, std::move(new_dims), std::move(new_strides));
+    }
+
     // Seal a tensor
     // This is used to implement things like early GPU copy
     friend class Sealer;
@@ -336,6 +357,36 @@ public:
         this->assure_device_cpu();
         this->assure_rank(N);
         return TensorAccessor<const T *, N>(get_raw_data_ptr(), get_dims().data(), get_strides().data());
+    }
+
+    // Return a view of this tensor with the requested dimensions.
+    // `requested_dims` must be compatible with the dims of this tensor.
+    // This method does not make a copy of the tensor and changes made in the
+    // returned view are visible in the original tensor.
+    template <typename... Dim>
+    auto view(Dim... requested_dims)
+    {
+        return view_helper(get_raw_data_ptr(), std::forward<Dim>(requested_dims)...);
+    }
+
+    template <typename... Dim>
+    auto view(Dim... requested_dims) const
+    {
+        return view_helper(get_raw_data_ptr(), std::forward<Dim>(requested_dims)...);
+    }
+
+    // Return a view of this tensor as a flat tensor
+    // (a 1D tensor)
+    auto flat()
+    {
+        // Return a view with 1 dim
+        return view(static_cast<int64_t>(get_num_elements()));
+    }
+
+    auto flat() const
+    {
+        // Return a view with 1 dim
+        return view(static_cast<int64_t>(get_num_elements()));
     }
 
     T &as_scalar()
@@ -460,7 +511,9 @@ public:
     static int cmp(const std::string &lhs, const std::string &rhs) { return lhs.compare(rhs); }
 
     // Based on https://en.cppreference.com/w/cpp/language/operators
+    // TODO(vip): Simplify these operators
     friend bool operator==(const StringProxy &lhs, const std::string &rhs) { return cmp(lhs, rhs) == 0; }
+    friend bool operator==(const std::string &lhs, const StringProxy &rhs) { return cmp(lhs, rhs) == 0; }
     friend bool operator!=(const StringProxy &lhs, const std::string &rhs) { return cmp(lhs, rhs) != 0; }
     friend bool operator<(const StringProxy &lhs, const std::string &rhs) { return cmp(lhs, rhs) < 0; }
     friend bool operator>(const StringProxy &lhs, const std::string &rhs) { return cmp(lhs, rhs) > 0; }
@@ -519,6 +572,36 @@ public:
         this->assure_rank(N);
         return TensorAccessor<const TypedNeuropodTensor<std::string> &, N>(
             *this, get_dims().data(), get_strides().data());
+    }
+
+    // Return a view of this tensor with the requested dimensions.
+    // `requested_dims` must be compatible with the dims of this tensor.
+    // This method does not make a copy of the tensor and changes made in the
+    // returned view are visible in the original tensor.
+    template <typename... Dim>
+    auto view(Dim... requested_dims)
+    {
+        return view_helper<TypedNeuropodTensor<std::string> &>(*this, std::forward<Dim>(requested_dims)...);
+    }
+
+    template <typename... Dim>
+    auto view(Dim... requested_dims) const
+    {
+        return view_helper<const TypedNeuropodTensor<std::string> &>(*this, std::forward<Dim>(requested_dims)...);
+    }
+
+    // Return a view of this tensor as a flat tensor
+    // (a 1D tensor)
+    auto flat()
+    {
+        // Return a view with 1 dim
+        return view(static_cast<int64_t>(get_num_elements()));
+    }
+
+    auto flat() const
+    {
+        // Return a view with 1 dim
+        return view(static_cast<int64_t>(get_num_elements()));
     }
 
 protected:
