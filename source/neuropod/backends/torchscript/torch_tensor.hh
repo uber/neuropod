@@ -29,6 +29,11 @@ limitations under the License.
 // If we're not building with a nightly relase of torch,
 // set the date to match the date of the official release
 #ifndef CAFFE2_NIGHTLY_VERSION
+#if CAFFE2_VERSION == 10100
+// The date of the official torch 1.1.0 release
+#define CAFFE2_NIGHTLY_VERSION 20190430
+#endif
+
 #if CAFFE2_VERSION == 10200
 // The date of the official torch 1.2.0 release
 #define CAFFE2_NIGHTLY_VERSION 20190808
@@ -67,27 +72,27 @@ T *get_data_from_torch_tensor(const torch::Tensor &tensor)
 }
 
 template <>
-uint16_t *get_data_from_torch_tensor(const torch::Tensor &tensor)
+[[maybe_unused]] uint16_t *get_data_from_torch_tensor(const torch::Tensor & /*unused*/)
 {
     NEUROPOD_ERROR("TorchScript doesn't support type uint16_t");
 }
 
 template <>
-uint32_t *get_data_from_torch_tensor(const torch::Tensor &tensor)
+[[maybe_unused]] uint32_t *get_data_from_torch_tensor(const torch::Tensor & /*unused*/)
 {
     NEUROPOD_ERROR("TorchScript doesn't support type uint32_t");
 }
 
 template <>
-uint64_t *get_data_from_torch_tensor(const torch::Tensor &tensor)
+[[maybe_unused]] uint64_t *get_data_from_torch_tensor(const torch::Tensor & /*unused*/)
 {
     NEUROPOD_ERROR("TorchScript doesn't support type uint64_t");
 }
 
-torch::Deleter get_torch_deleter(const Deleter &deleter, void *data)
+[[maybe_unused]] torch::Deleter get_torch_deleter(const Deleter &deleter, void *data)
 {
     auto handle = register_deleter(deleter, data);
-    return [handle](void *unused) { run_deleter(handle); };
+    return [handle](void * /*unused*/) { run_deleter(handle); };
 }
 
 } // namespace
@@ -116,7 +121,7 @@ public:
     }
 
     // Wrap an existing torch tensor
-    TorchNeuropodTensor(torch::Tensor tensor) : TypedNeuropodTensor<T>(tensor.sizes().vec()), tensor(tensor) {}
+    TorchNeuropodTensor(torch::Tensor t) : TypedNeuropodTensor<T>(t.sizes().vec()), tensor(t) {}
 
     ~TorchNeuropodTensor() = default;
 
@@ -147,7 +152,7 @@ protected:
         }
         else
         {
-            out = tensor.to(torch::Device(torch::kCUDA, device));
+            out = tensor.to(torch::Device(torch::kCUDA, static_cast<short>(device)));
         }
 
         return std::make_shared<TorchNeuropodTensor<T>>(std::move(out));
@@ -158,7 +163,7 @@ protected:
 #define ELEMENTS(collection) collection
 #define GET_STRING_FROM_LIST(item) item
 #else
-#define ELEMENTS(collectionptr) collectionptr->elements();
+#define ELEMENTS(collectionptr) collectionptr->elements()
 #define GET_STRING_FROM_LIST(item) item.toStringRef()
 #endif
 
@@ -254,7 +259,7 @@ protected:
 };
 
 // Utility function to get an IValue from a torch tensor
-torch::jit::IValue get_ivalue_from_torch_tensor(const std::shared_ptr<NeuropodValue> &tensor)
+inline torch::jit::IValue get_ivalue_from_torch_tensor(const std::shared_ptr<NeuropodValue> &tensor)
 {
     return std::dynamic_pointer_cast<NativeDataContainer<torch::jit::IValue>>(tensor)->get_native_data();
 }
