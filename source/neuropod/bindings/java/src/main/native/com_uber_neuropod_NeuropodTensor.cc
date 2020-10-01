@@ -128,68 +128,34 @@ JNIEXPORT jlong JNICALL Java_com_uber_neuropod_NeuropodTensor_nativeGetNumberOfE
     return 0;
 }
 
-JNIEXPORT jobject JNICALL Java_com_uber_neuropod_NeuropodTensor_nativeToStringList(JNIEnv *env,
-                                                                                   jclass,
-                                                                                   jlong nativeHandle)
+JNIEXPORT jobject JNICALL Java_com_uber_neuropod_NeuropodTensor_nativeToStringList(JNIEnv *env, jclass, jlong handle)
 {
     try
     {
-        auto neuropodTensor =
-            (*reinterpret_cast<std::shared_ptr<neuropod::NeuropodValue> *>(nativeHandle))->as_tensor();
-        auto tensorType = neuropodTensor->get_tensor_type();
-        if (tensorType != neuropod::STRING_TENSOR)
-        {
-            throw std::runtime_error("unexpected tensor type, should be STRING_TENSOR but found:" +
-                                     tensorTypeToString(tensorType));
-        }
-
-        auto    size = neuropodTensor->get_num_elements();
+        auto stringTensor = (*reinterpret_cast<std::shared_ptr<neuropod::NeuropodValue> *>(handle))
+                                ->as_tensor()
+                                ->as_typed_tensor<std::string>();
+        auto    size = stringTensor->get_num_elements();
         jobject ret  = env->NewObject(java_util_ArrayList, java_util_ArrayList_, size);
         if (!ret)
         {
             throw std::runtime_error("out of memory: cannot create ArrayList");
         }
 
-        auto typedTensor = neuropodTensor->as_typed_tensor<std::string>();
-
-        std::function<void(string_accessor_type *)> mapFunc = [env, ret](string_accessor_type *elem) {
-            // StringProxy supports conversion to std:string.
-            std::string tmpStr(*elem);
-            jstring     convertedElem = env->NewStringUTF(tmpStr.c_str());
+        auto flatAccessor = stringTensor->flat();
+        for (size_t i = 0; i < size; ++i)
+        {
+            const std::string &elem          = flatAccessor[i];
+            jstring            convertedElem = env->NewStringUTF(elem.c_str());
             env->CallBooleanMethod(ret, java_util_ArrayList_add, convertedElem);
             env->DeleteLocalRef(convertedElem);
-        };
-
-        auto dims = typedTensor->get_dims();
-        switch (dims.size())
-        {
-        case 1:
-            mapStringTensor(typedTensor->accessor<1>(), mapFunc, dims);
-            break;
-        case 2:
-            mapStringTensor(typedTensor->accessor<2>(), mapFunc, dims);
-            break;
-        case 3:
-            mapStringTensor(typedTensor->accessor<3>(), mapFunc, dims);
-            break;
-        case 4:
-            mapStringTensor(typedTensor->accessor<4>(), mapFunc, dims);
-            break;
-        default:
-            // Here copy data twice
-            const auto &elementList = typedTensor->get_data_as_vector();
-            for (const auto &elem : elementList)
-            {
-                jstring convertedElem = env->NewStringUTF(elem.c_str());
-                env->CallBooleanMethod(ret, java_util_ArrayList_add, convertedElem);
-                env->DeleteLocalRef(convertedElem);
-            }
         }
+
         return ret;
     }
     catch (const std::exception &e)
     {
-        throwJavaException(env, e.what());
+        throw_java_exception(env, e.what());
     }
     return nullptr;
 }
@@ -204,13 +170,12 @@ JNIEXPORT jstring JNICALL Java_com_uber_neuropod_NeuropodTensor_nativeGetString(
         auto stringTensor = (*reinterpret_cast<std::shared_ptr<neuropod::NeuropodValue> *>(handle))
                                 ->as_tensor()
                                 ->as_typed_tensor<std::string>();
-        const auto &       strList = stringTensor->get_data_as_vector();
-        const std::string &elem    = strList[index];
+        const std::string &elem = stringTensor->flat()[index];
         return env->NewStringUTF(elem.c_str());
     }
     catch (const std::exception &e)
     {
-        throwJavaException(env, e.what());
+        throw_java_exception(env, e.what());
     }
     return nullptr;
 }

@@ -97,3 +97,35 @@ JNIEXPORT jlong JNICALL Java_com_uber_neuropod_NeuropodTensorAllocator_nativeAll
     }
     return reinterpret_cast<jlong>(nullptr);
 }
+
+JNIEXPORT jlong JNICALL Java_com_uber_neuropod_NeuropodTensorAllocator_nativeCreateStringTensor(
+    JNIEnv *env, jclass, jobject data, jlongArray dims, jlong allocatorHandle)
+{
+    try
+    {
+        auto allocator = *reinterpret_cast<std::shared_ptr<neuropod::NeuropodTensorAllocator> *>(allocatorHandle);
+
+        // Prepare shape and then allocate tensor.
+        jsize                shapeSize = env->GetArrayLength(dims);
+        jlong *              arr       = env->GetLongArrayElements(dims, 0);
+        std::vector<int64_t> shapes(arr, arr + shapeSize);
+        env->ReleaseLongArrayElements(dims, arr, JNI_ABORT);
+
+        auto  stringTensor = allocator->allocate_tensor<std::string>(shapes);
+        jsize size         = env->CallIntMethod(data, java_util_ArrayList_size);
+        auto  flatAccessor = stringTensor->flat();
+        for (jsize i = 0; i < size; ++i)
+        {
+            jstring element = static_cast<jstring>(env->CallObjectMethod(data, java_util_ArrayList_get, i));
+            flatAccessor[i] = to_string(env, element);
+            env->DeleteLocalRef(element);
+        }
+
+        return reinterpret_cast<jlong>(toHeap(stringTensor));
+    }
+    catch (const std::exception &e)
+    {
+        throw_java_exception(env, e.what());
+    }
+    return reinterpret_cast<jlong>(nullptr);
+}

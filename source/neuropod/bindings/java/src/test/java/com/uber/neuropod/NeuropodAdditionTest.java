@@ -21,10 +21,8 @@ import org.junit.Test;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.nio.DoubleBuffer;
 import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
-import java.nio.LongBuffer;
+import java.nio.DoubleBuffer;
 
 import java.util.*;
 
@@ -123,85 +121,6 @@ public class NeuropodAdditionTest {
     }
 
     @Test
-    public void InputDoubleTensor() {
-       NeuropodTensorAllocator allocator = model.getTensorAllocator();
-
-       TensorType type = TensorType.DOUBLE_TENSOR;
-       ByteBuffer buffer = ByteBuffer.allocateDirect(type.getBytesPerElement() * 2).order(ByteOrder.nativeOrder());
-
-       DoubleBuffer typedBuffer = buffer.asDoubleBuffer();
-       typedBuffer.put(1.0f);
-       typedBuffer.put(2.0f);
-       NeuropodTensor tensor = allocator.tensorFromMemory(buffer, new long[]{1L, 2L}, type);
-       assertNotNull(tensor.toDoubleBuffer());
-
-       assertArrayEquals(new long[]{1L, 2L}, tensor.getDims());
-       assertEquals(2, tensor.getNumberOfElements());
-       assertEquals(TensorType.DOUBLE_TENSOR, tensor.getTensorType());
-
-       tensor.close();
-       allocator.close();
-    }
-
-    @Test
-    public void InputIntTensor() {
-       NeuropodTensorAllocator allocator = model.getTensorAllocator();
-
-       TensorType type = TensorType.INT32_TENSOR;
-       ByteBuffer buffer = ByteBuffer.allocateDirect(type.getBytesPerElement() * 2).order(ByteOrder.nativeOrder());
-
-       IntBuffer typedBuffer = buffer.asIntBuffer();
-       typedBuffer.put(1);
-       typedBuffer.put(2);
-       NeuropodTensor tensor = allocator.tensorFromMemory(buffer, new long[]{1L, 2L}, type);
-       assertNotNull(tensor.toIntBuffer());
-
-       assertArrayEquals(new long[]{1L, 2L}, tensor.getDims());
-       assertEquals(2, tensor.getNumberOfElements());
-       assertEquals(TensorType.INT32_TENSOR, tensor.getTensorType());
-
-       tensor.close();
-       allocator.close();
-    }
-
-    @Test
-    public void InputLongTensor() {
-       NeuropodTensorAllocator allocator = model.getTensorAllocator();
-
-       TensorType type = TensorType.INT64_TENSOR;
-       ByteBuffer buffer = ByteBuffer.allocateDirect(type.getBytesPerElement() * 2).order(ByteOrder.nativeOrder());
-
-       LongBuffer typedBuffer = buffer.asLongBuffer();
-       typedBuffer.put(1);
-       typedBuffer.put(2);
-       NeuropodTensor tensor = allocator.tensorFromMemory(buffer, new long[]{1L, 2L}, type);
-       assertNotNull(tensor.toLongBuffer());
-
-       assertArrayEquals(new long[]{1L, 2L}, tensor.getDims());
-       assertEquals(2, tensor.getNumberOfElements());
-       assertEquals(TensorType.INT64_TENSOR, tensor.getTensorType());
-
-       tensor.close();
-       allocator.close();
-    }
-
-    @Test
-    public void InputStringTensor() {
-       NeuropodTensorAllocator allocator = model.getTensorAllocator();
-
-       TensorType type = TensorType.STRING_TENSOR;
-
-       // Note that for String Tensor we can't use low level allocator's method tensorFromMemory
-       // that accepts direct ByteBuffer as input. It throws exception "unsupported tensor type"
-       // and intentionally prevents using it for String Tensors.
-
-       // Allocator provides create/copyFrom methods to create String Tensors in a safe way.
-       // TBD: Complete test when it is available.
-
-       allocator.close();
-    }
-
-    @Test
     public void infer() {
         NeuropodTensorAllocator allocator = model.getTensorAllocator();
         Map<String, NeuropodTensor> inputs = new HashMap<>();
@@ -236,6 +155,14 @@ public class NeuropodAdditionTest {
         assertEquals(4.0f , outBuffer.get(0), EPSILON);
         assertEquals(6.0f , outBuffer.get(1), EPSILON);
 
+        try {
+           // Test that it detects type-mismatch if we try to take Float Output Tensor as Double.
+           DoubleBuffer doubleBuffer = out.toDoubleBuffer();
+           Assert.fail("Expected exception on wrong type");
+        } catch (Exception expected) {
+           assertTrue(expected.getMessage(), expected.getMessage().contains("tensorType mismatch"));
+        }
+
         out.close();
 
         // Inference with requested outputs.
@@ -266,8 +193,7 @@ public class NeuropodAdditionTest {
         inputs.put("x", tensor);
         inputs.put("y", tensor);
 
-        try
-        {
+        try {
            // Inference with requested outputs.
            List<String> requestedOutputs = new ArrayList<String>();
            requestedOutputs.add("out");
@@ -275,9 +201,7 @@ public class NeuropodAdditionTest {
            requestedOutputs.add("out_wrong");
            Map<String, NeuropodTensor> res = model.infer(inputs, requestedOutputs);
            Assert.fail("Expected exception on wrong requested output");
-        }
-        catch (Exception expected)
-        {
+        } catch (Exception expected) {
            // Note that TF and Torchscript returns different exception message.
            // TF: Node out_wrong not found in node_name_mapping
            // Torchscript: Tried to request a tensor that does not exist: out_wrong
