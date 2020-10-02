@@ -299,7 +299,6 @@ public class NeuropodTensorAllocatorTest {
        // that accepts direct ByteBuffer as input. It throws exception "unsupported tensor type"
        // and intentionally prevents using it for String Tensors.
 
-       // TBD: Test that the exception.
        ByteBuffer buffer = ByteBuffer.allocateDirect("String Tensor Value".length())
                 .order(ByteOrder.nativeOrder());
        // Note that we theoretically can write String data into buffer but this is

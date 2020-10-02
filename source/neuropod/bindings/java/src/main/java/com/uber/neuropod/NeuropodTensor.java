@@ -265,12 +265,16 @@ public class NeuropodTensor extends NativeClass implements Serializable {
         }
     }
 
+    // Converts address of Tensor Dimension into position in internal 1D buffer.
+    // Internally Tensor data is presented as 1D buffer. Conversion example:
+    // Tensor Dimension (n, m) mapped to internal dimension (1, n*m).
+    // Element address [i, j] match internal address [0, i*m + j]
     private long toPos(long[] index) {
         long[] dims = getDims();
         if (index.length != dims.length) {
             throw new java.lang.IndexOutOfBoundsException("index "
-                    + Arrays.toString(index) + " does not match dimension size, actual dims is " + Arrays.toString(dims));
-        }
+                   + Arrays.toString(index) + " does not match dimension size, actual dims is " + Arrays.toString(dims));
+       }
 
         long pos = 0;
         long acc = 1;
