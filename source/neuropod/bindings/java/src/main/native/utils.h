@@ -19,6 +19,7 @@ limitations under the License.
 
 #include <memory>
 #include <string>
+#include <vector>
 
 #include <jni.h>
 
@@ -57,6 +58,9 @@ jobject createDirectBuffer(JNIEnv *env, NeuropodTensor *tensor);
 // If there are multiple throw_java_exception calls during a C++ function, only the
 // last one is effective.
 void throw_java_exception(JNIEnv *env, const std::string &message);
+
+using string_accessor_type =
+    StringProxy<TypedNeuropodTensor<std::basic_string<char, std::char_traits<char>, std::allocator<char>>>>;
 
 } // namespace jni
 } // namespace neuropod

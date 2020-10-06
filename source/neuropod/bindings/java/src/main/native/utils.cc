@@ -18,8 +18,10 @@ limitations under the License.
 #include "jclass_register.h"
 #include "neuropod/neuropod.hh"
 
+#include <sstream>
 #include <stdexcept>
 #include <string>
+#include <vector>
 
 #include <jni.h>
 

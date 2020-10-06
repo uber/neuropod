@@ -5,7 +5,10 @@
 #include "utils.h"
 
 #include <exception>
+#include <functional>
 #include <memory>
+#include <stdexcept>
+#include <string>
 
 #include <jni.h>
 
@@ -56,7 +59,7 @@ JNIEXPORT jobject JNICALL Java_com_uber_neuropod_NeuropodTensor_nativeGetBuffer(
             return createDirectBuffer<int64_t>(env, neuropodTensor);
         }
         default:
-            throw std::runtime_error("Unsupported tensor type: " + tensor_type_to_string(tensorType));
+            throw std::runtime_error("unsupported tensor type: " + tensor_type_to_string(tensorType));
         }
     }
     catch (const std::exception &e)
@@ -123,4 +126,56 @@ JNIEXPORT jlong JNICALL Java_com_uber_neuropod_NeuropodTensor_nativeGetNumberOfE
         throw_java_exception(env, e.what());
     }
     return 0;
+}
+
+JNIEXPORT jobject JNICALL Java_com_uber_neuropod_NeuropodTensor_nativeToStringList(JNIEnv *env, jclass, jlong handle)
+{
+    try
+    {
+        auto stringTensor = (*reinterpret_cast<std::shared_ptr<neuropod::NeuropodValue> *>(handle))
+                                ->as_tensor()
+                                ->as_typed_tensor<std::string>();
+        auto    size = stringTensor->get_num_elements();
+        jobject ret  = env->NewObject(java_util_ArrayList, java_util_ArrayList_, size);
+        if (!ret)
+        {
+            throw std::runtime_error("out of memory: cannot create ArrayList");
+        }
+
+        auto flatAccessor = stringTensor->flat();
+        for (size_t i = 0; i < size; ++i)
+        {
+            const std::string &elem          = flatAccessor[i];
+            jstring            convertedElem = env->NewStringUTF(elem.c_str());
+            env->CallBooleanMethod(ret, java_util_ArrayList_add, convertedElem);
+            env->DeleteLocalRef(convertedElem);
+        }
+
+        return ret;
+    }
+    catch (const std::exception &e)
+    {
+        throw_java_exception(env, e.what());
+    }
+    return nullptr;
+}
+
+JNIEXPORT jstring JNICALL Java_com_uber_neuropod_NeuropodTensor_nativeGetString(JNIEnv *env,
+                                                                                jclass,
+                                                                                jlong index,
+                                                                                jlong handle)
+{
+    try
+    {
+        auto stringTensor = (*reinterpret_cast<std::shared_ptr<neuropod::NeuropodValue> *>(handle))
+                                ->as_tensor()
+                                ->as_typed_tensor<std::string>();
+        const std::string &elem = stringTensor->flat()[index];
+        return env->NewStringUTF(elem.c_str());
+    }
+    catch (const std::exception &e)
+    {
+        throw_java_exception(env, e.what());
+    }
+    return nullptr;
 }
