@@ -37,6 +37,7 @@ neuropod_cc_library(
     ],
     deps = [
         ":internal",
+        "//neuropod:neuropod_hdrs",
         "//neuropod/backends:neuropod_backend",
         "//neuropod/serialization",
         "@boost_repo//:boost",
