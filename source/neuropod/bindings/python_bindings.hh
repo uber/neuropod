@@ -36,4 +36,8 @@ NeuropodValueMap from_numpy_dict(NeuropodTensorAllocator &allocator, py::dict &i
 // Convert the items to a python dict of numpy arrays
 py::dict to_numpy_dict(NeuropodValueMap &items);
 
+// The python interpreter will be "kept alive" until all tensors referencing python data
+// are destroyed and all handles returned by this function are destroyed
+std::shared_ptr<void> get_interpreter_handle();
+
 } // namespace neuropod

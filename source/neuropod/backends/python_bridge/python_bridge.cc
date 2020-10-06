@@ -23,8 +23,6 @@ limitations under the License.
 #include <sstream>
 #include <vector>
 
-#include <dlfcn.h>
-
 namespace neuropod
 {
 
@@ -49,66 +47,13 @@ void set_python_path(const std::vector<std::string> &paths_to_add)
     setenv("PYTHONPATH", python_path.str().c_str(), 1);
 }
 
-// Initialize python if necessary and make sure we don't lock the GIL
-std::unique_ptr<py::gil_scoped_release> maybe_initialize()
-{
-    if (Py_IsInitialized()) // NOLINT(readability-implicit-bool-conversion)
-    {
-        return nullptr;
-    }
-
-#ifndef __APPLE__
-// This binary is already linked against `libpython`; the dlopen just
-// promotes it to RTLD_GLOBAL.
-#define PYTHON_LIB_NAME "libpython" STR(PYTHON_VERSION) ".so.1.0"
-#define PYTHON_LIB_M_NAME "libpython" STR(PYTHON_VERSION) "m.so.1.0"
-    void *libpython = dlopen(PYTHON_LIB_NAME, RTLD_NOW | RTLD_GLOBAL | RTLD_NOLOAD);
-
-    if (libpython == nullptr)
-    {
-        libpython = dlopen(PYTHON_LIB_M_NAME, RTLD_NOW | RTLD_GLOBAL | RTLD_NOLOAD);
-    }
-
-    if (libpython == nullptr)
-    {
-        const auto err = dlerror();
-        if (err == nullptr)
-        {
-            NEUROPOD_ERROR("Failed to promote libpython to RTLD_GLOBAL; this likely means the neuropod backend library "
-                           "was not built correctly");
-        }
-        else
-        {
-            NEUROPOD_ERROR("Failed to promote libpython to RTLD_GLOBAL. Error from dlopen: {}", err);
-        }
-    }
-#endif
-
-    // If we have a virtualenv, use it
-    if (auto venv_path = std::getenv("VIRTUAL_ENV"))
-    {
-        setenv("PYTHONHOME", venv_path, true); // NOLINT(readability-implicit-bool-conversion)
-    }
-
-    // Start the interpreter
-    py::initialize_interpreter();
-
-    // TODO: shutdown the interpreter once we know that there are no more python objects left
-    // atexit(py::finalize_interpreter);
-    return stdx::make_unique<py::gil_scoped_release>();
-}
-
-// Handle interpreter startup and shutdown
-// If we initialized the interpreter, make sure we don't have a lock on the GIL by storing a
-// py::gil_scoped_release
-auto gil_release = maybe_initialize();
-
 } // namespace
 
 PythonBridge::PythonBridge(const std::string &             neuropod_path,
                            const RuntimeOptions &          options,
                            const std::vector<std::string> &python_path_additions)
-    : NeuropodBackendWithDefaultAllocator<GenericNeuropodTensor>(neuropod_path, options)
+    : NeuropodBackendWithDefaultAllocator<GenericNeuropodTensor>(neuropod_path, options),
+      py_interpreter_handle_(get_interpreter_handle())
 {
     // Modify PYTHONPATH
     set_python_path(python_path_additions);

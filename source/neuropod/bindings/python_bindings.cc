@@ -20,9 +20,12 @@ limitations under the License.
 #include "neuropod/internal/neuropod_tensor_raw_data_access.hh"
 #include "neuropod/neuropod.hh"
 
+#include <pybind11/embed.h>
 #include <pybind11/numpy.h>
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
+
+#include <dlfcn.h>
 
 namespace neuropod
 {
@@ -97,6 +100,68 @@ std::shared_ptr<NeuropodTensor> tensor_from_string_numpy(NeuropodTensorAllocator
     return tensor;
 }
 
+// A struct to manage interpreter state
+struct PyStateWrapper
+{
+    // Start the interpreter on construction and stop it on destruction
+    py::scoped_interpreter interp;
+
+    // Release the GIL on construction (and acquire it right before shutdown)
+    py::gil_scoped_release gil;
+};
+
+// Initialize python if necessary and make sure we don't lock the GIL
+std::shared_ptr<PyStateWrapper> maybe_initialize()
+{
+    if (Py_IsInitialized()) // NOLINT(readability-implicit-bool-conversion)
+    {
+        return nullptr;
+    }
+
+#ifndef __APPLE__
+// This binary is already linked against `libpython`; the dlopen just
+// promotes it to RTLD_GLOBAL.
+#define PYTHON_LIB_NAME "libpython" STR(PYTHON_VERSION) ".so.1.0"
+#define PYTHON_LIB_M_NAME "libpython" STR(PYTHON_VERSION) "m.so.1.0"
+    void *libpython = dlopen(PYTHON_LIB_NAME, RTLD_NOW | RTLD_GLOBAL | RTLD_NOLOAD);
+
+    if (libpython == nullptr)
+    {
+        libpython = dlopen(PYTHON_LIB_M_NAME, RTLD_NOW | RTLD_GLOBAL | RTLD_NOLOAD);
+    }
+
+    if (libpython == nullptr)
+    {
+        const auto err = dlerror();
+        if (err == nullptr)
+        {
+            NEUROPOD_ERROR("Failed to promote libpython to RTLD_GLOBAL; this likely means the neuropod backend library "
+                           "was not built correctly");
+        }
+        else
+        {
+            NEUROPOD_ERROR("Failed to promote libpython to RTLD_GLOBAL. Error from dlopen: {}", err);
+        }
+    }
+#endif
+
+    // If we have a virtualenv, use it
+    if (auto venv_path = std::getenv("VIRTUAL_ENV"))
+    {
+        setenv("PYTHONHOME", venv_path, true); // NOLINT(readability-implicit-bool-conversion)
+    }
+
+    // Start the interpreter and release the GIL
+    return std::make_shared<PyStateWrapper>();
+}
+
+// Handle interpreter startup and shutdown
+// If we initialized the interpreter, make sure we don't have a lock on the GIL
+//
+// This object needs to stay alive until all tensors referencing python data have been destroyed
+// This is done by capturing it in all tensors referencing numpy data
+auto py_interpreter_handle = maybe_initialize();
+
 } // namespace
 
 std::shared_ptr<NeuropodTensor> tensor_from_numpy(NeuropodTensorAllocator &allocator, py::array array)
@@ -117,10 +182,13 @@ std::shared_ptr<NeuropodTensor> tensor_from_numpy(NeuropodTensorAllocator &alloc
     auto dtype = get_array_type(array);
     auto data  = array.mutable_data();
 
+    // Ensure the python interpreter stays alive for the lifetime of this tensor
+    auto py_interp_handle = py_interpreter_handle;
+
     // Capture the array in our deleter so it doesn't get deallocated
     // until we're done
     auto to_delete = std::make_shared<py::array>(array);
-    auto deleter   = [to_delete](void *unused) mutable {
+    auto deleter   = [to_delete, py_interp_handle](void *unused) mutable {
         py::gil_scoped_acquire gil;
         to_delete.reset();
     };
@@ -197,6 +265,11 @@ py::dict to_numpy_dict(NeuropodValueMap &items)
     }
 
     return out;
+}
+
+std::shared_ptr<void> get_interpreter_handle()
+{
+    return py_interpreter_handle;
 }
 
 } // namespace neuropod
