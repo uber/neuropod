@@ -2,7 +2,7 @@ import sys
 from setuptools import setup, find_packages
 from setuptools.dist import Distribution
 
-REQUIRED_PACKAGES = ["numpy", "testpath", "future", "six"]
+REQUIRED_PACKAGES = ["numpy", "testpath", "future", "six", "pip-tools"]
 
 if sys.version_info[:2] in ((2, 7), (3, 4)):
     # typing is built in to cpython for >= 3.5

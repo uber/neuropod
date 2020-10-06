@@ -14,14 +14,22 @@
 
 import os
 import json
+import tempfile
 import shutil
 
 from neuropod.utils.packaging_utils import packager
+from neuropod.utils.pip_utils import compile_requirements
 
 
 @packager(platform="python")
 def create_python_neuropod(
-    neuropod_path, data_paths, code_path_spec, entrypoint_package, entrypoint, **kwargs
+    neuropod_path,
+    data_paths,
+    code_path_spec,
+    entrypoint_package,
+    entrypoint,
+    requirements=None,
+    **kwargs
 ):
     """
     Packages arbitrary python code as a neuropod package.
@@ -78,6 +86,17 @@ def create_python_neuropod(
                                     `entrypoint_package='my.awesome.addition_model'` and
                                     `entrypoint='neuropod_init'`
 
+    :param  requirements:       An optional string containing the runtime requirements of this model
+                                (specified in a format that pip understands)
+
+                                !!! note ""
+                                    ***Example***:
+                                    ```
+                                    tensorflow=1.15.0
+                                    numpy=1.8
+                                    ```
+
+
     {common_doc_post}
     """
     neuropod_data_path = os.path.join(neuropod_path, "0", "data")
@@ -117,6 +136,17 @@ def create_python_neuropod(
             with open(os.path.join(root, "__init__.py"), "w"):
                 # We just need to create the file
                 pass
+
+    # Save requirements if specified
+    if requirements is not None:
+        # Write requirements to a temp file
+        with tempfile.NamedTemporaryFile() as requirements_txt:
+            requirements_txt.write(requirements.encode("utf-8"))
+            requirements_txt.flush()
+
+            # Write the lockfile
+            lock_path = os.path.join(neuropod_path, "0", "requirements.lock")
+            compile_requirements(requirements_txt.name, lock_path)
 
     # We also need to save the entrypoint package name so we know what to load at runtime
     # This is python specific config so it's not saved in the overall neuropod config
