@@ -147,6 +147,22 @@ PythonBridge::~PythonBridge()
     // Delete the stored objects
     maybe_convert_bindings_types_.reset();
     neuropod_.reset();
+
+    // Write coverage info if necessary
+    // This is necessary because coveragepy depends on atexit. atexit is only called
+    // when Py_Finalize is called. Unfortunately, calling Py_Finalize with embedded
+    // interpreters is not straightforward.
+    // See https://github.com/uber/neuropod/pull/448#issuecomment-704095542 for more details.
+    auto sys_modules = py::module::import("sys").attr("modules").cast<py::dict>();
+    if (sys_modules.contains("coverage"))
+    {
+        py::object process_startup = sys_modules["coverage"].attr("process_startup");
+        if (py::hasattr(process_startup, "coverage"))
+        {
+            // Call the atexit handler
+            process_startup.attr("coverage").attr("_atexit")();
+        }
+    }
 }
 
 // Run inference
