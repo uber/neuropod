@@ -16,12 +16,14 @@ limitations under the License.
 #include "backend_registration.hh"
 
 #include "neuropod/internal/error_utils.hh"
+#include "neuropod/version.hh"
 
 #include <iostream>
 #include <mutex>
 #include <sstream>
 #include <stdexcept>
 #include <unordered_map>
+#include <unordered_set>
 
 #include <cpp-semver.hpp>
 #include <dlfcn.h>
@@ -51,44 +53,74 @@ void init_registrar_if_needed()
     });
 }
 
-// A map from a backend type (e.g. tensorflow, python, torchscript, etc.) and version to
-// the name of a shared library that supports that type. These will only be loaded if a backend
-// for the requested type hasn't already been loaded.
+std::vector<BackendLoadSpec> get_default_backend_map()
+{
+    std::vector<BackendLoadSpec> out;
+
+    // A structure to store some basic info about frameworks we support
+    struct FrameworkInfo
+    {
+        std::string              type;
+        std::string              soname;
+        bool                     has_gpu_version;
+        std::vector<std::string> versions;
+    };
+
+    // Information about frameworks that we use to generate a list of `BackendLoadSpec`
+    const std::vector<FrameworkInfo> frameworks = {
+        {"torchscript", "libneuropod_torchscript_backend.so", true, {"1.1.0", "1.2.0", "1.3.0", "1.4.0", "1.5.0"}},
+        {"tensorflow", "libneuropod_tensorflow_backend.so", true, {"1.12.0", "1.13.1", "1.14.0", "1.15.0"}},
+        {"python", "libneuropod_pythonbridge_backend.so", false, {"27", "35", "36", "37", "38"}}};
+
+    // Because the returned vector is in reverse priority order,
+    // the ordering below means we'd prefer to load a newer, GPU capable version of a framework if one is available.
+    // It also prioritizes non-absoltute so paths (i.e. controlled by LD_LIBRARY_PATH) over absolute ones in
+    // `/usr/local/lib/neuropod`. This is so we don't break existing behavior.
+    for (const auto &is_absolute_path : {false, true})
+    {
+        for (const auto &is_gpu : {false, true})
+        {
+            for (const auto &framework : frameworks)
+            {
+                if (is_gpu && !framework.has_gpu_version)
+                {
+                    // This framework doesn't have a GPU specific version
+                    continue;
+                }
+
+                for (const auto &version : framework.versions)
+                {
+                    BackendLoadSpec item;
+                    item.type    = framework.type;
+                    item.version = version;
+
+                    if (is_absolute_path)
+                    {
+                        // Ex:
+                        //  "/usr/local/lib/neuropod/0.2.0/backends/torchscript_1.4.0/libneuropod_torchscript_backend.so"
+                        // Ex:
+                        //  "/usr/local/lib/neuropod/0.2.0/backends/torchscript_1.4.0_gpu/libneuropod_torchscript_backend.so"
+                        item.path = "/usr/local/lib/neuropod/" NEUROPOD_VERSION "/backends/" + framework.type + "_" +
+                                    version + (is_gpu ? "_gpu" : "") + "/" + framework.soname;
+                    }
+                    else
+                    {
+                        item.path = framework.soname;
+                    }
+
+                    out.emplace_back(std::move(item));
+                }
+            }
+        }
+    }
+
+    return out;
+}
+
+// A list of backends, versions, and their corresponding so files.
+// These will only be loaded if a backend for the requested type hasn't already been loaded.
 // Note: these are listed in reverse priority order
-// The ordering below means we'd prefer to load a newer, GPU capable version of a framework if one is available
-// TODO(vip): Actually name the backend `so` files differently depending on version
-const std::vector<BackendLoadSpec> default_backend_for_type = {
-    // Torch CPU
-    {"torchscript", "1.1.0", "libneuropod_torchscript_backend.so"},
-    {"torchscript", "1.2.0", "libneuropod_torchscript_backend.so"},
-    {"torchscript", "1.3.0", "libneuropod_torchscript_backend.so"},
-    {"torchscript", "1.4.0", "libneuropod_torchscript_backend.so"},
-
-    // Torch GPU
-    {"torchscript", "1.1.0", "libneuropod_torchscript_backend.so"},
-    {"torchscript", "1.2.0", "libneuropod_torchscript_backend.so"},
-    {"torchscript", "1.3.0", "libneuropod_torchscript_backend.so"},
-    {"torchscript", "1.4.0", "libneuropod_torchscript_backend.so"},
-
-    // TF CPU
-    {"tensorflow", "1.12.0", "libneuropod_tensorflow_backend.so"},
-    {"tensorflow", "1.13.1", "libneuropod_tensorflow_backend.so"},
-    {"tensorflow", "1.14.0", "libneuropod_tensorflow_backend.so"},
-    {"tensorflow", "1.15.0", "libneuropod_tensorflow_backend.so"},
-
-    // TF GPU
-    {"tensorflow", "1.12.0", "libneuropod_tensorflow_backend.so"},
-    {"tensorflow", "1.13.1", "libneuropod_tensorflow_backend.so"},
-    {"tensorflow", "1.14.0", "libneuropod_tensorflow_backend.so"},
-    {"tensorflow", "1.15.0", "libneuropod_tensorflow_backend.so"},
-
-    // Python
-    {"python", "27", "libneuropod_pythonbridge_backend.so"},
-    {"python", "35", "libneuropod_pythonbridge_backend.so"},
-    {"python", "36", "libneuropod_pythonbridge_backend.so"},
-    {"python", "37", "libneuropod_pythonbridge_backend.so"},
-    {"python", "38", "libneuropod_pythonbridge_backend.so"},
-};
+const std::vector<BackendLoadSpec> default_backend_for_type = get_default_backend_map();
 
 bool load_default_backend(const std::vector<BackendLoadSpec> &backends,
                           const std::string &                 type,
@@ -125,7 +157,7 @@ bool load_default_backend(const std::vector<BackendLoadSpec> &backends,
                 SPDLOG_TRACE("Loading the default backend for type '{}' failed. Error from dlopen: {}", type, err);
             }
 
-            return false;
+            continue;
         }
 
         // Successfully loaded the backend
@@ -210,6 +242,15 @@ bool register_backend(const std::string &    name,
     return true;
 }
 
+// Loading process:
+// 1. If we already have a registered backend that matches the type and target version range, return it
+// 2. If we already have a registered backend that matches the type, throw an error explaining that OPE
+//    is required
+// 3. Attempt to load a backend given the user provided list of overrides
+// 4. If that failed, attempt to load a backend with the default backend for type map above
+// 5. Now that we (likely) loaded a backend, try again to find a registered backend that matches the request and return
+// it
+// 6. Throw an error with installation instructions
 BackendFactoryFunction get_backend_for_type(const std::vector<BackendLoadSpec> &default_backend_overrides,
                                             const std::string &                 type,
                                             const std::string &                 target_version_range)
@@ -261,11 +302,12 @@ BackendFactoryFunction get_backend_for_type(const std::vector<BackendLoadSpec> &
     }
 
     // Don't have anything that matches
-    NEUROPOD_ERROR("The model being loaded requires a Neuropod backend for type '{}' and version range '{}'. However, "
-                   "a backend satisfying these requirements was not found. See the installation instructions "
-                   "at https://neuropod.ai to install a backend. Retry with log level TRACE for more information.",
-                   type,
-                   target_version_range);
+    NEUROPOD_ERROR(
+        "The model being loaded requires a Neuropod backend for type '{}' and version range '{}'. However, "
+        "a backend satisfying these requirements was not found. See the installation instructions "
+        "at https://neuropod.ai/installing to install a backend. Retry with log level TRACE for more information.",
+        type,
+        target_version_range);
 }
 
 } // namespace neuropod
