@@ -15,12 +15,10 @@
 load("@bazel_tools//tools/build_defs/pkg:pkg.bzl", "pkg_tar")
 load("//bazel:copy_libs.bzl", "copy_libs")
 load("//bazel:cc.bzl", "neuropod_cc_binary", "neuropod_cc_library")
+load("@libtorch_repo//:neuropod_backend_path.bzl", "NEUROPOD_BACKEND_PATH")
 
 neuropod_cc_binary(
     name = "libneuropod_torchscript_backend.so",
-    srcs = [
-        "//neuropod:libneuropod.so",
-    ],
     data = [
         ":copy_libtorch",
     ] + select({
@@ -84,6 +82,7 @@ pkg_tar(
         "//conditions:default": [],
     }),
     extension = "tar.gz",
+    package_dir = NEUROPOD_BACKEND_PATH,
     tags = ["manual"],
     visibility = [
         "//visibility:public",

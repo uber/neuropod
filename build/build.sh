@@ -35,11 +35,14 @@ fi
 python setup.py bdist_wheel --plat-name "$PLATFORM_TAG"
 popd
 
+# Install the backends to our test base directory
+rm -rf "../.neuropod_test_base" && mkdir "../.neuropod_test_base"
+tar -xf "./bazel-bin/neuropod/backends/tensorflow/neuropod_tensorflow_backend.tar.gz" -C "../.neuropod_test_base"
+tar -xf "./bazel-bin/neuropod/backends/torchscript/neuropod_torchscript_backend.tar.gz" -C "../.neuropod_test_base"
+tar -xf "./bazel-bin/neuropod/backends/python_bridge/neuropod_pythonbridge_backend.tar.gz" -C "../.neuropod_test_base"
+
 # Add the python libray to the pythonpath
 export PYTHONPATH=$PYTHONPATH:`pwd`/python
-
-# Build the wheels for the backends
-python ../build/wheel/build_wheel.py
 
 if [[ $(uname -s) == 'Linux' ]]; then
     # Copy the build artificts into a dist folder

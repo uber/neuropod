@@ -1,3 +1,5 @@
+load("//bazel:version.bzl", "NEUROPOD_VERSION")
+
 # https://docs.bazel.build/versions/master/skylark/repository_rules.html
 def _impl(repository_ctx):
     # The `or` pattern below handles empty strings and unset env variables
@@ -105,6 +107,18 @@ def _impl(repository_ctx):
         substitutions = {
             "{TORCH_DEFINES}": "{}".format(defines),
         },
+    )
+
+    # Create a file that specifies versioning information
+    repository_ctx.file(
+        "neuropod_backend_path.bzl",
+        content = """
+        NEUROPOD_BACKEND_PATH = "{}/backends/torchscript_{}{}/"
+        """.format(
+            NEUROPOD_VERSION,
+            version,
+            "_gpu" if IS_GPU else "",
+        ).strip(),
     )
 
 libtorch_repository = repository_rule(

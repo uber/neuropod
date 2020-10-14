@@ -57,12 +57,6 @@ def upload():
     upload_package("source/bazel-bin/neuropod/backends/tensorflow/neuropod_tensorflow_backend.tar.gz", release_id, "{}-tensorflow-{}-backend.tar.gz".format(platform, REQUESTED_TF_VERSION))
     upload_package("source/bazel-bin/neuropod/backends/torchscript/neuropod_torchscript_backend.tar.gz", release_id, "{}-torchscript-{}-backend.tar.gz".format(platform, REQUESTED_TORCH_VERSION))
 
-    # Upload the wheels for the backends
-    for gpath in ["source/python/dist/neuropod_backend_tensorflow*.whl", "source/python/dist/neuropod_backend_torchscript*.whl"]:
-        whl_path = glob.glob(gpath)[0]
-        fname = os.path.basename(whl_path)
-        upload_package(whl_path, release_id, fname, content_type="application/zip")
-
     # The python package is the same across CPU/GPU and different versions of backends so we'll only upload once for mac and once for linux
     # For each OS: For each python version
     if not IS_GPU:
@@ -70,7 +64,7 @@ def upload():
         upload_package("source/bazel-bin/neuropod/backends/python_bridge/neuropod_pythonbridge_backend.tar.gz", release_id, "{}-python-{}-backend.tar.gz".format(platform, PYTHON_VERSION))
 
         # Upload the wheels
-        for gpath in ["source/python/dist/neuropod-*.whl", "source/python/dist/neuropod_backend_python*.whl"]:
+        for gpath in ["source/python/dist/neuropod-*.whl"]:
             whl_path = glob.glob(gpath)[0]
             fname = os.path.basename(whl_path)
             upload_package(whl_path, release_id, fname, content_type="application/zip")

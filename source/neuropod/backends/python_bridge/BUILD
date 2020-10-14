@@ -14,12 +14,10 @@
 
 load("@bazel_tools//tools/build_defs/pkg:pkg.bzl", "pkg_tar")
 load("//bazel:cc.bzl", "neuropod_cc_binary", "neuropod_cc_library")
+load("@python_repo//:neuropod_backend_path.bzl", "NEUROPOD_BACKEND_PATH")
 
 neuropod_cc_binary(
     name = "libneuropod_pythonbridge_backend.so",
-    srcs = [
-        "//neuropod:libneuropod.so",
-    ],
     linkopts = select({
         "@bazel_tools//src/conditions:darwin": ["-Wl,-rpath,@loader_path"],
         "//conditions:default": ["-Wl,-rpath,$$ORIGIN"],
@@ -62,6 +60,7 @@ pkg_tar(
         ":libneuropod_pythonbridge_backend.so",
     ],
     extension = "tar.gz",
+    package_dir = NEUROPOD_BACKEND_PATH,
     tags = ["manual"],
     visibility = [
         "//visibility:public",

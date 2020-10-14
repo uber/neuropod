@@ -13,6 +13,9 @@ export COVERAGE_PROCESS_START="`pwd`/source/python/.coveragerc"
 echo "import coverage; coverage.process_startup()" > \
     `python -c "from distutils.sysconfig import get_python_lib; print(get_python_lib())"`/coverage.pth
 
+# Override the Neuropod backend base directory
+export NEUROPOD_BASE_DIR=`pwd`/.neuropod_test_base
+
 pushd source
 
 # Make sure we have GPUs
