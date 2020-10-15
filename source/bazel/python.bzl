@@ -32,23 +32,23 @@ def _impl(repository_ctx):
 
         # Mac
         "2.7-mac": {
-            "url": "https://github.com/VivekPanyam/python-prebuilts/releases/download/0.0.2test/darwin_2.7.18_10.9.tar.gz",
-            "sha256": "da903cc36026ae4644c9aeee044e3ce336b13975040cb796d9d4847e511dba9b",
+            "url": "https://github.com/VivekPanyam/python-prebuilts/releases/download/v101520_1/darwin_2.7.18_10.9.tar.gz",
+            "sha256": "",
         },
         "3.5-mac": {
-            "url": "https://github.com/VivekPanyam/python-prebuilts/releases/download/0.0.2test/darwin_3.5.4_10.6.tar.gz",
+            "url": "https://github.com/VivekPanyam/python-prebuilts/releases/download/v101520_1/darwin_3.5.4_10.6.tar.gz",
             "sha256": "",
         },
         "3.6-mac": {
-            "url": "https://github.com/VivekPanyam/python-prebuilts/releases/download/0.0.2test/darwin_3.6.8_10.9.tar.gz",
+            "url": "https://github.com/VivekPanyam/python-prebuilts/releases/download/v101520_1/darwin_3.6.8_10.9.tar.gz",
             "sha256": "",
         },
         "3.7-mac": {
-            "url": "https://github.com/VivekPanyam/python-prebuilts/releases/download/0.0.2test/darwin_3.7.8_10.9.tar.gz",
+            "url": "https://github.com/VivekPanyam/python-prebuilts/releases/download/v101520_1/darwin_3.7.8_10.9.tar.gz",
             "sha256": "",
         },
         "3.8-mac": {
-            "url": "https://github.com/VivekPanyam/python-prebuilts/releases/download/0.0.2test/darwin_3.8.5_10.9.tar.gz",
+            "url": "https://github.com/VivekPanyam/python-prebuilts/releases/download/v101520_1/darwin_3.8.5_10.9.tar.gz",
             "sha256": "",
         },
     }

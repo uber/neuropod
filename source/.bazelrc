@@ -43,3 +43,7 @@ test --test_env=LLVM_PROFILE_FILE --test_env=COVERAGE_PROCESS_START --test_env=P
 
 # Build with warnings as errors in CI
 build:ci --copt='-Werror'
+
+# Because some of the bazel tests can now depend on non-hermetic backend installations,
+# we can't cache test results
+build --nocache_test_results

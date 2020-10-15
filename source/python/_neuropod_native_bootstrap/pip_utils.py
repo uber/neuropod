@@ -80,10 +80,12 @@ def bootstrap_requirements():
     # A lockfile of runtime requirements to bootstrap with
     reqs = """
     future==0.18.2
-    numpy==1.16.6
+    numpy=={}
     six==1.15.0
     testpath==0.4.4
-    """
+    """.format(
+        "1.18.0" if sys.version_info.major == 3 else "1.16.6"
+    )
 
     _load_deps_internal(reqs)
 

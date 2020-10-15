@@ -100,6 +100,7 @@ std::unique_ptr<py::gil_scoped_release> maybe_initialize()
     }
 #endif
 
+    std::string executable_path;
     if (std::getenv("NEUROPOD_DISABLE_PYTHON_ISOLATION") == nullptr)
     {
         // Set PYTHONHOME to point to the relative path
@@ -123,6 +124,11 @@ std::unique_ptr<py::gil_scoped_release> maybe_initialize()
             const auto bootstrap_dir = (sodir / "bootstrap").string();
             SPDLOG_TRACE("Setting PYTHONPATH to bootstrap dir at {}", bootstrap_dir);
             setenv("PYTHONPATH", bootstrap_dir.c_str(), true); // NOLINT(readability-implicit-bool-conversion)
+
+            // Set the executable path
+            executable_path = (fs::path(pythonhome) / ("bin/python" + std::to_string(PY_MAJOR_VERSION) + "." +
+                                                       std::to_string(PY_MINOR_VERSION)))
+                                  .string();
         }
         else
         {
@@ -151,6 +157,12 @@ std::unique_ptr<py::gil_scoped_release> maybe_initialize()
         if sys.path[-1] == ".":
             sys.path.pop()
     )");
+
+    // Set the executable path correctly
+    if (!executable_path.empty())
+    {
+        py::module::import("sys").attr("executable") = executable_path;
+    }
 
     // TODO: shutdown the interpreter once we know that there are no more python objects left
     // atexit(py::finalize_interpreter);
