@@ -10,23 +10,23 @@ def _impl(repository_ctx):
     MAPPING = {
         # Linux
         "2.7-linux": {
-            "url": "https://github.com/VivekPanyam/python-prebuilts/releases/download/0.0.2test/cp27-cp27mu.tar.gz",
-            "sha256": "bc488d261fb9da9168ada77358331efa75fb7d84f5d2c4618c9c12ea8da821bb",
+            "url": "https://github.com/VivekPanyam/python-prebuilts/releases/download/v101520_1/linux_cp27-cp27mu.tar.gz",
+            "sha256": "",
         },
         "3.5-linux": {
-            "url": "https://github.com/VivekPanyam/python-prebuilts/releases/download/0.0.2test/cp35-cp35m.tar.gz",
+            "url": "https://github.com/VivekPanyam/python-prebuilts/releases/download/v101520_1/linux_cp35-cp35m.tar.gz",
             "sha256": "",
         },
         "3.6-linux": {
-            "url": "https://github.com/VivekPanyam/python-prebuilts/releases/download/0.0.2test/cp36-cp36m.tar.gz",
+            "url": "https://github.com/VivekPanyam/python-prebuilts/releases/download/v101520_1/linux_cp36-cp36m.tar.gz",
             "sha256": "",
         },
         "3.7-linux": {
-            "url": "https://github.com/VivekPanyam/python-prebuilts/releases/download/0.0.2test/cp37-cp37m.tar.gz",
+            "url": "https://github.com/VivekPanyam/python-prebuilts/releases/download/v101520_1/linux_cp37-cp37m.tar.gz",
             "sha256": "",
         },
         "3.8-linux": {
-            "url": "https://github.com/VivekPanyam/python-prebuilts/releases/download/0.0.2test/cp38-cp38.tar.gz",
+            "url": "https://github.com/VivekPanyam/python-prebuilts/releases/download/v101520_1/linux_cp38-cp38.tar.gz",
             "sha256": "",
         },
 
