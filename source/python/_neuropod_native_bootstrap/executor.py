@@ -23,8 +23,8 @@ import json
 
 import numpy as np
 
-from neuropod.backends.neuropod_executor import NeuropodExecutor
-from neuropod.utils.hash_utils import sha256sum
+from _neuropod_native_bootstrap.hash_utils import sha256sum
+from _neuropod_native_bootstrap.pip_utils import load_deps
 
 # Workaround for https://bugs.python.org/issue32573
 if not hasattr(sys, "argv"):
@@ -54,18 +54,17 @@ atexit.register(cleanup_symlink)
 loaded_op_hashes = set()
 
 
-class PythonNeuropodExecutor(NeuropodExecutor):
+class NativePythonExecutor:
     """
     Executes a python neuropod
     """
 
-    def __init__(self, neuropod_path, load_custom_ops=True):
+    def __init__(self, neuropod_path):
         """
         Load a python neuropod
 
         :param  neuropod_path:  The path to a python neuropod package
         """
-        super(PythonNeuropodExecutor, self).__init__(neuropod_path)
         self.neuropod_path = neuropod_path
 
         # Load the model config
@@ -77,6 +76,16 @@ class PythonNeuropodExecutor(NeuropodExecutor):
         entrypoint_package_path = model_config["entrypoint_package"]
         entrypoint_fn_name = model_config["entrypoint"]
 
+        # This is running from the native code - set up the requirements if any
+        # Note: This is only intended to work when using OPE so this can be problematic
+        # when running multiple python models in a single process
+        # (which you should try to avoid anyway because of the GIL)
+        # For other code paths (e.g. when calling `load_neuropod` from python with `_always_use_native=False`),
+        # the user is responsible for ensuring that all dependencies are installed in the environment
+        lockfile = os.path.join(neuropod_path, "0", "requirements.lock")
+        if os.path.isfile(lockfile):
+            load_deps(lockfile)
+
         # Add the custom op paths to the beginning of the python path
         # Note: there currently isn't a good way to handle multiple custom ops with the same name.
         # Depending on the underlying framework, there can be a global registry that the ops register themselves with
@@ -84,39 +93,38 @@ class PythonNeuropodExecutor(NeuropodExecutor):
         # use an incorrect op.
         #
         # For complete isolation, out of process execution is the best solution
-        if load_custom_ops:
-            custom_op_path = os.path.abspath(os.path.join(neuropod_path, "0", "ops"))
+        custom_op_path = os.path.abspath(os.path.join(neuropod_path, "0", "ops"))
 
-            if os.path.isdir(custom_op_path):
-                # Try to avoid silently using the incorrect op
-                for item in os.listdir(custom_op_path):
-                    lib_path = os.path.join(custom_op_path, item)
-                    lib_hash = sha256sum(lib_path)
-                    if lib_hash in loaded_op_hashes:
-                        # We already loaded this op so it's fine if this is added to the path again
-                        # because the op is identical
-                        # TODO(vip): This might not be entirely true because of transitive dependencies
-                        continue
+        if os.path.isdir(custom_op_path):
+            # Try to avoid silently using the incorrect op
+            for item in os.listdir(custom_op_path):
+                lib_path = os.path.join(custom_op_path, item)
+                lib_hash = sha256sum(lib_path)
+                if lib_hash in loaded_op_hashes:
+                    # We already loaded this op so it's fine if this is added to the path again
+                    # because the op is identical
+                    # TODO(vip): This might not be entirely true because of transitive dependencies
+                    continue
 
-                    loaded_op_hashes.add(lib_hash)
+                loaded_op_hashes.add(lib_hash)
 
-                    # If we haven't already loaded the op, make sure there isn't something already loadable with the
-                    # same name as this op
-                    op_name = os.path.splitext(item)[0]
-                    try:
-                        importlib.import_module(op_name)
-                        raise ValueError(
-                            (
-                                "Package `{}` is importable before loading the neuropod! "
-                                "This means that a custom op in your neuropod package clashes with something already "
-                                "accessible by python. Please check your PYTHONPATH and try again"
-                            ).format(op_name)
-                        )
-                    except ImportError:
-                        pass
+                # If we haven't already loaded the op, make sure there isn't something already loadable with the
+                # same name as this op
+                op_name = os.path.splitext(item)[0]
+                try:
+                    importlib.import_module(op_name)
+                    raise ValueError(
+                        (
+                            "Package `{}` is importable before loading the neuropod! "
+                            "This means that a custom op in your neuropod package clashes with something already "
+                            "accessible by python. Please check your PYTHONPATH and try again"
+                        ).format(op_name)
+                    )
+                except ImportError:
+                    pass
 
-                # Add the ops directory to the path
-                sys.path.insert(0, custom_op_path)
+            # Add the ops directory to the path
+            sys.path.insert(0, custom_op_path)
 
         # Create a symlink to our code directory
         neuropod_code_path = os.path.abspath(os.path.join(neuropod_path, "0", "code"))
@@ -150,6 +158,11 @@ class PythonNeuropodExecutor(NeuropodExecutor):
         :returns:   A dict mapping output names to values. All the keys
                     in this dict are strings and all the values are numpy arrays.
         """
+        # Convert unicode to string
+        for k, v in inputs.items():
+            if v.dtype.type == np.unicode_:
+                inputs[k] = v.astype("str")
+
         out = self.model(**inputs)
 
         # Make sure everything is a numpy array
@@ -160,5 +173,10 @@ class PythonNeuropodExecutor(NeuropodExecutor):
                         key, type(value)
                     )
                 )
+
+        # Convert unicode to string
+        for k, v in out.items():
+            if v.dtype.type == np.unicode_:
+                out[k] = v.astype("str")
 
         return out

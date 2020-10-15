@@ -18,6 +18,8 @@ limitations under the License.
 #include "neuropod/bindings/python_bindings.hh"
 #include "neuropod/internal/error_utils.hh"
 
+#include <ghc/filesystem.hpp>
+
 #include <cstdlib>
 #include <exception>
 #include <sstream>
@@ -30,6 +32,17 @@ namespace neuropod
 
 namespace
 {
+
+namespace fs = ghc::filesystem;
+
+// Returns the path of the so that contains this function
+// This is so we can set PYTHONHOME correctly
+const char *get_current_so_path()
+{
+    Dl_info info;
+    dladdr(reinterpret_cast<const void *>(get_current_so_path), &info);
+    return info.dli_fname;
+}
 
 void set_python_path(const std::vector<std::string> &paths_to_add)
 {
@@ -52,6 +65,9 @@ void set_python_path(const std::vector<std::string> &paths_to_add)
 // Initialize python if necessary and make sure we don't lock the GIL
 std::unique_ptr<py::gil_scoped_release> maybe_initialize()
 {
+    // Make sure our logging is initialized
+    init_logging();
+
     if (Py_IsInitialized()) // NOLINT(readability-implicit-bool-conversion)
     {
         return nullptr;
@@ -84,14 +100,57 @@ std::unique_ptr<py::gil_scoped_release> maybe_initialize()
     }
 #endif
 
-    // If we have a virtualenv, use it
-    if (auto venv_path = std::getenv("VIRTUAL_ENV"))
+    if (std::getenv("NEUROPOD_DISABLE_PYTHON_ISOLATION") == nullptr)
     {
-        setenv("PYTHONHOME", venv_path, true); // NOLINT(readability-implicit-bool-conversion)
+        // Set PYTHONHOME to point to the relative path
+        if (auto sopath = get_current_so_path())
+        {
+
+            const auto sodir = fs::absolute(sopath).parent_path();
+
+#ifdef __APPLE__
+            const auto pythonhome = (sodir / "Python.framework/Versions/Current").string();
+#else
+            const auto pythonhome =
+                (sodir / ("opt/python" + std::to_string(PY_MAJOR_VERSION) + "." + std::to_string(PY_MINOR_VERSION)))
+                    .string();
+#endif
+
+            SPDLOG_TRACE("Setting PYTHONHOME to isolated environment at {}", pythonhome);
+            setenv("PYTHONHOME", pythonhome.c_str(), true); // NOLINT(readability-implicit-bool-conversion)
+
+            // Overwrite PYTHONPATH
+            const auto bootstrap_dir = (sodir / "bootstrap").string();
+            SPDLOG_TRACE("Setting PYTHONPATH to bootstrap dir at {}", bootstrap_dir);
+            setenv("PYTHONPATH", bootstrap_dir.c_str(), true); // NOLINT(readability-implicit-bool-conversion)
+        }
+        else
+        {
+            NEUROPOD_ERROR("Error getting path of current shared object. Cannot load python.");
+        }
+    }
+    else if (std::getenv("PYTHONHOME") == nullptr)
+    {
+        // We're not being asked to isolate from the environment and we don't have pythonhome already set
+        // Note: in this scenario, the user is responsible for making `_neuropod_native_bootstrap` available
+        // in the environment
+
+        // Check if we have a virtualenv
+        if (auto venv_path = std::getenv("VIRTUAL_ENV"))
+        {
+            setenv("PYTHONHOME", venv_path, true); // NOLINT(readability-implicit-bool-conversion)
+        }
     }
 
     // Start the interpreter
     py::initialize_interpreter();
+
+    // pybind11 adds the current working dir to the path and we don't want that
+    py::exec(R"(
+        import sys
+        if sys.path[-1] == ".":
+            sys.path.pop()
+    )");
 
     // TODO: shutdown the interpreter once we know that there are no more python objects left
     // atexit(py::finalize_interpreter);
@@ -124,19 +183,22 @@ void PythonBridge::load_model_internal()
     // Acquire the GIL
     py::gil_scoped_acquire gil;
 
+    // Bootstrap any deps needed by the Neuropod python library
+    py::module::import("_neuropod_native_bootstrap.pip_utils").attr("bootstrap_requirements")();
+
     // Get the python neuropod loader
-    py::object load_neuropod = py::module::import("neuropod.backends.python.executor").attr("PythonNeuropodExecutor");
+    py::object load_neuropod = py::module::import("_neuropod_native_bootstrap.executor").attr("NativePythonExecutor");
 
     // Converts from unicode to ascii for python 3 string arrays
     maybe_convert_bindings_types_ = stdx::make_unique<py::object>(
-        py::module::import("neuropod.utils.dtype_utils").attr("maybe_convert_bindings_types"));
+        py::module::import("_neuropod_native_bootstrap.dtype_utils").attr("maybe_convert_bindings_types"));
 
     // Make sure that the model is local
     // Note: we could also delegate this to the python implementation
     const auto local_path = loader_->ensure_local();
 
     // Load the neuropod and save a reference to it
-    neuropod_ = stdx::make_unique<py::object>(load_neuropod(local_path, true /* is_native */));
+    neuropod_ = stdx::make_unique<py::object>(load_neuropod(local_path));
 }
 
 PythonBridge::~PythonBridge()
@@ -175,7 +237,7 @@ std::unique_ptr<NeuropodValueMap> PythonBridge::infer_internal(const NeuropodVal
     py::dict model_inputs = to_numpy_dict(const_cast<NeuropodValueMap &>(inputs));
 
     // Run inference
-    auto model_outputs_raw = neuropod_->attr("infer")(model_inputs).cast<py::dict>();
+    auto model_outputs_raw = neuropod_->attr("forward")(model_inputs).cast<py::dict>();
 
     // Postprocess for python 3
     auto model_outputs = (*maybe_convert_bindings_types_)(model_outputs_raw).cast<py::dict>();

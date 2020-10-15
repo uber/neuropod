@@ -41,6 +41,14 @@ tar -xf "./bazel-bin/neuropod/backends/tensorflow/neuropod_tensorflow_backend.ta
 tar -xf "./bazel-bin/neuropod/backends/torchscript/neuropod_torchscript_backend.tar.gz" -C "../.neuropod_test_base"
 tar -xf "./bazel-bin/neuropod/backends/python_bridge/neuropod_pythonbridge_backend.tar.gz" -C "../.neuropod_test_base"
 
+# Copy our bootstrap library into the native python backend
+pushd ../.neuropod_test_base/*/backends/python_*
+mkdir bootstrap
+cd bootstrap
+BOOTSTRAP_DIR=`pwd`
+popd
+cp -r "python/_neuropod_native_bootstrap" "$BOOTSTRAP_DIR/"
+
 # Add the python libray to the pythonpath
 export PYTHONPATH=$PYTHONPATH:`pwd`/python
 

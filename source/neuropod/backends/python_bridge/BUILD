@@ -20,10 +20,9 @@ neuropod_cc_binary(
     name = "libneuropod_pythonbridge_backend.so",
     linkopts = select({
         "@bazel_tools//src/conditions:darwin": [
-            "-Wl,-rpath,@loader_path",
             "-Wl,-rpath,@loader_path/Python.framework",
         ],
-        "//conditions:default": ["-Wl,-rpath,$$ORIGIN"],
+        "//conditions:default": ["-Wl,-rpath,$$ORIGIN/usr/lib"],
     }),
     linkshared = True,
     linkstatic = True,
@@ -43,15 +42,7 @@ neuropod_cc_library(
     ],
     linkopts = [
         "-ldl",
-    ] + select({
-        "@bazel_tools//src/conditions:darwin": [
-            # This is so C++ PythonBridge tests work when running under bazel
-            # TODO(vip): Clean this up
-            "-Wl,-rpath,@loader_path/../../../../../external/python_repo/Python.framework",
-            "-Wl,-rpath,@loader_path/../../../../../../external/python_repo/Python.framework",
-        ],
-        "//conditions:default": [],
-    }),
+    ],
     visibility = [
         "//neuropod:__subpackages__",
     ],
@@ -60,6 +51,7 @@ neuropod_cc_library(
         "//neuropod/bindings",
         "//neuropod/core",
         "//neuropod/internal",
+        "@filesystem_repo//:filesystem",
         "@python_repo//:python",
     ],
     alwayslink = True,

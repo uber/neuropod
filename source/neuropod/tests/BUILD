@@ -29,7 +29,6 @@ cc_test(
         "benchmark_multiprocess.cc",
     ],
     data = [
-        "//neuropod/backends/tensorflow:libneuropod_tensorflow_backend.so",
         "//neuropod/tests/test_data",
     ],
     tags = [
@@ -148,10 +147,12 @@ cc_test(
     srcs = [
         "test_python_bridge.cc",
     ],
+    # Needed because we want to expose symbols and we're
+    # dynamically loading the python bridge
+    linkopts = ["-rdynamic"],
     deps = [
         ":neuropod_test_utils",
         "//neuropod:neuropod_impl",
-        "//neuropod/backends/python_bridge",
     ],
 )
 
@@ -160,11 +161,13 @@ cc_test(
     srcs = [
         "gpu_test_python_bridge.cc",
     ],
+    # Needed because we want to expose symbols and we're
+    # dynamically loading the python bridge
+    linkopts = ["-rdynamic"],
     tags = ["gpu"],
     deps = [
         ":neuropod_test_utils",
         "//neuropod:neuropod_impl",
-        "//neuropod/backends/python_bridge",
     ],
 )
 
@@ -348,11 +351,6 @@ cc_test(
     srcs = [
         "test_multiprocess.cc",
     ],
-    data = [
-        "//neuropod/backends/python_bridge:libneuropod_pythonbridge_backend.so",
-        "//neuropod/backends/tensorflow:libneuropod_tensorflow_backend.so",
-        "//neuropod/backends/torchscript:libneuropod_torchscript_backend.so",
-    ],
     tags = ["requires_path"],
     deps = [
         ":neuropod_test_utils",
@@ -365,9 +363,6 @@ cc_test(
     name = "test_ope_multiple_instances",
     srcs = [
         "test_ope_multiple_instances.cc",
-    ],
-    data = [
-        "//neuropod/backends/python_bridge:libneuropod_pythonbridge_backend.so",
     ],
     tags = [
         "no_trace_logging",
