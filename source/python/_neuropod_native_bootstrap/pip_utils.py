@@ -17,6 +17,8 @@ import os
 import glob
 import sys
 
+from _neuropod_native_bootstrap.filelock import FileLock
+
 PACKAGE_BASE_DIR = os.path.abspath(
     os.path.expanduser(
         "~/.neuropod/pythonpackages/py{}{}/".format(
@@ -146,9 +148,20 @@ def _load_deps_internal(lockfile_contents):
         if not req_path.startswith(PACKAGE_BASE_DIR):
             raise ValueError("Invalid dependency: {}".format(requirement))
 
-        # Install this package if we need to
-        if not os.path.isdir(req_path):
-            install_package(requirement, req_path)
+        # Check if we need to install the package
+        if not os.path.exists(req_path + ".complete"):
+            # Acquire a lock
+            # TODO(vip): it's possible that this'll conflict with a package if the version ends in `.lock`
+            lock = FileLock(req_path + ".lock")
+            with lock:
+                # Check again if we need to install the package
+                # (maybe another process installed it before we got the lock)
+                if not os.path.exists(req_path + ".complete"):
+                    # Install
+                    install_package(requirement, req_path)
+
+                    # Mark the installation as complete
+                    open(req_path + ".complete", "a").close()
 
         # Add this package to the pythonpath
         sys.path.insert(
