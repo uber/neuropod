@@ -5,18 +5,20 @@ set -e
 source .neuropod_venv/bin/activate
 
 BASE_PATH=`pwd`
+NEUROPOD_PY_BOOTSTRAP_DIR=`echo .neuropod_test_base/*/backends/python_*/bootstrap/_neuropod_native_bootstrap/`
 
-# Merge all the python coverage reports and print
-pushd source/python
+# Merge all the python coverage reports
+pushd /tmp/neuropod_py_coverage/
 coverage combine
+mv .coverage "$BASE_PATH"
+popd
+
+# Print the report
 coverage report
 
 # Generate an xml report and fix paths
 coverage xml
-sed -i "s+$BASE_PATH/++g" coverage.xml
-sed -i 's+name="\..*neuropod\.python+name="neuropod+g' coverage.xml
-
-popd
+sed -i "s+$NEUROPOD_PY_BOOTSTRAP_DIR+source/neuropod/backends/python_bridge/_neuropod_native_bootstrap/+g" coverage.xml
 
 pushd source
 

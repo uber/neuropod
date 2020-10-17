@@ -153,6 +153,16 @@ std::unique_ptr<py::gil_scoped_release> maybe_initialize()
          ("bin/python" + std::to_string(PY_MAJOR_VERSION) + "." + std::to_string(PY_MINOR_VERSION)))
             .string();
 
+    // For code coverage
+    if (std::getenv("PYTHONPATH") != nullptr)
+    {
+        // Get the coverage dependency
+        py::module::import("_neuropod_native_bootstrap.pip_utils").attr("_load_deps_internal")("coverage==5.3");
+
+        // Start coverage collection
+        py::module::import("coverage").attr("process_startup")();
+    }
+
     // TODO: shutdown the interpreter once we know that there are no more python objects left
     // atexit(py::finalize_interpreter);
     return stdx::make_unique<py::gil_scoped_release>();
