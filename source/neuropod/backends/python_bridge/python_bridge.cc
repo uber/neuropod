@@ -100,46 +100,32 @@ std::unique_ptr<py::gil_scoped_release> maybe_initialize()
     }
 #endif
 
-    std::string executable_path;
-    if (std::getenv("NEUROPOD_DISABLE_PYTHON_ISOLATION") == nullptr)
+    // Get the current backend directory
+    auto sopath = get_current_so_path();
+    if (sopath == nullptr)
     {
-        // Set PYTHONHOME to point to the relative path
-        if (auto sopath = get_current_so_path())
-        {
+        NEUROPOD_ERROR("Error getting path of current shared object. Cannot load python.");
+    }
 
-            const auto sodir = fs::absolute(sopath).parent_path();
+    const auto sodir = fs::absolute(sopath).parent_path();
 
+    // Get the path for pythonhone
 #ifdef __APPLE__
-            const auto pythonhome = (sodir / "Python.framework/Versions/Current").string();
+    const auto pythonhome = (sodir / "Python.framework/Versions/Current").string();
 #else
-            const auto pythonhome =
-                (sodir / ("opt/python" + std::to_string(PY_MAJOR_VERSION) + "." + std::to_string(PY_MINOR_VERSION)))
-                    .string();
+    const auto pythonhome =
+        (sodir / ("opt/python" + std::to_string(PY_MAJOR_VERSION) + "." + std::to_string(PY_MINOR_VERSION))).string();
 #endif
 
-            SPDLOG_TRACE("Setting PYTHONHOME to isolated environment at {}", pythonhome);
-            setenv("PYTHONHOME", pythonhome.c_str(), true); // NOLINT(readability-implicit-bool-conversion)
-
-            // Overwrite PYTHONPATH
-            const auto bootstrap_dir = (sodir / "bootstrap").string();
-            SPDLOG_TRACE("Setting PYTHONPATH to bootstrap dir at {}", bootstrap_dir);
-            setenv("PYTHONPATH", bootstrap_dir.c_str(), true); // NOLINT(readability-implicit-bool-conversion)
-
-            // Set the executable path
-            executable_path = (fs::path(pythonhome) / ("bin/python" + std::to_string(PY_MAJOR_VERSION) + "." +
-                                                       std::to_string(PY_MINOR_VERSION)))
-                                  .string();
-        }
-        else
-        {
-            NEUROPOD_ERROR("Error getting path of current shared object. Cannot load python.");
-        }
+    if (std::getenv("NEUROPOD_DISABLE_PYTHON_ISOLATION") == nullptr)
+    {
+        // Isolate from the environment, set PYTOHNHOME to the packaged python environment
+        SPDLOG_TRACE("Setting PYTHONHOME to isolated environment at {}", pythonhome);
+        setenv("PYTHONHOME", pythonhome.c_str(), true); // NOLINT(readability-implicit-bool-conversion)
     }
     else if (std::getenv("PYTHONHOME") == nullptr)
     {
         // We're not being asked to isolate from the environment and we don't have pythonhome already set
-        // Note: in this scenario, the user is responsible for making `_neuropod_native_bootstrap` available
-        // in the environment
 
         // Check if we have a virtualenv
         if (auto venv_path = std::getenv("VIRTUAL_ENV"))
@@ -158,11 +144,14 @@ std::unique_ptr<py::gil_scoped_release> maybe_initialize()
             sys.path.pop()
     )");
 
-    // Set the executable path correctly
-    if (!executable_path.empty())
-    {
-        py::module::import("sys").attr("executable") = executable_path;
-    }
+    // Add the bootstrap library to the pythonpath
+    py::module::import("sys").attr("path").cast<py::list>().append((sodir / "bootstrap").string());
+
+    // Set the executable path
+    py::module::import("sys").attr("executable") =
+        (fs::path(pythonhome) /
+         ("bin/python" + std::to_string(PY_MAJOR_VERSION) + "." + std::to_string(PY_MINOR_VERSION)))
+            .string();
 
     // TODO: shutdown the interpreter once we know that there are no more python objects left
     // atexit(py::finalize_interpreter);

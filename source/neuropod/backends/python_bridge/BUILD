@@ -69,6 +69,7 @@ pkg_tar(
         "//visibility:public",
     ],
     deps = [
+        "//neuropod/backends/python_bridge/_neuropod_native_bootstrap:neuropod_native_bootstrap",
         "@python_repo//:python.tar.gz",
     ],
 )
