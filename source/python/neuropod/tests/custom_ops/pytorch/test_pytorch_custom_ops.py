@@ -48,7 +48,8 @@ def build_op(workdir):
 
 
 @unittest.skipIf(
-    torch.__version__ != "1.4.0", "Skipping custom op test for torch != 1.4.0"
+    not torch.__version__.startswith("1.4.0"),
+    "Skipping custom op test for torch != 1.4.0",
 )
 class TestPytorchPackaging(unittest.TestCase):
     @classmethod
