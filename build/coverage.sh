@@ -4,13 +4,12 @@ set -e
 # Use the virtualenv
 source .neuropod_venv/bin/activate
 
-BASE_PATH=`pwd`
-NEUROPOD_PY_BOOTSTRAP_DIR=`echo .neuropod_test_base/*/backends/python_*/bootstrap/_neuropod_native_bootstrap/`
+# So the `coverage` commands find the config
+export COVERAGE_RCFILE="`pwd`/source/python/.coveragerc"
 
 # Merge all the python coverage reports
 pushd /tmp/neuropod_py_coverage/
 coverage combine
-mv .coverage "$BASE_PATH"
 popd
 
 # Print the report
@@ -18,6 +17,7 @@ coverage report
 
 # Generate an xml report and fix paths
 coverage xml
+NEUROPOD_PY_BOOTSTRAP_DIR=`echo .neuropod_test_base/*/backends/python_*/bootstrap/_neuropod_native_bootstrap/`
 sed -i "s+$NEUROPOD_PY_BOOTSTRAP_DIR+source/neuropod/backends/python_bridge/_neuropod_native_bootstrap/+g" coverage.xml
 
 pushd source

@@ -5,3 +5,7 @@ include =
 omit = *tests*
 concurrency = multiprocessing
 data_file = /tmp/neuropod_py_coverage/.coverage
+
+[report]
+# This is vendor code
+omit = */_neuropod_native_bootstrap/filelock.py

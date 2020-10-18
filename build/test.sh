@@ -13,6 +13,10 @@ echo "import coverage; coverage.process_startup()" > \
 # Override the Neuropod backend base directory
 export NEUROPOD_BASE_DIR=`pwd`/.neuropod_test_base
 
+# Enable python isolation
+# TODO(vip): Remove this once isolation is default behavior
+export NEUROPOD_ENABLE_PYTHON_ISOLATION=true
+
 pushd source
 
 # Add the python library to the pythonpath

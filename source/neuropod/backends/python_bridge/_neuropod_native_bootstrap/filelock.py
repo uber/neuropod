@@ -24,6 +24,8 @@
 # For more information, please refer to <http://unlicense.org>
 
 # From https://github.com/benediktschmitt/py-filelock
+# Note: this file is not covered by Neuropod code coverage
+# See .coveragerc for details
 
 """
 A platform independent file lock that supports the with-statement.

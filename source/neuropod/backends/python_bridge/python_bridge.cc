@@ -117,7 +117,7 @@ std::unique_ptr<py::gil_scoped_release> maybe_initialize()
         (sodir / ("opt/python" + std::to_string(PY_MAJOR_VERSION) + "." + std::to_string(PY_MINOR_VERSION))).string();
 #endif
 
-    if (std::getenv("NEUROPOD_DISABLE_PYTHON_ISOLATION") == nullptr)
+    if (std::getenv("NEUROPOD_ENABLE_PYTHON_ISOLATION") != nullptr)
     {
         // Isolate from the environment, set PYTOHNHOME to the packaged python environment
         SPDLOG_TRACE("Setting PYTHONHOME to isolated environment at {}", pythonhome);
@@ -154,7 +154,7 @@ std::unique_ptr<py::gil_scoped_release> maybe_initialize()
             .string();
 
     // For code coverage
-    if (std::getenv("PYTHONPATH") != nullptr)
+    if (std::getenv("COVERAGE_PROCESS_START") != nullptr)
     {
         // Get the coverage dependency
         py::module::import("_neuropod_native_bootstrap.pip_utils").attr("_load_deps_internal")("coverage==5.3");
