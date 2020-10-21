@@ -141,7 +141,7 @@ class TestSpecValidation(unittest.TestCase):
 
     def test_string_tensors(self):
         test_input = {
-            "x": np.array([["some", "string", "tensor"]], dtype=np.str_),
+            "x": np.array([["some", "string", "tensor"]], dtype=np.string_),
         }
 
         SPEC = [

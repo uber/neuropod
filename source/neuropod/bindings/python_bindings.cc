@@ -152,16 +152,39 @@ py::array tensor_to_numpy(std::shared_ptr<NeuropodTensor> value)
     // Handle string tensors
     if (tensor->get_tensor_type() == STRING_TENSOR)
     {
-        // Special case for empty string tensors because the pybind functions below don't correctly set the
-        // type of the resulting array in this case
+        // Special case for empty string tensors
         if (tensor->get_num_elements() == 0)
         {
-            return py::array_t<std::array<char, 1>>(tensor->get_dims());
+            return py::array(py::dtype("S"), tensor->get_dims());
         }
 
-        // This makes a copy
-        auto arr = py::array(py::cast(tensor->as_typed_tensor<std::string>()->get_data_as_vector()));
+        // Convert to a vector (which makes a copy)
+        auto data_vec = tensor->as_typed_tensor<std::string>()->get_data_as_vector();
+
+        // Get the max length
+        auto max_length =
+            std::max_element(data_vec.begin(), data_vec.end(), [](const std::string &first, const std::string &second) {
+                return first.size() < second.size();
+            })->size();
+
+        auto arr = py::array(py::dtype("S" + std::to_string(max_length)), data_vec.size());
+
+        // Get a pointer to the underlying data
+        char *data = static_cast<char *>(arr.mutable_data());
+
+        // Zero fill
+        memset(data, 0, max_length * data_vec.size());
+
+        // Copy the data in
+        for (size_t i = 0; i < data_vec.size(); i++)
+        {
+            auto &curr = data_vec.at(i);
+            memcpy(data + i * max_length, curr.c_str(), curr.size());
+        }
+
+        // Resize to the target size
         arr.resize(tensor->get_dims());
+
         return arr;
     }
 

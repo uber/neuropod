@@ -21,14 +21,14 @@ def get_dtype(arg):
     Get numpy dtypes from strings in a python 2 and 3 compatible way
     """
     if arg == "string":
-        arg = "str"
+        arg = "S"
 
     return np.dtype(arg)
 
 
 def get_dtype_name(arg):
     name = get_dtype(arg).name
-    if name == "str":
+    if name == "bytes":
         return "string"
 
     return name

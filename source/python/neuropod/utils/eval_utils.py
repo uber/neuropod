@@ -29,9 +29,9 @@ logger = logging.getLogger(__name__)
 
 def check_output_matches_expected(out, expected_out):
     for key, value in expected_out.items():
-        if value.dtype.type == np.str_:
+        if value.dtype.type == np.string_ or value.dtype.type == np.str_:
             # All strings are equal
-            success_condition = (value == out[key]).all()
+            success_condition = (value.astype(np.string_) == out[key]).all()
         else:
             # All the values are close
             success_condition = np.allclose(value, out[key])

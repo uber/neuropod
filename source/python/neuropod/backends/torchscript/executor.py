@@ -133,7 +133,7 @@ class TorchScriptNeuropodExecutor(NeuropodExecutor):
             # Get the target device for this tensor
             target_device = self._get_torch_device(self.input_device_mapping[k])
 
-            if v.dtype.type == np.str_:
+            if v.dtype.type == np.string_:
                 converted_inputs[k] = v.tolist()
 
                 # We don't handle devices for string "tensors" because lists cannot
@@ -210,7 +210,7 @@ class TorchScriptNeuropodExecutor(NeuropodExecutor):
         elif isinstance(value, list) and (
             dtype == "string" or isinstance(value[0], string_types)
         ):
-            neuropod_out[key] = np.array(value, dtype=np.str_)
+            neuropod_out[key] = np.array(value, dtype=np.string_)
         else:
             raise RuntimeError(
                 "All outputs must be torch tensors or list of strings! Output `{}` was of type `{}`".format(

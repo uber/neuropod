@@ -175,7 +175,7 @@ class NeuropodExecutor(object):
         # Convert unicode to string
         for k, v in inputs.items():
             if v.dtype.type == np.unicode_:
-                inputs[k] = v.astype("str")
+                inputs[k] = v.astype(np.string_)
 
         # Validate inputs
         validate_tensors_against_specs(inputs, self.neuropod_config["input_spec"])
@@ -189,7 +189,7 @@ class NeuropodExecutor(object):
         # Convert unicode to string
         for k, v in out.items():
             if v.dtype.type == np.unicode_:
-                out[k] = v.astype("str")
+                out[k] = v.astype(np.string_)
 
         # Validate outputs
         validate_tensors_against_specs(out, self.neuropod_config["output_spec"])

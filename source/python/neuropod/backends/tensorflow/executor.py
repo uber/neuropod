@@ -138,7 +138,7 @@ class TensorflowNeuropodExecutor(NeuropodExecutor):
             name = spec["name"]
             dtype = get_dtype(spec["dtype"])
             if (
-                dtype.type == np.str_
+                dtype.type == np.string_
                 and outputs[name].dtype == "object"
                 and type(outputs[name].item(0)) == six.binary_type
             ):

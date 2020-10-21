@@ -48,12 +48,6 @@ class TestSerialization(unittest.TestCase):
                 expected = np.random.random(size=shape).astype(dtype=dtype)
                 buffer = neuropod_native.serialize(expected)
                 actual = neuropod_native.deserialize(buffer)
-
-                # Unicode vs ascii for python 3
-                # TODO(vip): Add unicode support to the native bindings and fix this
-                if actual.dtype.type == np.unicode_:
-                    actual = actual.astype(np.string_)
-
                 np.testing.assert_array_equal(expected, actual)
 
                 # Add it to our dict to test NeuropodValueMap serialization
@@ -70,12 +64,6 @@ class TestSerialization(unittest.TestCase):
         # Compare elements
         for key, expected in expected_valuemap.items():
             actual = actual_valuemap[key]
-
-            # Unicode vs ascii for python 3
-            # TODO(vip): Add unicode support to the native bindings and fix this
-            if actual.dtype.type == np.unicode_:
-                actual = actual.astype(np.string_)
-
             np.testing.assert_array_equal(expected, actual)
 
     def test_invalid_stream_deserialization(self):
