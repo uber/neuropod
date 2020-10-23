@@ -23,57 +23,6 @@ from neuropod.utils.dtype_utils import maybe_convert_bindings_types
 os.environ["PATH"] += ":" + os.path.dirname(os.path.realpath(__file__))
 
 
-def load_installed_backends():
-    """
-    Get all the installed backends
-    """
-    # TODO(vip): Make sure these are all whitelisted packages published by us
-    # Note: these are listed in reverse priority order
-    # The ordering below means we'd prefer to load a newer, GPU capable version of a framework if one is available
-    PACKAGES = [
-        # Torch CPU
-        "neuropod-backend-torchscript-1-1-0-cpu",
-        "neuropod-backend-torchscript-1-2-0-cpu",
-        "neuropod-backend-torchscript-1-3-0-cpu",
-        "neuropod-backend-torchscript-1-4-0-cpu",
-        "neuropod-backend-torchscript-1-5-0-cpu",
-        # Torch GPU
-        "neuropod-backend-torchscript-1-1-0-gpu-cuda-9-0",
-        "neuropod-backend-torchscript-1-2-0-gpu-cuda-10-0",
-        "neuropod-backend-torchscript-1-3-0-gpu-cuda-10-0",
-        "neuropod-backend-torchscript-1-4-0-gpu-cuda-10-0",
-        "neuropod-backend-torchscript-1-5-0-gpu-cuda-10-1",
-        # TF CPU
-        "neuropod-backend-tensorflow-1-12-0-cpu",
-        "neuropod-backend-tensorflow-1-13-1-cpu",
-        "neuropod-backend-tensorflow-1-14-0-cpu",
-        "neuropod-backend-tensorflow-1-15-0-cpu",
-        # TF GPU
-        "neuropod-backend-tensorflow-1-12-0-gpu-cuda-9-0",
-        "neuropod-backend-tensorflow-1-13-1-gpu-cuda-10-0",
-        "neuropod-backend-tensorflow-1-14-0-gpu-cuda-10-0",
-        "neuropod-backend-tensorflow-1-15-0-gpu-cuda-10-0",
-        # Python
-        "neuropod-backend-python-27",
-        "neuropod-backend-python-35",
-        "neuropod-backend-python-36",
-        "neuropod-backend-python-37",
-        "neuropod-backend-python-38",
-    ]
-
-    import importlib
-
-    for package in PACKAGES:
-        try:
-            importlib.import_module(package)
-        except ImportError:
-            pass
-
-
-# Load all the installed backends when we import this file
-load_installed_backends()
-
-
 def _convert_native_shape_to_list(dims):
     """
     Takes a list of `neuropod_native.Dimension` objects and converts to a list of python types

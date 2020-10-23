@@ -8,3 +8,4 @@ source/python/dist/
 .idea/
 .vscode/
 .neuropod_venv/
+.neuropod_test_base/

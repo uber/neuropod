@@ -1,3 +1,5 @@
+load("//bazel:version.bzl", "NEUROPOD_VERSION")
+
 # https://docs.bazel.build/versions/master/skylark/repository_rules.html
 def _impl(repository_ctx):
     # The `or` pattern below handles empty strings and unset env variables
@@ -68,6 +70,17 @@ def _impl(repository_ctx):
         substitutions = {
             "{PYTHON_VERSION}": version,
         },
+    )
+
+    # Create a file that specifies versioning information
+    repository_ctx.file(
+        "neuropod_backend_path.bzl",
+        content = """
+        NEUROPOD_BACKEND_PATH = "{}/backends/python_{}/"
+        """.format(
+            NEUROPOD_VERSION,
+            version,
+        ).strip(),
     )
 
 python_repository = repository_rule(

@@ -70,7 +70,14 @@ std::vector<BackendLoadSpec> get_default_backend_map()
     const std::vector<FrameworkInfo> frameworks = {
         {"torchscript", "libneuropod_torchscript_backend.so", true, {"1.1.0", "1.2.0", "1.3.0", "1.4.0", "1.5.0"}},
         {"tensorflow", "libneuropod_tensorflow_backend.so", true, {"1.12.0", "1.13.1", "1.14.0", "1.15.0"}},
-        {"python", "libneuropod_pythonbridge_backend.so", false, {"27", "35", "36", "37", "38"}}};
+        {"python", "libneuropod_pythonbridge_backend.so", false, {"2.7", "3.5", "3.6", "3.7", "3.8"}}};
+
+    // Base directory for Neuropod backends
+    std::string neuropod_base_dir = "/usr/local/lib/neuropod";
+    if (auto base_dir = std::getenv("NEUROPOD_BASE_DIR"))
+    {
+        neuropod_base_dir = base_dir;
+    }
 
     // Because the returned vector is in reverse priority order,
     // the ordering below means we'd prefer to load a newer, GPU capable version of a framework if one is available.
@@ -100,7 +107,7 @@ std::vector<BackendLoadSpec> get_default_backend_map()
                         //  "/usr/local/lib/neuropod/0.2.0/backends/torchscript_1.4.0/libneuropod_torchscript_backend.so"
                         // Ex:
                         //  "/usr/local/lib/neuropod/0.2.0/backends/torchscript_1.4.0_gpu/libneuropod_torchscript_backend.so"
-                        item.path = "/usr/local/lib/neuropod/" NEUROPOD_VERSION "/backends/" + framework.type + "_" +
+                        item.path = neuropod_base_dir + ("/" NEUROPOD_VERSION "/backends/") + framework.type + "_" +
                                     version + (is_gpu ? "_gpu" : "") + "/" + framework.soname;
                     }
                     else

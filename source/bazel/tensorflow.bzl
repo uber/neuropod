@@ -1,3 +1,5 @@
+load("//bazel:version.bzl", "NEUROPOD_VERSION")
+
 # https://docs.bazel.build/versions/master/skylark/repository_rules.html
 def _impl(repository_ctx):
     # The `or` pattern below handles empty strings and unset env variables
@@ -90,6 +92,18 @@ def _impl(repository_ctx):
 
     repository_ctx.download_and_extract(download_url, sha256 = sha256)
     repository_ctx.symlink(repository_ctx.path(Label(repository_ctx.attr.build_file)), "BUILD.bazel")
+
+    # Create a file that specifies versioning information
+    repository_ctx.file(
+        "neuropod_backend_path.bzl",
+        content = """
+        NEUROPOD_BACKEND_PATH = "{}/backends/tensorflow_{}{}/"
+        """.format(
+            NEUROPOD_VERSION,
+            version,
+            "_gpu" if IS_GPU else "",
+        ).strip(),
+    )
 
 tensorflow_repository = repository_rule(
     implementation = _impl,
