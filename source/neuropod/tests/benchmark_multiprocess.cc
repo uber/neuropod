@@ -18,7 +18,6 @@ limitations under the License.
 
 #include "benchmark/benchmark.h"
 #include "neuropod/neuropod.hh"
-#include "neuropod/tests/ope_overrides.hh"
 
 namespace
 {
@@ -37,7 +36,7 @@ struct load_out_of_process
     {
         neuropod::RuntimeOptions opts;
         opts.use_ope = true;
-        return neuropod::stdx::make_unique<neuropod::Neuropod>(path, detail::ope_backend_location_overrides, opts);
+        return neuropod::stdx::make_unique<neuropod::Neuropod>(path, opts);
     }
 };
 

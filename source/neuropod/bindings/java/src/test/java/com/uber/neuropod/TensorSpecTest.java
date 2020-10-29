@@ -26,8 +26,6 @@ public class TensorSpecTest {
     @Before
     public void setUp() throws Exception {
         LibraryLoader.load();
-        // Set the test mode to true to use override library path
-        LibraryLoader.setTestMode(true);
     }
 
     @Test

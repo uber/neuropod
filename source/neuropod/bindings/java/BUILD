@@ -133,7 +133,6 @@ cc_binary(
     deps = [
         ":copy_jni_hdr_lib",
         "//neuropod:neuropod_hdrs",
-        "//neuropod/tests:ope_overrides",
     ],
 )
 

@@ -44,8 +44,7 @@ public class NeuropodAdditionTest {
 
     protected void prepareEnvironment() throws Exception {
         LibraryLoader.load();
-        // Set the test mode to true to use override library path
-        LibraryLoader.setTestMode(true);
+
         RuntimeOptions opts = new RuntimeOptions();
         // TODO(weijiad): For now OPE is required to use the Java bindings
         opts.useOpe = true;

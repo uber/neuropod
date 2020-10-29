@@ -58,8 +58,6 @@ jclass com_uber_neuropod_NeuropodJNIException;
 
 jint JNI_VERSION = JNI_VERSION_1_8;
 
-bool isTestMode = false;
-
 } // namespace neuropod::jni
 
 // TODO(vkuzmin): fix this

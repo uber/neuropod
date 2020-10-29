@@ -16,7 +16,6 @@ limitations under the License.
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 #include "neuropod/neuropod.hh"
-#include "neuropod/tests/ope_overrides.hh"
 
 #include <thread>
 
@@ -31,8 +30,7 @@ TEST(test_ope_multiple_instances, multithreaded)
     {
         neuropod::RuntimeOptions opts;
         opts.use_ope = true;
-        models.emplace_back(
-            "neuropod/tests/test_data/pytorch_strings_model/", detail::ope_backend_location_overrides, opts);
+        models.emplace_back("neuropod/tests/test_data/pytorch_strings_model/", opts);
     }
 
     // Start worker threads to run inference
