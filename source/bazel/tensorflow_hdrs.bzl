@@ -24,9 +24,9 @@ def _impl(repository_ctx):
             "url": "https://files.pythonhosted.org/packages/ec/98/f968caf5f65759e78873b900cbf0ae20b1699fb11268ecc0f892186419a7/tensorflow-1.15.0-cp27-cp27mu-manylinux2010_x86_64.whl",
             "sha256": "af57e0e16adb4d6ccd387954c1d70e34cc4925b74da9135d2b83ca7d3dd9d102",
         },
-        "2.2.0-linux-cpu": {
-            "url": "https://storage.googleapis.com/tensorflow/linux/cpu/tensorflow_cpu-2.2.0-cp38-cp38-manylinux2010_x86_64.whl",
-            "sha256": "8d1b7c1d45e7f582d8703c0d0a034a60d4bac942b11205bed91fa55981124d60",
+        "2.3.0-linux-cpu": {
+            "url": "https://storage.googleapis.com/tensorflow/linux/cpu/tensorflow_cpu-2.3.0-cp38-cp38-manylinux2010_x86_64.whl",
+            "sha256": "",
         },
 
         # Linux GPU
@@ -46,9 +46,9 @@ def _impl(repository_ctx):
             "url": "https://storage.googleapis.com/tensorflow/linux/gpu/tensorflow_gpu-1.15.0-cp27-cp27mu-manylinux2010_x86_64.whl",
             "sha256": "829c90021ec0fa33d74c2bcbff4e1e365fc63e875d2f04b60451c5abfeac8382",
         },
-        "2.2.0-linux-gpu": {
-            "url": "https://storage.googleapis.com/tensorflow/linux/gpu/tensorflow_gpu-2.2.0-cp38-cp38-manylinux2010_x86_64.whl",
-            "sha256": "845f261b0b922740bdd7f21fa3a4bed8ffd9e1712decd552fb33621da4d8ec45",
+        "2.3.0-linux-gpu": {
+            "url": "https://storage.googleapis.com/tensorflow/linux/gpu/tensorflow_gpu-2.3.0-cp38-cp38-manylinux2010_x86_64.whl",
+            "sha256": "",
         },
 
         # Mac CPU
@@ -68,11 +68,9 @@ def _impl(repository_ctx):
             "url": "https://files.pythonhosted.org/packages/b9/be/140e6c4deef96ddfe3837ef7ffc396a06cca73c958989835ac8f05773678/tensorflow-1.15.0-cp27-cp27m-macosx_10_11_x86_64.whl",
             "sha256": "0a01def34c28298970dc83776dd43877fd59e43fddd8e960d01b6eb849ba9938",
         },
-
-        # TODO(vip): replace this with TF2.2 once we use the correct libtensorflow binary for 2.2 on mac
-        "2.2.0-mac-cpu": {
-            "url": "https://files.pythonhosted.org/packages/b9/be/140e6c4deef96ddfe3837ef7ffc396a06cca73c958989835ac8f05773678/tensorflow-1.15.0-cp27-cp27m-macosx_10_11_x86_64.whl",
-            "sha256": "0a01def34c28298970dc83776dd43877fd59e43fddd8e960d01b6eb849ba9938",
+        "2.3.0-mac-cpu": {
+            "url": "https://storage.googleapis.com/tensorflow/mac/cpu/tensorflow-2.3.0-cp38-cp38-macosx_10_14_x86_64.whl",
+            "sha256": "44c8d979b2d19ed56dbe6b03aef87616d6138a58fd80c43e7a758c90105e9adf",
         },
     }
 
@@ -86,10 +84,6 @@ def _impl(repository_ctx):
     sha256 = download_mapping["sha256"]
 
     repository_ctx.download_and_extract(download_url, type = "zip", sha256 = sha256)
-
-    # TODO(vip): Remove once 2.2 on mac works
-    if version == "2.2.0":
-        version = "1.15.0"
 
     repository_ctx.template(
         "BUILD.bazel",

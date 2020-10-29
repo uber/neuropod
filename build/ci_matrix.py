@@ -97,7 +97,7 @@ FRAMEWORK_VERSIONS = [
     {"cuda": "10.0", "tensorflow": "1.13.1", "torch": "1.2.0", "python": "3.5"},
     {"cuda": "10.0", "tensorflow": "1.14.0", "torch": "1.3.0", "python": "3.6"},
     {"cuda": "10.0", "tensorflow": "1.15.0", "torch": "1.4.0", "python": "3.7"},
-    {"cuda": "10.1", "tensorflow": "2.2.0", "torch": "1.5.0", "python": "3.8"},
+    {"cuda": "10.1", "tensorflow": "2.3.0", "torch": "1.5.0", "python": "3.8"},
 ]
 
 travis_matrix = []
@@ -115,6 +115,7 @@ for platform, framework_version in itertools.product(PLATFORMS, FRAMEWORK_VERSIO
         # This is a Travis CI build
         travis_matrix.extend([
         "    - os: osx\n",
+        "      osx_image: xcode12\n",
         "      env: NEUROPOD_TENSORFLOW_VERSION={} NEUROPOD_TORCH_VERSION={} NEUROPOD_PYTHON_VERSION={}\n".format(tf_version, torch_version, py_version),
         "\n",
         ])

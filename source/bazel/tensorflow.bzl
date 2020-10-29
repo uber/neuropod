@@ -26,11 +26,9 @@ def _impl(repository_ctx):
             "url": "https://storage.googleapis.com/tensorflow/libtensorflow/libtensorflow-cpu-linux-x86_64-1.15.0.tar.gz",
             "sha256": "decbfd5a709eced3523f55ccfa239337a87e1ab3e000efda3617db79e1034ded",
         },
-        # There isn't an official libtensorflow release for TF 2.x so I had to build this from source
-        # TODO(vip): Update to an official release once there is one
-        "2.2.0-linux-cpu": {
-            "url": "https://github.com/VivekPanyam/tensorflow-prebuilts/releases/download/0.0.1/libtensorflow2.2.0rc3+-cpu-linux-x86_64.tar.gz",
-            "sha256": "ee287e2ccd41e652f51e8c36370c841caf02115bf7b0cb7d4c2119b2c8cbd5fb",
+        "2.3.0-linux-cpu": {
+            "url": "https://storage.googleapis.com/tensorflow/libtensorflow/libtensorflow-cpu-linux-x86_64-2.3.0.tar.gz",
+            "sha256": "",
         },
 
         # Linux GPU
@@ -50,11 +48,9 @@ def _impl(repository_ctx):
             "url": "https://storage.googleapis.com/tensorflow/libtensorflow/libtensorflow-gpu-linux-x86_64-1.15.0.tar.gz",
             "sha256": "98e20336ff2b9acf2121b5c1ea00c35561ae732303bba8cfec167db3f7aea681",
         },
-        # There isn't an official libtensorflow release for TF 2.x so I had to build this from source
-        # TODO(vip): Update to an official release once there is one
-        "2.2.0-linux-gpu": {
-            "url": "https://github.com/VivekPanyam/tensorflow-prebuilts/releases/download/0.0.1/libtensorflow2.2.0rc3+-gpu-linux-x86_64.tar.gz",
-            "sha256": "293f907623d7c9622d0ae9b17a2b5938c633eb8e32e9461346fe6afc36fe2e71",
+        "2.3.0-linux-gpu": {
+            "url": "https://storage.googleapis.com/tensorflow/libtensorflow/libtensorflow-gpu-linux-x86_64-2.3.0.tar.gz",
+            "sha256": "",
         },
 
         # Mac CPU
@@ -74,10 +70,9 @@ def _impl(repository_ctx):
             "url": "https://storage.googleapis.com/tensorflow/libtensorflow/libtensorflow-cpu-darwin-x86_64-1.15.0.tar.gz",
             "sha256": "1a9da42e31f613f1582cf996e3ead32528964994eb98b7c355923f2dc39bfce0",
         },
-        # TODO(vip): Replace this with a TF 2.2.0 URL once there's an official release
-        "2.2.0-mac-cpu": {
-            "url": "https://storage.googleapis.com/tensorflow/libtensorflow/libtensorflow-cpu-darwin-x86_64-1.15.0.tar.gz",
-            "sha256": "1a9da42e31f613f1582cf996e3ead32528964994eb98b7c355923f2dc39bfce0",
+        "2.3.0-mac-cpu": {
+            "url": "https://storage.googleapis.com/tensorflow/libtensorflow/libtensorflow-cpu-darwin-x86_64-2.3.0.tar.gz",
+            "sha256": "5db002213fe80f4144a1541cb0507222b057bb79f807cc51e02237e423bda174",
         },
     }
 
