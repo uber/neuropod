@@ -68,7 +68,10 @@ std::vector<BackendLoadSpec> get_default_backend_map()
 
     // Information about frameworks that we use to generate a list of `BackendLoadSpec`
     const std::vector<FrameworkInfo> frameworks = {
-        {"torchscript", "libneuropod_torchscript_backend.so", true, {"1.1.0", "1.2.0", "1.3.0", "1.4.0", "1.5.0"}},
+        {"torchscript",
+         "libneuropod_torchscript_backend.so",
+         true,
+         {"1.1.0", "1.2.0", "1.3.0", "1.4.0", "1.5.0", "1.6.0", "1.7.0"}},
         {"tensorflow", "libneuropod_tensorflow_backend.so", true, {"1.12.0", "1.13.1", "1.14.0", "1.15.0", "2.2.0"}},
         {"python", "libneuropod_pythonbridge_backend.so", false, {"2.7", "3.5", "3.6", "3.7", "3.8"}}};
 

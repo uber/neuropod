@@ -78,8 +78,8 @@ def install_pytorch(version):
             if torch_cuda_string != "cu101":
                 version += "+" + torch_cuda_string
 
-        # If this is the 1.5.0 stable release
-        if version_base == "1.5.0" and version_date is None:
+        # If this is the 1.5.0, 1.6.0, or 1.7.0 stable release
+        if version_base in ["1.5.0", "1.6.0", "1.7.0"] and version_date is None:
             # They changed the default from cuda 10.1 to cuda 10.2
             # For CUDA 10.2 builds, they don't add `cu102` to the version string
             if torch_cuda_string != "cu102":
