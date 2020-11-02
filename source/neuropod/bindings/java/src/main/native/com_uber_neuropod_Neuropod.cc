@@ -19,7 +19,6 @@ limitations under the License.
 #include "jclass_register.h"
 #include "neuropod/core/generic_tensor.hh"
 #include "neuropod/neuropod.hh"
-#include "neuropod/tests/ope_overrides.hh"
 #include "utils.h"
 
 #include <exception>
@@ -92,15 +91,7 @@ JNIEXPORT jlong JNICALL Java_com_uber_neuropod_Neuropod_nativeNew__Ljava_lang_St
             opts = *reinterpret_cast<neuropod::RuntimeOptions *>(optHandle);
         }
         auto                convertedPath = to_string(env, path);
-        neuropod::Neuropod *ret           = nullptr;
-        if (isTestMode)
-        {
-            ret = new neuropod::Neuropod(convertedPath, detail::ope_backend_location_overrides, opts);
-        }
-        else
-        {
-            ret = new neuropod::Neuropod(convertedPath, opts);
-        }
+        neuropod::Neuropod *ret           = new neuropod::Neuropod(convertedPath, opts);
         return reinterpret_cast<jlong>(ret);
     }
     catch (const std::exception &e)

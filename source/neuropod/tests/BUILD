@@ -37,7 +37,6 @@ cc_test(
         "no_trace_logging",
     ],
     deps = [
-        ":ope_overrides",
         "//neuropod:neuropod_impl",
         "//neuropod/backends/tensorflow:tensorflow_backend",
         "//neuropod/multiprocess",
@@ -206,20 +205,8 @@ cc_library(
         "//visibility:public",
     ],
     deps = [
-        ":ope_overrides",
         "//neuropod:neuropod_impl",
         "@gtest//:main",
-    ],
-)
-
-cc_library(
-    name = "ope_overrides",
-    hdrs = ["ope_overrides.hh"],
-    visibility = [
-        "//visibility:public",
-    ],
-    deps = [
-        "//neuropod:neuropod_impl",
     ],
 )
 

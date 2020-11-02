@@ -50,6 +50,5 @@ extern jmethodID com_uber_neuropod_NeuropodTensor_getHandle;
 
 extern jclass com_uber_neuropod_NeuropodJNIException;
 
-extern bool isTestMode;
 } // namespace jni
 } // namespace neuropod
