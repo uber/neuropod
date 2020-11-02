@@ -19,8 +19,10 @@ load("@python_repo//:neuropod_backend_path.bzl", "NEUROPOD_BACKEND_PATH")
 neuropod_cc_binary(
     name = "libneuropod_pythonbridge_backend.so",
     linkopts = select({
-        "@bazel_tools//src/conditions:darwin": ["-Wl,-rpath,@loader_path"],
-        "//conditions:default": ["-Wl,-rpath,$$ORIGIN"],
+        "@bazel_tools//src/conditions:darwin": [
+            "-Wl,-rpath,@loader_path/Python.framework",
+        ],
+        "//conditions:default": ["-Wl,-rpath,$$ORIGIN/usr/lib"],
     }),
     linkshared = True,
     linkstatic = True,
@@ -49,6 +51,7 @@ neuropod_cc_library(
         "//neuropod/bindings",
         "//neuropod/core",
         "//neuropod/internal",
+        "@filesystem_repo//:filesystem",
         "@python_repo//:python",
     ],
     alwayslink = True,
@@ -64,5 +67,9 @@ pkg_tar(
     tags = ["manual"],
     visibility = [
         "//visibility:public",
+    ],
+    deps = [
+        "//neuropod/backends/python_bridge/_neuropod_native_bootstrap:neuropod_native_bootstrap",
+        "@python_repo//:python.tar.gz",
     ],
 )

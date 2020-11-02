@@ -39,7 +39,11 @@ build:profile -c dbg --copt='-fno-omit-frame-pointer'
 test --test_output=errors
 
 # Pass certain env vars through to tests
-test --test_env=VIRTUAL_ENV --test_env=LLVM_PROFILE_FILE --test_env=COVERAGE_PROCESS_START --test_env=PATH --test_env=PYTHONPATH --test_env=LD_LIBRARY_PATH --test_env=NEUROPOD_BASE_DIR
+test --test_env=LLVM_PROFILE_FILE --test_env=COVERAGE_PROCESS_START --test_env=PATH --test_env=PYTHONPATH --test_env=NEUROPOD_BASE_DIR --test_env=NEUROPOD_ENABLE_PYTHON_ISOLATION
 
 # Build with warnings as errors in CI
 build:ci --copt='-Werror'
+
+# Because some of the bazel tests can now depend on non-hermetic backend installations,
+# we can't cache test results
+build --nocache_test_results

@@ -58,6 +58,9 @@ def package_strings_model(out_dir, do_fail=False):
         ],
         entrypoint_package="strings_model",
         entrypoint="get_model",
+        requirements="""
+        torch==1.4.0
+        """,
         # Get the input/output spec along with test data
         **get_string_concat_model_spec(do_fail=do_fail)
     )

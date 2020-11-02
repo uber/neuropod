@@ -4,9 +4,6 @@ set -ex
 # Use the virtualenv
 source .neuropod_venv/bin/activate
 
-# Use the system's libpython
-export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib/x86_64-linux-gnu/
-
 # Enable code coverage
 export LLVM_PROFILE_FILE="/tmp/neuropod_coverage/code-%p-%9m.profraw"
 export COVERAGE_PROCESS_START="`pwd`/source/python/.coveragerc"
@@ -15,6 +12,10 @@ echo "import coverage; coverage.process_startup()" > \
 
 # Override the Neuropod backend base directory
 export NEUROPOD_BASE_DIR=`pwd`/.neuropod_test_base
+
+# Enable python isolation
+# TODO(vip): Remove this once isolation is default behavior
+export NEUROPOD_ENABLE_PYTHON_ISOLATION=true
 
 pushd source
 
@@ -58,13 +59,13 @@ popd
 export PATH=$PATH:`pwd`/bazel-bin/neuropod/multiprocess/
 
 # GPU tests with trace logging
-bazel test "$@" --test_lang_filters="-java" --test_tag_filters="gpu,-no_trace_logging" --test_env="NEUROPOD_LOG_LEVEL=TRACE" //...
+bazel test "$@" --sandbox_writable_path="$HOME/.neuropod/pythonpackages/" --test_lang_filters="-java" --test_tag_filters="gpu,-no_trace_logging" --test_env="NEUROPOD_LOG_LEVEL=TRACE" //...
 
 # GPU tests without trace logging
-bazel test "$@" --test_lang_filters="-java" --test_tag_filters="gpu,no_trace_logging" //...
+bazel test "$@" --sandbox_writable_path="$HOME/.neuropod/pythonpackages/" --test_lang_filters="-java" --test_tag_filters="gpu,no_trace_logging" //...
 
 # Java GPU tests
-bazel test "$@" --combined_report=lcov --test_lang_filters="java" --test_tag_filters="gpu" //...
+bazel test "$@" --sandbox_writable_path="$HOME/.neuropod/pythonpackages/" --combined_report=lcov --test_lang_filters="java" --test_tag_filters="gpu" //...
 
 popd
 

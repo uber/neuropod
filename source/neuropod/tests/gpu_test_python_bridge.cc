@@ -17,18 +17,24 @@ limitations under the License.
 
 #include <thread>
 
+#include <patchlevel.h>
+
 TEST(test_models, test_pytorch_addition_model)
 {
+#if PY_MAJOR_VERSION == 3 && PY_MINOR_VERSION == 8
     // Test the PyTorch addition model using the python bridge
     test_addition_model("neuropod/tests/test_data/pytorch_addition_model_gpu/");
+#endif
 }
 
 TEST(test_models, test_pytorch_addition_model_threaded)
 {
+#if PY_MAJOR_VERSION == 3 && PY_MINOR_VERSION == 8
     std::thread t([]() {
         // Test the PyTorch addition model using the python bridge
         test_addition_model("neuropod/tests/test_data/pytorch_addition_model_gpu/");
     });
 
     t.join();
+#endif
 }

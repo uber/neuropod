@@ -7,7 +7,8 @@ source .neuropod_venv/bin/activate
 pushd source
 
 # Build the native code
-bazel build "$@" //...:all //neuropod:packages
+mkdir -p "$HOME/.neuropod/pythonpackages/"
+bazel build --sandbox_writable_path="$HOME/.neuropod/pythonpackages/" "$@" //...:all //neuropod:packages
 
 # Copy the binaries needed by the python bindings
 cp bazel-bin/neuropod/bindings/neuropod_native.so python/neuropod/

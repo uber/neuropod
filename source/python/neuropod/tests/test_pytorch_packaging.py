@@ -61,6 +61,9 @@ class TestPytorchPackaging(unittest.TestCase):
                 ],
                 entrypoint_package="addition_model",
                 entrypoint="get_model",
+                requirements="""
+                torch==1.4.0
+                """,
                 # Get the input/output spec along with test data
                 **get_addition_model_spec(do_fail=do_fail)
             )

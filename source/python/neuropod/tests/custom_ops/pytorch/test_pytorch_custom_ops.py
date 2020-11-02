@@ -18,6 +18,8 @@ import shutil
 import subprocess
 import sys
 import unittest
+
+import torch
 from testpath.tempdir import TemporaryDirectory
 
 from neuropod.packagers import create_pytorch_neuropod
@@ -45,6 +47,10 @@ def build_op(workdir):
     return glob.glob(os.path.join(workdir, "build", "lib*", "addition_op.so"))[0]
 
 
+@unittest.skipIf(
+    not torch.__version__.startswith("1.4.0"),
+    "Skipping custom op test for torch != 1.4.0",
+)
 class TestPytorchPackaging(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -85,6 +91,9 @@ class TestPytorchPackaging(unittest.TestCase):
             entrypoint_package="addition_model",
             entrypoint="get_model",
             custom_ops=custom_ops,
+            requirements="""
+            torch==1.4.0
+            """,
             # Get the input/output spec along with test data
             **get_addition_model_spec(do_fail=do_fail)
         )
