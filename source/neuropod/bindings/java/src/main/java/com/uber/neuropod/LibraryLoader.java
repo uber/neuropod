@@ -30,8 +30,20 @@ import java.util.logging.Logger;
 
 /**
  * This class is responsible for loading jni library
+ *
+ * <p>The Java bindings require a native (JNI) library. This library
+ * (libneuropod_jni.so on Linux, libneuropod_jni.dylib on OS X)
+ * can be made available to the JVM using the java.library.path System property (e.g., using
+ * -Djava.library.path command-line argument).
+ *
+ * <p>Alternatively, the native libraries can be packed in a .jar.
+ * However, in such cases, the native library has to be extracted from the .jar archive.
+ *
+ * <p>LibraryLoader.load() takes care of this. First looking for the library in java.library.path,
+ * if failed it tries to find the OS and architecture specific version of the library in the
+ * set of ClassLoader resources (under com/uber/neuropod/native/OS-ARCH).
  */
-class LibraryLoader {
+final class LibraryLoader {
     private LibraryLoader() {
     }
 
@@ -47,14 +59,21 @@ class LibraryLoader {
      * Load jni library.
      */
     public static void load() {
-        // Java static initializers are thread safe
+        // Java static initializers are thread safe.
         if (isLoaded() || loadSharedLibrary() || loadEmbeddedLibrary()) {
+            // Either:
+            // (1) The native library has already been statically loaded, OR
+            // (2) The required native code has been statically linked (through a custom launcher), OR
+            // (3) The native code is part of another library.
+            // (4) It has been packaged into the .jar file and loaded by loadEmbeddedLibrary.
+            //
+            // Somehow the native code is loaded, so nothing else to do.
             return;
         }
         throw new UnsatisfiedLinkError("load " + System.mapLibraryName(JNI_NAME) + " failed");
     }
 
-    // Load the jni library from the system library path
+    // Load the jni library from the system library path.
     private static boolean loadSharedLibrary() {
         try {
             System.loadLibrary(JNI_NAME);
@@ -66,32 +85,40 @@ class LibraryLoader {
         }
     }
 
-    // Load the jni library from the jar file
+    private static String makeResourcePath() {
+        return "/com/uber/neuropod/native/" + String.format("%s-%s/", os(), architecture());
+    }
+
+    // Load the jni library, neuropod core and backend from the jar file.
     private static boolean loadEmbeddedLibrary() {
-        // TODO(weijiad): Should be /com/uber/neuropod/native/{OS}/{PLATFORM} once we figure out how to copy native
-        // libraries to that path.
-        String resPath = "/";
-        if (getOS().equals("unsupported")) {
+        if (os().equals("unsupported")) {
             throw new NeuropodJNIException("unsupported OS");
         }
         try {
             final File tempPath = Files.createTempDirectory(TEMP_DIRECTORY_NAME).toFile();
             tempPath.deleteOnExit();
-            String libAbsPath = tempPath.getCanonicalPath().toString();
+            String libAbsPath = tempPath.getCanonicalPath();
+            String resPath = makeResourcePath();
             for (String libName : EMBEDDED_LIB_NAMES) {
-                File libFile = extractFile(libAbsPath, resPath, libName);
+                File embeddedLibFile = extractFile(libAbsPath, resPath, libName);
+                if (embeddedLibFile != null) {
+                    LOGGER.log(Level.INFO, "Extracted embedded lib file {0}", embeddedLibFile);
+                }
             }
             for (String binName : BIN_NAMES) {
                 File binFile = extractFile(libAbsPath, resPath, binName);
                 if (binFile != null) {
+                    LOGGER.log(Level.INFO, "Extracted bin file {0}", binFile);
                     binFile.setExecutable(true);
                 }
             }
             File libFile = extractFile(libAbsPath, resPath, System.mapLibraryName(JNI_NAME));
-            System.load(libFile.getCanonicalPath());
+            if (libFile != null) {
+                System.load(libFile.getCanonicalPath());
+            }
             nativeExport(libAbsPath);
         } catch (IOException e) {
-            System.out.println(e.getMessage());
+            LOGGER.log(Level.WARNING, e.getMessage());
             return false;
         }
         return true;
@@ -108,7 +135,7 @@ class LibraryLoader {
         targetFile.deleteOnExit();
         final InputStream in = nativeLibraryUrl.openStream();
         final OutputStream out = new BufferedOutputStream(new FileOutputStream(targetFile));
-        // Copy library file in jar to temporary file
+        // Copy library file in jar to temporary file.
         int len = 0;
         byte[] buffer = new byte[BUFFER_SIZE];
         while ((len = in.read(buffer)) > -1)
@@ -118,7 +145,7 @@ class LibraryLoader {
         return targetFile;
     }
 
-    private static String getOS() {
+    private static String os() {
         final String p = System.getProperty("os.name").toLowerCase();
         if (p.contains("linux")) {
             return "linux";
@@ -129,10 +156,17 @@ class LibraryLoader {
         }
     }
 
+    private static String architecture() {
+        final String arch = System.getProperty("os.arch").toLowerCase();
+        return (arch.equals("amd64")) ? "x86_64" : arch;
+    }
 
     private static boolean isLoaded() {
         try {
-            return nativeIsLoaded();
+            // Return value isn't important, it throws if not loaded.
+            boolean loaded = nativeIsLoaded();
+            LOGGER.log(Level.INFO, "isLoaded {0}", loaded);
+            return true;
         } catch (UnsatisfiedLinkError e) {
             return false;
         }

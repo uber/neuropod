@@ -1,7 +1,6 @@
 *.profraw
 *.pyc
 source/compile_commands.json
-source/python/.idea
 source/python/neuropod.egg-info/
 source/python/build/
 source/python/dist/
