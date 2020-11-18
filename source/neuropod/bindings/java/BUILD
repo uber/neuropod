@@ -64,6 +64,17 @@ filegroup(
     ],
 )
 
+# This genrule changes the libneuropod.so dependency path for darwin platform
+genrule(
+    name = "updated_neuropod_multiprocess_worker",
+    srcs = ["//neuropod/multiprocess:neuropod_multiprocess_worker"],
+    outs = ["neuropod_multiprocess_worker"],
+    cmd = select({
+        "@bazel_tools//src/conditions:darwin": "cp -f $< $@; chmod 755 $@; install_name_tool -change \"$$(otool -L $@ | grep libneuropod.so | cut -d ' ' -f1 | column -t)\" \"@rpath/libneuropod.so\" \"$@\"",
+        "//conditions:default": "cp -f $< $@",
+    }),
+)
+
 filegroup(
     name = "java_source",
     srcs = glob(["src/main/java/com/uber/neuropod/*.java"]),
@@ -72,14 +83,45 @@ filegroup(
     ],
 )
 
-java_binary(
+# Unpack jar file in tmp directory, move files to expected subdirectories, pack to jar file again.
+# Note it runs inside sandbox where all created files and dirs are temporarily that deleted after build.
+genrule(
     name = "neuropod_java_jar",
+    srcs = [":neuropod_java_tmp.jar"],
+    outs = ["neuropod_java_jar.jar"],
+    cmd = select({
+        "@bazel_tools//src/conditions:darwin":"""
+mkdir tmp
+cd tmp
+jar xf ../$(location :neuropod_java_tmp.jar)
+jni_path="./com/uber/neuropod/native/darwin-x86_64"
+mkdir -p $$jni_path
+mv libneuropod_jni.dylib libneuropod.so neuropod_multiprocess_worker $$jni_path
+cd ..
+jar cf $@ -C tmp/ .  # Creates the new jar file.
+""",
+        "//conditions:default":"""
+mkdir tmp
+cd tmp
+jar xf ../$(location :neuropod_java_tmp.jar)
+jni_path="./com/uber/neuropod/native/linux-x86_64"
+mkdir -p $$jni_path
+mv libneuropod_jni.so libneuropod.so neuropod_multiprocess_worker $$jni_path
+mv lib* $$jni_path
+cd ..
+jar cf $@ -C tmp/ .  # Creates the new jar file.
+""",
+    }),
+)
+
+java_binary(
+    name = "neuropod_java_tmp",
     srcs = [":java_source"],
-    # TODO(weijiad): Find a way to make these native libraries locate at /com/uber/neuropod/native/{OS}/{PLATFORM}
-    # in the jar file, instead of locating at the class root path.
+    # Need a way to make these native libraries locate at com/uber/neuropod/native/OS-ARCH in the jar file.
+    # Bazel doesn't provide official way for that, use genrule neuropod_java_jar workaround for now.
     classpath_resources = [
         "//neuropod:libneuropod.so",
-        "//neuropod/multiprocess:neuropod_multiprocess_worker",
+        ":updated_neuropod_multiprocess_worker",
         ":neuropod_jni",
     ],
     javacopts = JAVACOPTS,
@@ -93,7 +135,7 @@ java_library(
         ":backends",
         ":neuropod_jni",
         "//neuropod:libneuropod.so",
-        "//neuropod/multiprocess:neuropod_multiprocess_worker",
+        ":updated_neuropod_multiprocess_worker",
     ],
     javacopts = JAVACOPTS,
     visibility = ["//visibility:public"],
