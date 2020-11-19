@@ -32,6 +32,32 @@ genrule(
 )
 
 # This genrule copies the so to a file with a dylib extension
+filegroup(
+    name = "backends",
+    srcs = [
+        "//neuropod/backends/python_bridge:libneuropod_pythonbridge_backend.so",
+        "//neuropod/backends/tensorflow:libneuropod_tensorflow_backend.so",
+        "//neuropod/backends/torchscript:libneuropod_torchscript_backend.so",
+        "@libtorch_repo//:libtorch_libs",
+        "@tensorflow_repo//:libtensorflow_libs",
+    ],
+    visibility = [
+        "//neuropod:__subpackages__",
+    ],
+)
+
+filegroup(
+    name = "tar_backends",
+    srcs = [
+        "//neuropod/backends/tensorflow:neuropod_tensorflow_backend",
+        "//neuropod/backends/torchscript:neuropod_torchscript_backend",
+    ],
+    visibility = [
+        "//neuropod:__subpackages__",
+    ],
+)
+
+# This genrule copies to a dylib and changes the libneuropod.so dependency path
 genrule(
     name = "copy_to_dylib",
     srcs = [":libneuropod_jni.so"],
@@ -79,21 +105,24 @@ genrule(
         "@bazel_tools//src/conditions:darwin":"""
 mkdir tmp
 cd tmp
-jar xf ../$(location :neuropod_java_tmp.jar)
+jar -xf ../$(location :neuropod_java_tmp.jar)
 jni_path="./com/uber/neuropod/native/darwin-x86_64"
 mkdir -p $$jni_path
 mv libneuropod_jni.dylib libneuropod.so neuropod_multiprocess_worker $$jni_path
+mv neuropod_tensorflow_backend.tar.gz $$jni_path
+mv neuropod_torchscript_backend.tar.gz $$jni_path
 cd ..
 jar cf $@ -C tmp/ .  # Creates the new jar file.
 """,
         "//conditions:default":"""
 mkdir tmp
 cd tmp
-jar xf ../$(location :neuropod_java_tmp.jar)
+jar -xf ../$(location :neuropod_java_tmp.jar)
 jni_path="./com/uber/neuropod/native/linux-x86_64"
 mkdir -p $$jni_path
 mv libneuropod_jni.so libneuropod.so neuropod_multiprocess_worker $$jni_path
-mv lib* $$jni_path
+mv neuropod_tensorflow_backend.tar.gz $$jni_path
+mv neuropod_torchscript_backend.tar.gz $$jni_path
 cd ..
 jar cf $@ -C tmp/ .  # Creates the new jar file.
 """,
@@ -109,6 +138,7 @@ java_binary(
         "//neuropod:libneuropod.so",
         ":updated_neuropod_multiprocess_worker",
         ":neuropod_jni",
+        ":tar_backends",
     ],
     javacopts = JAVACOPTS,
     visibility = ["//visibility:public"],

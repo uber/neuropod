@@ -49,9 +49,18 @@ final class LibraryLoader {
 
     private static final Logger LOGGER = Logger.getLogger(LibraryLoader.class.getName());
     // C++ library names. If we use the Neruopod Java API from a jar file these files may be packed into the jar file.
+    // Note that embedded native files are OS-Arch specific and may be absent for curent platform.
     private static final List<String> EMBEDDED_LIB_NAMES = Arrays.asList("libneuropod.so");
     private static final List<String> BIN_NAMES = Arrays.asList("neuropod_multiprocess_worker");
-    private static final String JNI_NAME = "neuropod_jni"; // System.loadLibrary can autocompele the libname
+
+    private static final String NEUROPOD_BASE_DIR_ENV_VAR = "NEUROPOD_BASE_DIR";
+    private static final String NEUROPOD_BASE_DIR_DEFAULT = "/usr/local/neuropod";
+    private static final String TENSORFLOW_BACKEND = "neuropod_tensorflow_backend.tar.gz";
+    private static final String TORCHSCRIPT_BACKEND = "neuropod_torchscript_backend.tar.gz";
+    private static final List<String> EMBEDDED_BACKEND_PACKAGES_NAMES = Arrays.asList(TENSORFLOW_BACKEND, TORCHSCRIPT_BACKEND);
+
+    // System.loadLibrary can autocompele the libname.
+    private static final String JNI_NAME = "neuropod_jni";
     private static final int BUFFER_SIZE = 1 << 20;
     private static final String TEMP_DIRECTORY_NAME = "neuropod_native_libraries";
 
@@ -73,7 +82,9 @@ final class LibraryLoader {
         throw new UnsatisfiedLinkError("load " + System.mapLibraryName(JNI_NAME) + " failed");
     }
 
-    // Load the jni library from the system library path.
+    /**
+     * Load the jni library from the system library path (-Djava.library.path)
+     */
     private static boolean loadSharedLibrary() {
         try {
             System.loadLibrary(JNI_NAME);
@@ -89,8 +100,11 @@ final class LibraryLoader {
         return "/com/uber/neuropod/native/" + String.format("%s-%s/", os(), architecture());
     }
 
-    // Load the jni library, neuropod core and backend from the jar file.
+    /**
+     * Load the jni library, neuropod core and backend from the jar file.
+     */
     private static boolean loadEmbeddedLibrary() {
+        boolean result = true;
         if (os().equals("unsupported")) {
             throw new NeuropodJNIException("unsupported OS");
         }
@@ -99,12 +113,14 @@ final class LibraryLoader {
             tempPath.deleteOnExit();
             String libAbsPath = tempPath.getCanonicalPath();
             String resPath = makeResourcePath();
+
             for (String libName : EMBEDDED_LIB_NAMES) {
                 File embeddedLibFile = extractFile(libAbsPath, resPath, libName);
                 if (embeddedLibFile != null) {
                     LOGGER.log(Level.INFO, "Extracted embedded lib file {0}", embeddedLibFile);
                 }
             }
+
             for (String binName : BIN_NAMES) {
                 File binFile = extractFile(libAbsPath, resPath, binName);
                 if (binFile != null) {
@@ -112,12 +128,68 @@ final class LibraryLoader {
                     binFile.setExecutable(true);
                 }
             }
+
+            // Resources may have backend packages (optional) that should e extracted and installed then.
+            // If NEUROPOD_BASE_DIR is set, use this path to install backends.
+            // Note that packages are tar.gz files that has "neuropod standard" directory structure, for instance:
+            // 0.2.0/backends/tensorflow_1.15.0/
+            // 0.2.0/backends/torchscript_1.4.0/
+            // "register backends" looks at NEUROPOD_BASE_DIR and register backends by type and version.
+            // Note: NEUROPOD_BASE_DIR may already have other backends that will be registered also.
+            // When Neuropod model is loaded, backend that has best match is used. It means that embedded backends
+            // that are installed here are not necessaraly best match and may not used at all.
+            String neuropodBaseDir = System.getenv(NEUROPOD_BASE_DIR_ENV_VAR);
+            if (neuropodBaseDir == null) {
+                neuropodBaseDir = NEUROPOD_BASE_DIR_DEFAULT;
+            }
+            for (String libName : EMBEDDED_BACKEND_PACKAGES_NAMES) {
+                File embeddedPackageFile = extractFile(libAbsPath, resPath, libName);
+                if (embeddedPackageFile != null) {
+                    LOGGER.log(Level.INFO, "Extracted embedded package file {0}", embeddedPackageFile);
+                    String fileName = embeddedPackageFile.getName();
+                    if (fileName.equals(TENSORFLOW_BACKEND) || fileName.equals(TORCHSCRIPT_BACKEND)) {
+                        installFramework(libAbsPath, fileName, neuropodBaseDir);
+                    }
+                }
+            }
+
             File libFile = extractFile(libAbsPath, resPath, System.mapLibraryName(JNI_NAME));
             if (libFile != null) {
                 System.load(libFile.getCanonicalPath());
             }
+
             nativeExport(libAbsPath);
+            result = true;
         } catch (IOException e) {
+            LOGGER.log(Level.WARNING, e.getMessage());
+            result = false;
+        }
+        return result;
+    }
+
+    private static boolean installFramework(String libAbsPath, String frameworkPackage, String neuropodBaseDir) {
+        return startShellCommand(String.format("tar -xf %s/%s -C %s", libAbsPath, frameworkPackage, neuropodBaseDir));
+    }
+
+    private static boolean startShellCommand(String cmd) {
+        ProcessBuilder builder = new ProcessBuilder();
+        builder.command("sh", "-c", cmd);
+        builder.directory(new File(System.getProperty("user.home")));
+
+        LOGGER.log(Level.WARNING, "Command {0}", builder.command());
+        File logErr = new File("/tmp/log_err");
+        builder.redirectError(logErr);
+        File log = new File("/tmp/log");
+        builder.redirectOutput(log);
+
+        try {
+            Process process = builder.start();
+            int exitCode = process.waitFor();
+            LOGGER.log(Level.WARNING, "Exit code {0}", exitCode);
+        } catch (IOException e) {
+            LOGGER.log(Level.WARNING, e.getMessage());
+            return false;
+        } catch(InterruptedException e) {
             LOGGER.log(Level.WARNING, e.getMessage());
             return false;
         }
