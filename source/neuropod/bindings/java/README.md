@@ -1,6 +1,30 @@
 # Java API
 
 ***NOTE: This API is currently experimental***
+#  Build jar
+```shell script
+bazel build --verbose_failures --action_env=NEUROPOD_TENSORFLOW_VERSION=1.15.0 --action_env=NEUROPOD_TORCH_VERSION=1.4.0 //neuropod/bindings/java:neuropod_java
+```
+
+#  Build fat jar
+Fat jar is self-contained jar that includes native OS-Arch specific files: JNI library, Neuropod Core and Backend packages.
+```shell script
+bazel build --verbose_failures --action_env=NEUROPOD_TENSORFLOW_VERSION=1.15.0 --action_env=NEUROPOD_TORCH_VERSION=1.4.0 //neuropod/bindings/java:neuropod_java_jar
+```
+
+# Run Java tests only
+```shell script
+export NEUROPOD_BASE_DIR=/tmp/.neuropod_test_base
+rm -rf "/tmp/.neuropod_test_base" && mkdir "/tmp/.neuropod_test_base"
+bazel test --action_env=NEUROPOD_TENSORFLOW_VERSION=1.15.0 --action_env=NEUROPOD_TORCH_VERSION=1.4.0 --test_lang_filters="java" --test_tag_filters="-gpu" //...
+```
+
+Note that test builds fat jar first, that has "neuropod standard" directory structure
+```text
+0.2.0/backends/tensorflow_1.15.0/
+0.2.0/backends/torchscript_1.4.0/
+```
+that is expected by "register backends" logic.
 
 ## Usage
 

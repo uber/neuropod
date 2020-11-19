@@ -45,7 +45,18 @@ filegroup(
     ],
 )
 
-# This genrule copies the so to a file with a dylib extension
+filegroup(
+    name = "tar_backends",
+    srcs = [
+        "//neuropod/backends/tensorflow:neuropod_tensorflow_backend",
+        "//neuropod/backends/torchscript:neuropod_torchscript_backend",
+    ],
+    visibility = [
+        "//neuropod:__subpackages__",
+    ],
+)
+
+# This genrule copies to a dylib and changes the libneuropod.so dependency path
 genrule(
     name = "copy_to_dylib",
     srcs = [":libneuropod_jni.so"],
@@ -93,21 +104,24 @@ genrule(
         "@bazel_tools//src/conditions:darwin":"""
 mkdir tmp
 cd tmp
-jar xf ../$(location :neuropod_java_tmp.jar)
+jar -xf ../$(location :neuropod_java_tmp.jar)
 jni_path="./com/uber/neuropod/native/darwin-x86_64"
 mkdir -p $$jni_path
 mv libneuropod_jni.dylib libneuropod.so neuropod_multiprocess_worker $$jni_path
+mv neuropod_tensorflow_backend.tar.gz $$jni_path
+mv neuropod_torchscript_backend.tar.gz $$jni_path
 cd ..
 jar cf $@ -C tmp/ .  # Creates the new jar file.
 """,
         "//conditions:default":"""
 mkdir tmp
 cd tmp
-jar xf ../$(location :neuropod_java_tmp.jar)
+jar -xf ../$(location :neuropod_java_tmp.jar)
 jni_path="./com/uber/neuropod/native/linux-x86_64"
 mkdir -p $$jni_path
 mv libneuropod_jni.so libneuropod.so neuropod_multiprocess_worker $$jni_path
-mv lib* $$jni_path
+mv neuropod_tensorflow_backend.tar.gz $$jni_path
+mv neuropod_torchscript_backend.tar.gz $$jni_path
 cd ..
 jar cf $@ -C tmp/ .  # Creates the new jar file.
 """,
@@ -123,6 +137,7 @@ java_binary(
         "//neuropod:libneuropod.so",
         ":updated_neuropod_multiprocess_worker",
         ":neuropod_jni",
+        ":tar_backends",
     ],
     javacopts = JAVACOPTS,
     visibility = ["//visibility:public"],
@@ -193,11 +208,9 @@ java_test(
         "src/test/java/com/uber/neuropod/TFAdditionTest.java",
     ],
     data = [
-        "//neuropod/backends/tensorflow:libneuropod_tensorflow_backend.so",
         "//neuropod/tests/test_data",
     ],
     javacopts = JAVACOPTS,
-    tags = ["requires_path"],
     test_class = "com.uber.neuropod.TFAdditionTest",
     deps = [
         ":neuropod_java_jar",
@@ -212,11 +225,9 @@ java_test(
         "src/test/java/com/uber/neuropod/TorchscriptAdditionTest.java",
     ],
     data = [
-        "//neuropod/backends/torchscript:libneuropod_torchscript_backend.so",
         "//neuropod/tests/test_data",
     ],
     javacopts = JAVACOPTS,
-    tags = ["requires_path"],
     test_class = "com.uber.neuropod.TorchscriptAdditionTest",
     deps = [
         ":neuropod_java_jar",
@@ -228,11 +239,9 @@ java_test(
     name = "TensorSpecTest",
     srcs = ["src/test/java/com/uber/neuropod/TensorSpecTest.java"],
     data = [
-        "//neuropod/backends/torchscript:libneuropod_torchscript_backend.so",
         "//neuropod/tests/test_data",
     ],
     javacopts = JAVACOPTS,
-    tags = ["requires_path"],
     test_class = "com.uber.neuropod.TensorSpecTest",
     deps = [
         ":neuropod_java_jar",
