@@ -28,4 +28,21 @@ public class LibraryLoaderTest {
             fail();
         }
     }
+
+    @org.junit.Test
+    public void loadUnsupported() {
+        // Update os.name to unsupported os to test that this is detected.
+        String current = System.getProperty("os.name");
+        System.setProperty("os.name", "Windows");
+
+        try {
+            LibraryLoader.load();
+            // It should throw exception and never reach this line.
+            fail();
+        } catch (Exception expected) {
+            // Set property value back to avoid other failures.
+            System.setProperty("os.name", current);
+            assertTrue(expected.getMessage(), expected.getMessage().contains("unsupported OS"));
+        }
+    }
 }
