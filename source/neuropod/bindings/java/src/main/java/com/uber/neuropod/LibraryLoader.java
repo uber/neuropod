@@ -104,7 +104,6 @@ final class LibraryLoader {
      * Load the jni library, neuropod core and backend from the jar file.
      */
     private static boolean loadEmbeddedLibrary() {
-        boolean result = true;
         if (os().equals("unsupported")) {
             throw new NeuropodJNIException("unsupported OS");
         }
@@ -125,7 +124,8 @@ final class LibraryLoader {
                 File binFile = extractFile(libAbsPath, resPath, binName);
                 if (binFile != null) {
                     LOGGER.log(Level.INFO, "Extracted bin file {0}", binFile);
-                    binFile.setExecutable(true);
+                    boolean succeeded = binFile.setExecutable(true);
+                    LOGGER.log(Level.INFO, "Set everybody's execute permission {0}", succeeded);
                 }
             }
 
@@ -146,10 +146,7 @@ final class LibraryLoader {
                 File embeddedPackageFile = extractFile(libAbsPath, resPath, libName);
                 if (embeddedPackageFile != null) {
                     LOGGER.log(Level.INFO, "Extracted embedded package file {0}", embeddedPackageFile);
-                    String fileName = embeddedPackageFile.getName();
-                    if (fileName.equals(TENSORFLOW_BACKEND) || fileName.equals(TORCHSCRIPT_BACKEND)) {
-                        installFramework(libAbsPath, fileName, neuropodBaseDir);
-                    }
+                    installFramework(libAbsPath, embeddedPackageFile.getName(), neuropodBaseDir);
                 }
             }
 
@@ -159,12 +156,11 @@ final class LibraryLoader {
             }
 
             nativeExport(libAbsPath);
-            result = true;
         } catch (IOException e) {
             LOGGER.log(Level.WARNING, e.getMessage());
-            result = false;
+            return false;
         }
-        return result;
+        return true;
     }
 
     private static boolean installFramework(String libAbsPath, String frameworkPackage, String neuropodBaseDir) {
@@ -172,20 +168,14 @@ final class LibraryLoader {
     }
 
     private static boolean startShellCommand(String cmd) {
-        ProcessBuilder builder = new ProcessBuilder();
-        builder.command("sh", "-c", cmd);
-        builder.directory(new File(System.getProperty("user.home")));
-
-        LOGGER.log(Level.WARNING, "Command {0}", builder.command());
-        File logErr = new File("/tmp/log_err");
-        builder.redirectError(logErr);
-        File log = new File("/tmp/log");
-        builder.redirectOutput(log);
-
+        LOGGER.log(Level.INFO, "Command: {0}", cmd);
         try {
+            ProcessBuilder builder = new ProcessBuilder();
+            builder.command("sh", "-c", cmd);
+            builder.directory(new File(System.getProperty("user.home")));
             Process process = builder.start();
             int exitCode = process.waitFor();
-            LOGGER.log(Level.WARNING, "Exit code {0}", exitCode);
+            LOGGER.log(Level.INFO, "Exit code {0}", exitCode);
         } catch (IOException e) {
             LOGGER.log(Level.WARNING, e.getMessage());
             return false;
@@ -208,7 +198,7 @@ final class LibraryLoader {
         final InputStream in = nativeLibraryUrl.openStream();
         final OutputStream out = new BufferedOutputStream(new FileOutputStream(targetFile));
         // Copy library file in jar to temporary file.
-        int len = 0;
+        int len;
         byte[] buffer = new byte[BUFFER_SIZE];
         while ((len = in.read(buffer)) > -1)
             out.write(buffer, 0, len);
@@ -237,7 +227,7 @@ final class LibraryLoader {
         try {
             // Return value isn't important, it throws if not loaded.
             boolean loaded = nativeIsLoaded();
-            LOGGER.log(Level.INFO, "isLoaded {0}", loaded);
+            LOGGER.log(Level.INFO, "LibraryLoader.isLoaded {0}", loaded);
             return true;
         } catch (UnsatisfiedLinkError e) {
             return false;
