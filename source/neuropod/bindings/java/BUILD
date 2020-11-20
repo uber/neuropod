@@ -104,7 +104,7 @@ genrule(
     srcs = [":neuropod_java_tmp.jar"],
     outs = ["neuropod_java_jar.jar"],
     cmd = select({
-        "@bazel_tools//src/conditions:darwin":"""
+        "@bazel_tools//src/conditions:darwin": """
 mkdir tmp
 cd tmp
 jar -xf ../$(location :neuropod_java_tmp.jar)
@@ -116,7 +116,7 @@ mv neuropod_torchscript_backend.tar.gz $$jni_path
 cd ..
 jar cf $@ -C tmp/ .  # Creates the new jar file.
 """,
-        "//conditions:default":"""
+        "//conditions:default": """
 mkdir tmp
 cd tmp
 jar -xf ../$(location :neuropod_java_tmp.jar)
@@ -152,8 +152,8 @@ java_library(
     data = [
         ":backends",
         ":neuropod_jni",
-        "//neuropod:libneuropod.so",
         ":updated_neuropod_multiprocess_worker",
+        "//neuropod:libneuropod.so",
     ],
     javacopts = JAVACOPTS,
     visibility = ["//visibility:public"],
