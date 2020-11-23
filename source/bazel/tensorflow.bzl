@@ -74,10 +74,11 @@ def _impl(repository_ctx):
             "url": "https://storage.googleapis.com/tensorflow/libtensorflow/libtensorflow-cpu-darwin-x86_64-1.15.0.tar.gz",
             "sha256": "1a9da42e31f613f1582cf996e3ead32528964994eb98b7c355923f2dc39bfce0",
         },
-        # TODO(vip): Replace this with a TF 2.2.0 URL once there's an official release
+        # There isn't an official libtensorflow release for TF 2.x so I had to build this from source
+        # TODO(vip): Update to an official release once there is one
         "2.2.0-mac-cpu": {
-            "url": "https://storage.googleapis.com/tensorflow/libtensorflow/libtensorflow-cpu-darwin-x86_64-1.15.0.tar.gz",
-            "sha256": "1a9da42e31f613f1582cf996e3ead32528964994eb98b7c355923f2dc39bfce0",
+            "url": "https://github.com/VivekPanyam/tensorflow-prebuilts/releases/download/0.0.1/libtensorflow2.2.0rc3+-cpu-darwin-x86_64.tar.gz",
+            "sha256": "78e788a9ada69c8b6edd4061b21ee2a87dbcc41e0c55893c5b063140c28f969d",
         },
     }
 

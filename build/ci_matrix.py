@@ -115,6 +115,7 @@ for platform, framework_version in itertools.product(PLATFORMS, FRAMEWORK_VERSIO
         # This is a Travis CI build
         travis_matrix.extend([
         "    - os: osx\n",
+        "      osx_image: xcode12\n",
         "      env: NEUROPOD_TENSORFLOW_VERSION={} NEUROPOD_TORCH_VERSION={} NEUROPOD_PYTHON_VERSION={}\n".format(tf_version, torch_version, py_version),
         "\n",
         ])

@@ -68,11 +68,9 @@ def _impl(repository_ctx):
             "url": "https://files.pythonhosted.org/packages/b9/be/140e6c4deef96ddfe3837ef7ffc396a06cca73c958989835ac8f05773678/tensorflow-1.15.0-cp27-cp27m-macosx_10_11_x86_64.whl",
             "sha256": "0a01def34c28298970dc83776dd43877fd59e43fddd8e960d01b6eb849ba9938",
         },
-
-        # TODO(vip): replace this with TF2.2 once we use the correct libtensorflow binary for 2.2 on mac
         "2.2.0-mac-cpu": {
-            "url": "https://files.pythonhosted.org/packages/b9/be/140e6c4deef96ddfe3837ef7ffc396a06cca73c958989835ac8f05773678/tensorflow-1.15.0-cp27-cp27m-macosx_10_11_x86_64.whl",
-            "sha256": "0a01def34c28298970dc83776dd43877fd59e43fddd8e960d01b6eb849ba9938",
+            "url": "https://files.pythonhosted.org/packages/1c/fd/dea30c9b6db9305309477b8b6fc0330edbed9b36bc81c3d6094458de8b94/tensorflow-2.2.0rc3-cp35-cp35m-macosx_10_11_x86_64.whl",
+            "sha256": "bc0030f7ee9b47893cb1ed312a1e91715a911d76d24b121a7934a0d6769b1297",
         },
     }
 
@@ -86,10 +84,6 @@ def _impl(repository_ctx):
     sha256 = download_mapping["sha256"]
 
     repository_ctx.download_and_extract(download_url, type = "zip", sha256 = sha256)
-
-    # TODO(vip): Remove once 2.2 on mac works
-    if version == "2.2.0":
-        version = "1.15.0"
 
     repository_ctx.template(
         "BUILD.bazel",

@@ -19,7 +19,7 @@ package(
 cc_library(
     name = "libtensorflow",
     srcs = select({
-        "@bazel_tools//src/conditions:darwin": glob(["lib/libtensorflow.so", "lib/libtensorflow.1.dylib"]),
+        "@bazel_tools//src/conditions:darwin": glob(["lib/libtensorflow.so", "lib/libtensorflow.1.dylib", "lib/libtensorflow.2.dylib"]),
         "//conditions:default": glob([
             "lib/libtensorflow.so",
             "lib/libtensorflow_framework.so",
