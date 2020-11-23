@@ -43,6 +43,14 @@ def _impl(repository_ctx):
             "url": "https://download.pytorch.org/libtorch/cpu/libtorch-shared-with-deps-1.5.0%2Bcpu.zip",
             "sha256": "db3545b0d2b144db4292c2f0bec236febec44aa658dd54f6b3532f2848c50c8a",
         },
+        "1.6.0-linux-cpu": {
+            "url": "https://download.pytorch.org/libtorch/cpu/libtorch-shared-with-deps-1.6.0%2Bcpu.zip",
+            "sha256": "31d3c5a59b1394f9d958501e392cedc91476358accea76c7094d103e9335b80c",
+        },
+        "1.7.0-linux-cpu": {
+            "url": "https://download.pytorch.org/libtorch/cpu/libtorch-shared-with-deps-1.7.0%2Bcpu.zip",
+            "sha256": "4cf8635fb41774c3b38fcb9955ff86b4ed7eb8e73d1595a09297196b7c28db28",
+        },
 
         # Linux GPU
         "1.1.0-linux-cu90": {
@@ -65,6 +73,14 @@ def _impl(repository_ctx):
             "url": "https://download.pytorch.org/libtorch/cu101/libtorch-shared-with-deps-1.5.0%2Bcu101.zip",
             "sha256": "04c0fdb46ca1b74c39715d735a4906d08b976f1d57aef31a020eaf967a6a48b7",
         },
+        "1.6.0-linux-cu101": {
+            "url": "https://download.pytorch.org/libtorch/cu101/libtorch-shared-with-deps-1.6.0%2Bcu101.zip",
+            "sha256": "6a5a215da3dff3f3183674187de3290bd66be3f0ca686ea61f3dd34530da8e23",
+        },
+        "1.7.0-linux-cu101": {
+            "url": "https://download.pytorch.org/libtorch/cu101/libtorch-shared-with-deps-1.7.0%2Bcu101.zip",
+            "sha256": "e0816a692e4540739b6832c118f186b5e65d1fac56edb2048b600b756ae42687",
+        },
 
         # Mac CPU
         "1.1.0-mac-cpu": {
@@ -86,6 +102,14 @@ def _impl(repository_ctx):
         "1.5.0-mac-cpu": {
             "url": "https://download.pytorch.org/libtorch/cpu/libtorch-macos-1.5.0.zip",
             "sha256": "90bd7e5df2a73af1d80cdaa1403b6f5cc5ac9127be4bb5b7616bf32a868cf7d8",
+        },
+        "1.6.0-mac-cpu": {
+            "url": "https://download.pytorch.org/libtorch/cpu/libtorch-macos-1.6.0.zip",
+            "sha256": "e1140bed7bd56c26638bae28aebbdf68e588a9fae92c6684645bcdd996e4183c",
+        },
+        "1.7.0-mac-cpu": {
+            "url": "https://download.pytorch.org/libtorch/cpu/libtorch-macos-1.7.0.zip",
+            "sha256": "2dccb83f1beb16ef3129d9f7af5abafb2f5d9220d0c7da8fde3531bd4ef0e655",
         },
     }
 
