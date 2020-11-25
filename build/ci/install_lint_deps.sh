@@ -8,6 +8,7 @@ add-apt-repository -y ppa:ubuntu-toolchain-r/test
 add-apt-repository -y ppa:deadsnakes/ppa
 apt-get update
 apt-get install -y --no-install-recommends libstdc++6 python3.6 python3.6-dev tzdata jq
+apt-get install -y git
 
 # Install infer
 VERSION=0.17.0; \

@@ -168,6 +168,7 @@ for platform, framework_version in itertools.product(PLATFORMS, FRAMEWORK_VERSIO
         "            - CODECOV_TOKEN\n",
         "            - GH_STATUS_TOKEN\n",
         "            - GH_UPLOAD_TOKEN\n",
+        "            - WEB_DEPLOY_KEY\n",
         "    retry:\n",
         "      automatic: true\n",
         "\n",
