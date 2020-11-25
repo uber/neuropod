@@ -1,0 +1,909 @@
+
+
+
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      <meta http-equiv="x-ua-compatible" content="ie=edge">
+      
+      
+      
+      
+        <meta name="lang:clipboard.copy" content="Copy to clipboard">
+      
+        <meta name="lang:clipboard.copied" content="Copied to clipboard">
+      
+        <meta name="lang:search.language" content="en">
+      
+        <meta name="lang:search.pipeline.stopwords" content="True">
+      
+        <meta name="lang:search.pipeline.trimmer" content="True">
+      
+        <meta name="lang:search.result.none" content="No matching documents">
+      
+        <meta name="lang:search.result.one" content="1 matching document">
+      
+        <meta name="lang:search.result.other" content="# matching documents">
+      
+        <meta name="lang:search.tokenizer" content="[\s\-]+">
+      
+      <link rel="shortcut icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.0.4, mkdocs-material-4.6.0">
+    
+    
+      
+        <title>Efficient Tensor Creation - Neuropod</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/application.1b62728e.css">
+      
+      
+    
+    
+      <script src="../../assets/javascripts/modernizr.268332fc.js"></script>
+    
+    
+      
+        <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700%7CRoboto+Mono&display=fallback">
+        <style>body,input{font-family:"Roboto","Helvetica Neue",Helvetica,Arial,sans-serif}code,kbd,pre{font-family:"Roboto Mono","Courier New",Courier,monospace}</style>
+      
+    
+    <link rel="stylesheet" href="../../assets/fonts/material-icons.css">
+    
+    
+      <link rel="stylesheet" href="https://unpkg.com/mermaid@7.1.2/dist/mermaid.css">
+    
+    
+      
+        
+<script>
+  window.ga = window.ga || function() {
+    (ga.q = ga.q || []).push(arguments)
+  }
+  ga.l = +new Date
+  /* Setup integration and send page view */
+  ga("create", "UA-7627242-14", "auto")
+  ga("set", "anonymizeIp", true)
+  ga("send", "pageview")
+  /* Register handler to log search on blur */
+  document.addEventListener("DOMContentLoaded", () => {
+    if (document.forms.search) {
+      var query = document.forms.search.query
+      query.addEventListener("blur", function() {
+        if (this.value) {
+          var path = document.location.pathname;
+          ga("send", "pageview", path + "?q=" + this.value)
+        }
+      })
+    }
+  })
+</script>
+<script async src="https://www.google-analytics.com/analytics.js"></script>
+      
+    
+    
+  </head>
+  
+    <body dir="ltr">
+  
+    <svg class="md-svg">
+      <defs>
+        
+        
+      </defs>
+    </svg>
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" data-md-component="overlay" for="__drawer"></label>
+    
+      <a href="#writing-your-data-directly-into-a-tensor" tabindex="1" class="md-skip">
+        Skip to content
+      </a>
+    
+    
+      <header class="md-header" data-md-component="header">
+  <nav class="md-header-nav md-grid">
+    <div class="md-flex">
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <a href="../.." title="Neuropod" class="md-header-nav__button md-logo">
+          
+            <i class="md-icon"></i>
+          
+        </a>
+      </div>
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <label class="md-icon md-icon--menu md-header-nav__button" for="__drawer"></label>
+      </div>
+      <div class="md-flex__cell md-flex__cell--stretch">
+        <div class="md-flex__ellipsis md-header-nav__title" data-md-component="title">
+          
+            <span class="md-header-nav__topic">
+              Neuropod
+            </span>
+            <span class="md-header-nav__topic">
+              
+                Efficient Tensor Creation
+              
+            </span>
+          
+        </div>
+      </div>
+      <div class="md-flex__cell md-flex__cell--shrink">
+        
+          <label class="md-icon md-icon--search md-header-nav__button" for="__search"></label>
+          
+<div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="query" data-md-state="active">
+      <label class="md-icon md-search__icon" for="__search"></label>
+      <button type="reset" class="md-icon md-search__icon" data-md-component="reset" tabindex="-1">
+        &#xE5CD;
+      </button>
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="result">
+          <div class="md-search-result__meta">
+            Type to start searching
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+        
+      </div>
+      
+    </div>
+  </nav>
+</header>
+    
+    <div class="md-container">
+      
+        
+      
+      
+      <main class="md-main" role="main">
+        <div class="md-main__inner md-grid" data-md-component="container">
+          
+            
+              <div class="md-sidebar md-sidebar--primary" data-md-component="navigation">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    <nav class="md-nav md-nav--primary" data-md-level="0">
+  <label class="md-nav__title md-nav__title--site" for="__drawer">
+    <a href="../.." title="Neuropod" class="md-nav__button md-logo">
+      
+        <i class="md-icon"></i>
+      
+    </a>
+    Neuropod
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../.." title="Welcome" class="md-nav__link">
+      Welcome
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../../installing/" title="Installing" class="md-nav__link">
+      Installing
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-3" type="checkbox" id="nav-3">
+    
+    <label class="md-nav__link" for="nav-3">
+      Tutorials
+    </label>
+    <nav class="md-nav" data-md-component="collapsible" data-md-level="1">
+      <label class="md-nav__title" for="nav-3">
+        Tutorials
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../tutorial/" title="Basic Introduction" class="md-nav__link">
+      Basic Introduction
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-4" type="checkbox" id="nav-4">
+    
+    <label class="md-nav__link" for="nav-4">
+      Packaging API
+    </label>
+    <nav class="md-nav" data-md-component="collapsible" data-md-level="1">
+      <label class="md-nav__title" for="nav-4">
+        Packaging API
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../packagers/tensorflow/" title="TensorFlow" class="md-nav__link">
+      TensorFlow
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../packagers/pytorch/" title="PyTorch" class="md-nav__link">
+      PyTorch
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../packagers/torchscript/" title="TorchScript" class="md-nav__link">
+      TorchScript
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../packagers/keras/" title="Keras" class="md-nav__link">
+      Keras
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../../pyguide/" title="Python Guide" class="md-nav__link">
+      Python Guide
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../../cppguide/" title="C++ Guide" class="md-nav__link">
+      C++ Guide
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+  
+
+
+  <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    
+      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-7" type="checkbox" id="nav-7" checked>
+    
+    <label class="md-nav__link" for="nav-7">
+      Advanced
+    </label>
+    <nav class="md-nav" data-md-component="collapsible" data-md-level="1">
+      <label class="md-nav__title" for="nav-7">
+        Advanced
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+  
+
+
+  <li class="md-nav__item md-nav__item--active">
+    
+    <input class="md-toggle md-nav__toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+    
+    
+      <label class="md-nav__link md-nav__link--active" for="__toc">
+        Efficient Tensor Creation
+      </label>
+    
+    <a href="./" title="Efficient Tensor Creation" class="md-nav__link md-nav__link--active">
+      Efficient Tensor Creation
+    </a>
+    
+      
+<nav class="md-nav md-nav--secondary">
+  
+  
+  
+    <label class="md-nav__title" for="__toc">Table of contents</label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#writing-your-data-directly-into-a-tensor" class="md-nav__link">
+    Writing your data directly into a tensor
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#pros" class="md-nav__link">
+    Pros
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cons" class="md-nav__link">
+    Cons
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#examples" class="md-nav__link">
+    Examples
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#wrapping-existing-memory" class="md-nav__link">
+    Wrapping existing memory
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#pros_1" class="md-nav__link">
+    Pros
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cons_1" class="md-nav__link">
+    Cons
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#examples_1" class="md-nav__link">
+    Examples
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#copying-data-into-a-tensor" class="md-nav__link">
+    Copying data into a tensor
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#pros_2" class="md-nav__link">
+    Pros
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cons_2" class="md-nav__link">
+    Cons
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#examples_2" class="md-nav__link">
+    Examples
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#which-one-should-i-use" class="md-nav__link">
+    Which one should I use?
+  </a>
+  
+</li>
+      
+      
+      
+      
+      
+    </ul>
+  
+</nav>
+    
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../ope/" title="Out-of-process Execution" class="md-nav__link">
+      Out-of-process Execution
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../../developing/" title="Developing Neuropod" class="md-nav__link">
+      Developing Neuropod
+    </a>
+  </li>
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="toc">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+<nav class="md-nav md-nav--secondary">
+  
+  
+  
+    <label class="md-nav__title" for="__toc">Table of contents</label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#writing-your-data-directly-into-a-tensor" class="md-nav__link">
+    Writing your data directly into a tensor
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#pros" class="md-nav__link">
+    Pros
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cons" class="md-nav__link">
+    Cons
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#examples" class="md-nav__link">
+    Examples
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#wrapping-existing-memory" class="md-nav__link">
+    Wrapping existing memory
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#pros_1" class="md-nav__link">
+    Pros
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cons_1" class="md-nav__link">
+    Cons
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#examples_1" class="md-nav__link">
+    Examples
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#copying-data-into-a-tensor" class="md-nav__link">
+    Copying data into a tensor
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#pros_2" class="md-nav__link">
+    Pros
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cons_2" class="md-nav__link">
+    Cons
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#examples_2" class="md-nav__link">
+    Examples
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#which-one-should-i-use" class="md-nav__link">
+    Which one should I use?
+  </a>
+  
+</li>
+      
+      
+      
+      
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          <div class="md-content">
+            <article class="md-content__inner md-typeset">
+              
+                
+                
+                  <h1>Efficient Tensor Creation</h1>
+                
+                <p>There are a handful of ways of creating tensors from exisiting data in C++ and they all have different tradeoffs between simplicity and performance. This document goes over some approaches and their tradeoffs.</p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>Make sure to read the C++ guide before continuing</p>
+</div>
+<h2 id="writing-your-data-directly-into-a-tensor">Writing your data directly into a tensor<a class="headerlink" href="#writing-your-data-directly-into-a-tensor" title="Permanent link">&para;</a></h2>
+<p>This is preferable if you can do it.</p>
+<p>Instead of copying data or wrapping existing data, write your data directly into a tensor.</p>
+<h3 id="pros">Pros<a class="headerlink" href="#pros" title="Permanent link">&para;</a></h3>
+<ul>
+<li>This'll work without copies under the hood for both in-process and out-of-process execution</li>
+<li>Has no memory alignment requirements</li>
+<li>No need to work with deleters</li>
+</ul>
+<h3 id="cons">Cons<a class="headerlink" href="#cons" title="Permanent link">&para;</a></h3>
+<ul>
+<li>It can require a lot of refactoring of an existing application in order to make this work well</li>
+</ul>
+<h3 id="examples">Examples<a class="headerlink" href="#examples" title="Permanent link">&para;</a></h3>
+<p>You could receive data directly into a tensor's underlying buffer:
+<div class="codehilite"><pre><span></span><span class="c1">// Allocate a tensor</span>
+<span class="k">auto</span> <span class="n">tensor</span> <span class="o">=</span> <span class="n">allocator</span><span class="o">-&gt;</span><span class="n">allocate_tensor</span><span class="o">&lt;</span><span class="kt">float</span><span class="o">&gt;</span><span class="p">({</span><span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">});</span>
+
+<span class="c1">// Get a pointer to the underlying buffer</span>
+<span class="k">auto</span> <span class="n">data</span> <span class="o">=</span> <span class="n">tensor</span><span class="o">-&gt;</span><span class="n">get_raw_data_ptr</span><span class="p">();</span>
+
+<span class="c1">// Some function that writes data directly into this buffer</span>
+<span class="n">recv_message_into_buffer</span><span class="p">(</span><span class="n">data</span><span class="p">);</span>
+</pre></div></p>
+<p>Or you could manually fill in a tensor:
+<div class="codehilite"><pre><span></span><span class="c1">// Allocate a tensor</span>
+<span class="k">auto</span> <span class="n">tensor</span> <span class="o">=</span> <span class="n">allocator</span><span class="o">-&gt;</span><span class="n">allocate_tensor</span><span class="o">&lt;</span><span class="kt">float</span><span class="o">&gt;</span><span class="p">({</span><span class="mi">256</span><span class="p">,</span> <span class="mi">256</span><span class="p">});</span>
+<span class="k">const</span> <span class="k">auto</span> <span class="o">&amp;</span><span class="n">dims</span> <span class="o">=</span> <span class="n">tensor</span><span class="o">-&gt;</span><span class="n">get_dims</span><span class="p">();</span>
+
+<span class="c1">// Get an accessor</span>
+<span class="k">auto</span> <span class="n">accessor</span> <span class="o">=</span> <span class="n">tensor</span><span class="o">-&gt;</span><span class="n">accessor</span><span class="o">&lt;</span><span class="mi">2</span><span class="o">&gt;</span><span class="p">();</span>
+
+<span class="c1">// Write data directly into it</span>
+<span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">dims</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">j</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">j</span> <span class="o">&lt;</span> <span class="n">dims</span><span class="p">[</span><span class="mi">1</span><span class="p">];</span> <span class="n">j</span><span class="o">++</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">accessor</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">i</span> <span class="o">*</span> <span class="n">j</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div></p>
+<p>You could even parallelize that with TBB:
+<div class="codehilite"><pre><span></span><span class="c1">// Allocate a tensor</span>
+<span class="k">auto</span> <span class="n">tensor</span> <span class="o">=</span> <span class="n">allocator</span><span class="o">-&gt;</span><span class="n">allocate_tensor</span><span class="o">&lt;</span><span class="kt">float</span><span class="o">&gt;</span><span class="p">({</span><span class="mi">256</span><span class="p">,</span> <span class="mi">256</span><span class="p">});</span>
+<span class="k">const</span> <span class="k">auto</span> <span class="o">&amp;</span><span class="n">dims</span> <span class="o">=</span> <span class="n">tensor</span><span class="o">-&gt;</span><span class="n">get_dims</span><span class="p">();</span>
+
+<span class="c1">// Get an accessor</span>
+<span class="k">auto</span> <span class="n">accessor</span> <span class="o">=</span> <span class="n">tensor</span><span class="o">-&gt;</span><span class="n">accessor</span><span class="o">&lt;</span><span class="mi">2</span><span class="o">&gt;</span><span class="p">();</span>
+
+<span class="c1">// Write data into the tensor in parallel</span>
+<span class="n">tbb</span><span class="o">::</span><span class="n">parallel_for</span><span class="p">(</span>
+    <span class="c1">// Parallelize in blocks of 16 by 16</span>
+    <span class="nl">tbb</span><span class="p">:</span><span class="n">blocked_range2d</span><span class="o">&lt;</span><span class="kt">size_t</span><span class="o">&gt;</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">dims</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">dims</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">16</span><span class="p">),</span>
+
+    <span class="c1">// Run this lambda in parallel for each block in the range above</span>
+    <span class="p">[</span><span class="o">&amp;</span><span class="p">](</span><span class="k">const</span> <span class="n">blocked_range2d</span><span class="o">&lt;</span><span class="kt">size_t</span><span class="o">&gt;&amp;</span> <span class="n">r</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">for</span><span class="p">(</span><span class="kt">size_t</span> <span class="n">i</span> <span class="o">=</span> <span class="n">r</span><span class="p">.</span><span class="n">rows</span><span class="p">().</span><span class="n">begin</span><span class="p">();</span> <span class="n">i</span> <span class="o">!=</span> <span class="n">r</span><span class="p">.</span><span class="n">rows</span><span class="p">().</span><span class="n">end</span><span class="p">();</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="k">for</span><span class="p">(</span><span class="kt">size_t</span> <span class="n">j</span> <span class="o">=</span> <span class="n">r</span><span class="p">.</span><span class="n">cols</span><span class="p">().</span><span class="n">begin</span><span class="p">();</span> <span class="n">j</span> <span class="o">!=</span> <span class="n">r</span><span class="p">.</span><span class="n">cols</span><span class="p">().</span><span class="n">end</span><span class="p">();</span> <span class="n">j</span><span class="o">++</span><span class="p">)</span>
+            <span class="p">{</span>
+                <span class="n">accessor</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">i</span> <span class="o">*</span> <span class="n">j</span><span class="p">;</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">);</span>
+</pre></div></p>
+<h2 id="wrapping-existing-memory">Wrapping existing memory<a class="headerlink" href="#wrapping-existing-memory" title="Permanent link">&para;</a></h2>
+<p>This works well if you already have your data in a buffer somewhere.</p>
+<h3 id="pros_1">Pros<a class="headerlink" href="#pros_1" title="Permanent link">&para;</a></h3>
+<ul>
+<li>This'll work without copies during in-process execution</li>
+<li>Easy to do if you already have data</li>
+</ul>
+<h3 id="cons_1">Cons<a class="headerlink" href="#cons_1" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Need an understanding of what deleters are and how to use them correctly</li>
+<li>For efficient usage with TF, the data needs to be 64 byte aligned<ul>
+<li>Note: this isn't a hard requirement, but TF may copy unaligned data under the hood</li>
+</ul>
+</li>
+<li>Compared to #1, this makes an extra copy during out-of-process execution</li>
+</ul>
+<h3 id="examples_1">Examples<a class="headerlink" href="#examples_1" title="Permanent link">&para;</a></h3>
+<p>Wrapping data from a <code>cv::Mat</code>:
+<div class="codehilite"><pre><span></span><span class="n">cv</span><span class="o">::</span><span class="n">Mat</span> <span class="n">image</span> <span class="o">=</span> <span class="p">...</span> <span class="c1">// An image from somewhere</span>
+<span class="k">auto</span> <span class="n">tensor</span> <span class="o">=</span> <span class="n">allocator</span><span class="o">-&gt;</span><span class="n">tensor_from_memory</span><span class="o">&lt;</span><span class="kt">uint8_t</span><span class="o">&gt;</span><span class="p">(</span>
+    <span class="c1">// Dimensions</span>
+    <span class="p">{</span><span class="mi">1</span><span class="p">,</span> <span class="n">image</span><span class="p">.</span><span class="n">rows</span><span class="p">,</span> <span class="n">image</span><span class="p">.</span><span class="n">cols</span><span class="p">,</span> <span class="n">image</span><span class="p">.</span><span class="n">channels</span><span class="p">()},</span>
+
+    <span class="c1">// Data</span>
+    <span class="n">image</span><span class="p">.</span><span class="n">data</span><span class="p">,</span>
+
+    <span class="c1">// Deleter</span>
+    <span class="p">[</span><span class="n">image</span><span class="p">](</span><span class="kt">void</span> <span class="o">*</span> <span class="n">unused</span><span class="p">)</span> <span class="p">{</span>
+        <span class="c1">// By capturing `image` in this deleter, we ensure</span>
+        <span class="c1">// that the underlying data does not get deallocated</span>
+        <span class="c1">// before we&#39;re done with the tensor.</span>
+    <span class="p">}</span>
+<span class="p">);</span>
+</pre></div></p>
+<h2 id="copying-data-into-a-tensor">Copying data into a tensor<a class="headerlink" href="#copying-data-into-a-tensor" title="Permanent link">&para;</a></h2>
+<h3 id="pros_2">Pros<a class="headerlink" href="#pros_2" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Very easy to do</li>
+<li>No memory alignment requirements</li>
+<li>No need to work with deleters</li>
+</ul>
+<h3 id="cons_2">Cons<a class="headerlink" href="#cons_2" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Always makes an extra copy during in-process execution</li>
+<li>Compared to #1, this makes an extra copy during out-of-process execution (although this copy is explicitly written by the user)</li>
+</ul>
+<h3 id="examples_2">Examples<a class="headerlink" href="#examples_2" title="Permanent link">&para;</a></h3>
+<p>Copying from a <code>cv::Mat</code>:
+<div class="codehilite"><pre><span></span><span class="n">cv</span><span class="o">::</span><span class="n">Mat</span> <span class="n">image</span> <span class="o">=</span> <span class="p">...</span> <span class="c1">// An image from somewhere</span>
+<span class="k">auto</span> <span class="n">tensor</span> <span class="o">=</span> <span class="n">allocator</span><span class="o">-&gt;</span><span class="n">allocate_tensor</span><span class="o">&lt;</span><span class="kt">uint8_t</span><span class="o">&gt;</span><span class="p">(</span>
+    <span class="c1">// Dimensions</span>
+    <span class="p">{</span><span class="mi">1</span><span class="p">,</span> <span class="n">image</span><span class="p">.</span><span class="n">rows</span><span class="p">,</span> <span class="n">image</span><span class="p">.</span><span class="n">cols</span><span class="p">,</span> <span class="n">image</span><span class="p">.</span><span class="n">channels</span><span class="p">()}</span>
+<span class="p">);</span>
+
+<span class="c1">// Copy data into the tensor</span>
+<span class="n">tensor</span><span class="o">-&gt;</span><span class="n">copy_from</span><span class="p">(</span><span class="n">image</span><span class="p">.</span><span class="n">data</span><span class="p">,</span> <span class="n">tensor</span><span class="o">-&gt;</span><span class="n">get_num_elements</span><span class="p">());</span>
+</pre></div></p>
+<h2 id="which-one-should-i-use">Which one should I use?<a class="headerlink" href="#which-one-should-i-use" title="Permanent link">&para;</a></h2>
+<p>In general, the order of approaches in terms of performance is the following:</p>
+<ol>
+<li>Writing data directly into a tensor</li>
+<li>Wrapping existing memory</li>
+<li>Copying data into a tensor</li>
+</ol>
+<p>That said, profiling is your friend.</p>
+<p>The tradeoff between simplicity and performance is also different for large vs small tensors since copies are cheaper for small tensors.</p>
+                
+                  
+                
+                
+              
+              
+                
+
+
+              
+            </article>
+          </div>
+        </div>
+      </main>
+      
+        
+<footer class="md-footer">
+  
+    <div class="md-footer-nav">
+      <nav class="md-footer-nav__inner md-grid">
+        
+          <a href="../../cppguide/" title="C++ Guide" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+            <div class="md-flex__cell md-flex__cell--shrink">
+              <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
+            </div>
+            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
+              <span class="md-flex__ellipsis">
+                <span class="md-footer-nav__direction">
+                  Previous
+                </span>
+                C++ Guide
+              </span>
+            </div>
+          </a>
+        
+        
+          <a href="../ope/" title="Out-of-process Execution" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
+            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
+              <span class="md-flex__ellipsis">
+                <span class="md-footer-nav__direction">
+                  Next
+                </span>
+                Out-of-process Execution
+              </span>
+            </div>
+            <div class="md-flex__cell md-flex__cell--shrink">
+              <i class="md-icon md-icon--arrow-forward md-footer-nav__button"></i>
+            </div>
+          </a>
+        
+      </nav>
+    </div>
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-footer-copyright">
+        
+        powered by
+        <a href="https://www.mkdocs.org">MkDocs</a>
+        and
+        <a href="https://squidfunk.github.io/mkdocs-material/">
+          Material for MkDocs</a>
+      </div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    
+      <script src="../../assets/javascripts/application.808e90bb.js"></script>
+      
+      <script>app.initialize({version:"1.0.4",url:{base:"../.."}})</script>
+      
+        <script src="https://unpkg.com/mermaid@7.1.2/dist/mermaid.min.js"></script>
+      
+    
+  </body>
+</html>

@@ -1,0 +1,1415 @@
+
+
+
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      <meta http-equiv="x-ua-compatible" content="ie=edge">
+      
+      
+      
+      
+        <meta name="lang:clipboard.copy" content="Copy to clipboard">
+      
+        <meta name="lang:clipboard.copied" content="Copied to clipboard">
+      
+        <meta name="lang:search.language" content="en">
+      
+        <meta name="lang:search.pipeline.stopwords" content="True">
+      
+        <meta name="lang:search.pipeline.trimmer" content="True">
+      
+        <meta name="lang:search.result.none" content="No matching documents">
+      
+        <meta name="lang:search.result.one" content="1 matching document">
+      
+        <meta name="lang:search.result.other" content="# matching documents">
+      
+        <meta name="lang:search.tokenizer" content="[\s\-]+">
+      
+      <link rel="shortcut icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.0.4, mkdocs-material-4.6.0">
+    
+    
+      
+        <title>C++ Guide - Neuropod</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/application.1b62728e.css">
+      
+      
+    
+    
+      <script src="../assets/javascripts/modernizr.268332fc.js"></script>
+    
+    
+      
+        <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700%7CRoboto+Mono&display=fallback">
+        <style>body,input{font-family:"Roboto","Helvetica Neue",Helvetica,Arial,sans-serif}code,kbd,pre{font-family:"Roboto Mono","Courier New",Courier,monospace}</style>
+      
+    
+    <link rel="stylesheet" href="../assets/fonts/material-icons.css">
+    
+    
+      <link rel="stylesheet" href="https://unpkg.com/mermaid@7.1.2/dist/mermaid.css">
+    
+    
+      
+        
+<script>
+  window.ga = window.ga || function() {
+    (ga.q = ga.q || []).push(arguments)
+  }
+  ga.l = +new Date
+  /* Setup integration and send page view */
+  ga("create", "UA-7627242-14", "auto")
+  ga("set", "anonymizeIp", true)
+  ga("send", "pageview")
+  /* Register handler to log search on blur */
+  document.addEventListener("DOMContentLoaded", () => {
+    if (document.forms.search) {
+      var query = document.forms.search.query
+      query.addEventListener("blur", function() {
+        if (this.value) {
+          var path = document.location.pathname;
+          ga("send", "pageview", path + "?q=" + this.value)
+        }
+      })
+    }
+  })
+</script>
+<script async src="https://www.google-analytics.com/analytics.js"></script>
+      
+    
+    
+  </head>
+  
+    <body dir="ltr">
+  
+    <svg class="md-svg">
+      <defs>
+        
+        
+      </defs>
+    </svg>
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" data-md-component="overlay" for="__drawer"></label>
+    
+      <a href="#c-guide" tabindex="1" class="md-skip">
+        Skip to content
+      </a>
+    
+    
+      <header class="md-header" data-md-component="header">
+  <nav class="md-header-nav md-grid">
+    <div class="md-flex">
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <a href=".." title="Neuropod" class="md-header-nav__button md-logo">
+          
+            <i class="md-icon"></i>
+          
+        </a>
+      </div>
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <label class="md-icon md-icon--menu md-header-nav__button" for="__drawer"></label>
+      </div>
+      <div class="md-flex__cell md-flex__cell--stretch">
+        <div class="md-flex__ellipsis md-header-nav__title" data-md-component="title">
+          
+            <span class="md-header-nav__topic">
+              Neuropod
+            </span>
+            <span class="md-header-nav__topic">
+              
+                C++ Guide
+              
+            </span>
+          
+        </div>
+      </div>
+      <div class="md-flex__cell md-flex__cell--shrink">
+        
+          <label class="md-icon md-icon--search md-header-nav__button" for="__search"></label>
+          
+<div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="query" data-md-state="active">
+      <label class="md-icon md-search__icon" for="__search"></label>
+      <button type="reset" class="md-icon md-search__icon" data-md-component="reset" tabindex="-1">
+        &#xE5CD;
+      </button>
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="result">
+          <div class="md-search-result__meta">
+            Type to start searching
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+        
+      </div>
+      
+    </div>
+  </nav>
+</header>
+    
+    <div class="md-container">
+      
+        
+      
+      
+      <main class="md-main" role="main">
+        <div class="md-main__inner md-grid" data-md-component="container">
+          
+            
+              <div class="md-sidebar md-sidebar--primary" data-md-component="navigation">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    <nav class="md-nav md-nav--primary" data-md-level="0">
+  <label class="md-nav__title md-nav__title--site" for="__drawer">
+    <a href=".." title="Neuropod" class="md-nav__button md-logo">
+      
+        <i class="md-icon"></i>
+      
+    </a>
+    Neuropod
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href=".." title="Welcome" class="md-nav__link">
+      Welcome
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../installing/" title="Installing" class="md-nav__link">
+      Installing
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-3" type="checkbox" id="nav-3">
+    
+    <label class="md-nav__link" for="nav-3">
+      Tutorials
+    </label>
+    <nav class="md-nav" data-md-component="collapsible" data-md-level="1">
+      <label class="md-nav__title" for="nav-3">
+        Tutorials
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../tutorial/" title="Basic Introduction" class="md-nav__link">
+      Basic Introduction
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-4" type="checkbox" id="nav-4">
+    
+    <label class="md-nav__link" for="nav-4">
+      Packaging API
+    </label>
+    <nav class="md-nav" data-md-component="collapsible" data-md-level="1">
+      <label class="md-nav__title" for="nav-4">
+        Packaging API
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../packagers/tensorflow/" title="TensorFlow" class="md-nav__link">
+      TensorFlow
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../packagers/pytorch/" title="PyTorch" class="md-nav__link">
+      PyTorch
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../packagers/torchscript/" title="TorchScript" class="md-nav__link">
+      TorchScript
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../packagers/keras/" title="Keras" class="md-nav__link">
+      Keras
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../pyguide/" title="Python Guide" class="md-nav__link">
+      Python Guide
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+  
+
+
+  <li class="md-nav__item md-nav__item--active">
+    
+    <input class="md-toggle md-nav__toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+    
+      
+    
+    
+      <label class="md-nav__link md-nav__link--active" for="__toc">
+        C++ Guide
+      </label>
+    
+    <a href="./" title="C++ Guide" class="md-nav__link md-nav__link--active">
+      C++ Guide
+    </a>
+    
+      
+<nav class="md-nav md-nav--secondary">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">Table of contents</label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#loading-a-neuropod" class="md-nav__link">
+    Loading a Neuropod
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#options" class="md-nav__link">
+    Options
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#get-the-inputs-and-outputs-of-a-model" class="md-nav__link">
+    Get the inputs and outputs of a model
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tensor-types" class="md-nav__link">
+    Tensor Types
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#creating-tensors" class="md-nav__link">
+    Creating tensors
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#allocate-new-memory" class="md-nav__link">
+    Allocate new memory
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#from-existing-memory" class="md-nav__link">
+    From existing memory
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#cvmat" class="md-nav__link">
+    cv::Mat
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#eigen" class="md-nav__link">
+    Eigen
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#factory-functions" class="md-nav__link">
+    Factory functions
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#zeros" class="md-nav__link">
+    zeros
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ones" class="md-nav__link">
+    ones
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#full" class="md-nav__link">
+    full
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#randn" class="md-nav__link">
+    randn
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#arange" class="md-nav__link">
+    arange
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#eye" class="md-nav__link">
+    eye
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#interacting-with-tensors" class="md-nav__link">
+    Interacting with Tensors
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#types-of-tensors" class="md-nav__link">
+    Types of tensors
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#copy-data-into-a-tensor" class="md-nav__link">
+    Copy data into a tensor
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#directly-setget-data" class="md-nav__link">
+    Directly set/get data
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#get-the-dimensions-of-a-tensor" class="md-nav__link">
+    Get the dimensions of a tensor
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#get-the-number-of-elements-in-a-tensor" class="md-nav__link">
+    Get the number of elements in a tensor
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#get-the-type-of-a-tensor" class="md-nav__link">
+    Get the type of a tensor
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#get-a-raw-pointer-to-the-underlying-data" class="md-nav__link">
+    Get a raw pointer to the underlying data
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#get-the-data-as-a-vector" class="md-nav__link">
+    Get the data as a vector
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#inference" class="md-nav__link">
+    Inference
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#serialization" class="md-nav__link">
+    Serialization
+  </a>
+  
+</li>
+      
+      
+      
+      
+      
+    </ul>
+  
+</nav>
+    
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-7" type="checkbox" id="nav-7">
+    
+    <label class="md-nav__link" for="nav-7">
+      Advanced
+    </label>
+    <nav class="md-nav" data-md-component="collapsible" data-md-level="1">
+      <label class="md-nav__title" for="nav-7">
+        Advanced
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../advanced/efficient_tensor_creation/" title="Efficient Tensor Creation" class="md-nav__link">
+      Efficient Tensor Creation
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../advanced/ope/" title="Out-of-process Execution" class="md-nav__link">
+      Out-of-process Execution
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../developing/" title="Developing Neuropod" class="md-nav__link">
+      Developing Neuropod
+    </a>
+  </li>
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="toc">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+<nav class="md-nav md-nav--secondary">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">Table of contents</label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#loading-a-neuropod" class="md-nav__link">
+    Loading a Neuropod
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#options" class="md-nav__link">
+    Options
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#get-the-inputs-and-outputs-of-a-model" class="md-nav__link">
+    Get the inputs and outputs of a model
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tensor-types" class="md-nav__link">
+    Tensor Types
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#creating-tensors" class="md-nav__link">
+    Creating tensors
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#allocate-new-memory" class="md-nav__link">
+    Allocate new memory
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#from-existing-memory" class="md-nav__link">
+    From existing memory
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#cvmat" class="md-nav__link">
+    cv::Mat
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#eigen" class="md-nav__link">
+    Eigen
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#factory-functions" class="md-nav__link">
+    Factory functions
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#zeros" class="md-nav__link">
+    zeros
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ones" class="md-nav__link">
+    ones
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#full" class="md-nav__link">
+    full
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#randn" class="md-nav__link">
+    randn
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#arange" class="md-nav__link">
+    arange
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#eye" class="md-nav__link">
+    eye
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#interacting-with-tensors" class="md-nav__link">
+    Interacting with Tensors
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#types-of-tensors" class="md-nav__link">
+    Types of tensors
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#copy-data-into-a-tensor" class="md-nav__link">
+    Copy data into a tensor
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#directly-setget-data" class="md-nav__link">
+    Directly set/get data
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#get-the-dimensions-of-a-tensor" class="md-nav__link">
+    Get the dimensions of a tensor
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#get-the-number-of-elements-in-a-tensor" class="md-nav__link">
+    Get the number of elements in a tensor
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#get-the-type-of-a-tensor" class="md-nav__link">
+    Get the type of a tensor
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#get-a-raw-pointer-to-the-underlying-data" class="md-nav__link">
+    Get a raw pointer to the underlying data
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#get-the-data-as-a-vector" class="md-nav__link">
+    Get the data as a vector
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#inference" class="md-nav__link">
+    Inference
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#serialization" class="md-nav__link">
+    Serialization
+  </a>
+  
+</li>
+      
+      
+      
+      
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          <div class="md-content">
+            <article class="md-content__inner md-typeset">
+              
+                
+                
+                <h1 id="c-guide">C++ Guide<a class="headerlink" href="#c-guide" title="Permanent link">&para;</a></h1>
+<p>This guide walks through the Neuropod C++ API in detail and goes over many different ways of working with models.</p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>The Neuropod runtime interface is identical for all frameworks so this guide applies for models from all supported frameworks (including TensorFlow, PyTorch, Keras, and TorchScript)</p>
+</div>
+<h2 id="loading-a-neuropod">Loading a Neuropod<a class="headerlink" href="#loading-a-neuropod" title="Permanent link">&para;</a></h2>
+<p>The simplest way to load a neuropod is as follows:</p>
+<div class="codehilite"><pre><span></span><span class="cp">#include</span> <span class="cpf">&quot;neuropod/neuropod.hh&quot;</span><span class="cp"></span>
+
+<span class="n">Neuropod</span> <span class="nf">neuropod</span><span class="p">(</span><span class="n">PATH_TO_MY_MODEL</span><span class="p">);</span>
+</pre></div>
+
+<p>where <code>PATH_TO_MY_MODEL</code> is the path to a model exported using one of the packagers.</p>
+<h3 id="options">Options<a class="headerlink" href="#options" title="Permanent link">&para;</a></h3>
+<p>You can also provide runtime options when loading a model.</p>
+<p>To select what device to run the model on, you can specify the <code>visible_device</code> option:</p>
+<div class="codehilite"><pre><span></span><span class="n">neuropod</span><span class="o">::</span><span class="n">RuntimeOptions</span> <span class="n">opts</span><span class="p">;</span>
+
+<span class="c1">// Set the visible device to the first GPU</span>
+<span class="n">opts</span><span class="p">.</span><span class="n">visible_device</span> <span class="o">=</span> <span class="n">Device</span><span class="o">::</span><span class="n">GPU0</span><span class="p">;</span>
+
+<span class="n">Neuropod</span> <span class="nf">neuropod</span><span class="p">(</span><span class="n">PATH_TO_MY_MODEL</span><span class="p">,</span> <span class="n">opts</span><span class="p">);</span>
+</pre></div>
+
+<p>This defaults to <code>GPU0</code>. If no GPUs are available, Neuropod will attempt to fallback to CPU.</p>
+<p>Setting <code>opts.visible_device = Device::CPU</code> will force the model to run on CPU.</p>
+<p>For more details, see all the options <a href="https://github.com/uber/neuropod/blob/master/source/neuropod/options.hh">here</a></p>
+<h3 id="get-the-inputs-and-outputs-of-a-model">Get the inputs and outputs of a model<a class="headerlink" href="#get-the-inputs-and-outputs-of-a-model" title="Permanent link">&para;</a></h3>
+<p>To get the inputs and outputs of a model, you can do this:</p>
+<div class="codehilite"><pre><span></span><span class="n">Neuropod</span> <span class="nf">neuropod</span><span class="p">(</span><span class="n">PATH_TO_MY_MODEL</span><span class="p">);</span>
+
+<span class="c1">// Both of these are `std::vector&lt;TensorSpec&gt;`</span>
+<span class="k">const</span> <span class="k">auto</span> <span class="o">&amp;</span><span class="n">inputs</span>  <span class="o">=</span> <span class="n">neuropod</span><span class="p">.</span><span class="n">get_inputs</span><span class="p">();</span>
+<span class="k">const</span> <span class="k">auto</span> <span class="o">&amp;</span><span class="n">outputs</span> <span class="o">=</span> <span class="n">neuropod</span><span class="p">.</span><span class="n">get_outputs</span><span class="p">();</span>
+
+<span class="k">for</span> <span class="p">(</span><span class="k">const</span> <span class="k">auto</span> <span class="o">&amp;</span><span class="nl">item</span> <span class="p">:</span> <span class="n">inputs</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="c1">// A `TensorSpec` is a struct with a `name`, `dims` and `type`</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Tensor name: &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">item</span><span class="p">.</span><span class="n">name</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+
+<p>For more details, see <a href="https://github.com/uber/neuropod/blob/master/source/neuropod/internal/config_utils.hh#L25"><code>TensorSpec</code></a></p>
+<h2 id="tensor-types">Tensor Types<a class="headerlink" href="#tensor-types" title="Permanent link">&para;</a></h2>
+<p>The following tensor types are supported:</p>
+<ul>
+<li><code>float</code></li>
+<li><code>double</code></li>
+<li>
+<p><code>string</code></p>
+</li>
+<li>
+<p><code>int8</code></p>
+</li>
+<li><code>int16</code></li>
+<li><code>int32</code></li>
+<li>
+<p><code>int64</code></p>
+</li>
+<li>
+<p><code>uint8</code></p>
+</li>
+<li><code>uint16</code></li>
+<li><code>uint32</code></li>
+<li><code>uint64</code></li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><code>uint16</code>, <code>uint32</code>, and <code>uint64</code> are not supported by PyTorch or TorchScript. See the <a href="https://pytorch.org/docs/stable/tensors.html">supported type list</a> in the PyTorch documentation.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>TorchScript does not have support for string tensors so we represent them as lists of strings. Therefore TorchScript Neuropod models only support 1D string "tensors". See <a href="https://github.com/uber/neuropod/blob/master/source/python/neuropod/tests/test_torchscript_strings.py">here</a> for example usage.</p>
+</div>
+<h2 id="creating-tensors">Creating tensors<a class="headerlink" href="#creating-tensors" title="Permanent link">&para;</a></h2>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>See the Efficient Tensor Creation page for a guide on the approach that best fits your use case.</p>
+</div>
+<p>There are many different ways to create <code>NeuropodTensor</code>s, but all of them start with an <code>allocator</code>.</p>
+<p>To get an allocator for a loaded model, you can do something like:</p>
+<div class="codehilite"><pre><span></span><span class="n">Neuropod</span> <span class="nf">neuropod</span><span class="p">(</span><span class="n">PATH_TO_MY_MODEL</span><span class="p">);</span>
+
+<span class="k">auto</span> <span class="n">allocator</span> <span class="o">=</span> <span class="n">neuropod</span><span class="p">.</span><span class="n">get_tensor_allocator</span><span class="p">();</span>
+</pre></div>
+
+<p>For scenarios where a model isn't loaded (e.g. unit tests), you can use a generic tensor allocator:</p>
+<div class="codehilite"><pre><span></span><span class="cp">#include</span> <span class="cpf">&quot;neuropod/core/generic_tensor.hh&quot;</span><span class="cp"></span>
+
+<span class="k">auto</span> <span class="n">allocator</span> <span class="o">=</span> <span class="n">neuropod</span><span class="o">::</span><span class="n">get_generic_tensor_allocator</span><span class="p">();</span>
+</pre></div>
+
+<h3 id="allocate-new-memory">Allocate new memory<a class="headerlink" href="#allocate-new-memory" title="Permanent link">&para;</a></h3>
+<p>For this, we just need the dimensions and type of the tensor we want to allocate.</p>
+<div class="codehilite"><pre><span></span><span class="k">auto</span> <span class="n">tensor</span> <span class="o">=</span> <span class="n">allocator</span><span class="o">-&gt;</span><span class="n">allocate_tensor</span><span class="o">&lt;</span><span class="kt">float</span><span class="o">&gt;</span><span class="p">({</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">});</span>
+</pre></div>
+
+<p>You can also manually specify the type without using a templated function</p>
+<div class="codehilite"><pre><span></span><span class="k">auto</span> <span class="n">tensor</span> <span class="o">=</span> <span class="n">allocator</span><span class="o">-&gt;</span><span class="n">allocate_tensor</span><span class="p">({</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">},</span> <span class="n">neuropod</span><span class="o">::</span><span class="n">FLOAT_TENSOR</span><span class="p">);</span>
+</pre></div>
+
+<p>To do something useful with these tensors, see the <a href="#interacting-with-tensors">Interacting with Tensors</a> section below.</p>
+<h3 id="from-existing-memory">From existing memory<a class="headerlink" href="#from-existing-memory" title="Permanent link">&para;</a></h3>
+<p>Neuropod provides a way to wrap existing memory and use it in a zero-copy way.</p>
+<p>To do this, it needs four things:</p>
+<ul>
+<li>The dimension of the tensor to create</li>
+<li>The type of tensor to create</li>
+<li>A pointer to the data to wrap<ul>
+<li>Note: this should be 64 byte aligned</li>
+</ul>
+</li>
+<li>A deleter function</li>
+</ul>
+<p>This deleter function is called once Neuropod (and the underlying libraries) are done using this data. Until this function is called, it is not safe to deallocate the data.</p>
+<p>It is very important to pass in a correct deleter to make sure the memory doesn't get prematurely deallocated. Some examples are below.</p>
+<h4 id="cvmat">cv::Mat<a class="headerlink" href="#cvmat" title="Permanent link">&para;</a></h4>
+<div class="codehilite"><pre><span></span><span class="n">cv</span><span class="o">::</span><span class="n">Mat</span> <span class="n">image</span> <span class="o">=</span> <span class="p">...</span> <span class="c1">// An image from somewhere</span>
+<span class="k">auto</span> <span class="n">tensor</span> <span class="o">=</span> <span class="n">allocator</span><span class="o">-&gt;</span><span class="n">tensor_from_memory</span><span class="o">&lt;</span><span class="kt">uint8_t</span><span class="o">&gt;</span><span class="p">(</span>
+    <span class="c1">// Dimensions</span>
+    <span class="p">{</span><span class="mi">1</span><span class="p">,</span> <span class="n">image</span><span class="p">.</span><span class="n">rows</span><span class="p">,</span> <span class="n">image</span><span class="p">.</span><span class="n">cols</span><span class="p">,</span> <span class="n">image</span><span class="p">.</span><span class="n">channels</span><span class="p">()},</span>
+
+    <span class="c1">// Data</span>
+    <span class="n">image</span><span class="p">.</span><span class="n">data</span><span class="p">,</span>
+
+    <span class="c1">// Deleter</span>
+    <span class="p">[</span><span class="n">image</span><span class="p">](</span><span class="kt">void</span> <span class="o">*</span> <span class="n">unused</span><span class="p">)</span> <span class="p">{</span>
+        <span class="c1">// By capturing `image` in this deleter, we ensure</span>
+        <span class="c1">// that the underlying data does not get deallocated</span>
+        <span class="c1">// before we&#39;re done with the tensor.</span>
+    <span class="p">}</span>
+<span class="p">);</span>
+</pre></div>
+
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>You can also specify the type without using a templated function</p>
+<div class="codehilite"><pre><span></span><span class="n">cv</span><span class="o">::</span><span class="n">Mat</span> <span class="n">image</span> <span class="o">=</span> <span class="p">...</span> <span class="c1">// An image from somewhere</span>
+<span class="k">auto</span> <span class="n">tensor</span> <span class="o">=</span> <span class="n">allocator</span><span class="o">-&gt;</span><span class="n">tensor_from_memory</span><span class="p">(</span>
+    <span class="c1">// Dimensions</span>
+    <span class="p">{</span><span class="mi">1</span><span class="p">,</span> <span class="n">image</span><span class="p">.</span><span class="n">rows</span><span class="p">,</span> <span class="n">image</span><span class="p">.</span><span class="n">cols</span><span class="p">,</span> <span class="n">image</span><span class="p">.</span><span class="n">channels</span><span class="p">()},</span>
+
+    <span class="c1">// Tensor Type</span>
+    <span class="n">get_tensor_type_from_cv_mat</span><span class="p">(</span><span class="n">image</span><span class="p">),</span>
+
+    <span class="c1">// Data</span>
+    <span class="n">image</span><span class="p">.</span><span class="n">data</span><span class="p">,</span>
+
+    <span class="c1">// Deleter</span>
+    <span class="p">[</span><span class="n">image</span><span class="p">](</span><span class="kt">void</span> <span class="o">*</span> <span class="n">unused</span><span class="p">)</span> <span class="p">{}</span>
+<span class="p">);</span>
+</pre></div>
+
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Utilities for wrapping types from common libraries will be added in a future release.</p>
+</div>
+<h4 id="eigen">Eigen<a class="headerlink" href="#eigen" title="Permanent link">&para;</a></h4>
+<div class="codehilite"><pre><span></span><span class="cp">#include</span> <span class="cpf">&quot;neuropod/conversions/eigen.hh&quot;</span><span class="cp"></span>
+
+<span class="k">auto</span> <span class="n">tensor</span> <span class="o">=</span> <span class="n">allocator</span><span class="o">-&gt;</span><span class="n">allocate_tensor</span><span class="o">&lt;</span><span class="kt">float</span><span class="o">&gt;</span><span class="p">({</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">});</span>
+
+<span class="c1">// Returns an `Eigen::Map`</span>
+<span class="k">auto</span> <span class="n">eigen_map</span> <span class="o">=</span> <span class="n">neuropod</span><span class="o">::</span><span class="n">as_eigen</span><span class="p">(</span><span class="o">*</span><span class="n">tensor</span><span class="p">);</span>
+</pre></div>
+
+<p>See <a href="https://eigen.tuxfamily.org/dox/group__TutorialMapClass.html">the Eigen docs</a> for more details.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If you're not using the features of Eigen and just need simple element access, use <a href="#directly-setget-data">accessors</a> instead.</p>
+</div>
+<h3 id="factory-functions">Factory functions<a class="headerlink" href="#factory-functions" title="Permanent link">&para;</a></h3>
+<p>These functions are useful for creating test data.</p>
+<h4 id="zeros">zeros<a class="headerlink" href="#zeros" title="Permanent link">&para;</a></h4>
+<p>Returns a tensor of type <code>T</code> and shape <code>input_dims</code> filled with zeros</p>
+<div class="codehilite"><pre><span></span><span class="k">auto</span> <span class="n">zeros</span> <span class="o">=</span> <span class="n">allocator</span><span class="o">-&gt;</span><span class="n">zeros</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">(</span><span class="n">input_dims</span><span class="p">);</span>
+</pre></div>
+
+<h4 id="ones">ones<a class="headerlink" href="#ones" title="Permanent link">&para;</a></h4>
+<p>Returns a tensor of type <code>T</code> and shape <code>input_dims</code> filled with ones</p>
+<div class="codehilite"><pre><span></span><span class="k">auto</span> <span class="n">ones</span> <span class="o">=</span> <span class="n">allocator</span><span class="o">-&gt;</span><span class="n">ones</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">(</span><span class="n">input_dims</span><span class="p">);</span>
+</pre></div>
+
+<h4 id="full">full<a class="headerlink" href="#full" title="Permanent link">&para;</a></h4>
+<p>Returns a tensor of type <code>T</code> and shape <code>input_dims</code> filled with <code>fill_value</code></p>
+<div class="codehilite"><pre><span></span><span class="k">auto</span> <span class="n">full</span> <span class="o">=</span> <span class="n">allocator</span><span class="o">-&gt;</span><span class="n">full</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">(</span><span class="n">input_dims</span><span class="p">,</span> <span class="n">fill_value</span><span class="p">);</span>
+</pre></div>
+
+<h4 id="randn">randn<a class="headerlink" href="#randn" title="Permanent link">&para;</a></h4>
+<p>Returns a tensor of type <code>T</code> and shape <code>input_dims</code> filled with random numbers from a normal distribution with mean <code>mean</code> and standard deviation <code>stddev</code>.</p>
+<div class="codehilite"><pre><span></span><span class="k">auto</span> <span class="n">full</span> <span class="o">=</span> <span class="n">allocator</span><span class="o">-&gt;</span><span class="n">randn</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">(</span><span class="n">input_dims</span><span class="p">,</span> <span class="n">mean</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">stddev</span> <span class="o">=</span> <span class="mi">1</span><span class="p">);</span>
+</pre></div>
+
+<h4 id="arange">arange<a class="headerlink" href="#arange" title="Permanent link">&para;</a></h4>
+<p>Returns a 1D tensor of type <code>T</code> containing a sequence of numbers starting at <code>start</code> with a step size of <code>step</code>.</p>
+<div class="codehilite"><pre><span></span><span class="k">auto</span> <span class="n">range1</span> <span class="o">=</span> <span class="n">allocator</span><span class="o">-&gt;</span><span class="n">arange</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">(</span><span class="n">end</span><span class="p">);</span>
+<span class="k">auto</span> <span class="n">range2</span> <span class="o">=</span> <span class="n">allocator</span><span class="o">-&gt;</span><span class="n">arange</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">step</span> <span class="o">=</span> <span class="mi">1</span><span class="p">);</span>
+</pre></div>
+
+<p>Example:</p>
+<div class="codehilite"><pre><span></span><span class="c1">// 0, 1, 2, 3, 4</span>
+<span class="k">auto</span> <span class="n">range1</span> <span class="o">=</span> <span class="n">allocator</span><span class="o">-&gt;</span><span class="n">arange</span><span class="o">&lt;</span><span class="kt">float</span><span class="o">&gt;</span><span class="p">(</span><span class="mi">5</span><span class="p">);</span>
+
+<span class="c1">// 2, 3, 4, 5</span>
+<span class="k">auto</span> <span class="n">range2</span> <span class="o">=</span> <span class="n">allocator</span><span class="o">-&gt;</span><span class="n">arange</span><span class="o">&lt;</span><span class="kt">float</span><span class="o">&gt;</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">6</span><span class="p">);</span>
+
+<span class="c1">// 0, 2, 4, 6, 8</span>
+<span class="k">auto</span> <span class="n">range3</span> <span class="o">=</span> <span class="n">allocator</span><span class="o">-&gt;</span><span class="n">arange</span><span class="o">&lt;</span><span class="kt">float</span><span class="o">&gt;</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">2</span><span class="p">);</span>
+</pre></div>
+
+<h4 id="eye">eye<a class="headerlink" href="#eye" title="Permanent link">&para;</a></h4>
+<p>Returns an identity matrix of type <code>T</code> and shape (<code>M</code>, <code>N</code>). This matrix has ones on the diagonal and zeros everywhere else.</p>
+<div class="codehilite"><pre><span></span><span class="k">auto</span> <span class="n">eye1</span> <span class="o">=</span> <span class="n">allocator</span><span class="o">-&gt;</span><span class="n">eye</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="n">N</span><span class="p">);</span>
+</pre></div>
+
+<p>Example:</p>
+<div class="codehilite"><pre><span></span><span class="c1">// 1, 0, 0, 0,</span>
+<span class="c1">// 0, 1, 0, 0,</span>
+<span class="c1">// 0, 0, 1, 0,</span>
+<span class="c1">// 0, 0, 0, 1</span>
+<span class="k">auto</span> <span class="n">eye1</span> <span class="o">=</span> <span class="n">allocator</span><span class="o">-&gt;</span><span class="n">eye</span><span class="o">&lt;</span><span class="kt">float</span><span class="o">&gt;</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">);</span>
+
+<span class="c1">// 1, 0, 0, 0, 0, 0, 0,</span>
+<span class="c1">// 0, 1, 0, 0, 0, 0, 0,</span>
+<span class="c1">// 0, 0, 1, 0, 0, 0, 0</span>
+<span class="k">auto</span> <span class="n">eye2</span> <span class="o">=</span> <span class="n">allocator</span><span class="o">-&gt;</span><span class="n">eye</span><span class="o">&lt;</span><span class="kt">float</span><span class="o">&gt;</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">7</span><span class="p">);</span>
+</pre></div>
+
+<h2 id="interacting-with-tensors">Interacting with Tensors<a class="headerlink" href="#interacting-with-tensors" title="Permanent link">&para;</a></h2>
+<p>This section goes over various ways of interacting with existing tensors.</p>
+<h4 id="types-of-tensors">Types of tensors<a class="headerlink" href="#types-of-tensors" title="Permanent link">&para;</a></h4>
+<p>Neuropod has a few different ways of representing tensors: <code>NeuropodValue</code>, <code>NeuropodTensor</code>, and <code>TypedNeuropodTensor&lt;T&gt;</code></p>
+<ul>
+<li>
+<p><code>NeuropodValue</code> is the base type and represents any value that the library can store and pass around.</p>
+</li>
+<li>
+<p>A <code>NeuropodTensor</code> is a <code>NeuropodValue</code> that is a tensor. This adds metadata functionality (dimensions, type, num elements, etc.), but does not allow data access.</p>
+</li>
+<li>
+<p>A <code>TypedNeuropodTensor&lt;T&gt;</code> is a <code>NeuropodTensor</code> of a specific type. This level of the hierarchy adds type-safe data access.</p>
+</li>
+</ul>
+<p>This is what the class hierarchy looks like:</p>
+<div class="mermaid">graph TD;
+    NeuropodValue --&gt; NeuropodTensor;
+    NeuropodValue -.-&gt; non_tensor[Non-Tensor types];
+    NeuropodTensor --&gt; TypedNeuropodTensor&amp;ltT&amp;gt;
+
+style non_tensor opacity:0.1,fill:#aaa,stroke:#333,stroke-width:4px</div>
+
+<p>To convert from a <code>NeuropodValue</code> to a <code>NeuropodTensor</code>, you can use <code>as_tensor()</code>.</p>
+<div class="codehilite"><pre><span></span><span class="k">auto</span> <span class="n">my_value</span> <span class="o">=</span> <span class="p">...</span>
+<span class="k">auto</span> <span class="n">my_tensor</span> <span class="o">=</span> <span class="n">my_value</span><span class="o">-&gt;</span><span class="n">as_tensor</span><span class="p">();</span>
+</pre></div>
+
+<p>To convert from a <code>NeuropodValue</code> or <code>NeuropodTensor</code> to a <code>TypedNeuropodTensor</code> of a specific type, you can use <code>as_typed_tensor&lt;T&gt;()</code>. This does a type-checked downcast to the requested type and throws an error if the requested type does not match the actual type of the tensor.</p>
+<div class="codehilite"><pre><span></span><span class="k">auto</span> <span class="n">my_value</span> <span class="o">=</span> <span class="p">...</span>
+<span class="k">auto</span> <span class="n">my_float_tensor</span> <span class="o">=</span> <span class="n">my_value</span><span class="o">-&gt;</span><span class="n">as_typed_tensor</span><span class="o">&lt;</span><span class="kt">float</span><span class="o">&gt;</span><span class="p">();</span>
+
+<span class="c1">// This will throw an error</span>
+<span class="k">auto</span> <span class="n">my_uint_tensor</span> <span class="o">=</span> <span class="n">my_value</span><span class="o">-&gt;</span><span class="n">as_typed_tensor</span><span class="o">&lt;</span><span class="kt">uint8_t</span><span class="o">&gt;</span><span class="p">();</span>
+</pre></div>
+
+<p>The sections below will go over some more usage and examples.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Most use cases will not require usage of these methods (as the factories and templated allocators already return <code>TypedNeuropodTensor</code>s).</p>
+</div>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>Generally, data access requires a <code>TypedNeuropodTensor&lt;T&gt;</code> and metadata access requires at least a <code>NeuropodTensor</code></p>
+</div>
+<h4 id="copy-data-into-a-tensor">Copy data into a tensor<a class="headerlink" href="#copy-data-into-a-tensor" title="Permanent link">&para;</a></h4>
+<p><small>Requires <code>TypedNeuropodTensor&lt;T&gt;</code></small></p>
+<p>If you want to copy in data (and can't wrap it using the <code>tensor_from_memory</code> API above), you can do something like this:</p>
+<div class="codehilite"><pre><span></span><span class="kt">float</span> <span class="o">*</span> <span class="n">my_data</span> <span class="o">=</span> <span class="p">...;</span>
+<span class="kt">size_t</span> <span class="n">num_elements</span> <span class="o">=</span> <span class="p">...;</span>
+<span class="n">tensor</span><span class="o">-&gt;</span><span class="n">copy_from</span><span class="p">(</span><span class="n">my_data</span><span class="p">,</span> <span class="n">num_elements</span><span class="p">);</span>
+</pre></div>
+
+<p>You can also copy data from a vector:</p>
+<div class="codehilite"><pre><span></span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">float</span><span class="o">&gt;</span> <span class="n">my_data</span><span class="p">;</span>
+<span class="n">tensor</span><span class="o">-&gt;</span><span class="n">copy_from</span><span class="p">(</span><span class="n">my_data</span><span class="p">);</span>
+</pre></div>
+
+<h4 id="directly-setget-data">Directly set/get data<a class="headerlink" href="#directly-setget-data" title="Permanent link">&para;</a></h4>
+<p><small>Requires <code>TypedNeuropodTensor&lt;T&gt;</code></small></p>
+<p>You can do this using the accessor interface, which is very similar to PyTorch's accessor interface.</p>
+<div class="codehilite"><pre><span></span><span class="k">auto</span> <span class="n">tensor</span> <span class="o">=</span> <span class="n">allocator</span><span class="o">-&gt;</span><span class="n">allocate_tensor</span><span class="o">&lt;</span><span class="kt">float</span><span class="o">&gt;</span><span class="p">({</span><span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">});</span>
+
+<span class="c1">// 2 is the number of dimensions of this tensor</span>
+<span class="k">auto</span> <span class="n">accessor</span> <span class="o">=</span> <span class="n">tensor</span><span class="o">-&gt;</span><span class="n">accessor</span><span class="o">&lt;</span><span class="mi">2</span><span class="o">&gt;</span><span class="p">();</span>
+<span class="n">accessor</span><span class="p">[</span><span class="mi">5</span><span class="p">][</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">;</span>
+</pre></div>
+
+<p>Range-based for loops work with accessors as well:</p>
+<div class="codehilite"><pre><span></span><span class="k">auto</span> <span class="n">tensor</span> <span class="o">=</span> <span class="n">allocator</span><span class="o">-&gt;</span><span class="n">allocate_tensor</span><span class="o">&lt;</span><span class="kt">float</span><span class="o">&gt;</span><span class="p">({</span><span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">});</span>
+
+<span class="c1">// 2 is the number of dimensions of this tensor</span>
+<span class="k">auto</span> <span class="n">accessor</span> <span class="o">=</span> <span class="n">tensor</span><span class="o">-&gt;</span><span class="n">accessor</span><span class="o">&lt;</span><span class="mi">2</span><span class="o">&gt;</span><span class="p">();</span>
+
+<span class="k">for</span> <span class="p">(</span><span class="k">const</span> <span class="k">auto</span> <span class="o">&amp;</span><span class="nl">row</span> <span class="p">:</span> <span class="n">accessor</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">for</span> <span class="p">(</span><span class="k">const</span> <span class="k">auto</span> <span class="o">&amp;</span><span class="nl">item</span> <span class="p">:</span> <span class="n">row</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="c1">// Do something</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+
+<p>Example with string tensors:</p>
+<div class="codehilite"><pre><span></span><span class="k">auto</span> <span class="n">tensor</span> <span class="o">=</span> <span class="n">allocator</span><span class="o">-&gt;</span><span class="n">allocate_tensor</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;</span><span class="p">({</span><span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">});</span>
+
+<span class="c1">// 2 is the number of dimensions of this tensor</span>
+<span class="k">auto</span> <span class="n">accessor</span> <span class="o">=</span> <span class="n">tensor</span><span class="o">-&gt;</span><span class="n">accessor</span><span class="o">&lt;</span><span class="mi">2</span><span class="o">&gt;</span><span class="p">();</span>
+
+<span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">3</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">j</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">j</span> <span class="o">&lt;</span> <span class="mi">5</span><span class="p">;</span> <span class="n">j</span><span class="o">++</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">accessor</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">std</span><span class="o">::</span><span class="n">to_string</span><span class="p">(</span><span class="n">i</span> <span class="o">*</span> <span class="mi">5</span> <span class="o">+</span> <span class="n">j</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+
+<p>Individual element access with accessors is very efficient and <a href="https://github.com/uber/neuropod/blob/master/source/neuropod/tests/benchmark_accessor.cc">comparable to raw pointer</a> operations during an optimized build.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>See the Efficient Tensor Creation page for a guide on the approach that best fits your use case. Using</p>
+</div>
+<h4 id="get-the-dimensions-of-a-tensor">Get the dimensions of a tensor<a class="headerlink" href="#get-the-dimensions-of-a-tensor" title="Permanent link">&para;</a></h4>
+<p><small>Requires <code>NeuropodTensor</code></small></p>
+<div class="codehilite"><pre><span></span><span class="k">const</span> <span class="k">auto</span> <span class="o">&amp;</span><span class="n">dims</span> <span class="o">=</span> <span class="n">tensor</span><span class="o">-&gt;</span><span class="n">get_dims</span><span class="p">();</span>
+</pre></div>
+
+<h4 id="get-the-number-of-elements-in-a-tensor">Get the number of elements in a tensor<a class="headerlink" href="#get-the-number-of-elements-in-a-tensor" title="Permanent link">&para;</a></h4>
+<p><small>Requires <code>NeuropodTensor</code></small></p>
+<div class="codehilite"><pre><span></span><span class="k">auto</span> <span class="n">num_elements</span> <span class="o">=</span> <span class="n">tensor</span><span class="o">-&gt;</span><span class="n">get_num_elements</span><span class="p">();</span>
+</pre></div>
+
+<h4 id="get-the-type-of-a-tensor">Get the type of a tensor<a class="headerlink" href="#get-the-type-of-a-tensor" title="Permanent link">&para;</a></h4>
+<p><small>Requires <code>NeuropodTensor</code></small></p>
+<div class="codehilite"><pre><span></span><span class="k">auto</span> <span class="n">tensor_type</span> <span class="o">=</span> <span class="n">tensor</span><span class="o">-&gt;</span><span class="n">get_tensor_type</span><span class="p">();</span>
+</pre></div>
+
+<h4 id="get-a-raw-pointer-to-the-underlying-data">Get a raw pointer to the underlying data<a class="headerlink" href="#get-a-raw-pointer-to-the-underlying-data" title="Permanent link">&para;</a></h4>
+<p><small>Requires <code>TypedNeuropodTensor&lt;T&gt;</code></small></p>
+<div class="codehilite"><pre><span></span><span class="k">auto</span> <span class="n">data</span> <span class="o">=</span> <span class="n">tensor</span><span class="o">-&gt;</span><span class="n">get_raw_data_ptr</span><span class="p">();</span>
+</pre></div>
+
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This method does not work for String tensors. Use <a href="#directly-setget-data">accessors</a> instead</p>
+</div>
+<h4 id="get-the-data-as-a-vector">Get the data as a vector<a class="headerlink" href="#get-the-data-as-a-vector" title="Permanent link">&para;</a></h4>
+<p><small>Requires <code>TypedNeuropodTensor&lt;T&gt;</code></small></p>
+<div class="codehilite"><pre><span></span><span class="k">auto</span> <span class="n">data</span> <span class="o">=</span> <span class="n">tensor</span><span class="o">-&gt;</span><span class="n">get_data_as_vector</span><span class="p">();</span>
+</pre></div>
+
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>This method performs a copy</p>
+</div>
+<h2 id="inference">Inference<a class="headerlink" href="#inference" title="Permanent link">&para;</a></h2>
+<p>The basic inference method of a neuropod looks like this:</p>
+<div class="codehilite"><pre><span></span><span class="n">std</span><span class="o">::</span><span class="n">unique_ptr</span><span class="o">&lt;</span><span class="n">NeuropodValueMap</span><span class="o">&gt;</span> <span class="n">infer</span><span class="p">(</span><span class="k">const</span> <span class="n">NeuropodValueMap</span> <span class="o">&amp;</span><span class="n">inputs</span><span class="p">);</span>
+</pre></div>
+
+<p>A <code>NeuropodValueMap</code> is just a map from <code>std::string</code> to <code>std::shared_ptr&lt;NeuropodValue&gt;</code></p>
+<p>Interacting with it is identical to interacting with a <code>std::unordered_map</code>.</p>
+<p>For example:</p>
+<div class="codehilite"><pre><span></span><span class="c1">// Get an allocator</span>
+<span class="k">auto</span> <span class="n">alloctor</span> <span class="o">=</span> <span class="n">neuropod</span><span class="p">.</span><span class="n">get_tensor_allocator</span><span class="p">();</span>
+
+<span class="c1">// Create some tensors</span>
+<span class="k">auto</span> <span class="n">x</span> <span class="o">=</span> <span class="n">allocator</span><span class="o">-&gt;</span><span class="n">randn</span><span class="o">&lt;</span><span class="kt">float</span><span class="o">&gt;</span><span class="p">({</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">});</span>
+<span class="k">auto</span> <span class="n">y</span> <span class="o">=</span> <span class="n">allocator</span><span class="o">-&gt;</span><span class="n">ones</span><span class="o">&lt;</span><span class="kt">float</span><span class="o">&gt;</span><span class="p">({</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">});</span>
+
+<span class="c1">// Run inference</span>
+<span class="k">const</span> <span class="k">auto</span> <span class="n">output_data</span> <span class="o">=</span> <span class="n">neuropod</span><span class="p">.</span><span class="n">infer</span><span class="p">({</span>
+    <span class="p">{</span><span class="s">&quot;x&quot;</span><span class="p">,</span> <span class="n">x</span><span class="p">},</span>
+    <span class="p">{</span><span class="s">&quot;y&quot;</span><span class="p">,</span> <span class="n">y</span><span class="p">}</span>
+<span class="p">});</span>
+
+<span class="c1">// Get the outputs</span>
+<span class="k">auto</span> <span class="n">z</span> <span class="o">=</span> <span class="n">output_data</span><span class="o">-&gt;</span><span class="n">at</span><span class="p">(</span><span class="s">&quot;z&quot;</span><span class="p">)</span><span class="o">-&gt;</span><span class="n">as_typed_tensor</span><span class="o">&lt;</span><span class="kt">float</span><span class="o">&gt;</span><span class="p">();</span>
+</pre></div>
+
+<p>You can also get a subset of the model's output by providing a list of requested outputs:</p>
+<div class="codehilite"><pre><span></span><span class="n">std</span><span class="o">::</span><span class="n">unique_ptr</span><span class="o">&lt;</span><span class="n">NeuropodValueMap</span><span class="o">&gt;</span> <span class="n">infer</span><span class="p">(</span><span class="k">const</span> <span class="n">NeuropodValueMap</span> <span class="o">&amp;</span><span class="n">inputs</span><span class="p">,</span> <span class="k">const</span> <span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;</span> <span class="n">requested_outputs</span><span class="p">);</span>
+</pre></div>
+
+<p>For example, if you wanted to return a map containing only the tensor "z", you could do this:</p>
+<div class="codehilite"><pre><span></span><span class="k">const</span> <span class="k">auto</span> <span class="n">output_data</span> <span class="o">=</span> <span class="n">neuropod</span><span class="p">.</span><span class="n">infer</span><span class="p">(</span><span class="n">input_data</span><span class="p">,</span> <span class="p">{</span><span class="s">&quot;z&quot;</span><span class="p">});</span>
+</pre></div>
+
+<h2 id="serialization">Serialization<a class="headerlink" href="#serialization" title="Permanent link">&para;</a></h2>
+<p>All built-in <code>NeuropodValue</code> types are serializable. Furthermore, <code>NeuropodValueMap</code> is also serializable.</p>
+<div class="codehilite"><pre><span></span><span class="c1">// A stream to serialize to. Any ostream is allowed, but we use a</span>
+<span class="c1">// stringstream in this example</span>
+<span class="n">std</span><span class="o">::</span><span class="n">stringstream</span> <span class="n">ss</span><span class="p">;</span>
+
+<span class="n">neuropod</span><span class="o">::</span><span class="n">NeuropodValueMap</span> <span class="n">data</span> <span class="o">=</span> <span class="p">...;</span>
+<span class="n">neuropod</span><span class="o">::</span><span class="n">serialize</span><span class="p">(</span><span class="n">my_stream</span><span class="p">,</span> <span class="n">data</span><span class="p">);</span>
+</pre></div>
+
+<p>Similarly, deserializing is just as easy.</p>
+<div class="codehilite"><pre><span></span><span class="k">auto</span> <span class="n">deserialized</span> <span class="o">=</span> <span class="n">neuropod</span><span class="o">::</span><span class="n">deserialize</span><span class="o">&lt;</span><span class="n">neuropod</span><span class="o">::</span><span class="n">NeuropodValueMap</span><span class="o">&gt;</span><span class="p">(</span><span class="n">ss</span><span class="p">,</span> <span class="n">allocator</span><span class="p">);</span>
+</pre></div>
+
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Serialization and deserialization works across Python and C++. See the Python bindings docs for more</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>The goal for this API is to support transient serialization. There are no guarantees about backwards compatibility so this API should not be used for long term storage of data</p>
+</div>
+                
+                  
+                
+                
+              
+              
+                
+
+
+              
+            </article>
+          </div>
+        </div>
+      </main>
+      
+        
+<footer class="md-footer">
+  
+    <div class="md-footer-nav">
+      <nav class="md-footer-nav__inner md-grid">
+        
+          <a href="../pyguide/" title="Python Guide" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+            <div class="md-flex__cell md-flex__cell--shrink">
+              <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
+            </div>
+            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
+              <span class="md-flex__ellipsis">
+                <span class="md-footer-nav__direction">
+                  Previous
+                </span>
+                Python Guide
+              </span>
+            </div>
+          </a>
+        
+        
+          <a href="../advanced/efficient_tensor_creation/" title="Efficient Tensor Creation" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
+            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
+              <span class="md-flex__ellipsis">
+                <span class="md-footer-nav__direction">
+                  Next
+                </span>
+                Efficient Tensor Creation
+              </span>
+            </div>
+            <div class="md-flex__cell md-flex__cell--shrink">
+              <i class="md-icon md-icon--arrow-forward md-footer-nav__button"></i>
+            </div>
+          </a>
+        
+      </nav>
+    </div>
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-footer-copyright">
+        
+        powered by
+        <a href="https://www.mkdocs.org">MkDocs</a>
+        and
+        <a href="https://squidfunk.github.io/mkdocs-material/">
+          Material for MkDocs</a>
+      </div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    
+      <script src="../assets/javascripts/application.808e90bb.js"></script>
+      
+      <script>app.initialize({version:"1.0.4",url:{base:".."}})</script>
+      
+        <script src="https://unpkg.com/mermaid@7.1.2/dist/mermaid.min.js"></script>
+      
+    
+  </body>
+</html>
