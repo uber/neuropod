@@ -1,0 +1,17 @@
+[build]
+    # Publish the site directory
+    publish = "site/"
+
+    # Command to build the version of the site that's deployed
+    command = "./tools/build.sh"
+
+# Version specific 404 rewrite
+[[redirects]]
+    from = "/docs/:version/*"
+    to = "/docs/:version/404.html"
+    status = 404
+
+# Redirect any other 404s to stable docs
+[[redirects]]
+    from = "/*"
+    to = "/docs/stable/:splat"
