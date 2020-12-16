@@ -78,6 +78,10 @@ def get_release_id(tag_name):
     print("Release ID: {}".format(release_id))
     return release_id
 
+def get_repo_info():
+    # https://api.github.com/repos/uber/neuropod
+    return requests.get('https://api.github.com/repos/uber/neuropod').json()
+
 def upload_package(local_path, release_id, asset_filename, content_type="application/gzip"):
     # POST https://uploads.github.com/repos/uber/neuropod/releases/{release_id}/assets?name={asset_filename}
     print("Uploading {}...".format(asset_filename))
@@ -97,6 +101,10 @@ def upload_package(local_path, release_id, asset_filename, content_type="applica
 
 
 if __name__ == '__main__':
+    if os.getenv("CI") is not None:
+        # Make a request to the github API to ensure we can (this helps catch failures like old SSL libs)
+        get_repo_info()
+
     if not GIT_TAG or not GH_UPLOAD_TOKEN:
         # Don't upload if we don't have a tag or token
         pass
