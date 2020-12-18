@@ -17,8 +17,13 @@ if [[ $(uname -s) == 'Darwin' ]]; then
         wget https://www.python.org/ftp/python/2.7.18/python-2.7.18-macosx10.9.pkg &> /dev/null
         sudo installer -pkg python-2.7.18-macosx10.9.pkg -target /
     elif [[ "${NEUROPOD_PYTHON_VERSION}" == "3.5" ]]; then
-        wget https://www.python.org/ftp/python/3.5.4/python-3.5.4-macosx10.6.pkg &> /dev/null
-        sudo installer -pkg python-3.5.4-macosx10.6.pkg -target /
+        # SSL is broken on the official python 3.5 release (and python 3.5 is deprecated)
+        # so we need to install it a different way
+        export MACOSX_DEPLOYMENT_TARGET="${MACOSX_DEPLOYMENT_TARGET:-10.15}"
+        brew install pyenv
+        pyenv install 3.5.4
+        pyenv global 3.5.4
+        eval "$(pyenv init -)"
     elif [[ "${NEUROPOD_PYTHON_VERSION}" == "3.6" ]]; then
         wget https://www.python.org/ftp/python/3.6.8/python-3.6.8-macosx10.9.pkg &> /dev/null
         sudo installer -pkg python-3.6.8-macosx10.9.pkg -target /
