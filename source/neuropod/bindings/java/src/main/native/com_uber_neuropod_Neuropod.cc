@@ -40,6 +40,11 @@ namespace
 jobject toJavaTensorSpecList(JNIEnv *env, const std::vector<neuropod::TensorSpec> &specs)
 {
     jobject ret = env->NewObject(java_util_ArrayList, java_util_ArrayList_, specs.size());
+    if (!ret || env->ExceptionCheck())
+    {
+        throw std::runtime_error("NewObject failed: cannot create ArrayList");
+    }
+
     for (const auto &tensorSpec : specs)
     {
         auto    type = get_tensor_type_field(env, tensor_type_to_string(tensorSpec.type));
@@ -47,7 +52,7 @@ jobject toJavaTensorSpecList(JNIEnv *env, const std::vector<neuropod::TensorSpec
         jobject dims = env->NewObject(java_util_ArrayList, java_util_ArrayList_, tensorSpec.dims.size());
         for (const auto &dim : tensorSpec.dims)
         {
-            // Dim is symbol
+            // Neuropod uses "reserved" number for symbolic Dim.
             if (dim.value == -2)
             {
                 jstring symbol = env->NewStringUTF(dim.symbol.c_str());
@@ -85,11 +90,12 @@ JNIEXPORT jlong JNICALL Java_com_uber_neuropod_Neuropod_nativeNew__Ljava_lang_St
 {
     try
     {
-        neuropod::RuntimeOptions opts;
-        if (optHandle != 0)
+        if (optHandle == 0 || env->ExceptionCheck())
         {
-            opts = *reinterpret_cast<neuropod::RuntimeOptions *>(optHandle);
+            throw std::runtime_error("illegal state: invalid handle");
         }
+        neuropod::RuntimeOptions opts;
+        opts                              = *reinterpret_cast<neuropod::RuntimeOptions *>(optHandle);
         auto                convertedPath = to_string(env, path);
         neuropod::Neuropod *ret           = new neuropod::Neuropod(convertedPath, opts);
         return reinterpret_cast<jlong>(ret);
@@ -251,9 +257,9 @@ JNIEXPORT jobject JNICALL Java_com_uber_neuropod_Neuropod_nativeInfer(
                 to_string(env, static_cast<jstring>(env->CallObjectMethod(entry, java_util_Map_Entry_getKey)));
             jobject value        = env->CallObjectMethod(entry, java_util_Map_Entry_getValue);
             jlong   tensorHandle = env->CallLongMethod(value, com_uber_neuropod_NeuropodTensor_getHandle);
-            if (tensorHandle == 0)
+            if (tensorHandle == 0 || env->ExceptionCheck())
             {
-                throw std::runtime_error("unexpected NULL tensor handle");
+                throw std::runtime_error("invalid tensor handle");
             }
             nativeMap.insert(
                 std::make_pair(key, *reinterpret_cast<std::shared_ptr<neuropod::NeuropodValue> *>(tensorHandle)));
@@ -266,11 +272,22 @@ JNIEXPORT jobject JNICALL Java_com_uber_neuropod_Neuropod_nativeInfer(
 
         // Put data to Java Map
         auto ret = env->NewObject(java_util_HashMap, java_util_HashMap_);
+        if (!ret || env->ExceptionCheck())
+        {
+            throw std::runtime_error("NewObject failed: cannot create HashMap");
+        }
+
         for (auto &entry : *inferredMap)
         {
             jobject javaTensor = env->NewObject(com_uber_neuropod_NeuropodTensor,
                                                 com_uber_neuropod_NeuropodTensor_,
                                                 reinterpret_cast<jlong>(toHeap(entry.second)));
+
+            if (!javaTensor || env->ExceptionCheck())
+            {
+                throw std::runtime_error("NewObject failed: cannot create Tensor");
+            }
+
             env->CallObjectMethod(ret, java_util_HashMap_put, env->NewStringUTF(entry.first.c_str()), javaTensor);
             env->DeleteLocalRef(javaTensor);
         }

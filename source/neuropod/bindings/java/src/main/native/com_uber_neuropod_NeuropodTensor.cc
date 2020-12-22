@@ -78,13 +78,13 @@ JNIEXPORT jlongArray JNICALL Java_com_uber_neuropod_NeuropodTensor_nativeGetDims
     {
         auto       tensor = (*reinterpret_cast<std::shared_ptr<neuropod::NeuropodValue> *>(handle))->as_tensor();
         auto       dims   = tensor->as_tensor()->get_dims();
-        jlongArray result = env->NewLongArray(dims.size());
-        if (!result)
+        jlongArray ret    = env->NewLongArray(dims.size());
+        if (!ret || env->ExceptionCheck())
         {
-            throw std::runtime_error("out of memory");
+            throw std::runtime_error("NewLongArray failed: cannot allocate long array");
         }
-        env->SetLongArrayRegion(result, 0, dims.size(), reinterpret_cast<jlong *>(dims.data()));
-        return result;
+        env->SetLongArrayRegion(ret, 0, dims.size(), reinterpret_cast<jlong *>(dims.data()));
+        return ret;
     }
     catch (const std::exception &e)
     {
@@ -137,9 +137,9 @@ JNIEXPORT jobject JNICALL Java_com_uber_neuropod_NeuropodTensor_nativeToStringLi
                                 ->as_typed_tensor<std::string>();
         auto    size = stringTensor->get_num_elements();
         jobject ret  = env->NewObject(java_util_ArrayList, java_util_ArrayList_, size);
-        if (!ret)
+        if (!ret || env->ExceptionCheck())
         {
-            throw std::runtime_error("out of memory: cannot create ArrayList");
+            throw std::runtime_error("NewObject failed: cannot create ArrayList");
         }
 
         auto flatAccessor = stringTensor->flat();
