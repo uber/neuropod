@@ -26,7 +26,7 @@ limitations under the License.
 
 #include <jni.h>
 
-using namespace neuropod::jni;
+namespace njni = neuropod::jni;
 
 // NOLINTNEXTLINE(readability-identifier-naming): Ignore function case for Java API methods
 JNIEXPORT void JNICALL Java_com_uber_neuropod_NeuropodTensorAllocator_nativeDelete(JNIEnv *env,
@@ -42,7 +42,7 @@ JNIEXPORT void JNICALL Java_com_uber_neuropod_NeuropodTensorAllocator_nativeDele
     }
     catch (const std::exception &e)
     {
-        neuropod::jni::throw_java_exception(env, e.what());
+        njni::throw_java_exception(env, e.what());
     }
 }
 
@@ -89,11 +89,11 @@ JNIEXPORT jlong JNICALL Java_com_uber_neuropod_NeuropodTensorAllocator_nativeAll
         default:
             throw std::runtime_error("unsupported tensor type");
         }
-        return reinterpret_cast<jlong>(toHeap(tensor));
+        return reinterpret_cast<jlong>(njni::toHeap(tensor));
     }
     catch (const std::exception &e)
     {
-        throw_java_exception(env, e.what());
+        njni::throw_java_exception(env, e.what());
     }
     return reinterpret_cast<jlong>(nullptr);
 }
@@ -112,20 +112,20 @@ JNIEXPORT jlong JNICALL Java_com_uber_neuropod_NeuropodTensorAllocator_nativeCre
         env->ReleaseLongArrayElements(dims, arr, JNI_ABORT);
 
         auto  stringTensor = allocator->allocate_tensor<std::string>(shapes);
-        jsize size         = env->CallIntMethod(data, java_util_ArrayList_size);
+        jsize size         = env->CallIntMethod(data, njni::java_util_ArrayList_size);
         auto  flatAccessor = stringTensor->flat();
         for (jsize i = 0; i < size; ++i)
         {
-            jstring element = static_cast<jstring>(env->CallObjectMethod(data, java_util_ArrayList_get, i));
-            flatAccessor[i] = to_string(env, element);
+            jstring element = static_cast<jstring>(env->CallObjectMethod(data, njni::java_util_ArrayList_get, i));
+            flatAccessor[i] = njni::to_string(env, element);
             env->DeleteLocalRef(element);
         }
 
-        return reinterpret_cast<jlong>(toHeap(stringTensor));
+        return reinterpret_cast<jlong>(njni::toHeap(stringTensor));
     }
     catch (const std::exception &e)
     {
-        throw_java_exception(env, e.what());
+        njni::throw_java_exception(env, e.what());
     }
     return reinterpret_cast<jlong>(nullptr);
 }
