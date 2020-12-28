@@ -388,6 +388,13 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#platform_version_semver" class="md-nav__link">
+    platform_version_semver
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#input_spec" class="md-nav__link">
     input_spec
   </a>
@@ -630,6 +637,13 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#platform_version_semver" class="md-nav__link">
+    platform_version_semver
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#input_spec" class="md-nav__link">
     input_spec
   </a>
@@ -729,6 +743,7 @@
 <span class="err">    sess,</span>
 <span class="err">    model,</span>
 <span class="err">    node_name_mapping = None,</span>
+<span class="err">    platform_version_semver = *,</span>
 <span class="err">    input_spec = None,</span>
 <span class="err">    output_spec = None,</span>
 <span class="err">    input_tensor_device = None,</span>
@@ -761,6 +776,21 @@
 </pre></div></p>
 </div>
 <p>Defaults to using Keras input/output names as neuropod input/output names.</p>
+<h4 id="platform_version_semver">platform_version_semver<a class="headerlink" href="#platform_version_semver" title="Permanent link">&para;</a></h4>
+<p><em>default: <code>*</code></em></p>
+<p>The versions of the platform (e.g. Torch, TensorFlow, etc)
+that this model is compatible with specified as semver range.
+See https://semver.org/, https://docs.npmjs.com/misc/semver#ranges
+or https://docs.npmjs.com/misc/semver#advanced-range-syntax for
+examples and more info. Default is <code>*</code> (any version is okay).</p>
+<p>When this model is loaded, Neuropod will load it with a backend
+that is compatible with the specified versions ranges or throw an
+error if no compatible backends are installed. This can be used to
+ensure a model always runs with a particular version of a framework.</p>
+<div class="admonition note">
+<p><strong><em>Example</em></strong>:
+<code>1.13.1</code> or <code>&gt; 1.13.1</code> or <code>1.4.0 - 1.6.0</code></p>
+</div>
 <h4 id="input_spec">input_spec<a class="headerlink" href="#input_spec" title="Permanent link">&para;</a></h4>
 <p><em>default: <code>None</code></em></p>
 <p>A list of dicts specifying the input to the model. For each input, if shape
