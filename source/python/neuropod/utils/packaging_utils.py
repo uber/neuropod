@@ -60,6 +60,21 @@ COMMON_DOC_PRE = """
 """
 
 COMMON_DOC_POST = """
+    :param  platform_version_semver:    The versions of the platform (e.g. Torch, TensorFlow, etc)
+                                        that this model is compatible with specified as semver range.
+                                        See https://semver.org/, https://docs.npmjs.com/misc/semver#ranges
+                                        or https://docs.npmjs.com/misc/semver#advanced-range-syntax for
+                                        examples and more info. Default is `*` (any version is okay).
+
+                                        When this model is loaded, Neuropod will load it with a backend
+                                        that is compatible with the specified versions ranges or throw an
+                                        error if no compatible backends are installed. This can be used to
+                                        ensure a model always runs with a particular version of a framework.
+
+                                        !!! note ""
+                                            ***Example***:
+                                            `1.13.1` or `> 1.13.1` or `1.4.0 - 1.6.0`
+
     :param  input_spec:         A list of dicts specifying the input to the model. For each input, if shape
                                 is set to `None`, no validation is done on the shape. If shape is a tuple, the
                                 dimensions of the input are validated against that tuple.  A value of
