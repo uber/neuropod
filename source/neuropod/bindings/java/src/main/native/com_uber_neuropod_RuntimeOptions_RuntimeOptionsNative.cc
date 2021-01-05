@@ -23,9 +23,7 @@ limitations under the License.
 
 #include <jni.h>
 
-// TODO(vkuzmin): fix this
-// NOLINTNEXTLINE(google-build-using-namespace)
-using namespace neuropod::jni;
+namespace njni = neuropod::jni;
 
 JNIEXPORT jlong JNICALL
 // NOLINTNEXTLINE(readability-identifier-naming): Ignore function case for Java API methods
@@ -40,7 +38,7 @@ Java_com_uber_neuropod_RuntimeOptions_00024RuntimeOptionsNative_nativeCreate(JNI
 {
     try
     {
-        std::string controlQueueName              = to_string(env, jControlQueueName);
+        std::string controlQueueName              = njni::to_string(env, jControlQueueName);
         auto        opts                          = new neuropod::RuntimeOptions();
         opts->use_ope                             = (useOpe == JNI_TRUE);
         opts->ope_options.free_memory_every_cycle = (freeMemoryEveryCycle == JNI_TRUE);
@@ -52,7 +50,7 @@ Java_com_uber_neuropod_RuntimeOptions_00024RuntimeOptionsNative_nativeCreate(JNI
     }
     catch (const std::exception &e)
     {
-        throw_java_exception(env, e.what());
+        njni::throw_java_exception(env, e.what());
     }
     return reinterpret_cast<jlong>(nullptr);
 }
@@ -67,6 +65,6 @@ JNIEXPORT void JNICALL Java_com_uber_neuropod_RuntimeOptions_00024RuntimeOptions
     }
     catch (const std::exception &e)
     {
-        throw_java_exception(env, e.what());
+        njni::throw_java_exception(env, e.what());
     }
 }
