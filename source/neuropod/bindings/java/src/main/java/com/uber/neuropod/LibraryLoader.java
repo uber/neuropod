@@ -53,12 +53,6 @@ final class LibraryLoader {
     private static final List<String> EMBEDDED_LIB_NAMES = Arrays.asList("libneuropod.so");
     private static final List<String> BIN_NAMES = Arrays.asList("neuropod_multiprocess_worker");
 
-    private static final String NEUROPOD_BASE_DIR_ENV_VAR = "NEUROPOD_BASE_DIR";
-    private static final String NEUROPOD_BASE_DIR_DEFAULT = "/usr/local/neuropod";
-    private static final String TENSORFLOW_BACKEND = "neuropod_tensorflow_backend.tar.gz";
-    private static final String TORCHSCRIPT_BACKEND = "neuropod_torchscript_backend.tar.gz";
-    private static final List<String> EMBEDDED_BACKEND_PACKAGES_NAMES = Arrays.asList(TENSORFLOW_BACKEND, TORCHSCRIPT_BACKEND);
-
     // System.loadLibrary can autocompele the libname.
     private static final String JNI_NAME = "neuropod_jni";
     private static final int BUFFER_SIZE = 1 << 20;
@@ -129,27 +123,6 @@ final class LibraryLoader {
                 }
             }
 
-            // Resources may have backend packages (optional) that should e extracted and installed then.
-            // If NEUROPOD_BASE_DIR is set, use this path to install backends.
-            // Note that packages are tar.gz files that has "neuropod standard" directory structure, for instance:
-            // 0.2.0/backends/tensorflow_1.15.0/
-            // 0.2.0/backends/torchscript_1.4.0/
-            // "register backends" looks at NEUROPOD_BASE_DIR and register backends by type and version.
-            // Note: NEUROPOD_BASE_DIR may already have other backends that will be registered also.
-            // When Neuropod model is loaded, backend that has best match is used. It means that embedded backends
-            // that are installed here are not necessaraly best match and may not used at all.
-            String neuropodBaseDir = System.getenv(NEUROPOD_BASE_DIR_ENV_VAR);
-            if (neuropodBaseDir == null) {
-                neuropodBaseDir = NEUROPOD_BASE_DIR_DEFAULT;
-            }
-            for (String libName : EMBEDDED_BACKEND_PACKAGES_NAMES) {
-                File embeddedPackageFile = extractFile(libAbsPath, resPath, libName);
-                if (embeddedPackageFile != null) {
-                    LOGGER.log(Level.INFO, "Extracted embedded package file {0}", embeddedPackageFile);
-                    installFramework(libAbsPath, embeddedPackageFile.getName(), neuropodBaseDir);
-                }
-            }
-
             File libFile = extractFile(libAbsPath, resPath, System.mapLibraryName(JNI_NAME));
             if (libFile != null) {
                 System.load(libFile.getCanonicalPath());
@@ -157,29 +130,6 @@ final class LibraryLoader {
 
             nativeExport(libAbsPath);
         } catch (IOException e) {
-            LOGGER.log(Level.WARNING, e.getMessage());
-            return false;
-        }
-        return true;
-    }
-
-    private static boolean installFramework(String libAbsPath, String frameworkPackage, String neuropodBaseDir) {
-        return startShellCommand(String.format("tar -xf %s/%s -C %s", libAbsPath, frameworkPackage, neuropodBaseDir));
-    }
-
-    private static boolean startShellCommand(String cmd) {
-        LOGGER.log(Level.INFO, "Command: {0}", cmd);
-        try {
-            ProcessBuilder builder = new ProcessBuilder();
-            builder.command("sh", "-c", cmd);
-            builder.directory(new File(System.getProperty("user.home")));
-            Process process = builder.start();
-            int exitCode = process.waitFor();
-            LOGGER.log(Level.INFO, "Exit code {0}", exitCode);
-        } catch (IOException e) {
-            LOGGER.log(Level.WARNING, e.getMessage());
-            return false;
-        } catch(InterruptedException e) {
             LOGGER.log(Level.WARNING, e.getMessage());
             return false;
         }

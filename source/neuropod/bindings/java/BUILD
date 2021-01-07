@@ -111,8 +111,6 @@ jar -xf ../$(location :neuropod_java_tmp.jar)
 jni_path="./com/uber/neuropod/native/darwin-x86_64"
 mkdir -p $$jni_path
 mv libneuropod_jni.dylib libneuropod.so neuropod_multiprocess_worker $$jni_path
-mv neuropod_tensorflow_backend.tar.gz $$jni_path
-mv neuropod_torchscript_backend.tar.gz $$jni_path
 cd ..
 jar cf $@ -C tmp/ .  # Creates the new jar file.
 """,
@@ -123,8 +121,6 @@ jar -xf ../$(location :neuropod_java_tmp.jar)
 jni_path="./com/uber/neuropod/native/linux-x86_64"
 mkdir -p $$jni_path
 mv libneuropod_jni.so libneuropod.so neuropod_multiprocess_worker $$jni_path
-mv neuropod_tensorflow_backend.tar.gz $$jni_path
-mv neuropod_torchscript_backend.tar.gz $$jni_path
 cd ..
 jar cf $@ -C tmp/ .  # Creates the new jar file.
 """,
