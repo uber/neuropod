@@ -45,15 +45,12 @@ filegroup(
     ],
 )
 
-# This genrule copies to a dylib and changes the libneuropod.so dependency path
+# This genrule copies the so to a file with a dylib extension
 genrule(
     name = "copy_to_dylib",
     srcs = [":libneuropod_jni.so"],
     outs = ["libneuropod_jni.dylib"],
-    cmd = select({
-        "@bazel_tools//src/conditions:darwin": "cp -f $< $@; chmod 755 $@; install_name_tool -change \"$$(otool -L $@ | grep libneuropod.so | cut -d ' ' -f1 | column -t)\" \"@rpath/libneuropod.so\" \"$@\"",
-        "//conditions:default": "cp -f $< $@",
-    }),
+    cmd = "cp -f $< $@",
 )
 
 filegroup(

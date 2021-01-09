@@ -15,17 +15,6 @@ cp bazel-bin/neuropod/bindings/neuropod_native.so python/neuropod/
 cp bazel-bin/neuropod/libneuropod.so python/neuropod/
 cp bazel-bin/neuropod/multiprocess/neuropod_multiprocess_worker python/neuropod/
 
-if [[ $(uname -s) == 'Darwin' ]]; then
-    # Postprocessing needed on mac
-    chmod 755 "python/neuropod/libneuropod.so"
-    for FILE in "python/neuropod/neuropod_native.so" "python/neuropod/neuropod_multiprocess_worker"
-    do
-        chmod 755 $FILE
-        OLD_PATH=$(otool -L ${FILE} | grep libneuropod.so | cut -d ' ' -f1 | column -t)
-        install_name_tool -change "${OLD_PATH}" "@rpath/libneuropod.so" "${FILE}"
-    done
-fi
-
 # Build a wheel
 pushd python
 if [[ $(uname -s) == 'Darwin' ]]; then
