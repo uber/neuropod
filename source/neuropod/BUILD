@@ -40,18 +40,29 @@ cc_library(
 )
 
 cc_binary(
-    name = "libneuropod.so",
+    name = "libneuropod_orig.so",
     linkopts = select({
         "@bazel_tools//src/conditions:darwin": ["-Wl,-rpath,@loader_path"],
         "//conditions:default": ["-Wl,-rpath,$$ORIGIN"],
     }),
     linkshared = True,
     linkstatic = True,
-    visibility = [
-        "//visibility:public",
-    ],
     deps = [
         ":neuropod_impl",
+    ],
+)
+
+# This genrule changes the dylib id for libneuropod.so on mac
+genrule(
+    name = "change_dylib_id",
+    srcs = [":libneuropod_orig.so"],
+    outs = ["libneuropod.so"],
+    cmd = select({
+        "@bazel_tools//src/conditions:darwin": "cp -f $< $@; chmod 755 $@; install_name_tool -id @rpath/libneuropod.so $@",
+        "//conditions:default": "cp -f $< $@",
+    }),
+    visibility = [
+        "//visibility:public",
     ],
 )
 
