@@ -23,6 +23,8 @@ import java.io.BufferedOutputStream;
 import java.io.FileOutputStream;
 import java.net.URL;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
@@ -54,7 +56,7 @@ final class LibraryLoader {
     private static final List<String> BIN_NAMES = Arrays.asList("neuropod_multiprocess_worker");
 
     private static final String NEUROPOD_BASE_DIR_ENV_VAR = "NEUROPOD_BASE_DIR";
-    private static final String NEUROPOD_BASE_DIR_DEFAULT = "/usr/local/neuropod";
+    private static final String NEUROPOD_BASE_SUBDIR = "neuropod_jni_backends";
     private static final String TENSORFLOW_BACKEND = "neuropod_tensorflow_backend.tar.gz";
     private static final String TORCHSCRIPT_BACKEND = "neuropod_torchscript_backend.tar.gz";
     private static final List<String> EMBEDDED_BACKEND_PACKAGES_NAMES = Arrays.asList(TENSORFLOW_BACKEND, TORCHSCRIPT_BACKEND);
@@ -108,9 +110,9 @@ final class LibraryLoader {
             throw new NeuropodJNIException("unsupported OS");
         }
         try {
-            final File tempPath = Files.createTempDirectory(TEMP_DIRECTORY_NAME).toFile();
-            tempPath.deleteOnExit();
-            String libAbsPath = tempPath.getCanonicalPath();
+            final Path tempPath = Files.createTempDirectory(TEMP_DIRECTORY_NAME).toAbsolutePath();
+            tempPath.toFile().deleteOnExit();
+            String libAbsPath = tempPath.toString();
             String resPath = makeResourcePath();
 
             for (String libName : EMBEDDED_LIB_NAMES) {
@@ -129,33 +131,55 @@ final class LibraryLoader {
                 }
             }
 
-            // Resources may have backend packages (optional) that should e extracted and installed then.
-            // If NEUROPOD_BASE_DIR is set, use this path to install backends.
-            // Note that packages are tar.gz files that has "neuropod standard" directory structure, for instance:
-            // 0.2.0/backends/tensorflow_1.15.0/
-            // 0.2.0/backends/torchscript_1.4.0/
-            // "register backends" looks at NEUROPOD_BASE_DIR and register backends by type and version.
-            // Note: NEUROPOD_BASE_DIR may already have other backends that will be registered also.
-            // When Neuropod model is loaded, backend that has best match is used. It means that embedded backends
-            // that are installed here are not necessaraly best match and may not used at all.
-            String neuropodBaseDir = System.getenv(NEUROPOD_BASE_DIR_ENV_VAR);
-            if (neuropodBaseDir == null) {
-                neuropodBaseDir = NEUROPOD_BASE_DIR_DEFAULT;
-            }
-            for (String libName : EMBEDDED_BACKEND_PACKAGES_NAMES) {
-                File embeddedPackageFile = extractFile(libAbsPath, resPath, libName);
-                if (embeddedPackageFile != null) {
-                    LOGGER.log(Level.INFO, "Extracted embedded package file {0}", embeddedPackageFile);
-                    installFramework(libAbsPath, embeddedPackageFile.getName(), neuropodBaseDir);
-                }
-            }
-
             File libFile = extractFile(libAbsPath, resPath, System.mapLibraryName(JNI_NAME));
             if (libFile != null) {
                 System.load(libFile.getCanonicalPath());
             }
 
             nativeExport(libAbsPath);
+
+            // Native Neuropod Core is using environment variable NEUROPOD_BASE_DIR if it is set,
+            // to register neuropod backends.
+            // otherwise it uses path to system local libraries (/usr/local/lib/neuropod).
+
+            // Resources of this package may have embedded backend packages packed as tar (optional).
+            // Neuropod Java API library uses strategy that uses setup of existing "neuropod" environments
+            // and allows fat jar to configure "non-neuropod" environment.
+            // Existing "neuropod" system is detected by envvar NEUROPOD_BASE_DIR that should have a path
+            // to pre-installed neuropod backends.
+
+            String neuropodBaseDir = System.getenv(NEUROPOD_BASE_DIR_ENV_VAR);
+            if (neuropodBaseDir != null) {
+                return true;
+            }
+
+            // If NEUROPOD_BASE_DIR is not set and Jar has backend packages, unpack and install it to
+            // temp directory and set NEUROPOD_BASE_DIR that Neuropod Core register these backends.
+            // Note that packages are tar.gz files that has "neuropod standard" directory structure, for instance:
+            // 0.2.0/backends/tensorflow_1.15.0/
+            // 0.2.0/backends/torchscript_1.4.0/
+            // "register backends" looks at NEUROPOD_BASE_DIR and register backends by type and version.
+            neuropodBaseDir = tempPath.resolve(NEUROPOD_BASE_SUBDIR).toString();
+
+            final Path neuropodBasePath = Paths.get(neuropodBaseDir);
+            LOGGER.log(Level.INFO, "Create temp neuropod base directory {0}", neuropodBasePath);
+            Path directories = Files.createDirectories(neuropodBasePath.toAbsolutePath());
+
+            boolean extracted = false;
+            for (String libName : EMBEDDED_BACKEND_PACKAGES_NAMES) {
+                File embeddedPackageFile = extractFile(libAbsPath, resPath, libName);
+                if (embeddedPackageFile != null) {
+                    extracted = true;
+                    LOGGER.log(Level.INFO, "Extracted embedded package file {0}", embeddedPackageFile);
+                    installFramework(libAbsPath, embeddedPackageFile.getName(), neuropodBaseDir);
+                }
+            }
+
+            if (extracted) {
+                LOGGER.log(Level.INFO, "Set NEUROPOD_BASE_DIR={0}", neuropodBaseDir);
+                long res = nativeSetEnv(NEUROPOD_BASE_DIR_ENV_VAR, neuropodBaseDir);
+            }
+
         } catch (IOException e) {
             LOGGER.log(Level.WARNING, e.getMessage());
             return false;
@@ -237,4 +261,6 @@ final class LibraryLoader {
     private static native boolean nativeIsLoaded();
 
     private static native void nativeExport(String path);
+
+    private static native long nativeSetEnv(String name, String value);
 }

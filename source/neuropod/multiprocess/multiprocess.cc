@@ -63,6 +63,13 @@ std::unordered_map<std::string, std::string> get_env_map()
         env[key] = val;
     }
 
+    // Base directory for Neuropod backends
+    if (auto base_dir = std::getenv("NEUROPOD_BASE_DIR"))
+    {
+        env["NEUROPOD_BASE_DIR"] = base_dir;
+        SPDLOG_TRACE("set NEUROPOD_BASE_DIR={}", base_dir);
+    }
+
     return env;
 }
 

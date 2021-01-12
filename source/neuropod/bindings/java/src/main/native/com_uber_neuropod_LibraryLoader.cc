@@ -36,3 +36,12 @@ JNIEXPORT void JNICALL Java_com_uber_neuropod_LibraryLoader_nativeExport(JNIEnv 
     std::string oriPath = getenv("PATH");
     setenv("PATH", (oriPath + ":" + neuropod::jni::to_string(env, libPath)).c_str(), 1 /* Overwrite */);
 }
+
+// NOLINTNEXTLINE(readability-identifier-naming): Ignore function case for Java API methods
+JNIEXPORT jlong JNICALL Java_com_uber_neuropod_LibraryLoader_nativeSetEnv(JNIEnv *env,
+                                                                         jclass /*unused*/,
+                                                                         jstring name,
+                                                                         jstring value)
+{
+    return setenv(neuropod::jni::to_string(env, name).c_str(), neuropod::jni::to_string(env, value).c_str(), 1 /* Overwrite */);
+}
