@@ -61,6 +61,30 @@ py::dict infer(Neuropod &neuropod, py::dict &inputs_dict)
     return to_numpy_dict(*outputs);
 }
 
+py::object infer_async(Neuropod &neuropod, py::dict &inputs_dict)
+{
+    // Convert from a py::dict of numpy arrays to an unordered_map of `NeuropodTensor`s
+    auto             allocator = neuropod.get_tensor_allocator();
+    NeuropodValueMap inputs    = from_numpy_dict(*allocator, inputs_dict);
+
+    // Run inference
+    auto outputs = neuropod.infer(inputs);
+
+    // Convert the outputs to a python dict of numpy arrays
+    auto result = to_numpy_dict(*outputs);
+
+    // Get the event loop and create a future
+    // (note can't use get_running_loop because this isn't a coroutine)
+    py::object loop = py::module::import("asyncio").attr("get_event_loop")();
+    py::object f    = loop.attr("create_future")();
+
+    // Set the result
+    // This can be called from another thread (still need to keep track of the GIL)
+    loop.attr("call_soon_threadsafe")(f.attr("set_result"), result);
+
+    return f;
+}
+
 py::array deserialize_tensor_binding(py::bytes buffer)
 {
     // Deserialize to a NeuropodTensor
@@ -157,6 +181,7 @@ PYBIND11_MODULE(neuropod_native, m)
                          const std::vector<BackendLoadSpec> &default_backend_overrides,
                          py::kwargs kwargs) { return make_neuropod(kwargs, path, default_backend_overrides); }))
         .def("infer", &infer)
+        .def("infer_async", &infer_async)
         .def("get_inputs", &Neuropod::get_inputs)
         .def("get_outputs", &Neuropod::get_outputs)
         .def("get_name", &Neuropod::get_name)

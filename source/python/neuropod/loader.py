@@ -130,6 +130,29 @@ class NativeNeuropodExecutor:
         inputs = maybe_convert_bindings_types(inputs)
         return self.model.infer(inputs)
 
+    def infer_async(self, inputs):
+        """
+        Run inference in an asyncio compatible way.
+
+        Callers should ensure they limit the number of in-flight requests to avoid memory
+        growth (e.g. by using asyncio.Semaphore)
+
+        Note: this method currently blocks the current python thread. This will change
+        in the future
+
+        :param  inputs:     A dict mapping input names to values. This must match the input
+                            spec in the neuropod config for the loaded model.
+                            Ex: {'x1': np.array([5]), 'x2': np.array([6])}
+                            *Note:* all the keys in this dict must be strings and all the
+                            values must be numpy arrays
+
+        :returns:   asyncio.Future  containing the same result type as `infer` above
+        """
+        inputs = maybe_convert_bindings_types(inputs)
+
+        # Pass the inputs to the native code and return a future
+        return self.model.infer_async(inputs)
+
     def __enter__(self):
         # Needed in order to be used as a contextmanager
         return self
