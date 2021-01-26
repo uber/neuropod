@@ -5,7 +5,7 @@ set -e
 NEUROPOD_PYTHON_BINARY="python${NEUROPOD_PYTHON_VERSION}"
 
 # Install pip
-wget https://bootstrap.pypa.io/get-pip.py -O /tmp/get-pip.py
+wget https://bootstrap.pypa.io/2.7/get-pip.py -O /tmp/get-pip.py
 ${NEUROPOD_PYTHON_BINARY} /tmp/get-pip.py
 
 # Setup a virtualenv
