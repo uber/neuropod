@@ -29,7 +29,8 @@ fi
 pushd source
 
 # Run clang-format
-python /tmp/run-clang-format.py -r .
+# Note: this assumes the script is being run from the root of the repo
+python /tmp/run-clang-format.py --clang-format-executable bazel-source/external/llvm_toolchain/bin/clang-format -r .
 
 pushd python
 

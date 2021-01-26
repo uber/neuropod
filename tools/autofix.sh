@@ -14,7 +14,8 @@ fi
 pushd source
 
 # Reformat with clang-format
-find . -name "*.hh" -o -name "*.h" -o -name "*.cc" -o -name "*.c" | xargs -L1 clang-format -style=file -i
+# Note: this assumes the script is being run from the root of the repo
+find . -name "*.hh" -o -name "*.h" -o -name "*.cc" -o -name "*.c" | xargs -L1 bazel-source/external/llvm_toolchain/bin/clang-format -style=file -i
 
 pushd python
 
