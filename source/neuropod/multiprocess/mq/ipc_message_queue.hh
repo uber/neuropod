@@ -105,6 +105,9 @@ private:
     // Whether or not a shutdown is in progress
     bool shutdown_started_ = false;
 
+    // If we lost the heartbeat from the other process
+    std::atomic_bool lost_heartbeat_;
+
     // A thread that handles incoming messages
     std::thread read_worker_;
 
@@ -113,6 +116,9 @@ private:
 
     // Send a message to the other process
     void send_message(const WireFormat &msg);
+
+    // Throw an error if we lost communication with the other process
+    void throw_if_lost_heartbeat();
 
 public:
     IPCMessageQueue(const std::string &control_queue_name, ProcessType type);

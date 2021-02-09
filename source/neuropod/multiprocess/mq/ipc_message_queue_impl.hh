@@ -76,10 +76,20 @@ void IPCMessageQueue<UserPayloadType>::read_worker_loop()
         if (!successful_read)
         {
             // We timed out
-            NEUROPOD_ERROR("Timed out waiting for a response from worker process. "
-                           "Didn't receive a message in {}ms, but expected a heartbeat every {}ms.",
-                           detail::MESSAGE_TIMEOUT_MS,
-                           detail::HEARTBEAT_INTERVAL_MS);
+            SPDLOG_ERROR("Timed out waiting for a response from worker process. "
+                         "Didn't receive a message in {}ms, but expected a heartbeat every {}ms.",
+                         detail::MESSAGE_TIMEOUT_MS,
+                         detail::HEARTBEAT_INTERVAL_MS);
+
+            // Set a flag so that any pending writers know
+            lost_heartbeat_.store(true, std::memory_order_relaxed);
+
+            // Let any pending readers know
+            // (Because recv isn't threadsafe, there should only be one)
+            out_queue_.try_emplace(nullptr);
+
+            // Shutdown this thread
+            break;
         }
 
         if (received->type == detail::USER_PAYLOAD)
@@ -152,7 +162,32 @@ void IPCMessageQueue<UserPayloadType>::send_message(const WireFormat &msg)
         SPDLOG_TRACE("OPE: Sending IPC control message {}.", msg.type);
     }
 
-    send_queue_->send(&msg, sizeof(msg), 0);
+    // Send w/ timeout + heartbeat check
+    while (true)
+    {
+        auto timeout_at = boost::interprocess::microsec_clock::universal_time() +
+                          boost::posix_time::milliseconds(detail::HEARTBEAT_INTERVAL_MS);
+
+        if (send_queue_->timed_send(&msg, sizeof(msg), 0, timeout_at))
+        {
+            // Successfully sent
+            break;
+        }
+
+        // Make sure the worker process is still alive
+        throw_if_lost_heartbeat();
+    }
+}
+
+// Throw an error if we lost communication with the other process
+template <typename UserPayloadType>
+void IPCMessageQueue<UserPayloadType>::throw_if_lost_heartbeat()
+{
+    if (lost_heartbeat_.load(std::memory_order_relaxed))
+    {
+        // We lost the heartbeat so let's throw an error here (where the user can catch it)
+        NEUROPOD_ERROR("OPE lost communication with the other process. See logs for more details.");
+    }
 }
 
 template <typename UserPayloadType>
@@ -163,6 +198,7 @@ IPCMessageQueue<UserPayloadType>::IPCMessageQueue(const std::string &control_que
       recv_queue_(detail::make_recv_queue<UserPayloadType>(control_queue_name_, type)),
       heartbeat_controller_(stdx::make_unique<detail::HeartbeatController>(*this)),
       transferrable_controller_(stdx::make_unique<detail::TransferrableController>()),
+      lost_heartbeat_(false),
       read_worker_(&IPCMessageQueue<UserPayloadType>::read_worker_loop, this)
 {
 }
@@ -257,9 +293,19 @@ void IPCMessageQueue<UserPayloadType>::send_message(UserPayloadType payload_type
 template <typename UserPayloadType>
 QueueMessage<UserPayloadType> IPCMessageQueue<UserPayloadType>::recv_message()
 {
-    // Read the message
+    // Make sure the worker process is still alive
+    throw_if_lost_heartbeat();
+
+    // Read a message
     std::unique_ptr<WireFormat> out;
     out_queue_.pop(out);
+
+    if (out == nullptr)
+    {
+        // We lost communication with the other processs while we were reading
+        NEUROPOD_ERROR("OPE lost communication with the other process. See logs for more details.");
+    }
+
     SPDLOG_TRACE(
         "OPE: Received user payload of type: {} (requires done: {})", out->payload_type, out->requires_done_msg);
 
