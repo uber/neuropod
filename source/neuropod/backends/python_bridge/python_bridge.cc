@@ -109,7 +109,7 @@ std::unique_ptr<py::gil_scoped_release> maybe_initialize()
 
     const auto sodir = fs::absolute(sopath).parent_path();
 
-    // Get the path for pythonhone
+    // Get the path for pythonhome
 #ifdef __APPLE__
     const auto pythonhome = (sodir / "Python.framework/Versions/Current").string();
 #else

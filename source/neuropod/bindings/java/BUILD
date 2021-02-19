@@ -126,6 +126,39 @@ cd ..
 jar cf $@ -C tmp/ .  # Creates the new jar file.
 """,
     }),
+
+# Unpack jar file in tmp directory, move files to expected subdirectories, pack to jar file again.
+# Note it runs inside sandbox where all created files and dirs are temporarily that deleted after build.
+genrule(
+    name = "neuropod_java_jar_fat",
+    srcs = [":neuropod_java_tmp.jar"],
+    outs = ["neuropod_java_jar_fat.jar"],
+    cmd = select({
+        "@bazel_tools//src/conditions:darwin": """
+mkdir tmp
+cd tmp
+jar -xf ../$(location :neuropod_java_tmp.jar)
+jni_path="./com/uber/neuropod/native/darwin-x86_64"
+mkdir -p $$jni_path
+mv libneuropod_jni.dylib libneuropod.so neuropod_multiprocess_worker $$jni_path
+mv neuropod_tensorflow_backend.tar.gz $$jni_path
+mv neuropod_torchscript_backend.tar.gz $$jni_path
+cd ..
+jar cf $@ -C tmp/ .  # Creates the new jar file.
+""",
+        "//conditions:default": """
+mkdir tmp
+cd tmp
+jar -xf ../$(location :neuropod_java_tmp.jar)
+jni_path="./com/uber/neuropod/native/linux-x86_64"
+mkdir -p $$jni_path
+mv libneuropod_jni.so libneuropod.so neuropod_multiprocess_worker $$jni_path
+mv neuropod_tensorflow_backend.tar.gz $$jni_path
+mv neuropod_torchscript_backend.tar.gz $$jni_path
+cd ..
+jar cf $@ -C tmp/ .  # Creates the new jar file.
+""",
+    }),
 )
 
 java_binary(
