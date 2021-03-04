@@ -30,6 +30,8 @@ def compile_requirements(requirements, lockfile):
             "--no-header",
             "--no-annotate",
             "--allow-unsafe",
+            "--no-emit-index-url",
+            "--no-emit-trusted-host",
             "-q",
             "-o",
             lockfile,
