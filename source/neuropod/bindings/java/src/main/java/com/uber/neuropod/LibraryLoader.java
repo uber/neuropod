@@ -118,16 +118,16 @@ final class LibraryLoader {
             for (String libName : EMBEDDED_LIB_NAMES) {
                 File embeddedLibFile = extractFile(libAbsPath, resPath, libName);
                 if (embeddedLibFile != null) {
-                    LOGGER.log(Level.INFO, "Extracted embedded lib file {0}", embeddedLibFile);
+                    LOGGER.log(Level.INFO, String.format("Extracted embedded lib file %s", embeddedLibFile));
                 }
             }
 
             for (String binName : BIN_NAMES) {
                 File binFile = extractFile(libAbsPath, resPath, binName);
                 if (binFile != null) {
-                    LOGGER.log(Level.INFO, "Extracted bin file {0}", binFile);
+                    LOGGER.log(Level.INFO, String.format("Extracted bin file %s", binFile));
                     boolean succeeded = binFile.setExecutable(true);
-                    LOGGER.log(Level.INFO, "Set everybody's execute permission {0}", succeeded);
+                    LOGGER.log(Level.INFO, String.format("Set everybody's execute permission %s", succeeded));
                 }
             }
 
@@ -150,6 +150,7 @@ final class LibraryLoader {
 
             String neuropodBaseDir = System.getenv(NEUROPOD_BASE_DIR_ENV_VAR);
             if (neuropodBaseDir != null) {
+                LOGGER.log(Level.INFO, String.format("Found NEUROPOD_BASE_DIR=%s", neuropodBaseDir));
                 return true;
             }
 
@@ -162,7 +163,7 @@ final class LibraryLoader {
             neuropodBaseDir = tempPath.resolve(NEUROPOD_BASE_SUBDIR).toString();
 
             final Path neuropodBasePath = Paths.get(neuropodBaseDir);
-            LOGGER.log(Level.INFO, "Create temp neuropod base directory {0}", neuropodBasePath);
+            LOGGER.log(Level.INFO, String.format("Create temp neuropod base directory %s", neuropodBasePath));
             Path directories = Files.createDirectories(neuropodBasePath.toAbsolutePath());
 
             boolean extracted = false;
@@ -170,13 +171,13 @@ final class LibraryLoader {
                 File embeddedPackageFile = extractFile(libAbsPath, resPath, libName);
                 if (embeddedPackageFile != null) {
                     extracted = true;
-                    LOGGER.log(Level.INFO, "Extracted embedded package file {0}", embeddedPackageFile);
+                    LOGGER.log(Level.INFO, String.format("Extracted embedded package file %s", embeddedPackageFile));
                     installFramework(libAbsPath, embeddedPackageFile.getName(), neuropodBaseDir);
                 }
             }
 
             if (extracted) {
-                LOGGER.log(Level.INFO, "Set NEUROPOD_BASE_DIR={0}", neuropodBaseDir);
+                LOGGER.log(Level.INFO, String.format("Set NEUROPOD_BASE_DIR=%s", neuropodBaseDir));
                 long res = nativeSetEnv(NEUROPOD_BASE_DIR_ENV_VAR, neuropodBaseDir);
             }
 
@@ -192,14 +193,14 @@ final class LibraryLoader {
     }
 
     private static boolean startShellCommand(String cmd) {
-        LOGGER.log(Level.INFO, "Command: {0}", cmd);
+        LOGGER.log(Level.INFO, String.format("Command: %s``", cmd));
         try {
             ProcessBuilder builder = new ProcessBuilder();
             builder.command("sh", "-c", cmd);
             builder.directory(new File(System.getProperty("user.home")));
             Process process = builder.start();
             int exitCode = process.waitFor();
-            LOGGER.log(Level.INFO, "Exit code {0}", exitCode);
+            LOGGER.log(Level.INFO, String.format("Exit code %s", exitCode));
         } catch (IOException e) {
             LOGGER.log(Level.WARNING, e.getMessage());
             return false;
@@ -213,7 +214,7 @@ final class LibraryLoader {
     private static File extractFile(String targetDir, String resPath, String localLibName) throws IOException {
         URL nativeLibraryUrl = LibraryLoader.class.getResource(resPath + localLibName);
         if (nativeLibraryUrl == null) {
-            LOGGER.log(Level.WARNING, "File {0} not found in the jar package, should be fine if it is part " +
+            LOGGER.log(Level.WARNING, "File %s not found in the jar package, should be fine if it is part " +
                     "of a backend library that is not packed into the jar file", resPath + localLibName);
             return null;
         }
@@ -251,7 +252,7 @@ final class LibraryLoader {
         try {
             // Return value isn't important, it throws if not loaded.
             boolean loaded = nativeIsLoaded();
-            LOGGER.log(Level.INFO, "LibraryLoader.isLoaded {0}", loaded);
+            LOGGER.log(Level.INFO, String.format("LibraryLoader.isLoaded %s", loaded));
             return true;
         } catch (UnsatisfiedLinkError e) {
             return false;
