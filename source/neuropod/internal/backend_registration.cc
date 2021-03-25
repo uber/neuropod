@@ -127,11 +127,6 @@ std::vector<BackendLoadSpec> get_default_backend_map()
     return out;
 }
 
-// A list of backends, versions, and their corresponding so files.
-// These will only be loaded if a backend for the requested type hasn't already been loaded.
-// Note: these are listed in reverse priority order
-const std::vector<BackendLoadSpec> default_backend_for_type = get_default_backend_map();
-
 bool load_default_backend(const std::vector<BackendLoadSpec> &backends,
                           const std::string &                 type,
                           const std::string &                 target_version_range)
@@ -297,6 +292,11 @@ BackendFactoryFunction get_backend_for_type(const std::vector<BackendLoadSpec> &
     bool load_success = load_default_backend(default_backend_overrides, type, target_version_range);
     if (!load_success)
     {
+	// A list of backends, versions, and their corresponding so files.
+	// These will only be loaded if a backend for the requested type hasn't already been loaded.
+	// Note: these are listed in reverse priority order
+	const std::vector<BackendLoadSpec> default_backend_for_type = get_default_backend_map();
+
         // If that didn't work, try loading using the default map
         load_success = load_default_backend(default_backend_for_type, type, target_version_range);
     }

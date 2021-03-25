@@ -89,7 +89,13 @@ final class LibraryLoader {
      */
     private static boolean loadSharedLibrary() {
         try {
+            for (String libName : EMBEDDED_LIB_NAMES) {
+                LOGGER.log(Level.INFO, String.format("Load library from (-Djava.library.path=%s) %s", System.getProperty("java.library.path"), libName));
+            }
+            String libJni = System.mapLibraryName(JNI_NAME);
+            LOGGER.log(Level.INFO, String.format("Load JNI library from (-Djava.library.path=%s) %s", System.getProperty("java.library.path"), libJni));
             System.loadLibrary(JNI_NAME);
+            nativeExport(System.getProperty("java.library.path"));
             return true;
         } catch (UnsatisfiedLinkError e) {
             LOGGER.log(Level.WARNING, "try loading shared library failed, should be fine if using the " +
@@ -150,7 +156,7 @@ final class LibraryLoader {
 
             String neuropodBaseDir = System.getenv(NEUROPOD_BASE_DIR_ENV_VAR);
             if (neuropodBaseDir != null) {
-                LOGGER.log(Level.INFO, String.format("Found NEUROPOD_BASE_DIR=%s", neuropodBaseDir));
+                LOGGER.log(Level.INFO, String.format("Found NEUROPOD_BASE_DIR=%s. Skip extracting of embedded backends", neuropodBaseDir));
                 return true;
             }
 
@@ -214,8 +220,8 @@ final class LibraryLoader {
     private static File extractFile(String targetDir, String resPath, String localLibName) throws IOException {
         URL nativeLibraryUrl = LibraryLoader.class.getResource(resPath + localLibName);
         if (nativeLibraryUrl == null) {
-            LOGGER.log(Level.WARNING, "File %s not found in the jar package, should be fine if it is part " +
-                    "of a backend library that is not packed into the jar file", resPath + localLibName);
+            LOGGER.log(Level.WARNING, String.format("File %s not found in the jar package, should be fine if it is part " +
+                    "of a backend library that is not packed into the jar file", resPath + localLibName));
             return null;
         }
         final File targetFile = new File(targetDir, localLibName);

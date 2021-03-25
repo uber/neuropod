@@ -17,8 +17,10 @@ limitations under the License.
 
 #include "jclass_register.h"
 #include "utils.h"
+#include "neuropod/internal/logging.hh"
 
 #include <string>
+#include <dlfcn.h>
 
 #include <jni.h>
 
@@ -35,6 +37,20 @@ JNIEXPORT void JNICALL Java_com_uber_neuropod_LibraryLoader_nativeExport(JNIEnv 
 {
     std::string oriPath = getenv("PATH");
     setenv("PATH", (oriPath + ":" + neuropod::jni::to_string(env, libPath)).c_str(), 1 /* Overwrite */);
+
+    std::string libNeuropod("libneuropod.so");
+    if (dlopen(libNeuropod.c_str(), RTLD_LAZY | RTLD_GLOBAL) == nullptr)
+    {
+            const auto err = dlerror();
+            if (err == nullptr)
+            {
+                SPDLOG_TRACE("Loading '{}' failed, but no error message was avaliable", libNeuropod);
+            }
+            else
+            {
+                SPDLOG_TRACE("Loading '{}' failed. Error from dlopen: {}", libNeuropod, err);
+            }
+    }
 }
 
 // NOLINTNEXTLINE(readability-identifier-naming): Ignore function case for Java API methods
