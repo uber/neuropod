@@ -47,7 +47,7 @@ public class NeuropodAdditionTest {
 
         RuntimeOptions opts = new RuntimeOptions();
         // TODO(weijiad): For now OPE is required to use the Java bindings
-        opts.useOpe = true;
+        opts.useOpe = false;
         model = new Neuropod(model_path, opts);
     }
 
@@ -105,7 +105,7 @@ public class NeuropodAdditionTest {
     public void loadModel() {
         RuntimeOptions ope = new RuntimeOptions();
         // TODO(weijiad): For now OPE is required to use the Java bindings
-        ope.useOpe = true;
+        ope.useOpe = false;
         ope.loadModelAtConstruction = false;
         try (Neuropod model = new Neuropod(model_path, ope)) {
             try {
