@@ -182,7 +182,6 @@ java_binary(
         "//neuropod:libneuropod.so",
         ":updated_neuropod_multiprocess_worker",
         ":neuropod_jni",
-        ":tar_backends",
     ],
     javacopts = JAVACOPTS,
     visibility = ["//visibility:public"],
