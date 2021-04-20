@@ -17,7 +17,7 @@ import six
 
 import numpy as np
 
-from neuropod.backends import config_utils
+from neuropod.utils import config_utils
 from neuropod.utils.dtype_utils import get_dtype
 
 

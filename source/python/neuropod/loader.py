@@ -13,8 +13,7 @@
 # limitations under the License.
 
 import os
-from neuropod.backends import config_utils
-from neuropod.utils import zip_loader
+from neuropod.utils import config_utils, zip_loader
 
 from neuropod.registry import _REGISTERED_BACKENDS
 from neuropod.utils.dtype_utils import maybe_convert_bindings_types
