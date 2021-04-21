@@ -31,20 +31,6 @@ genrule(
     cmd = "cp -f $< $@",
 )
 
-filegroup(
-    name = "backends",
-    srcs = [
-        "//neuropod/backends/python_bridge:libneuropod_pythonbridge_backend.so",
-        "//neuropod/backends/tensorflow:libneuropod_tensorflow_backend.so",
-        "//neuropod/backends/torchscript:libneuropod_torchscript_backend.so",
-        "@libtorch_repo//:libtorch_libs",
-        "@tensorflow_repo//:libtensorflow_libs",
-    ],
-    visibility = [
-        "//neuropod:__subpackages__",
-    ],
-)
-
 # This genrule copies the so to a file with a dylib extension
 genrule(
     name = "copy_to_dylib",
@@ -90,7 +76,6 @@ java_library(
     name = "neuropod_java",
     srcs = [":java_source"],
     data = [
-        ":backends",
         ":neuropod_jni",
         "//neuropod:libneuropod.so",
         "//neuropod/multiprocess:neuropod_multiprocess_worker",
@@ -151,7 +136,6 @@ java_test(
         "src/test/java/com/uber/neuropod/TFAdditionTest.java",
     ],
     data = [
-        "//neuropod/backends/tensorflow:libneuropod_tensorflow_backend.so",
         "//neuropod/tests/test_data",
     ],
     javacopts = JAVACOPTS,
@@ -170,7 +154,6 @@ java_test(
         "src/test/java/com/uber/neuropod/TorchscriptAdditionTest.java",
     ],
     data = [
-        "//neuropod/backends/torchscript:libneuropod_torchscript_backend.so",
         "//neuropod/tests/test_data",
     ],
     javacopts = JAVACOPTS,
@@ -186,7 +169,6 @@ java_test(
     name = "TensorSpecTest",
     srcs = ["src/test/java/com/uber/neuropod/TensorSpecTest.java"],
     data = [
-        "//neuropod/backends/torchscript:libneuropod_torchscript_backend.so",
         "//neuropod/tests/test_data",
     ],
     javacopts = JAVACOPTS,
