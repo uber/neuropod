@@ -1,4 +1,4 @@
-# Copyright (c) 2020 UATC, LLC
+# Copyright (c) 2021 UATC, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,15 +12,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-cc_library(
-    name = "neuropod_test_utils",
-    testonly = True,
-    hdrs = ["test_utils.hh"],
-    data = [
-        "//neuropod/tests/test_data",
+cc_test(
+    name = "test_factories",
+    srcs = [
+        "test_factories.cc",
     ],
-    visibility = [
-        "//visibility:public",
+    deps = [
+        "//neuropod:neuropod_impl",
+        "@gtest//:main",
+    ],
+)
+
+cc_test(
+    name = "test_tensor_validation",
+    srcs = [
+        "test_tensor_validation.cc",
     ],
     deps = [
         "//neuropod:neuropod_impl",

@@ -26,7 +26,7 @@ pushd source
 ./external/llvm_toolchain/bin/llvm-profdata merge -output=/tmp/neuropod_coverage/code.profdata /tmp/neuropod_coverage/code-*.profraw
 
 # Generate a coverage report and fix paths
-bazel query 'kind("cc_binary|cc_test", ...)' | sed 's/\/\//-object bazel-bin\//g' |  sed 's/:/\//g' | paste -sd ' ' | xargs ./bazel-source/external/llvm_toolchain/bin/llvm-cov export --format=lcov -instr-profile=/tmp/neuropod_coverage/code.profdata -ignore-filename-regex="(external|tests)" > native_coverage.txt
+bazel query 'kind("cc_binary|cc_test", ...)' | sed 's/\/\//-object bazel-bin\//g' |  sed 's/:/\//g' | paste -sd ' ' | xargs ./bazel-source/external/llvm_toolchain/bin/llvm-cov export --format=lcov -instr-profile=/tmp/neuropod_coverage/code.profdata -ignore-filename-regex="(external|test_|benchmark_)" > native_coverage.txt
 sed -i 's+/proc/self/cwd/+source/+g' native_coverage.txt
 
 # Get Java coverage and fix paths

@@ -1,4 +1,4 @@
-# Copyright (c) 2020 UATC, LLC
+# Copyright (c) 2021 UATC, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,18 +12,38 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-cc_library(
-    name = "neuropod_test_utils",
-    testonly = True,
-    hdrs = ["test_utils.hh"],
-    data = [
-        "//neuropod/tests/test_data",
-    ],
-    visibility = [
-        "//visibility:public",
+cc_test(
+    name = "benchmark_serialization",
+    srcs = [
+        "benchmark_serialization.cc",
     ],
     deps = [
         "//neuropod:neuropod_impl",
+        "//neuropod/serialization",
+        "@benchmark//:benchmark_main",
+    ],
+)
+
+cc_test(
+    name = "test_input_output",
+    srcs = [
+        "test_input_output.cc",
+    ],
+    deps = [
+        "//neuropod:neuropod_impl",
+        "//neuropod/serialization",
+        "@gtest//:main",
+    ],
+)
+
+cc_test(
+    name = "test_serialization",
+    srcs = [
+        "test_serialization.cc",
+    ],
+    deps = [
+        "//neuropod:neuropod_impl",
+        "//neuropod/serialization",
         "@gtest//:main",
     ],
 )

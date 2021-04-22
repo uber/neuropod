@@ -155,7 +155,6 @@ java_test(
         "//neuropod/tests/test_data",
     ],
     javacopts = JAVACOPTS,
-    tags = ["requires_path"],
     test_class = "com.uber.neuropod.TFAdditionTest",
     deps = [
         ":neuropod_java_jar",
@@ -174,7 +173,6 @@ java_test(
         "//neuropod/tests/test_data",
     ],
     javacopts = JAVACOPTS,
-    tags = ["requires_path"],
     test_class = "com.uber.neuropod.TorchscriptAdditionTest",
     deps = [
         ":neuropod_java_jar",
@@ -190,7 +188,6 @@ java_test(
         "//neuropod/tests/test_data",
     ],
     javacopts = JAVACOPTS,
-    tags = ["requires_path"],
     test_class = "com.uber.neuropod.TensorSpecTest",
     deps = [
         ":neuropod_java_jar",

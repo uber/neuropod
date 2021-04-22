@@ -13,7 +13,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#include "test_utils.hh"
+#include "neuropod/tests/test_utils.hh"
 
 TEST(test_torchscript_backend, test_torchscript_addition_model)
 {
