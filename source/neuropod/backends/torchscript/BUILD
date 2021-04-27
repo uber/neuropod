@@ -13,18 +13,11 @@
 # limitations under the License.
 
 load("@bazel_tools//tools/build_defs/pkg:pkg.bzl", "pkg_tar")
-load("//bazel:copy_libs.bzl", "copy_libs")
 load("//bazel:cc.bzl", "neuropod_cc_binary", "neuropod_cc_library")
 load("@libtorch_repo//:neuropod_backend_path.bzl", "NEUROPOD_BACKEND_PATH")
 
 neuropod_cc_binary(
     name = "libneuropod_torchscript_backend.so",
-    data = [
-        ":copy_libtorch",
-    ] + select({
-        "@bazel_tools//src/conditions:darwin": [":copy_mklml"],
-        "//conditions:default": [],
-    }),
     linkopts = select({
         "@bazel_tools//src/conditions:darwin": ["-Wl,-rpath,@loader_path"],
         "//conditions:default": ["-Wl,-rpath,$$ORIGIN"],
@@ -60,16 +53,6 @@ neuropod_cc_library(
         "@libtorch_repo//:libtorch",
     ],
     alwayslink = True,
-)
-
-copy_libs(
-    name = "copy_libtorch",
-    libs = "@libtorch_repo//:libtorch_libs",
-)
-
-copy_libs(
-    name = "copy_mklml",
-    libs = "@mklml_repo_darwin//:mklml_libs",
 )
 
 pkg_tar(
