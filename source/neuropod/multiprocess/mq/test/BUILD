@@ -1,0 +1,62 @@
+# Copyright (c) 2021 UATC, LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+cc_test(
+    name = "test_ipc_message_queue",
+    srcs = [
+        "test_ipc_message_queue.cc",
+    ],
+    deps = [
+        "//neuropod:neuropod_impl",
+        "//neuropod/multiprocess:ipc_control_channel",
+        "//neuropod/multiprocess/mq",
+        "@gtest//:main",
+    ],
+)
+
+cc_test(
+    name = "test_ope_heartbeat",
+    srcs = [
+        "test_ope_heartbeat.cc",
+    ],
+    deps = [
+        "//neuropod:neuropod_impl",
+        "//neuropod/multiprocess/mq",
+        "@gtest//:main",
+    ],
+)
+
+cc_test(
+    name = "test_ope_transferrables",
+    srcs = [
+        "test_ope_transferrables.cc",
+    ],
+    deps = [
+        "//neuropod:neuropod_impl",
+        "//neuropod/multiprocess/mq",
+        "@gtest//:main",
+    ],
+)
+
+cc_test(
+    name = "test_ope_wire_format",
+    srcs = [
+        "test_ope_wire_format.cc",
+    ],
+    deps = [
+        "//neuropod:neuropod_impl",
+        "//neuropod/multiprocess/mq",
+        "@gtest//:main",
+    ],
+)

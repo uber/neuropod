@@ -1,4 +1,4 @@
-# Copyright (c) 2020 UATC, LLC
+# Copyright (c) 2021 UATC, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,18 +12,25 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-cc_library(
-    name = "neuropod_test_utils",
-    testonly = True,
-    hdrs = ["test_utils.hh"],
-    data = [
-        "//neuropod/tests/test_data",
+cc_test(
+    name = "benchmark_shm_allocator",
+    srcs = [
+        "benchmark_shm_allocator.cc",
     ],
-    visibility = [
-        "//visibility:public",
+    deps = [
+        "//neuropod/multiprocess/shm",
+        "@benchmark//:benchmark_main",
+    ],
+)
+
+cc_test(
+    name = "test_shm_allocator",
+    srcs = [
+        "test_shm_allocator.cc",
     ],
     deps = [
         "//neuropod:neuropod_impl",
+        "//neuropod/multiprocess/shm",
         "@gtest//:main",
     ],
 )
