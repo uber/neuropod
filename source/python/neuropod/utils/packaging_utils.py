@@ -20,7 +20,7 @@ import time
 import shutil
 import zipfile
 
-from neuropod.backends import config_utils
+from neuropod.utils import config_utils
 from neuropod.utils.eval_utils import save_test_data, load_and_test_neuropod
 
 # Set a consistent time on the files we're zipping so the hash of the zipfile is the same
