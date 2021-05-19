@@ -61,7 +61,6 @@ services:
       context: .
       dockerfile: build/neuropod.dockerfile
       target: neuropod-base
-    privileged: true
 
   test-gpu:
     extends: test-base
@@ -140,16 +139,16 @@ for platform, framework_version in itertools.product(PLATFORMS, FRAMEWORK_VERSIO
 
         plugin_config = [
         "    plugins:\n",
-        "      - docker-compose#v3.1.0:\n",
+        "      - docker-compose#v3.7.0:\n",
         "          build: {}\n".format(variant_name),
         "          config: docker-compose.test.yml\n",
         "          image-repository: 027047743804.dkr.ecr.us-east-2.amazonaws.com/uber\n",
         "          cache-from: {}:027047743804.dkr.ecr.us-east-2.amazonaws.com/uber:{}\n".format(variant_name, variant_name),
         "          push-retries: 5\n",
-        "      - docker-compose#v3.1.0:\n",
+        "      - docker-compose#v3.7.0:\n",
         "          push: {}:027047743804.dkr.ecr.us-east-2.amazonaws.com/uber:{}\n".format(variant_name, variant_name),
         "          config: docker-compose.test.yml\n",
-        "      - docker-compose#v3.1.0:\n",
+        "      - docker-compose#v3.7.0:\n",
         "          run: {}\n".format(variant_name),
         "          config: docker-compose.test.yml\n",
         "          env:\n",
@@ -178,7 +177,7 @@ for platform, framework_version in itertools.product(PLATFORMS, FRAMEWORK_VERSIO
         "  - label: \":docker: {} Tests ({})\"\n".format("GPU" if is_gpu else "CPU", variant_name),
         "    timeout_in_minutes: 60\n",
         "    agents:\n",
-        "      queue: private-{}\n".format("gpu" if is_gpu else "default"),
+        "      queue: {}\n".format("public-gpu" if is_gpu else "public-gpu"), # Temporarily run everything on `public-gpu`
         "    command: build/ci/{}.sh\n".format("buildkite_build_gpu" if is_gpu else "buildkite_build"),
         ] + plugin_config)
 
@@ -190,7 +189,7 @@ for platform, framework_version in itertools.product(PLATFORMS, FRAMEWORK_VERSIO
             "  - label: \":docker: Lint + Docs\"\n".format(variant_name),
             "    timeout_in_minutes: 60\n",
             "    agents:\n",
-            "      queue: private-default\n",
+                "      queue: public-gpu\n",  # Temporarily run everything on `public-gpu`
             "    command: build/ci/buildkite_lint.sh\n",
             ] + plugin_config)
 

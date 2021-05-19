@@ -1,0 +1,3 @@
+.buildkite/pipeline.yml linguist-generated=true
+docker-compose.test.yml linguist-generated=true
+.travis.yml linguist-generated=true

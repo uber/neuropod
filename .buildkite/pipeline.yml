@@ -8,19 +8,19 @@ steps:
   - label: ":docker: CPU Tests (test-cpu-variant-tf-1_12_0-torch-1_1_0-py2_7)"
     timeout_in_minutes: 60
     agents:
-      queue: private-default
+      queue: public-gpu
     command: build/ci/buildkite_build.sh
     plugins:
-      - docker-compose#v3.1.0:
+      - docker-compose#v3.7.0:
           build: test-cpu-variant-tf-1_12_0-torch-1_1_0-py2_7
           config: docker-compose.test.yml
           image-repository: 027047743804.dkr.ecr.us-east-2.amazonaws.com/uber
           cache-from: test-cpu-variant-tf-1_12_0-torch-1_1_0-py2_7:027047743804.dkr.ecr.us-east-2.amazonaws.com/uber:test-cpu-variant-tf-1_12_0-torch-1_1_0-py2_7
           push-retries: 5
-      - docker-compose#v3.1.0:
+      - docker-compose#v3.7.0:
           push: test-cpu-variant-tf-1_12_0-torch-1_1_0-py2_7:027047743804.dkr.ecr.us-east-2.amazonaws.com/uber:test-cpu-variant-tf-1_12_0-torch-1_1_0-py2_7
           config: docker-compose.test.yml
-      - docker-compose#v3.1.0:
+      - docker-compose#v3.7.0:
           run: test-cpu-variant-tf-1_12_0-torch-1_1_0-py2_7
           config: docker-compose.test.yml
           env:
@@ -46,19 +46,19 @@ steps:
   - label: ":docker: Lint + Docs"
     timeout_in_minutes: 60
     agents:
-      queue: private-default
+      queue: public-gpu
     command: build/ci/buildkite_lint.sh
     plugins:
-      - docker-compose#v3.1.0:
+      - docker-compose#v3.7.0:
           build: test-cpu-variant-tf-1_12_0-torch-1_1_0-py2_7
           config: docker-compose.test.yml
           image-repository: 027047743804.dkr.ecr.us-east-2.amazonaws.com/uber
           cache-from: test-cpu-variant-tf-1_12_0-torch-1_1_0-py2_7:027047743804.dkr.ecr.us-east-2.amazonaws.com/uber:test-cpu-variant-tf-1_12_0-torch-1_1_0-py2_7
           push-retries: 5
-      - docker-compose#v3.1.0:
+      - docker-compose#v3.7.0:
           push: test-cpu-variant-tf-1_12_0-torch-1_1_0-py2_7:027047743804.dkr.ecr.us-east-2.amazonaws.com/uber:test-cpu-variant-tf-1_12_0-torch-1_1_0-py2_7
           config: docker-compose.test.yml
-      - docker-compose#v3.1.0:
+      - docker-compose#v3.7.0:
           run: test-cpu-variant-tf-1_12_0-torch-1_1_0-py2_7
           config: docker-compose.test.yml
           env:
@@ -84,19 +84,19 @@ steps:
   - label: ":docker: CPU Tests (test-cpu-variant-tf-1_13_1-torch-1_2_0-py3_5)"
     timeout_in_minutes: 60
     agents:
-      queue: private-default
+      queue: public-gpu
     command: build/ci/buildkite_build.sh
     plugins:
-      - docker-compose#v3.1.0:
+      - docker-compose#v3.7.0:
           build: test-cpu-variant-tf-1_13_1-torch-1_2_0-py3_5
           config: docker-compose.test.yml
           image-repository: 027047743804.dkr.ecr.us-east-2.amazonaws.com/uber
           cache-from: test-cpu-variant-tf-1_13_1-torch-1_2_0-py3_5:027047743804.dkr.ecr.us-east-2.amazonaws.com/uber:test-cpu-variant-tf-1_13_1-torch-1_2_0-py3_5
           push-retries: 5
-      - docker-compose#v3.1.0:
+      - docker-compose#v3.7.0:
           push: test-cpu-variant-tf-1_13_1-torch-1_2_0-py3_5:027047743804.dkr.ecr.us-east-2.amazonaws.com/uber:test-cpu-variant-tf-1_13_1-torch-1_2_0-py3_5
           config: docker-compose.test.yml
-      - docker-compose#v3.1.0:
+      - docker-compose#v3.7.0:
           run: test-cpu-variant-tf-1_13_1-torch-1_2_0-py3_5
           config: docker-compose.test.yml
           env:
@@ -122,19 +122,19 @@ steps:
   - label: ":docker: CPU Tests (test-cpu-variant-tf-1_14_0-torch-1_3_0-py3_6)"
     timeout_in_minutes: 60
     agents:
-      queue: private-default
+      queue: public-gpu
     command: build/ci/buildkite_build.sh
     plugins:
-      - docker-compose#v3.1.0:
+      - docker-compose#v3.7.0:
           build: test-cpu-variant-tf-1_14_0-torch-1_3_0-py3_6
           config: docker-compose.test.yml
           image-repository: 027047743804.dkr.ecr.us-east-2.amazonaws.com/uber
           cache-from: test-cpu-variant-tf-1_14_0-torch-1_3_0-py3_6:027047743804.dkr.ecr.us-east-2.amazonaws.com/uber:test-cpu-variant-tf-1_14_0-torch-1_3_0-py3_6
           push-retries: 5
-      - docker-compose#v3.1.0:
+      - docker-compose#v3.7.0:
           push: test-cpu-variant-tf-1_14_0-torch-1_3_0-py3_6:027047743804.dkr.ecr.us-east-2.amazonaws.com/uber:test-cpu-variant-tf-1_14_0-torch-1_3_0-py3_6
           config: docker-compose.test.yml
-      - docker-compose#v3.1.0:
+      - docker-compose#v3.7.0:
           run: test-cpu-variant-tf-1_14_0-torch-1_3_0-py3_6
           config: docker-compose.test.yml
           env:
@@ -160,19 +160,19 @@ steps:
   - label: ":docker: CPU Tests (test-cpu-variant-tf-1_15_0-torch-1_4_0-py3_7)"
     timeout_in_minutes: 60
     agents:
-      queue: private-default
+      queue: public-gpu
     command: build/ci/buildkite_build.sh
     plugins:
-      - docker-compose#v3.1.0:
+      - docker-compose#v3.7.0:
           build: test-cpu-variant-tf-1_15_0-torch-1_4_0-py3_7
           config: docker-compose.test.yml
           image-repository: 027047743804.dkr.ecr.us-east-2.amazonaws.com/uber
           cache-from: test-cpu-variant-tf-1_15_0-torch-1_4_0-py3_7:027047743804.dkr.ecr.us-east-2.amazonaws.com/uber:test-cpu-variant-tf-1_15_0-torch-1_4_0-py3_7
           push-retries: 5
-      - docker-compose#v3.1.0:
+      - docker-compose#v3.7.0:
           push: test-cpu-variant-tf-1_15_0-torch-1_4_0-py3_7:027047743804.dkr.ecr.us-east-2.amazonaws.com/uber:test-cpu-variant-tf-1_15_0-torch-1_4_0-py3_7
           config: docker-compose.test.yml
-      - docker-compose#v3.1.0:
+      - docker-compose#v3.7.0:
           run: test-cpu-variant-tf-1_15_0-torch-1_4_0-py3_7
           config: docker-compose.test.yml
           env:
@@ -198,19 +198,19 @@ steps:
   - label: ":docker: CPU Tests (test-cpu-variant-tf-2_2_0-torch-1_5_0-py3_8)"
     timeout_in_minutes: 60
     agents:
-      queue: private-default
+      queue: public-gpu
     command: build/ci/buildkite_build.sh
     plugins:
-      - docker-compose#v3.1.0:
+      - docker-compose#v3.7.0:
           build: test-cpu-variant-tf-2_2_0-torch-1_5_0-py3_8
           config: docker-compose.test.yml
           image-repository: 027047743804.dkr.ecr.us-east-2.amazonaws.com/uber
           cache-from: test-cpu-variant-tf-2_2_0-torch-1_5_0-py3_8:027047743804.dkr.ecr.us-east-2.amazonaws.com/uber:test-cpu-variant-tf-2_2_0-torch-1_5_0-py3_8
           push-retries: 5
-      - docker-compose#v3.1.0:
+      - docker-compose#v3.7.0:
           push: test-cpu-variant-tf-2_2_0-torch-1_5_0-py3_8:027047743804.dkr.ecr.us-east-2.amazonaws.com/uber:test-cpu-variant-tf-2_2_0-torch-1_5_0-py3_8
           config: docker-compose.test.yml
-      - docker-compose#v3.1.0:
+      - docker-compose#v3.7.0:
           run: test-cpu-variant-tf-2_2_0-torch-1_5_0-py3_8
           config: docker-compose.test.yml
           env:
@@ -236,19 +236,19 @@ steps:
   - label: ":docker: CPU Tests (test-cpu-variant-tf-2_2_0-torch-1_6_0-py3_8)"
     timeout_in_minutes: 60
     agents:
-      queue: private-default
+      queue: public-gpu
     command: build/ci/buildkite_build.sh
     plugins:
-      - docker-compose#v3.1.0:
+      - docker-compose#v3.7.0:
           build: test-cpu-variant-tf-2_2_0-torch-1_6_0-py3_8
           config: docker-compose.test.yml
           image-repository: 027047743804.dkr.ecr.us-east-2.amazonaws.com/uber
           cache-from: test-cpu-variant-tf-2_2_0-torch-1_6_0-py3_8:027047743804.dkr.ecr.us-east-2.amazonaws.com/uber:test-cpu-variant-tf-2_2_0-torch-1_6_0-py3_8
           push-retries: 5
-      - docker-compose#v3.1.0:
+      - docker-compose#v3.7.0:
           push: test-cpu-variant-tf-2_2_0-torch-1_6_0-py3_8:027047743804.dkr.ecr.us-east-2.amazonaws.com/uber:test-cpu-variant-tf-2_2_0-torch-1_6_0-py3_8
           config: docker-compose.test.yml
-      - docker-compose#v3.1.0:
+      - docker-compose#v3.7.0:
           run: test-cpu-variant-tf-2_2_0-torch-1_6_0-py3_8
           config: docker-compose.test.yml
           env:
@@ -274,19 +274,19 @@ steps:
   - label: ":docker: CPU Tests (test-cpu-variant-tf-2_2_0-torch-1_7_0-py3_8)"
     timeout_in_minutes: 60
     agents:
-      queue: private-default
+      queue: public-gpu
     command: build/ci/buildkite_build.sh
     plugins:
-      - docker-compose#v3.1.0:
+      - docker-compose#v3.7.0:
           build: test-cpu-variant-tf-2_2_0-torch-1_7_0-py3_8
           config: docker-compose.test.yml
           image-repository: 027047743804.dkr.ecr.us-east-2.amazonaws.com/uber
           cache-from: test-cpu-variant-tf-2_2_0-torch-1_7_0-py3_8:027047743804.dkr.ecr.us-east-2.amazonaws.com/uber:test-cpu-variant-tf-2_2_0-torch-1_7_0-py3_8
           push-retries: 5
-      - docker-compose#v3.1.0:
+      - docker-compose#v3.7.0:
           push: test-cpu-variant-tf-2_2_0-torch-1_7_0-py3_8:027047743804.dkr.ecr.us-east-2.amazonaws.com/uber:test-cpu-variant-tf-2_2_0-torch-1_7_0-py3_8
           config: docker-compose.test.yml
-      - docker-compose#v3.1.0:
+      - docker-compose#v3.7.0:
           run: test-cpu-variant-tf-2_2_0-torch-1_7_0-py3_8
           config: docker-compose.test.yml
           env:
@@ -312,19 +312,19 @@ steps:
   - label: ":docker: GPU Tests (test-gpu-variant-tf-1_12_0-torch-1_1_0-py2_7)"
     timeout_in_minutes: 60
     agents:
-      queue: private-gpu
+      queue: public-gpu
     command: build/ci/buildkite_build_gpu.sh
     plugins:
-      - docker-compose#v3.1.0:
+      - docker-compose#v3.7.0:
           build: test-gpu-variant-tf-1_12_0-torch-1_1_0-py2_7
           config: docker-compose.test.yml
           image-repository: 027047743804.dkr.ecr.us-east-2.amazonaws.com/uber
           cache-from: test-gpu-variant-tf-1_12_0-torch-1_1_0-py2_7:027047743804.dkr.ecr.us-east-2.amazonaws.com/uber:test-gpu-variant-tf-1_12_0-torch-1_1_0-py2_7
           push-retries: 5
-      - docker-compose#v3.1.0:
+      - docker-compose#v3.7.0:
           push: test-gpu-variant-tf-1_12_0-torch-1_1_0-py2_7:027047743804.dkr.ecr.us-east-2.amazonaws.com/uber:test-gpu-variant-tf-1_12_0-torch-1_1_0-py2_7
           config: docker-compose.test.yml
-      - docker-compose#v3.1.0:
+      - docker-compose#v3.7.0:
           run: test-gpu-variant-tf-1_12_0-torch-1_1_0-py2_7
           config: docker-compose.test.yml
           env:
@@ -350,19 +350,19 @@ steps:
   - label: ":docker: GPU Tests (test-gpu-variant-tf-1_13_1-torch-1_2_0-py3_5)"
     timeout_in_minutes: 60
     agents:
-      queue: private-gpu
+      queue: public-gpu
     command: build/ci/buildkite_build_gpu.sh
     plugins:
-      - docker-compose#v3.1.0:
+      - docker-compose#v3.7.0:
           build: test-gpu-variant-tf-1_13_1-torch-1_2_0-py3_5
           config: docker-compose.test.yml
           image-repository: 027047743804.dkr.ecr.us-east-2.amazonaws.com/uber
           cache-from: test-gpu-variant-tf-1_13_1-torch-1_2_0-py3_5:027047743804.dkr.ecr.us-east-2.amazonaws.com/uber:test-gpu-variant-tf-1_13_1-torch-1_2_0-py3_5
           push-retries: 5
-      - docker-compose#v3.1.0:
+      - docker-compose#v3.7.0:
           push: test-gpu-variant-tf-1_13_1-torch-1_2_0-py3_5:027047743804.dkr.ecr.us-east-2.amazonaws.com/uber:test-gpu-variant-tf-1_13_1-torch-1_2_0-py3_5
           config: docker-compose.test.yml
-      - docker-compose#v3.1.0:
+      - docker-compose#v3.7.0:
           run: test-gpu-variant-tf-1_13_1-torch-1_2_0-py3_5
           config: docker-compose.test.yml
           env:
@@ -388,19 +388,19 @@ steps:
   - label: ":docker: GPU Tests (test-gpu-variant-tf-1_14_0-torch-1_3_0-py3_6)"
     timeout_in_minutes: 60
     agents:
-      queue: private-gpu
+      queue: public-gpu
     command: build/ci/buildkite_build_gpu.sh
     plugins:
-      - docker-compose#v3.1.0:
+      - docker-compose#v3.7.0:
           build: test-gpu-variant-tf-1_14_0-torch-1_3_0-py3_6
           config: docker-compose.test.yml
           image-repository: 027047743804.dkr.ecr.us-east-2.amazonaws.com/uber
           cache-from: test-gpu-variant-tf-1_14_0-torch-1_3_0-py3_6:027047743804.dkr.ecr.us-east-2.amazonaws.com/uber:test-gpu-variant-tf-1_14_0-torch-1_3_0-py3_6
           push-retries: 5
-      - docker-compose#v3.1.0:
+      - docker-compose#v3.7.0:
           push: test-gpu-variant-tf-1_14_0-torch-1_3_0-py3_6:027047743804.dkr.ecr.us-east-2.amazonaws.com/uber:test-gpu-variant-tf-1_14_0-torch-1_3_0-py3_6
           config: docker-compose.test.yml
-      - docker-compose#v3.1.0:
+      - docker-compose#v3.7.0:
           run: test-gpu-variant-tf-1_14_0-torch-1_3_0-py3_6
           config: docker-compose.test.yml
           env:
@@ -426,19 +426,19 @@ steps:
   - label: ":docker: GPU Tests (test-gpu-variant-tf-1_15_0-torch-1_4_0-py3_7)"
     timeout_in_minutes: 60
     agents:
-      queue: private-gpu
+      queue: public-gpu
     command: build/ci/buildkite_build_gpu.sh
     plugins:
-      - docker-compose#v3.1.0:
+      - docker-compose#v3.7.0:
           build: test-gpu-variant-tf-1_15_0-torch-1_4_0-py3_7
           config: docker-compose.test.yml
           image-repository: 027047743804.dkr.ecr.us-east-2.amazonaws.com/uber
           cache-from: test-gpu-variant-tf-1_15_0-torch-1_4_0-py3_7:027047743804.dkr.ecr.us-east-2.amazonaws.com/uber:test-gpu-variant-tf-1_15_0-torch-1_4_0-py3_7
           push-retries: 5
-      - docker-compose#v3.1.0:
+      - docker-compose#v3.7.0:
           push: test-gpu-variant-tf-1_15_0-torch-1_4_0-py3_7:027047743804.dkr.ecr.us-east-2.amazonaws.com/uber:test-gpu-variant-tf-1_15_0-torch-1_4_0-py3_7
           config: docker-compose.test.yml
-      - docker-compose#v3.1.0:
+      - docker-compose#v3.7.0:
           run: test-gpu-variant-tf-1_15_0-torch-1_4_0-py3_7
           config: docker-compose.test.yml
           env:
@@ -464,19 +464,19 @@ steps:
   - label: ":docker: GPU Tests (test-gpu-variant-tf-2_2_0-torch-1_5_0-py3_8)"
     timeout_in_minutes: 60
     agents:
-      queue: private-gpu
+      queue: public-gpu
     command: build/ci/buildkite_build_gpu.sh
     plugins:
-      - docker-compose#v3.1.0:
+      - docker-compose#v3.7.0:
           build: test-gpu-variant-tf-2_2_0-torch-1_5_0-py3_8
           config: docker-compose.test.yml
           image-repository: 027047743804.dkr.ecr.us-east-2.amazonaws.com/uber
           cache-from: test-gpu-variant-tf-2_2_0-torch-1_5_0-py3_8:027047743804.dkr.ecr.us-east-2.amazonaws.com/uber:test-gpu-variant-tf-2_2_0-torch-1_5_0-py3_8
           push-retries: 5
-      - docker-compose#v3.1.0:
+      - docker-compose#v3.7.0:
           push: test-gpu-variant-tf-2_2_0-torch-1_5_0-py3_8:027047743804.dkr.ecr.us-east-2.amazonaws.com/uber:test-gpu-variant-tf-2_2_0-torch-1_5_0-py3_8
           config: docker-compose.test.yml
-      - docker-compose#v3.1.0:
+      - docker-compose#v3.7.0:
           run: test-gpu-variant-tf-2_2_0-torch-1_5_0-py3_8
           config: docker-compose.test.yml
           env:
@@ -502,19 +502,19 @@ steps:
   - label: ":docker: GPU Tests (test-gpu-variant-tf-2_2_0-torch-1_6_0-py3_8)"
     timeout_in_minutes: 60
     agents:
-      queue: private-gpu
+      queue: public-gpu
     command: build/ci/buildkite_build_gpu.sh
     plugins:
-      - docker-compose#v3.1.0:
+      - docker-compose#v3.7.0:
           build: test-gpu-variant-tf-2_2_0-torch-1_6_0-py3_8
           config: docker-compose.test.yml
           image-repository: 027047743804.dkr.ecr.us-east-2.amazonaws.com/uber
           cache-from: test-gpu-variant-tf-2_2_0-torch-1_6_0-py3_8:027047743804.dkr.ecr.us-east-2.amazonaws.com/uber:test-gpu-variant-tf-2_2_0-torch-1_6_0-py3_8
           push-retries: 5
-      - docker-compose#v3.1.0:
+      - docker-compose#v3.7.0:
           push: test-gpu-variant-tf-2_2_0-torch-1_6_0-py3_8:027047743804.dkr.ecr.us-east-2.amazonaws.com/uber:test-gpu-variant-tf-2_2_0-torch-1_6_0-py3_8
           config: docker-compose.test.yml
-      - docker-compose#v3.1.0:
+      - docker-compose#v3.7.0:
           run: test-gpu-variant-tf-2_2_0-torch-1_6_0-py3_8
           config: docker-compose.test.yml
           env:
@@ -540,19 +540,19 @@ steps:
   - label: ":docker: GPU Tests (test-gpu-variant-tf-2_2_0-torch-1_7_0-py3_8)"
     timeout_in_minutes: 60
     agents:
-      queue: private-gpu
+      queue: public-gpu
     command: build/ci/buildkite_build_gpu.sh
     plugins:
-      - docker-compose#v3.1.0:
+      - docker-compose#v3.7.0:
           build: test-gpu-variant-tf-2_2_0-torch-1_7_0-py3_8
           config: docker-compose.test.yml
           image-repository: 027047743804.dkr.ecr.us-east-2.amazonaws.com/uber
           cache-from: test-gpu-variant-tf-2_2_0-torch-1_7_0-py3_8:027047743804.dkr.ecr.us-east-2.amazonaws.com/uber:test-gpu-variant-tf-2_2_0-torch-1_7_0-py3_8
           push-retries: 5
-      - docker-compose#v3.1.0:
+      - docker-compose#v3.7.0:
           push: test-gpu-variant-tf-2_2_0-torch-1_7_0-py3_8:027047743804.dkr.ecr.us-east-2.amazonaws.com/uber:test-gpu-variant-tf-2_2_0-torch-1_7_0-py3_8
           config: docker-compose.test.yml
-      - docker-compose#v3.1.0:
+      - docker-compose#v3.7.0:
           run: test-gpu-variant-tf-2_2_0-torch-1_7_0-py3_8
           config: docker-compose.test.yml
           env:
