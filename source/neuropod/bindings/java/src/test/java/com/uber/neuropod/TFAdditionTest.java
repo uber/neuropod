@@ -22,6 +22,9 @@ public class TFAdditionTest extends NeuropodAdditionTest {
     public void setUp() throws Exception {
         this.model_path = "neuropod/tests/test_data/tf_addition_model/";
         this.platform = "tensorflow";
+        this.opts.useOpe = false;
+        this.opts.interOpParallelismThreads = 2;
+        this.opts.intraOpParallelismThreads = 3;
         this.prepareEnvironment();
     }
 }

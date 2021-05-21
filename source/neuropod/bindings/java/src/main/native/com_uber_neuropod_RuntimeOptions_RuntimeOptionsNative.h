@@ -28,7 +28,7 @@ extern "C" {
  * Signature: (ZZLjava/lang/String;IZZ)J
  */
 JNIEXPORT jlong JNICALL Java_com_uber_neuropod_RuntimeOptions_00024RuntimeOptionsNative_nativeCreate(
-    JNIEnv *, jclass, jboolean, jboolean, jstring, jint, jboolean, jboolean);
+    JNIEnv *, jclass, jboolean, jboolean, jstring, jint, jboolean, jboolean, jint, jint);
 
 /*
  * Class:     com_uber_neuropod_RuntimeOptions_RuntimeOptionsNative

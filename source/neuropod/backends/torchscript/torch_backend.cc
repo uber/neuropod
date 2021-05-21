@@ -17,16 +17,23 @@ limitations under the License.
 
 #include "neuropod/backends/torchscript/type_utils.hh"
 #include "neuropod/internal/tensor_types.hh"
+#include "neuropod/internal/logging.hh"
 
 #include <caffe2/core/macros.h>
+
+#include <torch/torch.h>
 
 #include <iostream>
 #include <mutex>
 #include <sstream>
 #include <stdexcept>
 #include <unordered_set>
+#include <vector>
+#include <algorithm>
+#include <memory>
 
 #include <dlfcn.h>
+
 
 namespace neuropod
 {
@@ -221,30 +228,52 @@ void process_dict(NeuropodValueMap &output, const c10::IValue &item)
 std::unordered_set<std::string> loaded_op_hashes;
 std::mutex                      loaded_op_mutex;
 
+std::atomic<int> num_interop_threads{-1};
+
 } // namespace
+
 
 TorchNeuropodBackend::TorchNeuropodBackend(const std::string &neuropod_path, const RuntimeOptions &options)
     : NeuropodBackendWithDefaultAllocator<TorchNeuropodTensor>(neuropod_path, options)
 {
 // inter and intra op parallelism settings only supported in Torch >= 1.2.0
 #if CAFFE2_NIGHTLY_VERSION >= 20190808
+    SPDLOG_TRACE("TORCH: Caffe 2 Version {} Set {} Interop and {} Intraop Threads ",
+                 CAFFE2_NIGHTLY_VERSION,
+                 options.experimental_inter_op_parallelism_threads,
+                 options.experimental_intra_op_parallelism_threads);
+
     // Set intra and inter op parallelism
     // See https://pytorch.org/docs/stable/notes/cpu_threading_torchscript_inference.html#runtime-api
     if (options.experimental_inter_op_parallelism_threads != 0)
     {
-        at::set_num_interop_threads(static_cast<int32_t>(options.experimental_inter_op_parallelism_threads));
+        int no_value = -1;
+        int nthreads = static_cast<int32_t>(options.experimental_inter_op_parallelism_threads);
+        if (num_interop_threads.compare_exchange_strong(no_value, nthreads)) {
+            torch::set_num_interop_threads(static_cast<int32_t>(
+                options.experimental_inter_op_parallelism_threads));
+        } else {
+            SPDLOG_INFO("TORCH: cannot set number of interop threads (value={}) "
+            "after it was set (value={}) or parallel work started.", nthreads, no_value);
+        }
     }
 
     if (options.experimental_intra_op_parallelism_threads != 0)
     {
-        at::set_num_threads(static_cast<int32_t>(options.experimental_intra_op_parallelism_threads));
+        torch::set_num_threads(static_cast<int32_t>(options.experimental_intra_op_parallelism_threads));
     }
+
 #endif
 
     if (options.load_model_at_construction)
     {
         load_model();
     }
+
+    SPDLOG_TRACE("TORCH: Caffe 2 Version {} concurrency {} Interop and {} Intraop Threads ",
+            CAFFE2_NIGHTLY_VERSION,
+            torch::get_num_interop_threads(),
+            torch::get_num_threads());
 }
 
 void TorchNeuropodBackend::load_model_internal()
@@ -274,7 +303,7 @@ void TorchNeuropodBackend::load_model_internal()
 
                                   // Load the model onto the appropriate device (ideally a GPU if we have one available)
                                   // Note: this uses the options set in the initializer list above
-                                  get_torch_device(DeviceType::GPU));
+                                  get_torch_device(DeviceType::CPU));
 
     if (!model_)
     {
@@ -287,7 +316,8 @@ void TorchNeuropodBackend::load_model_internal()
     }
 }
 
-TorchNeuropodBackend::~TorchNeuropodBackend() = default;
+TorchNeuropodBackend::~TorchNeuropodBackend() {
+}
 
 torch::Device TorchNeuropodBackend::get_torch_device(NeuropodDeviceType target_device)
 {
@@ -452,6 +482,7 @@ std::unique_ptr<NeuropodValueMap> TorchNeuropodBackend::infer_internal(const Neu
         {
             NEUROPOD_ERROR("Model did not return dict and output spec is not size 1");
         }
+
 
         auto &name        = output_specs_[0].name;
         auto &tensor_type = output_specs_[0].type;

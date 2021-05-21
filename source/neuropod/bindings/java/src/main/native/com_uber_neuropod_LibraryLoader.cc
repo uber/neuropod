@@ -38,6 +38,9 @@ JNIEXPORT void JNICALL Java_com_uber_neuropod_LibraryLoader_nativeExport(JNIEnv 
     std::string oriPath = getenv("PATH");
     setenv("PATH", (oriPath + ":" + neuropod::jni::to_string(env, libPath)).c_str(), 1 /* Overwrite */);
 
+// Java/JVM loads lib without RTLD_GLOBAL that is necessary for neuropod's plugable design.
+// But appeared that we should not do it for Apple/OSX.
+#ifndef __APPLE__
     std::string libNeuropod("libneuropod.so");
     if (dlopen(libNeuropod.c_str(), RTLD_LAZY | RTLD_GLOBAL) == nullptr)
     {
@@ -51,6 +54,8 @@ JNIEXPORT void JNICALL Java_com_uber_neuropod_LibraryLoader_nativeExport(JNIEnv 
                 SPDLOG_TRACE("Loading '{}' failed. Error from dlopen: {}", libNeuropod, err);
             }
     }
+#endif
+
 }
 
 // NOLINTNEXTLINE(readability-identifier-naming): Ignore function case for Java API methods

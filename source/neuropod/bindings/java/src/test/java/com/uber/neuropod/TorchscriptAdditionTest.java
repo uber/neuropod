@@ -22,6 +22,7 @@ public class TorchscriptAdditionTest extends NeuropodAdditionTest {
     public void setUp() throws Exception {
         this.model_path = "neuropod/tests/test_data/torchscript_addition_model/";
         this.platform = "torchscript";
+        this.opts.useOpe = false;
         this.prepareEnvironment();
     }
 }

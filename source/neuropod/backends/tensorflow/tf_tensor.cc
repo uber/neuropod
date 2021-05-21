@@ -126,6 +126,10 @@ std::vector<int64_t> get_dims(const tensorflow::Tensor &tensor)
     return shape;
 }
 
+
+static char alignOptions = 0;
+
+
 void create_tensor_from_existing_memory(const std::vector<int64_t> &dims,
                                         void *                      data,
                                         const Deleter &             deleter,
@@ -137,20 +141,36 @@ void create_tensor_from_existing_memory(const std::vector<int64_t> &dims,
     auto deleter_handle = register_deleter(deleter, data);
     if (reinterpret_cast<intptr_t>(data) % 64 != 0)
     {
-        SPDLOG_WARN("In order to wrap data, TensorFlow expects data to be 64 byte aligned! Making a copy...");
+        if ((alignOptions & 1) != true)
+        {
+            const char* tmp = std::getenv("NEUROPOD_ALIGN_OPTIONS");
+            if (tmp != nullptr) {
+              alignOptions = tmp[0] - '\0';
+            }
+            // Set 1 bit as "set" flag
+            alignOptions = (alignOptions | (1 << 1));
+        }
 
-        // Copy the data
-        void *copy_buffer = malloc(data_size_bytes + 64);
-        void *aligned     = detail::get_next_aligned_offset(copy_buffer);
+        // Check if "supress report" flag is set. 
+        if ((alignOptions & 2) != true) {
+            SPDLOG_WARN("In order to wrap data, TensorFlow expects data to be 64 byte aligned! Making a copy...");
+        }
 
-        memcpy(aligned, data, data_size_bytes);
+        // Check if "turn off copy"flag is set.
+        if ((alignOptions & 4) != true) {
+            // Copy the data
+            void *copy_buffer = malloc(data_size_bytes + 64);
+            void *aligned     = detail::get_next_aligned_offset(copy_buffer);
 
-        // Run the deleter on the original data since we no longer need it
-        run_deleter(deleter_handle);
+            memcpy(aligned, data, data_size_bytes);
 
-        // Register a new deleter and update the buffer
-        deleter_handle = register_deleter([](void *to_free) { free(to_free); }, copy_buffer);
-        data           = aligned;
+            // Run the deleter on the original data since we no longer need it
+            run_deleter(deleter_handle);
+
+            // Register a new deleter and update the buffer
+            deleter_handle = register_deleter([](void *to_free) { free(to_free); }, copy_buffer);
+            data           = aligned;
+        }
     }
 
     buf    = new NeuropodTensorBuffer(data, data_size_bytes, deleter_handle);

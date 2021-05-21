@@ -1,17 +1,16 @@
-/* Copyright (c) 2020 The Neuropod Authors
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-*/
+/*
+ * Copyright (c) 2020 UATC, LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
+ */
 
 package com.uber.neuropod;
 
@@ -37,17 +36,19 @@ public class NeuropodAdditionTest {
     // Platform should be set by derived class to (tensorflow, torchscript).
     protected String platform;
 
-    // When asserting float and double, juint4 requires an additional delta value. Float and double are not precise.
-    // If the absolute difference between the expected value and the actual value is smaller than this delta value,
+    // Can be updated by derived class.
+    protected RuntimeOptions opts = new RuntimeOptions();
+
+    // When asserting float and double, juint4 requires an additional delta value. Float and double
+    // are not precise.
+    // If the absolute difference between the expected value and the actual value is smaller than
+    // this delta value,
     // junit4 will think they are the same value even they do not equal to each other.
     private static final double EPSILON = 1E-6;
 
     protected void prepareEnvironment() throws Exception {
         LibraryLoader.load();
 
-        RuntimeOptions opts = new RuntimeOptions();
-        // TODO(weijiad): For now OPE is required to use the Java bindings
-        opts.useOpe = false;
         model = new Neuropod(model_path, opts);
     }
 
@@ -95,16 +96,14 @@ public class NeuropodAdditionTest {
     @Test
     public void getOutputs() {
         Set<TensorSpec> outputs = new HashSet<>(model.getOutputs());
-        Set<TensorSpec> expected = new HashSet<>(Arrays.asList(
-                new TensorSpec("out", TensorType.FLOAT_TENSOR,
-                        Arrays.asList(new Dimension(-1), new Dimension(-1)))));
+        Set<TensorSpec> expected = new HashSet<>(Arrays.asList(new TensorSpec("out",
+                TensorType.FLOAT_TENSOR, Arrays.asList(new Dimension(-1), new Dimension(-1)))));
         assertEquals(outputs, expected);
     }
 
     @Test
     public void loadModel() {
         RuntimeOptions ope = new RuntimeOptions();
-        // TODO(weijiad): For now OPE is required to use the Java bindings
         ope.useOpe = false;
         ope.loadModelAtConstruction = false;
         try (Neuropod model = new Neuropod(model_path, ope)) {
@@ -125,18 +124,20 @@ public class NeuropodAdditionTest {
         Map<String, NeuropodTensor> inputs = new HashMap<>();
         TensorType type = TensorType.FLOAT_TENSOR;
 
-        ByteBuffer bufferX = ByteBuffer.allocateDirect(type.getBytesPerElement() * 2).order(ByteOrder.nativeOrder());
+        ByteBuffer bufferX = ByteBuffer.allocateDirect(type.getBytesPerElement() * 2)
+                .order(ByteOrder.nativeOrder());
         FloatBuffer floatBufferX = bufferX.asFloatBuffer();
         floatBufferX.put(1.0f);
         floatBufferX.put(2.0f);
-        NeuropodTensor tensorX = allocator.tensorFromMemory(bufferX, new long[]{1L, 2L}, type);
+        NeuropodTensor tensorX = allocator.tensorFromMemory(bufferX, new long[] {1L, 2L}, type);
         inputs.put("x", tensorX);
 
-        ByteBuffer bufferY = ByteBuffer.allocateDirect(type.getBytesPerElement() * 2).order(ByteOrder.nativeOrder());
+        ByteBuffer bufferY = ByteBuffer.allocateDirect(type.getBytesPerElement() * 2)
+                .order(ByteOrder.nativeOrder());
         FloatBuffer floatBufferY = bufferY.asFloatBuffer();
         floatBufferY.put(3.0f);
         floatBufferY.put(4.0f);
-        NeuropodTensor tensorY = allocator.tensorFromMemory(bufferY, new long[]{1L, 2L}, type);
+        NeuropodTensor tensorY = allocator.tensorFromMemory(bufferY, new long[] {1L, 2L}, type);
         inputs.put("y", tensorY);
 
         Map<String, NeuropodTensor> res = model.infer(inputs);
@@ -147,19 +148,20 @@ public class NeuropodAdditionTest {
         assertNotNull(out);
         FloatBuffer outBuffer = out.toFloatBuffer();
 
-        assertArrayEquals(new long[]{1L, 2L}, out.getDims());
+        assertArrayEquals(new long[] {1L, 2L}, out.getDims());
         assertEquals(2, out.getNumberOfElements());
         assertEquals(TensorType.FLOAT_TENSOR, out.getTensorType());
 
-        assertEquals(4.0f , outBuffer.get(0), EPSILON);
-        assertEquals(6.0f , outBuffer.get(1), EPSILON);
+        assertEquals(4.0f, outBuffer.get(0), EPSILON);
+        assertEquals(6.0f, outBuffer.get(1), EPSILON);
 
         try {
-           // Test that it detects type-mismatch if we try to take Float Output Tensor as Double.
-           DoubleBuffer doubleBuffer = out.toDoubleBuffer();
-           Assert.fail("Expected exception on wrong type");
+            // Test that it detects type-mismatch if we try to take Float Output Tensor as Double.
+            DoubleBuffer doubleBuffer = out.toDoubleBuffer();
+            Assert.fail("Expected exception on wrong type");
         } catch (Exception expected) {
-           assertTrue(expected.getMessage(), expected.getMessage().contains("tensorType mismatch"));
+            assertTrue(expected.getMessage(),
+                    expected.getMessage().contains("tensorType mismatch"));
         }
 
         out.close();
@@ -178,34 +180,36 @@ public class NeuropodAdditionTest {
     @Test
     public void inferWithUnexpectedRequestedOutput() {
         // Note that TF performs validation of requested output at the very begining.
-        // Hence it doesn't need valid Input in this test because it supposed to fail before it tests Input.
+        // Hence it doesn't need valid Input in this test because it supposed to fail before it
+        // tests Input.
         // But Torchscript is trying to use input and only then detects wrong requested output.
         // This is why we build valid Input here even we don't care about input/output value really.
         NeuropodTensorAllocator allocator = model.getTensorAllocator();
         TensorType type = TensorType.FLOAT_TENSOR;
-        ByteBuffer buffer = ByteBuffer.allocateDirect(type.getBytesPerElement() * 2).order(ByteOrder.nativeOrder());
+        ByteBuffer buffer = ByteBuffer.allocateDirect(type.getBytesPerElement() * 2)
+                .order(ByteOrder.nativeOrder());
         FloatBuffer floatBuffer = buffer.asFloatBuffer();
         floatBuffer.put(1.0f);
-        NeuropodTensor tensor = allocator.tensorFromMemory(buffer, new long[]{1L, 1L}, type);
+        NeuropodTensor tensor = allocator.tensorFromMemory(buffer, new long[] {1L, 1L}, type);
 
         Map<String, NeuropodTensor> inputs = new HashMap<>();
         inputs.put("x", tensor);
         inputs.put("y", tensor);
 
         try {
-           // Inference with requested outputs.
-           List<String> requestedOutputs = new ArrayList<String>();
-           requestedOutputs.add("out");
-           // Add unexpected "requested output" that should cause a failure.
-           requestedOutputs.add("out_wrong");
-           Map<String, NeuropodTensor> res = model.infer(inputs, requestedOutputs);
-           Assert.fail("Expected exception on wrong requested output");
+            // Inference with requested outputs.
+            List<String> requestedOutputs = new ArrayList<String>();
+            requestedOutputs.add("out");
+            // Add unexpected "requested output" that should cause a failure.
+            requestedOutputs.add("out_wrong");
+            Map<String, NeuropodTensor> res = model.infer(inputs, requestedOutputs);
+            Assert.fail("Expected exception on wrong requested output");
         } catch (Exception expected) {
-           // Note that TF and Torchscript returns different exception message.
-           // TF: Node out_wrong not found in node_name_mapping
-           // Torchscript: Tried to request a tensor that does not exist: out_wrong
-           // Test that message contains out_wrong name.
-           assertTrue(expected.getMessage(), expected.getMessage().contains("out_wrong"));
+            // Note that TF and Torchscript returns different exception message.
+            // TF: Node out_wrong not found in node_name_mapping
+            // Torchscript: Tried to request a tensor that does not exist: out_wrong
+            // Test that message contains out_wrong name.
+            assertTrue(expected.getMessage(), expected.getMessage().contains("out_wrong"));
         }
 
         tensor.close();
