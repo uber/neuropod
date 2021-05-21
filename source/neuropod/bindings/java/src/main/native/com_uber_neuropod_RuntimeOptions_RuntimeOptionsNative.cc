@@ -34,7 +34,9 @@ Java_com_uber_neuropod_RuntimeOptions_00024RuntimeOptionsNative_nativeCreate(JNI
                                                                              jstring  jControlQueueName,
                                                                              jint     visibleDevice,
                                                                              jboolean loadModelAtConstruction,
-                                                                             jboolean disableShapeAndTypeChecking)
+                                                                             jboolean disableShapeAndTypeChecking,
+                                                                             jint interOpParallelismThreads,
+                                                                             jint intraOpParallelismThreads)
 {
     try
     {
@@ -46,6 +48,8 @@ Java_com_uber_neuropod_RuntimeOptions_00024RuntimeOptionsNative_nativeCreate(JNI
         opts->visible_device                      = static_cast<int32_t>(visibleDevice);
         opts->load_model_at_construction          = (loadModelAtConstruction == JNI_TRUE);
         opts->disable_shape_and_type_checking     = (disableShapeAndTypeChecking == JNI_TRUE);
+        opts->experimental_inter_op_parallelism_threads = static_cast<uint32_t>(interOpParallelismThreads);
+        opts->experimental_intra_op_parallelism_threads = static_cast<uint32_t>(intraOpParallelismThreads);
         return reinterpret_cast<jlong>(opts);
     }
     catch (const std::exception &e)
