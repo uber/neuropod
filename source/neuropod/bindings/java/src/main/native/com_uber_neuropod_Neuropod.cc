@@ -297,3 +297,94 @@ JNIEXPORT jobject JNICALL Java_com_uber_neuropod_Neuropod_nativeInfer(
     }
     return nullptr;
 }
+
+JNIEXPORT jlong JNICALL Java_com_uber_neuropod_Neuropod_nativePrepare(JNIEnv *env, jclass, jobjectArray entryArray)
+{
+    try
+    {
+        // Prepare requestedOutputs
+        std::vector<std::string> requestedOutputs;
+
+
+        // Fill in NeuropodValueMap
+        jsize                      entrySize = env->GetArrayLength(entryArray);
+        std::unique_ptr<neuropod::NeuropodValueMap> nativeMap(new neuropod::NeuropodValueMap());
+        for (jsize i = 0; i < entrySize; i++)
+        {
+            jobject     entry = env->GetObjectArrayElement(entryArray, i);
+            std::string key   = njni::to_string(
+                env, static_cast<jstring>(env->CallObjectMethod(entry, njni::java_util_Map_Entry_getKey)));
+            jobject value        = env->CallObjectMethod(entry, njni::java_util_Map_Entry_getValue);
+            jlong   tensorHandle = env->CallLongMethod(value, njni::com_uber_neuropod_NeuropodTensor_getHandle);
+            if (tensorHandle == 0 || env->ExceptionCheck())
+            {
+                throw std::runtime_error("invalid tensor handle");
+            }
+            nativeMap->insert(
+                std::make_pair(key, *reinterpret_cast<std::shared_ptr<neuropod::NeuropodValue> *>(tensorHandle)));
+            env->DeleteLocalRef(entry);
+            env->DeleteLocalRef(value);
+        }
+
+        return reinterpret_cast<jlong>(nativeMap.release());
+    }
+    catch (const std::exception &e)
+    {
+        njni::throw_java_exception(env, e.what());
+    }
+    return 0;
+}
+
+JNIEXPORT void JNICALL Java_com_uber_neuropod_Neuropod_nativeDeletePrepared(JNIEnv *env, jclass, jlong handle)
+{
+    try
+    {
+        delete reinterpret_cast<neuropod::NeuropodValueMap *>(handle);
+    }
+    catch (const std::exception &e)
+    {
+        njni::throw_java_exception(env, e.what());
+    }
+}
+
+
+JNIEXPORT jobject JNICALL Java_com_uber_neuropod_Neuropod_nativeInferPrepared(JNIEnv *env, jclass, jlong inputHandle, jlong modelHandle)
+{
+    try
+    {
+        auto model       = reinterpret_cast<neuropod::Neuropod *>(modelHandle);
+        auto nativeMap   = reinterpret_cast<neuropod::NeuropodValueMap*>(inputHandle);
+
+        std::vector<std::string> requestedOutputs;
+        auto inferredMap = model->infer(*nativeMap, requestedOutputs);
+
+        // Put data to Java Map
+        auto ret = env->NewObject(njni::java_util_HashMap, njni::java_util_HashMap_);
+        if (!ret || env->ExceptionCheck())
+        {
+            throw std::runtime_error("NewObject failed: cannot create HashMap");
+        }
+
+        for (auto &entry : *inferredMap)
+        {
+            jobject javaTensor = env->NewObject(njni::com_uber_neuropod_NeuropodTensor,
+                                                njni::com_uber_neuropod_NeuropodTensor_,
+                                                reinterpret_cast<jlong>(njni::toHeap(entry.second)));
+
+            if (!javaTensor || env->ExceptionCheck())
+            {
+                throw std::runtime_error("NewObject failed: cannot create output Tensor");
+            }
+
+            env->CallObjectMethod(ret, njni::java_util_HashMap_put, env->NewStringUTF(entry.first.c_str()), javaTensor);
+            env->DeleteLocalRef(javaTensor);
+        }
+        return ret;
+    }
+    catch (const std::exception &e)
+    {
+        njni::throw_java_exception(env, e.what());
+    }
+    return nullptr;
+}
+

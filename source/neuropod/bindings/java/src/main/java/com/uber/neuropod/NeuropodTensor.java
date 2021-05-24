@@ -47,6 +47,16 @@ public class NeuropodTensor extends NativeClass implements Serializable {
         buffer = nativeGetBuffer(handle).order(ByteOrder.nativeOrder());
     }
 
+    public static void closeQuietly(AutoCloseable c) {
+        if (c != null) {
+            try {
+                c.close();
+            } catch (Exception e) {
+                throw new NeuropodJNIException(e.getMessage());
+            }
+        }
+    }
+
     /**
      * Get the dims array which represnents the shape of a tensor.
      *
@@ -89,7 +99,6 @@ public class NeuropodTensor extends NativeClass implements Serializable {
             return buffer.asLongBuffer();
         }
         LongBuffer ret = LongBuffer.allocate((int) getNumberOfElements()).put(buffer.asLongBuffer());
-        ret.rewind();
         return ret;
     }
 
@@ -108,7 +117,6 @@ public class NeuropodTensor extends NativeClass implements Serializable {
             return buffer.asFloatBuffer();
         }
         FloatBuffer ret = FloatBuffer.allocate((int) getNumberOfElements()).put(buffer.asFloatBuffer());
-        ret.rewind();
         return ret;
     }
 
@@ -127,7 +135,6 @@ public class NeuropodTensor extends NativeClass implements Serializable {
             return buffer.asIntBuffer();
         }
         IntBuffer ret = IntBuffer.allocate((int) getNumberOfElements()).put(buffer.asIntBuffer());
-        ret.rewind();
         return ret;
     }
 
@@ -146,7 +153,6 @@ public class NeuropodTensor extends NativeClass implements Serializable {
             return buffer.asDoubleBuffer();
         }
         DoubleBuffer ret = DoubleBuffer.allocate((int) getNumberOfElements()).put(buffer.asDoubleBuffer());
-        ret.rewind();
         return ret;
     }
 
@@ -272,7 +278,7 @@ public class NeuropodTensor extends NativeClass implements Serializable {
     private long toPos(long[] index) {
         long[] dims = getDims();
         if (index.length != dims.length) {
-            throw new java.lang.IndexOutOfBoundsException("index "
+            throw new IndexOutOfBoundsException("index "
                    + Arrays.toString(index) + " does not match dimension size, actual dims is " + Arrays.toString(dims));
        }
 
@@ -280,7 +286,7 @@ public class NeuropodTensor extends NativeClass implements Serializable {
         long acc = 1;
         for (int i = dims.length - 1; i >= 0; i--) {
             if (index[i] >= dims[i]) {
-                throw new java.lang.IndexOutOfBoundsException("index "
+                throw new IndexOutOfBoundsException("index "
                         + Arrays.toString(index) + " has out of bounds value, actual dims is " + Arrays.toString(dims));
             }
             pos += index[i] * acc;

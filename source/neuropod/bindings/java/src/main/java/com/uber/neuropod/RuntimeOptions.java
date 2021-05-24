@@ -75,9 +75,9 @@ public class RuntimeOptions {
      */
     public boolean disableShapeAndTypeChecking = false;
 
-    public int intraOpParallelismThreads = 4;
+    public int intraOpParallelismThreads = 0;
 
-    public int interOpParallelismThreads = 4;
+    public int interOpParallelismThreads = 0;
 
     /**
      * Instantiates a new Runtime options.

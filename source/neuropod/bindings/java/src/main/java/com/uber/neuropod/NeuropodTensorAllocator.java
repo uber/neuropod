@@ -15,11 +15,15 @@ limitations under the License.
 
 package com.uber.neuropod;
 
+import java.lang.reflect.Field;
+import java.nio.ByteBuffer;
+import java.nio.Buffer;
 import java.nio.*;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import sun.misc.Unsafe;
 
 /**
  * The factory type for NeuropodTensor, can be obtained from a neuropod model or as a generic allocator.
@@ -30,11 +34,63 @@ public class NeuropodTensorAllocator extends NativeClass {
         super(handle);
     }
 
+    private static Unsafe unsafe = null;
+    private static long addressOffset;
+    static {
+        try {
+            final Field unsafeField = Unsafe.class.getDeclaredField("theUnsafe");
+            unsafeField.setAccessible(true);
+            unsafe = (Unsafe) unsafeField.get(null);
+            addressOffset = unsafe.objectFieldOffset(Buffer.class.getDeclaredField("address"));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static long getAddress(ByteBuffer buffy) {
+        // steal the value of address field from Buffer, holding the memory address for this ByteBuffer
+        return unsafe.getLong(buffy, addressOffset);
+    }
+
+    public static ByteBuffer allocateAlignedByteBuffer(int capacity, long align) {
+        // Power of 2 --> single bit, none power of 2 alignments are not allowed.
+        if (Long.bitCount(align) != 1) {
+            throw new IllegalArgumentException("Alignment must be a power of 2");
+        }
+        // We over allocate by the alignment so we know we can have a large enough aligned
+        // block of memory to use. Also set order to native while we are here.
+        ByteBuffer allocatedBuffer = ByteBuffer.allocateDirect((int) (capacity + align));
+        long address = getAddress(allocatedBuffer);
+
+        // check if the address is already aligned
+        // Because JDK11 is used to build but 8 at runtime, there is a problem with ByteBuffer methods:
+        // https://github.com/eclipse/jetty.project/issues/3244
+        // This is know problem https://engwiki.uberinternal.com/display/TE0DEVEXP/%5BFAQ%5D+Migrating+to+Java+11
+        Buffer buffy = (Buffer) allocatedBuffer;
+        if ((address & (align - 1)) == 0) {
+            buffy.limit(capacity);
+            return allocatedBuffer.slice().order(ByteOrder.nativeOrder());
+        } else {
+            // shift the start position to an aligned address --> address + (align - (address % align))
+            // the formula is valid for power of 2 values only
+            int newPosition = (int) (align - (address & (align - 1)));
+            buffy.position(newPosition);
+            int newLimit = newPosition + capacity;
+            buffy.limit(newLimit);
+            return allocatedBuffer.slice().order(ByteOrder.nativeOrder());
+        }
+    }
+
     private static final Set<TensorType> SUPPORTED_TENSOR_TYPES = new HashSet<>(Arrays.asList(
             TensorType.INT32_TENSOR,
             TensorType.INT64_TENSOR,
             TensorType.DOUBLE_TENSOR,
             TensorType.FLOAT_TENSOR));
+
+
+    public Set<TensorType> getSupportedTensorTypes() {
+        return SUPPORTED_TENSOR_TYPES;
+    }
 
     /**
      * Create a NeuropodTensor based on given ByteBuffer, dims array and tensorType. The created tensor

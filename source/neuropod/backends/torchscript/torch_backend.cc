@@ -251,7 +251,7 @@ TorchNeuropodBackend::TorchNeuropodBackend(const std::string &neuropod_path, con
         if (num_interop_threads.compare_exchange_strong(no_value, nthreads)) {
             torch::set_num_interop_threads(static_cast<int32_t>(
                 options.experimental_inter_op_parallelism_threads));
-        } else {
+        } else if (nthreads != no_value) {
             SPDLOG_INFO("TORCH: cannot set number of interop threads (value={}) "
             "after it was set (value={}) or parallel work started.", nthreads, no_value);
         }
@@ -299,7 +299,6 @@ void TorchNeuropodBackend::load_model_internal()
 
     model_ = load_model_from_path(*graph_stream,
                                   custom_ops,
-
                                   // Load the model onto the appropriate device (ideally a GPU if we have one available)
                                   // Note: this uses the options set in the initializer list above
                                   get_torch_device(DeviceType::CPU));
@@ -315,8 +314,7 @@ void TorchNeuropodBackend::load_model_internal()
     }
 }
 
-TorchNeuropodBackend::~TorchNeuropodBackend() {
-}
+TorchNeuropodBackend::~TorchNeuropodBackend() = default;
 
 torch::Device TorchNeuropodBackend::get_torch_device(NeuropodDeviceType target_device)
 {
@@ -454,7 +452,6 @@ std::unique_ptr<NeuropodValueMap> TorchNeuropodBackend::infer_internal(const Neu
         {
             NEUROPOD_ERROR("Model did not return dict and output spec is not size 1");
         }
-
 
         auto &name        = output_specs_[0].name;
         auto &tensor_type = output_specs_[0].type;
