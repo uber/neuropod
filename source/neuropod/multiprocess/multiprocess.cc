@@ -203,7 +203,9 @@ public:
 
         // Since we're using CUDA_VISIBLE_DEVICES to set the appropriate device above,
         // we'll just tell the worker to use GPU0
-        load_config_.opts.visible_device = Device::GPU0;
+        // load_config_.opts.visible_device = Device::GPU0;
+        // NJNI needs CPU in OPE mode.
+        load_config_.opts.visible_device = Device::CPU;
 
         if (options.load_model_at_construction)
         {
