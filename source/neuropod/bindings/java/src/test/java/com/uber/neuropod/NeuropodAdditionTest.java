@@ -104,6 +104,11 @@ public class NeuropodAdditionTest {
     @Test
     public void loadModel() {
         RuntimeOptions ope = new RuntimeOptions();
+        ope.visibleDevice = NeuropodDevice.CPU;
+        ope.disableShapeAndTypeChecking = true;
+        ope.freeMemoryEveryCycle = false;
+        ope.intraOpParallelismThreads = 2;
+        ope.interOpParallelismThreads = 3;
         ope.useOpe = false;
         ope.loadModelAtConstruction = false;
         try (Neuropod model = new Neuropod(model_path, ope)) {
@@ -216,8 +221,90 @@ public class NeuropodAdditionTest {
         allocator.close();
     }
 
+    @Test
+    public void inferWithPrepared() {
+        NeuropodTensorAllocator allocator = model.getTensorAllocator();
+        Map<String, NeuropodTensor> inputs = new HashMap<>();
+        TensorType type = TensorType.FLOAT_TENSOR;
+
+        ByteBuffer bufferX = NeuropodTensorAllocator.allocateAlignedByteBuffer(type.getBytesPerElement() * 2, 64)
+                .order(ByteOrder.nativeOrder());
+        FloatBuffer floatBufferX = bufferX.asFloatBuffer();
+        floatBufferX.put(1.0f);
+        floatBufferX.put(2.0f);
+        NeuropodTensor tensorX = allocator.tensorFromMemory(bufferX, new long[] {1L, 2L}, type);
+        inputs.put("x", tensorX);
+
+        ByteBuffer bufferY = NeuropodTensorAllocator.allocateAlignedByteBuffer(type.getBytesPerElement() * 2, 64)
+                .order(ByteOrder.nativeOrder());
+        FloatBuffer floatBufferY = bufferY.asFloatBuffer();
+        floatBufferY.put(3.0f);
+        floatBufferY.put(4.0f);
+        NeuropodTensor tensorY = allocator.tensorFromMemory(bufferY, new long[] {1L, 2L}, type);
+        inputs.put("y", tensorY);
+
+        Neuropod.Prepared prepared = model.new Prepared(inputs);
+        Map<String, NeuropodTensor> res = prepared.infer();
+        assertEquals(1, res.size());
+
+        assertTrue(res.containsKey("out"));
+        NeuropodTensor out = res.get("out");
+        assertNotNull(out);
+        FloatBuffer outBuffer = out.toFloatBuffer();
+
+        assertArrayEquals(new long[] {1L, 2L}, out.getDims());
+        assertEquals(2, out.getNumberOfElements());
+        assertEquals(TensorType.FLOAT_TENSOR, out.getTensorType());
+
+        assertEquals(4.0f, outBuffer.get(0), EPSILON);
+        assertEquals(6.0f, outBuffer.get(1), EPSILON);
+
+        try {
+            // Test that it detects type-mismatch if we try to take Float Output Tensor as Double.
+            DoubleBuffer doubleBuffer = out.toDoubleBuffer();
+            Assert.fail("Expected exception on wrong type");
+        } catch (Exception expected) {
+            assertTrue(expected.getMessage(),
+                    expected.getMessage().contains("tensorType mismatch"));
+        }
+
+        out.close();
+
+        // Inference with requested outputs.
+        int i = 10;
+        while (i-- >= 1) {
+            floatBufferX.rewind();
+            float fi = (float)i;
+            floatBufferX.put(fi + 1.0f);
+            floatBufferX.put(fi + 2.0f);
+            res = prepared.infer();
+            assertEquals(1, res.size());
+
+            assertTrue(res.containsKey("out"));
+            out = res.get("out");
+            assertNotNull(out);
+            outBuffer = out.toFloatBuffer();
+
+            assertArrayEquals(new long[] {1L, 2L}, out.getDims());
+            assertEquals(2, out.getNumberOfElements());
+            assertEquals(TensorType.FLOAT_TENSOR, out.getTensorType());
+
+            assertEquals(fi + 4.0f, outBuffer.get(0), EPSILON);
+            assertEquals(fi + 6.0f, outBuffer.get(1), EPSILON);
+            long[] d = out.getDims();
+            NeuropodTensor.closeQuietly(out);
+            // System.out.println("TRACE: i=" + i + " out[0]=" + outBuffer.get(0) + " out[1]=" + outBuffer.get(1));
+            // System.out.println("TRACE: i=" + i + " dims[0]=" + d[0] + " dims[1]=" + d[1]);
+        }
+
+        NeuropodTensor.closeQuietly(tensorX);
+        NeuropodTensor.closeQuietly(tensorY);
+        allocator.close();
+    }
+
+
     @After
     public void tearDown() throws Exception {
-        model.close();
+        if (model != null) model.close();
     }
 }

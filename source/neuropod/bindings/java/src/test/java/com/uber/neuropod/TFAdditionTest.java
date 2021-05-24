@@ -23,8 +23,11 @@ public class TFAdditionTest extends NeuropodAdditionTest {
         this.model_path = "neuropod/tests/test_data/tf_addition_model/";
         this.platform = "tensorflow";
         this.opts.useOpe = false;
-        this.opts.interOpParallelismThreads = 2;
-        this.opts.intraOpParallelismThreads = 3;
+        this.opts.visibleDevice = NeuropodDevice.CPU;
+        this.opts.disableShapeAndTypeChecking = true;
+        this.opts.freeMemoryEveryCycle = false;
+        this.opts.intraOpParallelismThreads = 2;
+        this.opts.interOpParallelismThreads = 3;
         this.prepareEnvironment();
     }
 }

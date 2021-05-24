@@ -34,7 +34,7 @@ public class Neuropod extends NativeClass {
      *
      * @param neuropodPath the neuropod model path
      */
-    public Neuropod(String neuropodPath) throws NeuropodJNIException {
+    public Neuropod(String neuropodPath) throws NeuropodJNIException, IllegalAccessException {
         super.setNativeHandle(nativeNew(neuropodPath, 0));
     }
 
@@ -151,7 +151,42 @@ public class Neuropod extends NativeClass {
 
     private static native Map<String, NeuropodTensor> nativeInfer(Object[] inputs, List<String> requestedOutputs,
                                                                   long modelHandle);
-
     @Override
     protected native void nativeDelete(long handle);
+
+
+    public class Prepared extends NativeClass {
+        private Map<String, NeuropodTensor> inputsArray = null;
+        Prepared(Map<String, NeuropodTensor> inputs) {
+            super(nativePrepare(inputs.entrySet().toArray()));
+            this.inputsArray = inputs;
+        }
+
+        /**
+         * Call callable by given handle. before this calls, Input Tensor buffers should be updated with new values.
+         * After the call output data will be availbale through Output Tensors that were provided to callable
+         * during "prepared" call.
+         * @param handle to callable
+         */
+        public Map<String, NeuropodTensor> infer() {
+            return Neuropod.nativeInferPrepared(super.getNativeHandle(), Neuropod.this.getNativeHandle());
+        }
+
+        @Override
+        protected void nativeDelete(long handle) {
+            if (this.inputsArray != null)
+                this.inputsArray.values().forEach(NeuropodTensor::closeQuietly);
+            nativeDeletePrepared(handle);
+        }
+    }
+
+    // Returns handle for inference context with given inputs for model. Note that inputs already have Tensors
+    // that were allocated with model's allocator and this is why this call doesn't need model's handle at all.
+    // Caller can prepare it once, then update input buffers, call infer and get output.
+    // This can be repeated again for the same set of inputs, with the same size and shape.
+    private static native long nativePrepare(Object[] inputs);
+    private static native void nativeDeletePrepared(long handle);
+
+    // Perform inference using prepared  that already contains inputs.
+    private static native Map<String, NeuropodTensor> nativeInferPrepared(long preparedHandle, long modelHandle);
 }

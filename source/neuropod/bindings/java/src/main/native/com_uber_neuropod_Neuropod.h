@@ -90,6 +90,27 @@ JNIEXPORT jobject JNICALL Java_com_uber_neuropod_Neuropod_nativeInfer(JNIEnv *, 
 
 /*
  * Class:     com_uber_neuropod_Neuropod
+ * Method:    nativePrepare
+ * Signature: ([Ljava/lang/Object)J
+ */
+JNIEXPORT jlong JNICALL Java_com_uber_neuropod_Neuropod_nativePrepare(JNIEnv *, jclass, jobjectArray);
+
+/*
+ * Class:     com_uber_neuropod_Neuropod
+ * Method:    nativeInferPrepared
+ * Signature: (J;J)Ljava/util/Map;
+ */
+JNIEXPORT jobject JNICALL Java_com_uber_neuropod_Neuropod_nativeInferPrepared(JNIEnv *, jclass, jlong, jlong);
+
+/*
+ * Class:     com_uber_neuropod_Neuropod
+ * Method:    nativeDeletePrepared
+ * Signature: (J)V
+ */
+JNIEXPORT void JNICALL Java_com_uber_neuropod_Neuropod_nativeDeletePrepared(JNIEnv *, jclass, jlong);
+
+/*
+ * Class:     com_uber_neuropod_Neuropod
  * Method:    nativeDelete
  * Signature: (J)V
  */

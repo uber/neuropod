@@ -23,6 +23,7 @@ limitations under the License.
 #include <string>
 #include <unordered_map>
 #include <vector>
+#include <shared_mutex>
 
 namespace tensorflow
 {
@@ -42,8 +43,11 @@ class TensorflowNeuropodBackend : public NeuropodBackendWithDefaultAllocator<Ten
 private:
     std::unique_ptr<tensorflow::Session> session_;
 
-    // Cached access to callable handles
+    // Cached access to callable handles. Because of limited number of models, there will be
+    // few writes first and only reads then. Use RWLock strategy based on mutex and shared/unique lock interfaces.
+    mutable std::shared_mutex mutex_;
     std::unordered_map<std::string, int64_t> callable_handle_cache_;
+    int64_t find_callable_handle_cache(const std::string&) const;
 
     // Map from a neuropod node name to the appropriate node in the TF graph
     std::unordered_map<std::string, std::string> node_name_mapping_;

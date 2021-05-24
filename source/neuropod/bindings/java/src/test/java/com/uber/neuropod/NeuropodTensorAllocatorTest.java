@@ -36,6 +36,13 @@ public class NeuropodTensorAllocatorTest {
     }
 
     @Test
+    public void getAlignedBuffer() {
+        TensorType type = TensorType.FLOAT_TENSOR;
+        ByteBuffer buffer = NeuropodTensorAllocator.allocateAlignedByteBuffer(4 * type.getBytesPerElement(), 64);
+        tensorFromMemoryFloatBuffer(buffer);
+    }
+
+    @Test
     public void getTensorValueAsIntWithOutOfBounds() {
         IntBuffer intBuffer = IntBuffer.allocate(4);
         for (int i = 0; i < 4; i++) {
@@ -181,6 +188,11 @@ public class NeuropodTensorAllocatorTest {
         TensorType type = TensorType.FLOAT_TENSOR;
         ByteBuffer buffer = ByteBuffer.allocateDirect(4 * type.getBytesPerElement())
                 .order(ByteOrder.nativeOrder());
+        tensorFromMemoryFloatBuffer(buffer);
+    }
+
+    private void tensorFromMemoryFloatBuffer(ByteBuffer buffer) {
+        TensorType type = TensorType.FLOAT_TENSOR;
         FloatBuffer typedBuffer = buffer.asFloatBuffer();
         for (int i = 0; i < 4; i++) {
             typedBuffer.put(i);

@@ -287,22 +287,29 @@ TensorflowNeuropodBackend::~TensorflowNeuropodBackend()
     }
 }
 
+int64_t TensorflowNeuropodBackend::find_callable_handle_cache(const std::string& cache_key) const {
+    std::shared_lock lock(mutex_);
+    auto it = callable_handle_cache_.find(cache_key);
+    return it != callable_handle_cache_.end() ? it->second : 0;
+}
+
 int64_t TensorflowNeuropodBackend::get_callable(const std::map<std::string, tensorflow::Tensor> &tensor_feeds,
                                                 const std::map<std::string, std::string> &       tensor_fetches)
 {
     tensorflow::Session::CallableHandle handle{};
 
     const auto cache_key     = get_handle_cache_key(tensor_feeds, tensor_fetches);
-    auto       cached_handle = callable_handle_cache_.find(cache_key);
-    if (cached_handle != callable_handle_cache_.end())
+
+    auto       cached_handle = find_callable_handle_cache(cache_key);
+    if (cached_handle != 0)
     {
         // Cache hit!
-        handle = cached_handle->second;
+        handle = cached_handle;
     }
     else
     {
         // Cache miss...
-        SPDLOG_DEBUG("TF: Callable cache miss. Creating new callable...");
+        SPDLOG_DEBUG("TF: Callable cache miss. Creating new callable... key={}", cache_key);
 
         // Used for setting the inputs and outputs of the subgraph we want to run
         tensorflow::CallableOptions opts;
@@ -327,6 +334,7 @@ int64_t TensorflowNeuropodBackend::get_callable(const std::map<std::string, tens
         check_tf_status(session_->MakeCallable(opts, &handle));
 
         // Add it to our cache
+        std::unique_lock lock(mutex_);
         callable_handle_cache_[cache_key] = handle;
     }
 

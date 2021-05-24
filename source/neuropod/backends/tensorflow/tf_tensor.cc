@@ -141,23 +141,14 @@ void create_tensor_from_existing_memory(const std::vector<int64_t> &dims,
     auto deleter_handle = register_deleter(deleter, data);
     if (reinterpret_cast<intptr_t>(data) % 64 != 0)
     {
-        if ((alignOptions & 1) != true)
-        {
-            const char* tmp = std::getenv("NEUROPOD_ALIGN_OPTIONS");
-            if (tmp != nullptr) {
-              alignOptions = tmp[0] - '\0';
-            }
-            // Set 1 bit as "set" flag
-            alignOptions = (alignOptions | (1 << 1));
-        }
-
         // Check if "supress report" flag is set. 
-        if ((alignOptions & 2) != true) {
-            SPDLOG_WARN("In order to wrap data, TensorFlow expects data to be 64 byte aligned! Making a copy...");
+        if ((alignOptions & 1) == 0) {
+            alignOptions = (alignOptions | (1 << 1));
+            SPDLOG_INFO("In order to wrap data, TensorFlow expects data to be 64 byte aligned! Making a copy...");
         }
 
-        // Check if "turn off copy"flag is set.
-        if ((alignOptions & 4) != true) {
+        // Check if "turn off copy" flag is set.
+        if ((alignOptions & 4) == 0) {
             // Copy the data
             void *copy_buffer = malloc(data_size_bytes + 64);
             void *aligned     = detail::get_next_aligned_offset(copy_buffer);
