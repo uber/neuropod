@@ -38,6 +38,5 @@ cc_test(
     deps = [
         "//neuropod:neuropod_impl",
         "//neuropod/tests:neuropod_test_utils",
-        "@python_repo//:python_hdrs",
     ],
 )
