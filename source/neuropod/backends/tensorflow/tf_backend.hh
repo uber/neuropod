@@ -56,6 +56,10 @@ private:
     int64_t get_callable(const std::map<std::string, tensorflow::Tensor> &tensor_feeds,
                          const std::map<std::string, std::string> &       tensor_fetches);
 
+    void load_saved_model();
+
+    void load_frozen_graph(std::istream &graph_stream);
+
 public:
     TensorflowNeuropodBackend(const std::string &neuropod_path, const RuntimeOptions &options);
 

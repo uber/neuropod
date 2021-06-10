@@ -34,14 +34,12 @@ neuropod_cc_binary(
 
 neuropod_cc_library(
     name = "tensorflow_backend",
-    srcs = [
-        "tf_backend.cc",
-        "tf_backend.hh",
-        "tf_tensor.cc",
-        "tf_tensor.hh",
-        "type_utils.cc",
-        "type_utils.hh",
-    ],
+    srcs = glob([
+        "*.cc",
+        "*.hh",
+        "saved_model/*.cc",
+        "saved_model/*.h",
+    ]),
     visibility = [
         "//neuropod:__subpackages__",
     ],
