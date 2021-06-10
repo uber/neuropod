@@ -7,7 +7,7 @@ NEUROPOD_PYTHON_BINARY="python${NEUROPOD_PYTHON_VERSION}"
 # Install system dependencies
 ./build/install_system_deps.sh
 
-# Mac and Travis CI specific deps
+# Mac specific deps
 if [[ $(uname -s) == 'Darwin' ]]; then
     # Install the requested version of python
     export HOMEBREW_NO_AUTO_UPDATE=1
@@ -23,7 +23,7 @@ if [[ $(uname -s) == 'Darwin' ]]; then
         brew install pyenv
         pyenv install 3.5.4
         pyenv global 3.5.4
-        eval "$(pyenv init -)"
+        eval "$(pyenv init --path)"
     elif [[ "${NEUROPOD_PYTHON_VERSION}" == "3.6" ]]; then
         wget https://www.python.org/ftp/python/3.6.8/python-3.6.8-macosx10.9.pkg &> /dev/null
         sudo installer -pkg python-3.6.8-macosx10.9.pkg -target /
