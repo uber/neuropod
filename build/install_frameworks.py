@@ -44,6 +44,10 @@ def install_pytorch(version):
     # Get the torch cuda string (e.g. cpu, cu90, cu92, cu100)
     torch_cuda_string = "cu{}".format(CUDA_VERSION.replace(".", "")) if IS_GPU else "cpu"
 
+    # TODO(vip): Fix this once we have a better way of dealing with CUDA 11.2
+    if torch_cuda_string == "cu1121":
+        torch_cuda_string = "cpu"
+
     # The base version of torch (e.g. 1.2.0)
     version_base = None
 

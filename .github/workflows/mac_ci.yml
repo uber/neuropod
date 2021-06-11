@@ -12,8 +12,6 @@ on:
     tags:
       - v*
   pull_request:
-    branches:
-      - master
 jobs:
     build:
         runs-on: macos-10.15
@@ -73,5 +71,10 @@ jobs:
                       torch: 1.7.0
                       python: 3.8
                       test_frameworks: torchscript,python
+
+                    - tf: 2.5.0
+                      torch: 1.7.0
+                      python: 3.8
+                      test_frameworks: tensorflow
 
 

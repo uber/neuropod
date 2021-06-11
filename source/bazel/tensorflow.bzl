@@ -32,6 +32,10 @@ def _impl(repository_ctx):
             "url": "https://github.com/VivekPanyam/tensorflow-prebuilts/releases/download/0.0.1/libtensorflow2.2.0rc3+-cpu-linux-x86_64.tar.gz",
             "sha256": "ee287e2ccd41e652f51e8c36370c841caf02115bf7b0cb7d4c2119b2c8cbd5fb",
         },
+        "2.5.0-linux-cpu": {
+            "url": "https://github.com/VivekPanyam/tensorflow-prebuilts/releases/download/0.0.1/libtensorflow2.5.0rc1-cpu-linux-x86_64.tar.gz",
+            "sha256": "",
+        },
 
         # Linux GPU
         "1.12.0-linux-gpu": {
@@ -56,6 +60,10 @@ def _impl(repository_ctx):
             "url": "https://github.com/VivekPanyam/tensorflow-prebuilts/releases/download/0.0.1/libtensorflow2.2.0rc3+-gpu-linux-x86_64.tar.gz",
             "sha256": "293f907623d7c9622d0ae9b17a2b5938c633eb8e32e9461346fe6afc36fe2e71",
         },
+        "2.5.0-linux-gpu": {
+            "url": "https://github.com/VivekPanyam/tensorflow-prebuilts/releases/download/0.0.1/libtensorflow2.5.0rc1-gpu-linux-x86_64.tar.gz",
+            "sha256": "",
+        },
 
         # Mac CPU
         "1.12.0-mac-cpu": {
@@ -79,6 +87,10 @@ def _impl(repository_ctx):
         "2.2.0-mac-cpu": {
             "url": "https://github.com/VivekPanyam/tensorflow-prebuilts/releases/download/0.0.1/libtensorflow2.2.0rc3+-cpu-darwin-x86_64.tar.gz",
             "sha256": "78e788a9ada69c8b6edd4061b21ee2a87dbcc41e0c55893c5b063140c28f969d",
+        },
+        "2.5.0-mac-cpu": {
+            "url": "https://storage.googleapis.com/tensorflow/libtensorflow/libtensorflow-cpu-darwin-x86_64-2.5.0.tar.gz",
+            "sha256": "",
         },
     }
 

@@ -28,6 +28,10 @@ def _impl(repository_ctx):
             "url": "https://storage.googleapis.com/tensorflow/linux/cpu/tensorflow_cpu-2.2.0-cp38-cp38-manylinux2010_x86_64.whl",
             "sha256": "8d1b7c1d45e7f582d8703c0d0a034a60d4bac942b11205bed91fa55981124d60",
         },
+        "2.5.0-linux-cpu": {
+            "url": "https://storage.googleapis.com/tensorflow/linux/cpu/tensorflow_cpu-2.5.0rc0-cp38-cp38-manylinux2010_x86_64.whl",
+            "sha256": "",
+        },
 
         # Linux GPU
         "1.12.0-linux-gpu": {
@@ -50,6 +54,10 @@ def _impl(repository_ctx):
             "url": "https://storage.googleapis.com/tensorflow/linux/gpu/tensorflow_gpu-2.2.0-cp38-cp38-manylinux2010_x86_64.whl",
             "sha256": "845f261b0b922740bdd7f21fa3a4bed8ffd9e1712decd552fb33621da4d8ec45",
         },
+        "2.5.0-linux-gpu": {
+            "url": "https://storage.googleapis.com/tensorflow/linux/gpu/tensorflow_gpu-2.5.0rc0-cp38-cp38-manylinux2010_x86_64.whl",
+            "sha256": "",
+        },
 
         # Mac CPU
         "1.12.0-mac-cpu": {
@@ -71,6 +79,10 @@ def _impl(repository_ctx):
         "2.2.0-mac-cpu": {
             "url": "https://files.pythonhosted.org/packages/1c/fd/dea30c9b6db9305309477b8b6fc0330edbed9b36bc81c3d6094458de8b94/tensorflow-2.2.0rc3-cp35-cp35m-macosx_10_11_x86_64.whl",
             "sha256": "bc0030f7ee9b47893cb1ed312a1e91715a911d76d24b121a7934a0d6769b1297",
+        },
+        "2.5.0-mac-cpu": {
+            "url": "https://files.pythonhosted.org/packages/ee/b9/35492679a1a35fb9d8e8c075fb5d4bb26b200fbe214c14717d59e996021e/tensorflow-2.5.0rc0-cp38-cp38-macosx_10_11_x86_64.whl",
+            "sha256": "",
         },
     }
 
