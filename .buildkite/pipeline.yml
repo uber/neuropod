@@ -9,6 +9,8 @@ steps:
     timeout_in_minutes: 60
     agents:
       queue: public-gpu
+    env:
+      NEUROPOD_TEST_FRAMEWORKS: tensorflow,torchscript,python
     command: build/ci/buildkite_build.sh
     plugins:
       - docker-compose#v3.7.0:
@@ -39,6 +41,7 @@ steps:
             - CODECOV_TOKEN
             - GH_STATUS_TOKEN
             - GH_UPLOAD_TOKEN
+            - NEUROPOD_TEST_FRAMEWORKS
             - WEB_DEPLOY_KEY
     retry:
       automatic: true
@@ -77,6 +80,7 @@ steps:
             - CODECOV_TOKEN
             - GH_STATUS_TOKEN
             - GH_UPLOAD_TOKEN
+            - NEUROPOD_TEST_FRAMEWORKS
             - WEB_DEPLOY_KEY
     retry:
       automatic: true
@@ -85,6 +89,8 @@ steps:
     timeout_in_minutes: 60
     agents:
       queue: public-gpu
+    env:
+      NEUROPOD_TEST_FRAMEWORKS: tensorflow,torchscript,python
     command: build/ci/buildkite_build.sh
     plugins:
       - docker-compose#v3.7.0:
@@ -115,6 +121,7 @@ steps:
             - CODECOV_TOKEN
             - GH_STATUS_TOKEN
             - GH_UPLOAD_TOKEN
+            - NEUROPOD_TEST_FRAMEWORKS
             - WEB_DEPLOY_KEY
     retry:
       automatic: true
@@ -123,6 +130,8 @@ steps:
     timeout_in_minutes: 60
     agents:
       queue: public-gpu
+    env:
+      NEUROPOD_TEST_FRAMEWORKS: tensorflow,torchscript,python
     command: build/ci/buildkite_build.sh
     plugins:
       - docker-compose#v3.7.0:
@@ -153,6 +162,7 @@ steps:
             - CODECOV_TOKEN
             - GH_STATUS_TOKEN
             - GH_UPLOAD_TOKEN
+            - NEUROPOD_TEST_FRAMEWORKS
             - WEB_DEPLOY_KEY
     retry:
       automatic: true
@@ -161,6 +171,8 @@ steps:
     timeout_in_minutes: 60
     agents:
       queue: public-gpu
+    env:
+      NEUROPOD_TEST_FRAMEWORKS: tensorflow,torchscript,python
     command: build/ci/buildkite_build.sh
     plugins:
       - docker-compose#v3.7.0:
@@ -191,6 +203,7 @@ steps:
             - CODECOV_TOKEN
             - GH_STATUS_TOKEN
             - GH_UPLOAD_TOKEN
+            - NEUROPOD_TEST_FRAMEWORKS
             - WEB_DEPLOY_KEY
     retry:
       automatic: true
@@ -199,6 +212,8 @@ steps:
     timeout_in_minutes: 60
     agents:
       queue: public-gpu
+    env:
+      NEUROPOD_TEST_FRAMEWORKS: tensorflow,torchscript,python
     command: build/ci/buildkite_build.sh
     plugins:
       - docker-compose#v3.7.0:
@@ -229,6 +244,7 @@ steps:
             - CODECOV_TOKEN
             - GH_STATUS_TOKEN
             - GH_UPLOAD_TOKEN
+            - NEUROPOD_TEST_FRAMEWORKS
             - WEB_DEPLOY_KEY
     retry:
       automatic: true
@@ -237,6 +253,8 @@ steps:
     timeout_in_minutes: 60
     agents:
       queue: public-gpu
+    env:
+      NEUROPOD_TEST_FRAMEWORKS: torchscript,python
     command: build/ci/buildkite_build.sh
     plugins:
       - docker-compose#v3.7.0:
@@ -267,6 +285,7 @@ steps:
             - CODECOV_TOKEN
             - GH_STATUS_TOKEN
             - GH_UPLOAD_TOKEN
+            - NEUROPOD_TEST_FRAMEWORKS
             - WEB_DEPLOY_KEY
     retry:
       automatic: true
@@ -275,6 +294,8 @@ steps:
     timeout_in_minutes: 60
     agents:
       queue: public-gpu
+    env:
+      NEUROPOD_TEST_FRAMEWORKS: torchscript,python
     command: build/ci/buildkite_build.sh
     plugins:
       - docker-compose#v3.7.0:
@@ -305,6 +326,7 @@ steps:
             - CODECOV_TOKEN
             - GH_STATUS_TOKEN
             - GH_UPLOAD_TOKEN
+            - NEUROPOD_TEST_FRAMEWORKS
             - WEB_DEPLOY_KEY
     retry:
       automatic: true
@@ -313,6 +335,8 @@ steps:
     timeout_in_minutes: 60
     agents:
       queue: public-gpu
+    env:
+      NEUROPOD_TEST_FRAMEWORKS: tensorflow,torchscript,python
     command: build/ci/buildkite_build_gpu.sh
     plugins:
       - docker-compose#v3.7.0:
@@ -343,6 +367,7 @@ steps:
             - CODECOV_TOKEN
             - GH_STATUS_TOKEN
             - GH_UPLOAD_TOKEN
+            - NEUROPOD_TEST_FRAMEWORKS
             - WEB_DEPLOY_KEY
     retry:
       automatic: true
@@ -351,6 +376,8 @@ steps:
     timeout_in_minutes: 60
     agents:
       queue: public-gpu
+    env:
+      NEUROPOD_TEST_FRAMEWORKS: tensorflow,torchscript,python
     command: build/ci/buildkite_build_gpu.sh
     plugins:
       - docker-compose#v3.7.0:
@@ -381,6 +408,7 @@ steps:
             - CODECOV_TOKEN
             - GH_STATUS_TOKEN
             - GH_UPLOAD_TOKEN
+            - NEUROPOD_TEST_FRAMEWORKS
             - WEB_DEPLOY_KEY
     retry:
       automatic: true
@@ -389,6 +417,8 @@ steps:
     timeout_in_minutes: 60
     agents:
       queue: public-gpu
+    env:
+      NEUROPOD_TEST_FRAMEWORKS: tensorflow,torchscript,python
     command: build/ci/buildkite_build_gpu.sh
     plugins:
       - docker-compose#v3.7.0:
@@ -419,6 +449,7 @@ steps:
             - CODECOV_TOKEN
             - GH_STATUS_TOKEN
             - GH_UPLOAD_TOKEN
+            - NEUROPOD_TEST_FRAMEWORKS
             - WEB_DEPLOY_KEY
     retry:
       automatic: true
@@ -427,6 +458,8 @@ steps:
     timeout_in_minutes: 60
     agents:
       queue: public-gpu
+    env:
+      NEUROPOD_TEST_FRAMEWORKS: tensorflow,torchscript,python
     command: build/ci/buildkite_build_gpu.sh
     plugins:
       - docker-compose#v3.7.0:
@@ -457,6 +490,7 @@ steps:
             - CODECOV_TOKEN
             - GH_STATUS_TOKEN
             - GH_UPLOAD_TOKEN
+            - NEUROPOD_TEST_FRAMEWORKS
             - WEB_DEPLOY_KEY
     retry:
       automatic: true
@@ -465,6 +499,8 @@ steps:
     timeout_in_minutes: 60
     agents:
       queue: public-gpu
+    env:
+      NEUROPOD_TEST_FRAMEWORKS: tensorflow,torchscript,python
     command: build/ci/buildkite_build_gpu.sh
     plugins:
       - docker-compose#v3.7.0:
@@ -495,6 +531,7 @@ steps:
             - CODECOV_TOKEN
             - GH_STATUS_TOKEN
             - GH_UPLOAD_TOKEN
+            - NEUROPOD_TEST_FRAMEWORKS
             - WEB_DEPLOY_KEY
     retry:
       automatic: true
@@ -503,6 +540,8 @@ steps:
     timeout_in_minutes: 60
     agents:
       queue: public-gpu
+    env:
+      NEUROPOD_TEST_FRAMEWORKS: torchscript,python
     command: build/ci/buildkite_build_gpu.sh
     plugins:
       - docker-compose#v3.7.0:
@@ -533,6 +572,7 @@ steps:
             - CODECOV_TOKEN
             - GH_STATUS_TOKEN
             - GH_UPLOAD_TOKEN
+            - NEUROPOD_TEST_FRAMEWORKS
             - WEB_DEPLOY_KEY
     retry:
       automatic: true
@@ -541,6 +581,8 @@ steps:
     timeout_in_minutes: 60
     agents:
       queue: public-gpu
+    env:
+      NEUROPOD_TEST_FRAMEWORKS: torchscript,python
     command: build/ci/buildkite_build_gpu.sh
     plugins:
       - docker-compose#v3.7.0:
@@ -571,6 +613,7 @@ steps:
             - CODECOV_TOKEN
             - GH_STATUS_TOKEN
             - GH_UPLOAD_TOKEN
+            - NEUROPOD_TEST_FRAMEWORKS
             - WEB_DEPLOY_KEY
     retry:
       automatic: true
