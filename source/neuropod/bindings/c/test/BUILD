@@ -21,6 +21,7 @@ cc_test(
     data = [
         "//neuropod/tests/test_data",
     ],
+    tags = ["requires_framework_tensorflow"],
     deps = [
         "//neuropod:neuropod_impl",
         "//neuropod/backends/tensorflow:tensorflow_backend",

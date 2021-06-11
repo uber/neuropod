@@ -23,6 +23,7 @@ cc_test(
     tags = [
         # Don't do trace logging in CI for this benchmark
         "no_trace_logging",
+        "requires_framework_tensorflow",
     ],
     deps = [
         "//neuropod:neuropod_impl",
@@ -69,24 +70,13 @@ cc_test(
 )
 
 cc_test(
-    name = "test_multiprocess",
-    srcs = [
-        "test_multiprocess.cc",
-    ],
-    deps = [
-        "//neuropod:neuropod_impl",
-        "//neuropod/multiprocess",
-        "//neuropod/tests:neuropod_test_utils",
-    ],
-)
-
-cc_test(
     name = "test_ope_multiple_instances",
     srcs = [
         "test_ope_multiple_instances.cc",
     ],
     tags = [
         "no_trace_logging",
+        "requires_framework_python",
     ],
     deps = [
         "//neuropod:neuropod_impl",
