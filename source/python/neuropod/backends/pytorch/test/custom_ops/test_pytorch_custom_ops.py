@@ -23,7 +23,7 @@ import torch
 from testpath.tempdir import TemporaryDirectory
 
 from neuropod.packagers import create_pytorch_neuropod
-from neuropod.tests.utils import get_addition_model_spec
+from neuropod.tests.utils import get_addition_model_spec, requires_frameworks
 from neuropod.utils.hash_utils import sha256sum
 
 ADDITION_MODEL_SOURCE = """
@@ -47,6 +47,7 @@ def build_op(workdir):
     return glob.glob(os.path.join(workdir, "build", "lib*", "addition_op.so"))[0]
 
 
+@requires_frameworks("python")
 @unittest.skipIf(
     not torch.__version__.startswith("1.4.0"),
     "Skipping custom op test for torch != 1.4.0",

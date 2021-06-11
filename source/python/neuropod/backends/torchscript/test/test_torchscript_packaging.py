@@ -27,6 +27,7 @@ from neuropod.tests.utils import (
     get_addition_model_spec,
     get_mixed_model_spec,
     check_addition_model,
+    requires_frameworks,
 )
 
 
@@ -117,6 +118,7 @@ class NamedTupleModel(torch.jit.ScriptModule):
         return SomeNamedTuple(sum=x + y, difference=x - y, product=x * y)
 
 
+@requires_frameworks("torchscript")
 class TestTorchScriptPackaging(unittest.TestCase):
     def package_simple_addition_model(self, do_fail=False):
         for model in [AdditionModel, AdditionModelDictInput, AdditionModelTensorOutput]:

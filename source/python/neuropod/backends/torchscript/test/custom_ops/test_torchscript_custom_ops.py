@@ -22,7 +22,7 @@ import unittest
 from testpath.tempdir import TemporaryDirectory
 
 from neuropod.packagers import create_torchscript_neuropod
-from neuropod.tests.utils import get_addition_model_spec
+from neuropod.tests.utils import get_addition_model_spec, requires_frameworks
 from neuropod.utils.eval_utils import RUN_NATIVE_TESTS
 
 
@@ -36,6 +36,7 @@ class CustomOpModel(torch.jit.ScriptModule):
         return {"out": torch.ops.neuropod_test_ops.add(x, y)}
 
 
+@requires_frameworks("torchscript")
 @unittest.skipIf(
     not RUN_NATIVE_TESTS,
     "A torch bug causes a segfault when destroying a catch-all custom op",

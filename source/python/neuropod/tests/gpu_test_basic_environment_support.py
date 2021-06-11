@@ -15,6 +15,9 @@
 import unittest
 
 
+from neuropod.tests.utils import requires_frameworks
+
+
 class TestGPUEnvSupport(unittest.TestCase):
     """
     Tests that the environment running the tests has GPUs available
@@ -22,11 +25,13 @@ class TestGPUEnvSupport(unittest.TestCase):
     GPUs
     """
 
+    @requires_frameworks("torchscript")  # TODO(vip): Maybe find a better way to do this
     def test_torch_gpu(self):
         import torch
 
         self.assertTrue(torch.cuda.is_available())
 
+    @requires_frameworks("tensorflow")
     def test_tf_gpu(self):
         import tensorflow as tf
 

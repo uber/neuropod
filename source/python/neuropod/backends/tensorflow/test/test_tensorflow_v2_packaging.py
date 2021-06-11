@@ -18,7 +18,11 @@ import unittest
 from testpath.tempdir import TemporaryDirectory
 
 from neuropod.packagers import create_tensorflow_neuropod
-from neuropod.tests.utils import get_addition_model_spec, check_addition_model
+from neuropod.tests.utils import (
+    get_addition_model_spec,
+    check_addition_model,
+    requires_frameworks,
+)
 from neuropod.utils.eval_utils import RUN_NATIVE_TESTS
 
 
@@ -40,6 +44,7 @@ def create_tf_addition_model():
     return Adder()
 
 
+@requires_frameworks("tensorflow")
 @unittest.skipIf(tf.__version__[0] != "2", "Skipping TF 2.x tests for TF 1.x")
 class TestTensorflowV2Packaging(unittest.TestCase):
     def package_simple_addition_model(self, do_fail=False, **kwargs):

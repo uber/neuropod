@@ -17,7 +17,11 @@ import unittest
 from testpath.tempdir import TemporaryDirectory
 
 from neuropod.packagers import create_pytorch_neuropod
-from neuropod.tests.utils import get_string_concat_model_spec, check_strings_model
+from neuropod.tests.utils import (
+    get_string_concat_model_spec,
+    check_strings_model,
+    requires_frameworks,
+)
 
 STRINGS_MODEL_SOURCE = """
 import numpy as np
@@ -35,6 +39,7 @@ def get_model(_):
 """
 
 
+@requires_frameworks("python")
 def package_strings_model(out_dir, do_fail=False):
     neuropod_path = os.path.join(out_dir, "test_neuropod")
     model_code_dir = os.path.join(out_dir, "model_code")

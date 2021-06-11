@@ -22,6 +22,7 @@ from typing import Dict
 
 from neuropod.packagers import create_torchscript_neuropod
 from neuropod.utils.eval_utils import load_and_test_neuropod
+from neuropod.tests.utils import requires_frameworks
 
 
 class DevicesModel(torch.jit.ScriptModule):
@@ -57,6 +58,7 @@ class DevicesModel(torch.jit.ScriptModule):
         }
 
 
+@requires_frameworks("torchscript")
 class TestTorchScriptDevices(unittest.TestCase):
     def package_devices_model(self):
         with TemporaryDirectory() as test_dir:
