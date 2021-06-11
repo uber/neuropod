@@ -331,13 +331,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#node_name_mapping" class="md-nav__link">
-    node_name_mapping
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#input_spec" class="md-nav__link">
     input_spec
   </a>
@@ -352,6 +345,13 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#node_name_mapping" class="md-nav__link">
+    node_name_mapping
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#frozen_graph_path" class="md-nav__link">
     frozen_graph_path
   </a>
@@ -361,6 +361,20 @@
           <li class="md-nav__item">
   <a href="#graph_def" class="md-nav__link">
     graph_def
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#saved_model_dir" class="md-nav__link">
+    saved_model_dir
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#trackable_obj" class="md-nav__link">
+    trackable_obj
   </a>
   
 </li>
@@ -623,13 +637,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#node_name_mapping" class="md-nav__link">
-    node_name_mapping
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#input_spec" class="md-nav__link">
     input_spec
   </a>
@@ -644,6 +651,13 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#node_name_mapping" class="md-nav__link">
+    node_name_mapping
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#frozen_graph_path" class="md-nav__link">
     frozen_graph_path
   </a>
@@ -653,6 +667,20 @@
           <li class="md-nav__item">
   <a href="#graph_def" class="md-nav__link">
     graph_def
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#saved_model_dir" class="md-nav__link">
+    saved_model_dir
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#trackable_obj" class="md-nav__link">
+    trackable_obj
   </a>
   
 </li>
@@ -754,11 +782,13 @@
 <div class="codehilite"><pre><span></span><span class="err">create_tensorflow_neuropod(</span>
 <span class="err">    neuropod_path,</span>
 <span class="err">    model_name,</span>
-<span class="err">    node_name_mapping,</span>
 <span class="err">    input_spec,</span>
 <span class="err">    output_spec,</span>
+<span class="err">    node_name_mapping = None,</span>
 <span class="err">    frozen_graph_path = None,</span>
 <span class="err">    graph_def = None,</span>
+<span class="err">    saved_model_dir = None,</span>
+<span class="err">    trackable_obj = None,</span>
 <span class="err">    init_op_names = [],</span>
 <span class="err">    platform_version_semver = *,</span>
 <span class="err">    input_tensor_device = None,</span>
@@ -775,18 +805,6 @@
 <p>The output neuropod path</p>
 <h4 id="model_name">model_name<a class="headerlink" href="#model_name" title="Permanent link">&para;</a></h4>
 <p>The name of the model</p>
-<h4 id="node_name_mapping">node_name_mapping<a class="headerlink" href="#node_name_mapping" title="Permanent link">&para;</a></h4>
-<p>Mapping from a neuropod input/output name to a node in the graph. The <code>:0</code> is
-optional.</p>
-<div class="admonition note">
-<p><strong><em>Example</em></strong>:
-<div class="codehilite"><pre><span></span><span class="err">{</span>
-<span class="err">    &quot;x&quot;: &quot;some_namespace/in_x:0&quot;,</span>
-<span class="err">    &quot;y&quot;: &quot;some_namespace/in_y:0&quot;,</span>
-<span class="err">    &quot;out&quot;: &quot;some_namespace/out:0&quot;,</span>
-<span class="err">}</span>
-</pre></div></p>
-</div>
 <h4 id="input_spec">input_spec<a class="headerlink" href="#input_spec" title="Permanent link">&para;</a></h4>
 <p>A list of dicts specifying the input to the model. For each input, if shape
 is set to <code>None</code>, no validation is done on the shape. If shape is a tuple, the
@@ -811,14 +829,38 @@ the <code>input_spec</code> parameter for more details.</p>
 <span class="err">]</span>
 </pre></div></p>
 </div>
+<h4 id="node_name_mapping">node_name_mapping<a class="headerlink" href="#node_name_mapping" title="Permanent link">&para;</a></h4>
+<p><em>default: <code>None</code></em></p>
+<p>Mapping from a neuropod input/output name to a node in the graph. The <code>:0</code> is
+optional. Required unless using a saved model.</p>
+<div class="admonition note">
+<p><strong><em>Example</em></strong>:
+<div class="codehilite"><pre><span></span><span class="err">{</span>
+<span class="err">    &quot;x&quot;: &quot;some_namespace/in_x:0&quot;,</span>
+<span class="err">    &quot;y&quot;: &quot;some_namespace/in_y:0&quot;,</span>
+<span class="err">    &quot;out&quot;: &quot;some_namespace/out:0&quot;,</span>
+<span class="err">}</span>
+</pre></div></p>
+</div>
 <h4 id="frozen_graph_path">frozen_graph_path<a class="headerlink" href="#frozen_graph_path" title="Permanent link">&para;</a></h4>
 <p><em>default: <code>None</code></em></p>
-<p>The path to a frozen tensorflow graph. If this is not provided, <code>graph_def</code> must
-be set</p>
+<p>The path to a frozen tensorflow graph. Exactly one of <code>frozen_graph_path</code>, <code>graph_def</code>, <code>saved_model_dir</code>
+and <code>trackable_obj</code> must be provided.</p>
 <h4 id="graph_def">graph_def<a class="headerlink" href="#graph_def" title="Permanent link">&para;</a></h4>
 <p><em>default: <code>None</code></em></p>
-<p>A tensorflow <code>GraphDef</code> object. If this is not provided, <code>frozen_graph_path</code> must
-be set</p>
+<p>A tensorflow <code>GraphDef</code> object. Exactly one of <code>frozen_graph_path</code>, <code>graph_def</code>, <code>saved_model_dir</code>
+and <code>trackable_obj</code> must be provided.</p>
+<h4 id="saved_model_dir">saved_model_dir<a class="headerlink" href="#saved_model_dir" title="Permanent link">&para;</a></h4>
+<p><em>default: <code>None</code></em></p>
+<p>The path to a tensorflow saved model dir. Exactly one of <code>frozen_graph_path</code>, <code>graph_def</code>, <code>saved_model_dir</code>
+and <code>trackable_obj</code> must be provided.
+Note: this is only tested with TF 2.x at the moment</p>
+<h4 id="trackable_obj">trackable_obj<a class="headerlink" href="#trackable_obj" title="Permanent link">&para;</a></h4>
+<p><em>default: <code>None</code></em></p>
+<p>A trackable object that can be passed to <code>tf.saved_model.save</code>. For more control over the
+saved model, you can create one yourself and pass in the path using <code>saved_model_dir</code>.
+Exactly one of <code>frozen_graph_path</code>, <code>graph_def</code>, <code>saved_model_dir</code> and <code>trackable_obj</code> must be provided.
+Note: this is only tested with TF 2.x at the moment</p>
 <h4 id="init_op_names">init_op_names<a class="headerlink" href="#init_op_names" title="Permanent link">&para;</a></h4>
 <p><em>default: <code>[]</code></em></p>
 <p>A list of initialization operator names. These operations are evaluated in the session
