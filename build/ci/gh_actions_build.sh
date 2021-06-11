@@ -62,7 +62,7 @@ else
 fi
 
 chmod +x /tmp/bazel-remote
-/tmp/bazel-remote --dir /tmp/bazel_cache --max_size 5 --port 7777 &> /dev/null &
+/tmp/bazel-remote --dir ~/bazel_cache --max_size 5 --port 7777 &> /dev/null &
 CACHE_PID=$!
 
 # Build with the remote cache
