@@ -47,7 +47,7 @@ jobs:
             - name: Bazel Cache
               uses: actions/cache@v2
               with:
-                path: /tmp/bazel_cache
+                path: ~/bazel_cache
                 key: ${{{{ runner.os }}}}-bazel-cache-tf-${{{{ matrix.tf }}}}-torch-${{{{ matrix.torch }}}}-python-${{{{ matrix.python }}}}
             # Build and test
             - name: Build and Test
