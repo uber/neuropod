@@ -26,9 +26,9 @@ from neuropod.utils.hash_utils import sha256sum
 loaded_op_hashes = set()
 
 
-class TensorflowNeuropodExecutor(NeuropodExecutor):
+class TensorflowFrozenGraphNeuropodExecutor(NeuropodExecutor):
     """
-    Executes a Tensorflow neuropod
+    Executes a Tensorflow neuropod that contains a frozen graph
     """
 
     def __init__(self, neuropod_path, load_custom_ops=True):
@@ -37,7 +37,7 @@ class TensorflowNeuropodExecutor(NeuropodExecutor):
 
         :param  neuropod_path:  The path to a python neuropod package
         """
-        super(TensorflowNeuropodExecutor, self).__init__(neuropod_path)
+        super(TensorflowFrozenGraphNeuropodExecutor, self).__init__(neuropod_path)
 
         # Load custom ops (if any)
         if load_custom_ops and "custom_ops" in self.neuropod_config:
@@ -146,3 +146,94 @@ class TensorflowNeuropodExecutor(NeuropodExecutor):
                 outputs[name] = outputs[name].astype("str")
 
         return outputs
+
+
+class TensorflowSavedModelNeuropodExecutor(NeuropodExecutor):
+    """
+    Executes a Tensorflow neuropod that contains a SavedModel
+
+    Note: only tested with TF2
+    """
+
+    def __init__(self, neuropod_path, load_custom_ops=True):
+        """
+        Load a Tensorflow neuropod
+
+        :param  neuropod_path:  The path to a python neuropod package
+        """
+        super(TensorflowSavedModelNeuropodExecutor, self).__init__(neuropod_path)
+
+        # Load custom ops (if any)
+        if load_custom_ops and "custom_ops" in self.neuropod_config:
+            for op in self.neuropod_config["custom_ops"]:
+                lib_path = os.path.join(neuropod_path, "0", "ops", op)
+                lib_hash = sha256sum(lib_path)
+                if lib_hash not in loaded_op_hashes:
+                    tf.load_op_library(str(lib_path))
+                    loaded_op_hashes.add(lib_hash)
+
+        # Load the savedmodel
+        loaded = tf.saved_model.load(
+            os.path.join(neuropod_path, "0", "data", "savedmodel")
+        )
+        self._model = loaded.signatures["serving_default"]
+
+    def forward(self, inputs):
+        """
+        Run inference using the specifed inputs.
+
+        :param  inputs:     A dict mapping input names to values. This must match the input
+                            spec in the neuropod config for the loaded model.
+                            Ex: {'x1': np.array([5]), 'x2': np.array([6])}
+                            *Note:* all the keys in this dict must be strings and all the
+                            values must be numpy arrays
+
+        :returns:   A dict mapping output names to values. All the keys
+                    in this dict are strings and all the values are numpy arrays.
+        """
+        # Convert to tensors
+        transformed = {k: tf.convert_to_tensor(v) for k, v in inputs.items()}
+
+        # Run inference
+        out = self._model(**transformed)
+
+        # Convert to numpy arrays and return
+        return {k: v.numpy() for k, v in out.items()}
+
+
+class TensorflowNeuropodExecutor(NeuropodExecutor):
+    """
+    Executes a Tensorflow neuropod
+    """
+
+    def __init__(self, neuropod_path, **kwargs):
+        """
+        Load a Tensorflow neuropod
+
+        :param  neuropod_path:  The path to a python neuropod package
+        """
+        super(TensorflowNeuropodExecutor, self).__init__(neuropod_path)
+
+        # Load the model
+        if os.path.exists(os.path.join(neuropod_path, "0", "data", "model.pb")):
+            # Frozen graph
+            self._model = TensorflowFrozenGraphNeuropodExecutor(neuropod_path, **kwargs)
+        else:
+            # Saved model
+            self._model = TensorflowSavedModelNeuropodExecutor(neuropod_path, **kwargs)
+
+    def forward(self, inputs):
+        """
+        Run inference using the specifed inputs.
+
+        :param  inputs:     A dict mapping input names to values. This must match the input
+                            spec in the neuropod config for the loaded model.
+                            Ex: {'x1': np.array([5]), 'x2': np.array([6])}
+                            *Note:* all the keys in this dict must be strings and all the
+                            values must be numpy arrays
+
+        :returns:   A dict mapping output names to values. All the keys
+                    in this dict are strings and all the values are numpy arrays.
+        """
+        # Run inference
+        return self._model.forward(inputs)

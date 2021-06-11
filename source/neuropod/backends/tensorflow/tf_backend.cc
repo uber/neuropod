@@ -15,6 +15,8 @@ limitations under the License.
 
 #include "neuropod/backends/tensorflow/tf_backend.hh"
 
+#include "neuropod/backends/tensorflow/saved_model/loader.h"
+#include "neuropod/backends/tensorflow/tf_utils.hh"
 #include "neuropod/neuropod.hh"
 #include "tensorflow/core/framework/graph.pb.h"
 #include "tensorflow/core/public/session.h"
@@ -83,15 +85,6 @@ void setup_node_mapping_and_init_ops(std::istream &                             
     }
 }
 
-// Throws an error if `status` is not ok
-void check_tf_status(const tensorflow::Status &status)
-{
-    if (!status.ok())
-    {
-        NEUROPOD_ERROR("TensorFlow error: {}", status.error_message());
-    }
-}
-
 // Get TF session options given Neuropod RuntimeOptions
 tensorflow::SessionOptions get_tf_opts(const RuntimeOptions & /*unused*/)
 {
@@ -152,6 +145,72 @@ TensorflowNeuropodBackend::TensorflowNeuropodBackend(const std::string &neuropod
     }
 }
 
+void TensorflowNeuropodBackend::load_saved_model()
+{
+    tensorflow::SavedModelBundle bundle;
+    constexpr char               kSavedModelTagServe[] = "serve";
+    check_tf_status(tensorflow::LoadSavedModel(
+        get_tf_opts(options_), {}, loader_->get_file_path("0/data/savedmodel"), {kSavedModelTagServe}, &bundle));
+
+    session_ = std::move(bundle.session);
+
+    // Get the input and output node names for the `serving_default` signature in the savedmodel
+    // See https://www.tensorflow.org/guide/saved_model#specifying_signatures_during_export
+    // for more details
+    const auto &signature_def = bundle.GetSignatures().at("serving_default");
+
+    for (const auto &item : signature_def.inputs())
+    {
+        node_name_mapping_[item.first] = item.second.name();
+    }
+
+    for (const auto &item : signature_def.outputs())
+    {
+        node_name_mapping_[item.first] = item.second.name();
+    }
+}
+
+void TensorflowNeuropodBackend::load_frozen_graph(std::istream &graph_stream)
+{
+    // Create a buffer of the right size
+    graph_stream.seekg(0, graph_stream.end);
+    auto              graph_length = static_cast<size_t>(graph_stream.tellg());
+    std::vector<char> buffer(graph_length);
+
+    // Read into the buffer
+    graph_stream.seekg(0, graph_stream.beg);
+    graph_stream.read(buffer.data(), static_cast<std::streamsize>(graph_length));
+    if (graph_stream.fail())
+    {
+        NEUROPOD_ERROR("Error reading TensorFlow GraphDef for neuropod {}", neuropod_path_);
+    }
+
+    // Read the GraphDef
+    tensorflow::GraphDef graph;
+    tensorflow::ParseProtoUnlimited(&graph, buffer.data(), buffer.size());
+
+    // Move the graph to the target device
+    move_graph_to_device(graph, *session_, options_.visible_device);
+
+    // Create a session
+    auto status = session_->Create(graph);
+    if (!status.ok())
+    {
+        NEUROPOD_ERROR("Error loading TensorFlow graph: {}", status.error_message());
+    }
+
+    // Setup the nodename mapping and get the init ops (if any)
+    std::vector<std::string> init_ops;
+    auto                     config_stream = loader_->get_istream_for_file("0/config.json");
+    setup_node_mapping_and_init_ops(*config_stream, node_name_mapping_, init_ops);
+
+    // Run init ops if any
+    for (const auto &op_name : init_ops)
+    {
+        check_tf_status(session_->Run({}, {}, {op_name}, nullptr));
+    }
+}
+
 void TensorflowNeuropodBackend::load_model_internal()
 {
     // Load custom ops (if any)
@@ -181,84 +240,21 @@ void TensorflowNeuropodBackend::load_model_internal()
         }
     }
 
-    // Get a stream for the graph
-    auto graph_stream = loader_->get_istream_for_file("0/data/model.pb");
-
-    // Create a buffer of the right size
-    graph_stream->seekg(0, graph_stream->end);
-    auto              graph_length = static_cast<size_t>(graph_stream->tellg());
-    std::vector<char> buffer(graph_length);
-
-    // Read into the buffer
-    graph_stream->seekg(0, graph_stream->beg);
-    graph_stream->read(buffer.data(), static_cast<std::streamsize>(graph_length));
-    if (graph_stream->fail())
-    {
-        NEUROPOD_ERROR("Error reading TensorFlow GraphDef for neuropod {}", neuropod_path_);
-    }
-
-    // Read the GraphDef
-    tensorflow::GraphDef graph;
-    tensorflow::ParseProtoUnlimited(&graph, buffer.data(), buffer.size());
-
-    // Figure out the correct target device
-    std::string target_device = "/device:CPU:0";
-    if (options_.visible_device != Device::CPU)
-    {
-        // Get all the available devices
-        std::vector<tensorflow::DeviceAttributes> devices;
-        check_tf_status(session_->ListDevices(&devices));
-
-        // Check if we have any GPUs
-        bool found_gpu = std::any_of(devices.begin(), devices.end(), [](const tensorflow::DeviceAttributes &device) {
-            return device.device_type() == "GPU";
-        });
-
-        // If we have a GPU, update the target device
-        if (found_gpu)
-        {
-            target_device = std::string("/device:GPU:") + std::to_string(options_.visible_device);
-        }
-    }
-
-    // Iterate through all the nodes in the graph and move them to the target device
-    for (auto &node : *graph.mutable_node())
-    {
-        const auto &node_device = node.device();
-
-        // If a node is on CPU, leave it there
-        if (node_device != "/device:CPU:0" && node_device != target_device)
-        {
-            SPDLOG_TRACE("TF: Moving node {} from device {} to device {}", node.name(), node_device, target_device);
-            node.set_device(target_device);
-        }
-        else
-        {
-            SPDLOG_TRACE("TF: Leaving node {} on device {}", node.name(), node_device);
-        }
-    }
-
-    // Create a session
-    auto status = session_->Create(graph);
-    if (!status.ok())
-    {
-        NEUROPOD_ERROR("Error loading TensorFlow graph: {}", status.error_message());
-    }
-
-    // Setup the nodename mapping and get the init ops (if any)
-    std::vector<std::string> init_ops;
-    auto                     config_stream = loader_->get_istream_for_file("0/config.json");
-    setup_node_mapping_and_init_ops(*config_stream, node_name_mapping_, init_ops);
-
     // Get a list of the output nodes
     for (const auto &output : model_config_->outputs)
     {
         output_names_.emplace_back(output.name);
     }
 
-    for (const auto &op_name : init_ops)
+    // Get a stream for the graph
+    auto graph_stream = loader_->get_istream_for_file("0/data/model.pb");
+    if (graph_stream)
     {
-        check_tf_status(session_->Run({}, {}, {op_name}, nullptr));
+        load_frozen_graph(*graph_stream);
+    }
+    else
+    {
+        load_saved_model();
     }
 }
 

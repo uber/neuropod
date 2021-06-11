@@ -48,7 +48,13 @@ public:
 
     std::unique_ptr<std::istream> get_istream_for_file(const std::string &path) override
     {
-        return stdx::make_unique<std::ifstream>(get_file_path(path));
+        auto ret = stdx::make_unique<std::ifstream>(get_file_path(path));
+        if (!(*ret))
+        {
+            return nullptr;
+        }
+
+        return ret;
     }
 
     std::string get_file_path(const std::string &path) override
@@ -94,7 +100,11 @@ public:
     std::unique_ptr<std::istream> get_istream_for_file(const std::string &path) override
     {
         auto out = stdx::make_unique<std::stringstream>();
-        unzipper_.extractEntryToStream(path, *out);
+        if (!unzipper_.extractEntryToStream(path, *out))
+        {
+            return nullptr;
+        }
+
         return out;
     }
 
