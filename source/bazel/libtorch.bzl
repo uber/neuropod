@@ -9,6 +9,11 @@ def _impl(repository_ctx):
     IS_GPU = (repository_ctx.os.environ.get("NEUROPOD_IS_GPU") or None) != None
     CUDA_VERSION = repository_ctx.os.environ.get("NEUROPOD_CUDA_VERSION") or "10.0"
 
+    # TODO(vip): Fix this once we have a better way of dealing with CUDA 11.2
+    if CUDA_VERSION == "11.2.1":
+        CUDA_VERSION = "10.1"
+        IS_GPU = False
+
     # Get the torch cuda string (e.g. cpu, cu90, cu92, cu100)
     torch_cuda_string = "cu" + CUDA_VERSION.replace(".", "") if IS_GPU else "cpu"
 

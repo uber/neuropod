@@ -3,7 +3,8 @@
 # To only install deps (and skip build and tests), pass `--target neuropod-base` to docker build
 # FROM ubuntu:16.04 as neuropod-base
 ARG NEUROPOD_CUDA_VERSION=10.0
-FROM nvidia/cuda:${NEUROPOD_CUDA_VERSION}-cudnn7-runtime-ubuntu16.04 as neuropod-base
+ARG NEUROPOD_CUDNN_VERSION=7
+FROM nvidia/cuda:${NEUROPOD_CUDA_VERSION}-cudnn${NEUROPOD_CUDNN_VERSION}-runtime-ubuntu16.04 as neuropod-base
 
 # Use utf8
 ENV LC_ALL=C.UTF-8
