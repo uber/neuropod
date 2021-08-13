@@ -18,7 +18,11 @@ import unittest
 from testpath.tempdir import TemporaryDirectory
 
 from neuropod.packagers import create_tensorflow_neuropod
-from neuropod.tests.utils import get_string_concat_model_spec, check_strings_model
+from neuropod.tests.utils import (
+    get_string_concat_model_spec,
+    check_strings_model,
+    requires_frameworks,
+)
 
 
 def create_tf_strings_model():
@@ -37,6 +41,7 @@ def create_tf_strings_model():
     return g.as_graph_def()
 
 
+@requires_frameworks("tensorflow")
 @unittest.skipIf(tf.__version__[0] == "2", "Skipping TF 1.x tests for TF 2.x")
 class TestTensorflowStrings(unittest.TestCase):
     def package_strings_model(self, do_fail=False):

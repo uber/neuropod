@@ -17,7 +17,11 @@ import unittest
 from testpath.tempdir import TemporaryDirectory
 
 from neuropod.packagers import create_pytorch_neuropod
-from neuropod.tests.utils import get_addition_model_spec, check_addition_model
+from neuropod.tests.utils import (
+    get_addition_model_spec,
+    check_addition_model,
+    requires_frameworks,
+)
 
 ADDITION_MODEL_SOURCE = """
 import torch
@@ -34,6 +38,7 @@ def get_model(_):
 """
 
 
+@requires_frameworks("python")
 class TestPytorchPackaging(unittest.TestCase):
     def package_simple_addition_model(self, do_fail=False):
         with TemporaryDirectory() as test_dir:

@@ -23,6 +23,7 @@ from tempfile import mkdtemp
 
 from neuropod.loader import load_neuropod
 from neuropod.utils.randomify import randomify_neuropod
+from neuropod.tests.utils import requires_frameworks
 
 input_spec = [
     {"name": "in_string_vector", "dtype": "string", "shape": ("N",)},
@@ -39,6 +40,7 @@ output_spec = [
 ]
 
 
+@requires_frameworks("tensorflow")
 @unittest.skipIf(tf.__version__[0] == "2", "Skipping TF 1.x tests for TF 2.x")
 class TestSpecValidation(unittest.TestCase):
     @classmethod

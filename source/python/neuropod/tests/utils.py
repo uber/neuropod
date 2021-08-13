@@ -13,6 +13,8 @@
 # limitations under the License.
 
 import numpy as np
+import os
+import unittest
 
 from neuropod.loader import load_neuropod
 
@@ -147,3 +149,24 @@ def check_specs_match(specs, targets):
 
         if spec != target:
             raise ValueError("Spec ({}) not equal to target ({})".format(spec, target))
+
+
+AVAILABLE_FRAMEWORKS = os.getenv("NEUROPOD_TEST_FRAMEWORKS")
+
+if AVAILABLE_FRAMEWORKS is not None:
+    AVAILABLE_FRAMEWORKS = AVAILABLE_FRAMEWORKS.split(",")
+
+
+def _identity(obj):
+    return obj
+
+
+def requires_frameworks(*frameworks):
+    if AVAILABLE_FRAMEWORKS is None:
+        return _identity
+
+    for framework in frameworks:
+        if framework not in AVAILABLE_FRAMEWORKS:
+            return unittest.skip("Skipping test that requires {}".format(framework))
+
+    return _identity

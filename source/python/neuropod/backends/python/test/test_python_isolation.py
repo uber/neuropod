@@ -19,6 +19,7 @@ from testpath.tempdir import TemporaryDirectory
 
 from neuropod.loader import load_neuropod
 from neuropod.packagers import create_python_neuropod
+from neuropod.tests.utils import requires_frameworks
 
 DUMMY_MODEL_SOURCE = """
 import numpy as np
@@ -33,6 +34,7 @@ def get_model(_):
 """
 
 
+@requires_frameworks("python")
 class TestPythonIsolation(unittest.TestCase):
     def package_dummy_model(self, test_dir, target):
         neuropod_path = os.path.join(test_dir, "test_neuropod")

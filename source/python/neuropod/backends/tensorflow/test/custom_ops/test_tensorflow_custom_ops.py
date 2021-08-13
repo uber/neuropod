@@ -21,7 +21,7 @@ import unittest
 from testpath.tempdir import TemporaryDirectory
 
 from neuropod.packagers import create_tensorflow_neuropod
-from neuropod.tests.utils import get_addition_model_spec
+from neuropod.tests.utils import get_addition_model_spec, requires_frameworks
 
 
 def create_tf_addition_model(custom_op_path):
@@ -42,6 +42,7 @@ def create_tf_addition_model(custom_op_path):
     return g.as_graph_def()
 
 
+@requires_frameworks("tensorflow")
 @unittest.skipIf(
     tf.__version__ == "1.14.0" and sys.platform == "darwin",
     "See https://github.com/tensorflow/tensorflow/issues/30633",

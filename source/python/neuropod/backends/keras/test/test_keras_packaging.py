@@ -24,7 +24,11 @@ from neuropod.backends.keras.packager import (
     infer_keras_input_spec,
     infer_keras_output_spec,
 )
-from neuropod.tests.utils import get_addition_model_spec, check_addition_model
+from neuropod.tests.utils import (
+    get_addition_model_spec,
+    check_addition_model,
+    requires_frameworks,
+)
 
 
 def create_keras_addition_model(node_name_mapping=None):
@@ -46,6 +50,7 @@ def create_keras_addition_model(node_name_mapping=None):
     return model
 
 
+@requires_frameworks("tensorflow")
 @unittest.skipIf(tf.__version__[0] == "2", "Skipping TF 1.x tests for TF 2.x")
 class TestKerasPackaging(unittest.TestCase):
     def package_simple_addition_model(self, alias_names=False, do_fail=False):

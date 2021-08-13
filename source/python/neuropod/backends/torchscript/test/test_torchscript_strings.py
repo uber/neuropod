@@ -19,7 +19,11 @@ from testpath.tempdir import TemporaryDirectory
 from typing import Dict, List
 
 from neuropod.packagers import create_torchscript_neuropod
-from neuropod.tests.utils import get_string_concat_model_spec, check_strings_model
+from neuropod.tests.utils import (
+    get_string_concat_model_spec,
+    check_strings_model,
+    requires_frameworks,
+)
 
 
 class StringsModel(torch.jit.ScriptModule):
@@ -102,6 +106,7 @@ def package_strings_model(out_dir, model=StringsModel, do_fail=False):
     check_strings_model(neuropod_path)
 
 
+@requires_frameworks("torchscript")
 class TestTorchScriptStrings(unittest.TestCase):
     def test_strings_model(self):
         # Tests a case where packaging works correctly and

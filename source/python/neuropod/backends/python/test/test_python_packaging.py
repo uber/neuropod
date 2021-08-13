@@ -18,7 +18,11 @@ import unittest
 from testpath.tempdir import TemporaryDirectory
 
 from neuropod.packagers import create_python_neuropod
-from neuropod.tests.utils import get_addition_model_spec, check_addition_model
+from neuropod.tests.utils import (
+    get_addition_model_spec,
+    check_addition_model,
+    requires_frameworks,
+)
 
 ADDITION_MODEL_SOURCE = """
 import sys
@@ -46,6 +50,7 @@ def get_model(_):
 """
 
 
+@requires_frameworks("python")
 class TestPythonPackaging(unittest.TestCase):
     def package_simple_addition_model(self, do_fail=False):
         with TemporaryDirectory() as test_dir:
