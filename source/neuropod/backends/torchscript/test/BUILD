@@ -17,6 +17,7 @@ cc_test(
     srcs = [
         "test_torchscript_backend.cc",
     ],
+    tags = ["requires_framework_torchscript"],
     deps = [
         "//neuropod:neuropod_impl",
         "//neuropod/backends/torchscript:torch_backend",

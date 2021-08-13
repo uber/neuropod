@@ -20,6 +20,7 @@ cc_test(
     # Needed because we want to expose symbols and we're
     # dynamically loading the python bridge
     linkopts = ["-rdynamic"],
+    tags = ["requires_framework_python"],
     deps = [
         "//neuropod:neuropod_impl",
         "//neuropod/tests:neuropod_test_utils",
@@ -34,7 +35,10 @@ cc_test(
     # Needed because we want to expose symbols and we're
     # dynamically loading the python bridge
     linkopts = ["-rdynamic"],
-    tags = ["gpu"],
+    tags = [
+        "gpu",
+        "requires_framework_python",
+    ],
     deps = [
         "//neuropod:neuropod_impl",
         "//neuropod/tests:neuropod_test_utils",

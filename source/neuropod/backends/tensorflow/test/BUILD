@@ -17,6 +17,7 @@ cc_test(
     srcs = [
         "test_tensorflow_backend.cc",
     ],
+    tags = ["requires_framework_tensorflow"],
     deps = [
         "//neuropod:neuropod_impl",
         "//neuropod/backends/tensorflow:tensorflow_backend",

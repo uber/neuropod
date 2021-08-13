@@ -41,14 +41,24 @@ popd
 # Run native and java tests
 export PATH=$PATH:`pwd`/bazel-bin/neuropod/multiprocess/
 
+if [ -z ${NEUROPOD_TEST_FRAMEWORKS+x} ]; then
+    # Run all tests if NEUROPOD_TEST_FRAMEWORKS is unset
+    TEST_TARGETS=$(bazel query "kind(_test, //...)")
+else
+    # Get all test targets that match our framework filters
+    # All tests - tests that require a framework + tests that require any of the available frameworks
+    # TODO(vip): this doesn't currently handle tests that require multiple frameworks, but we don't have any of those at the moment
+    TEST_TARGETS=$(bazel query "kind(_test, //...) - attr(tags, '\\brequires_framework_', //...) + attr(tags, '\\brequires_framework_(${NEUROPOD_TEST_FRAMEWORKS//,/|})\\b', //...)")
+fi
+
 # CPU tests with trace logging
-bazel test "$@" --sandbox_writable_path="$HOME/.neuropod/pythonpackages/" --test_lang_filters="-java" --test_tag_filters="-gpu,-no_trace_logging" --test_env="NEUROPOD_LOG_LEVEL=TRACE" //...
+bazel test "$@" --sandbox_writable_path="$HOME/.neuropod/pythonpackages/" --test_lang_filters="-java" --test_tag_filters="-gpu,-no_trace_logging" --test_env="NEUROPOD_LOG_LEVEL=TRACE" $TEST_TARGETS
 
 # CPU tests without trace logging
-bazel test "$@" --sandbox_writable_path="$HOME/.neuropod/pythonpackages/" --test_lang_filters="-java" --test_tag_filters="-gpu,no_trace_logging" //...
+bazel test "$@" --sandbox_writable_path="$HOME/.neuropod/pythonpackages/" --test_lang_filters="-java" --test_tag_filters="-gpu,no_trace_logging" $TEST_TARGETS
 
 # Java CPU tests
-bazel test "$@" --sandbox_writable_path="$HOME/.neuropod/pythonpackages/" --combined_report=lcov --test_lang_filters="java" --test_tag_filters="-gpu" //...
+bazel test "$@" --sandbox_writable_path="$HOME/.neuropod/pythonpackages/" --combined_report=lcov --test_lang_filters="java" --test_tag_filters="-gpu" $TEST_TARGETS
 
 popd
 

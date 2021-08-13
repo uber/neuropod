@@ -26,3 +26,15 @@ TEST(test_models, test_pytorch_strings_model)
     // Test the PyTorch strings model using the python bridge
     test_strings_model("neuropod/tests/test_data/pytorch_strings_model/");
 }
+
+TEST(test_multiprocess_backend, test_pytorch_addition_model)
+{
+    // Test the PyTorch addition model in another process
+    test_addition_model_ope("neuropod/tests/test_data/pytorch_addition_model/");
+}
+
+TEST(test_multiprocess_backend, test_pytorch_strings_model)
+{
+    // Test the PyTorch strings model in another process
+    test_strings_model_ope("neuropod/tests/test_data/pytorch_strings_model/");
+}
