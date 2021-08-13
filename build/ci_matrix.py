@@ -52,6 +52,8 @@ jobs:
             # Build and test
             - name: Build and Test
               run: ./build/ci/gh_actions_build.sh
+              env:
+                NEUROPOD_TEST_FRAMEWORKS: ${{{{ matrix.test_frameworks }}}}
         strategy:
             matrix:
                 include:
@@ -108,8 +110,10 @@ FRAMEWORK_VERSIONS = [
     {"cuda": "10.0", "tensorflow": "1.14.0", "torch": "1.3.0", "python": "3.6"},
     {"cuda": "10.0", "tensorflow": "1.15.0", "torch": "1.4.0", "python": "3.7"},
     {"cuda": "10.1", "tensorflow": "2.2.0", "torch": "1.5.0", "python": "3.8"},
-    {"cuda": "10.1", "tensorflow": "2.2.0", "torch": "1.6.0", "python": "3.8"},
-    {"cuda": "10.1", "tensorflow": "2.2.0", "torch": "1.7.0", "python": "3.8"},
+
+    # No need to rerun tensorflow tests for 2.2.0 on py3.8
+    {"cuda": "10.1", "tensorflow": "2.2.0", "torch": "1.6.0", "python": "3.8", "test_frameworks": "torchscript,python"},
+    {"cuda": "10.1", "tensorflow": "2.2.0", "torch": "1.7.0", "python": "3.8", "test_frameworks": "torchscript,python"},
 ]
 
 gh_actions_matrix = []
@@ -122,6 +126,10 @@ for platform, framework_version in itertools.product(PLATFORMS, FRAMEWORK_VERSIO
     torch_version = framework_version["torch"]
     py_version = framework_version["python"]
 
+    # Which frameworks we want to run tests for
+    # TODO(vip): do this better
+    test_frameworks = framework_version["test_frameworks"] if "test_frameworks" in framework_version else "tensorflow,torchscript,python"
+
     # Generate the appropriate configuration
     if "macos" in platform:
         # This is a GH Actions build
@@ -129,6 +137,7 @@ for platform, framework_version in itertools.product(PLATFORMS, FRAMEWORK_VERSIO
         "                    - tf: {}\n".format(tf_version),
         "                      torch: {}\n".format(torch_version),
         "                      python: {}\n".format(py_version),
+        "                      test_frameworks: {}\n".format(test_frameworks),
         "\n",
         ])
 
@@ -178,6 +187,7 @@ for platform, framework_version in itertools.product(PLATFORMS, FRAMEWORK_VERSIO
         "            - CODECOV_TOKEN\n",
         "            - GH_STATUS_TOKEN\n",
         "            - GH_UPLOAD_TOKEN\n",
+        "            - NEUROPOD_TEST_FRAMEWORKS\n",
         "            - WEB_DEPLOY_KEY\n",
         "    retry:\n",
         "      automatic: true\n",
@@ -189,6 +199,8 @@ for platform, framework_version in itertools.product(PLATFORMS, FRAMEWORK_VERSIO
         "    timeout_in_minutes: 60\n",
         "    agents:\n",
         "      queue: {}\n".format("public-gpu" if is_gpu else "public-gpu"), # Temporarily run everything on `public-gpu`
+        "    env:\n",
+        "      NEUROPOD_TEST_FRAMEWORKS: {}\n".format(test_frameworks),
         "    command: build/ci/{}.sh\n".format("buildkite_build_gpu" if is_gpu else "buildkite_build"),
         ] + plugin_config)
 
@@ -200,7 +212,7 @@ for platform, framework_version in itertools.product(PLATFORMS, FRAMEWORK_VERSIO
             "  - label: \":docker: Lint + Docs\"\n".format(variant_name),
             "    timeout_in_minutes: 60\n",
             "    agents:\n",
-                "      queue: public-gpu\n",  # Temporarily run everything on `public-gpu`
+            "      queue: public-gpu\n",  # Temporarily run everything on `public-gpu`
             "    command: build/ci/buildkite_lint.sh\n",
             ] + plugin_config)
 
