@@ -28,9 +28,30 @@ IS_GPU = (os.getenv("NEUROPOD_IS_GPU") or None) is not None
 CUDA_VERSION = os.getenv("NEUROPOD_CUDA_VERSION") or "10.0"
 IS_MAC = platform.system() == "Darwin"
 
-GIT_TAG = os.getenv("TRAVIS_TAG", os.getenv("BUILDKITE_TAG"))
+GIT_TAG = os.getenv("BUILDKITE_TAG")
+if GIT_TAG is None:
+    # Check GH actions
+    github_ref = os.getenv("GITHUB_REF", default="")
+    if github_ref.startswith("refs/tags/"):
+        GIT_TAG = github_ref.replace("refs/tags/","", 1)
+
 PYTHON_VERSION = "{}{}".format(sys.version_info.major, sys.version_info.minor)
 GH_UPLOAD_TOKEN = os.getenv("GH_UPLOAD_TOKEN")
+
+# Get the frameworks we should upload
+NEUROPOD_TEST_FRAMEWORKS = os.getenv("NEUROPOD_TEST_FRAMEWORKS")
+if NEUROPOD_TEST_FRAMEWORKS is not None:
+    NEUROPOD_TEST_FRAMEWORKS = set(NEUROPOD_TEST_FRAMEWORKS.split(","))
+
+def should_upload(framework):
+    """
+    Whether we should upload an artifact for `framework`
+    """
+    if NEUROPOD_TEST_FRAMEWORKS is None:
+        return True
+
+    return framework in NEUROPOD_TEST_FRAMEWORKS
+
 
 def upload():
     release_id = get_release_id(GIT_TAG)
@@ -53,24 +74,26 @@ def upload():
             )
         )
 
-    # For each OS: For each backend version: For each CPU/GPU:
-    upload_package("source/bazel-bin/neuropod/backends/torchscript/neuropod_torchscript_backend.tar.gz", release_id, "{}-torchscript-{}-backend.tar.gz".format(platform, REQUESTED_TORCH_VERSION))
+    if should_upload("torchscript"):
+        # For each OS: For each backend version: For each CPU/GPU:
+        upload_package("source/bazel-bin/neuropod/backends/torchscript/neuropod_torchscript_backend.tar.gz", release_id, "{}-torchscript-{}-backend.tar.gz".format(platform, REQUESTED_TORCH_VERSION))
 
-    # Only upload these once
-    if REQUESTED_TORCH_VERSION != "1.6.0" and REQUESTED_TORCH_VERSION != "1.7.0":
+    if should_upload("tensorflow"):
+        # For each OS: For each backend version: For each CPU/GPU:
         upload_package("source/bazel-bin/neuropod/backends/tensorflow/neuropod_tensorflow_backend.tar.gz", release_id, "{}-tensorflow-{}-backend.tar.gz".format(platform, REQUESTED_TF_VERSION))
 
-        # The python package is the same across CPU/GPU and different versions of backends so we'll only upload once for mac and once for linux
+    # The python package is the same across CPU/GPU and different versions of backends so we'll only upload once for mac and once for linux
+    # TODO(vip): Do this better
+    if REQUESTED_TORCH_VERSION != "1.6.0" and REQUESTED_TORCH_VERSION != "1.7.0" and not IS_GPU:
         # For each OS: For each python version
-        if not IS_GPU:
-            # Upload the pythonbridge backend
-            upload_package("source/bazel-bin/neuropod/backends/python_bridge/neuropod_pythonbridge_backend.tar.gz", release_id, "{}-python-{}-backend.tar.gz".format(platform, PYTHON_VERSION))
+        # Upload the pythonbridge backend
+        upload_package("source/bazel-bin/neuropod/backends/python_bridge/neuropod_pythonbridge_backend.tar.gz", release_id, "{}-python-{}-backend.tar.gz".format(platform, PYTHON_VERSION))
 
-            # Upload the wheels
-            for gpath in ["source/python/dist/neuropod-*.whl"]:
-                whl_path = glob.glob(gpath)[0]
-                fname = os.path.basename(whl_path)
-                upload_package(whl_path, release_id, fname, content_type="application/zip")
+        # Upload the wheels
+        for gpath in ["source/python/dist/neuropod-*.whl"]:
+            whl_path = glob.glob(gpath)[0]
+            fname = os.path.basename(whl_path)
+            upload_package(whl_path, release_id, fname, content_type="application/zip")
 
 def get_release_id(tag_name):
     # https://api.github.com/repos/uber/neuropod/releases/tags/{tag_name}
@@ -111,10 +134,6 @@ if __name__ == '__main__':
     if not GIT_TAG or not GH_UPLOAD_TOKEN:
         # Don't upload if we don't have a tag or token
         pass
-    elif os.getenv("TRAVIS_TAG") is not None and not IS_MAC:
-        # Don't push releases from linux on Travis
-        # (buildkite pushes all the linux releases)
-        pass
     else:
-        print("Uploading packages...")
+        print("Uploading packages for tag {}...".format(GIT_TAG))
         upload()
