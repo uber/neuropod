@@ -42,7 +42,7 @@ sudo mkdir -p "$NEUROPOD_BASE_DIR"
 # Find URLs of backends you want to install from the releases page (https://github.com/uber/neuropod/releases) and install them
 # by untarring them in your NEUROPOD_BASE_DIR directory.
 # For example, to install a GPU enabled Torch 1.7 backend for CUDA 10.1, run
-curl -L https://github.com/uber/neuropod/releases/download/v0.3.0-rc1/libneuropod-gpu-cuda-10.1-linux-v0.3.0-rc1-torchscript-1.7.0-backend.tar.gz | sudo tar -xz -C "$NEUROPOD_BASE_DIR"
+curl -L https://github.com/uber/neuropod/releases/download/v0.3.0-rc2/libneuropod-gpu-cuda-10.1-linux-v0.3.0-rc2-torchscript-1.7.0-backend.tar.gz | sudo tar -xz -C "$NEUROPOD_BASE_DIR"
 ```
 
 Multiple backends can be installed for a given framework and Neuropod will select the correct one when loading a model.
