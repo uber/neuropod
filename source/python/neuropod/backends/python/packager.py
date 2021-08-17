@@ -122,7 +122,7 @@ def create_python_neuropod(
             os.path.realpath(python_root) + os.sep
         ):
             raise ValueError(
-                "`neuropod_path` cannot be the same directory as `python_root' or a subdirectory of `python_root`"
+                "`neuropod_path` cannot be the same directory as `python_root' or a subdirectory of `python_root`."
             )
 
         for dir_to_package in copy_spec["dirs_to_package"]:
