@@ -19,7 +19,7 @@ class BinaryDistribution(Distribution):
 
 setup(
     name="neuropod",
-    version="0.3.0rc1",
+    version="0.3.0rc2",
     install_requires=REQUIRED_PACKAGES,
     packages=find_packages(),
     package_data={
