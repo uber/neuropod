@@ -34,6 +34,7 @@ jobs:
               run: ./build/ci/gh_actions_build.sh
               env:
                 NEUROPOD_TEST_FRAMEWORKS: ${{ matrix.test_frameworks }}
+                GH_UPLOAD_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         strategy:
             matrix:
                 include:
