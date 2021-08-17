@@ -34,10 +34,6 @@ if [[ $(uname -s) == 'Darwin' ]]; then
         wget https://www.python.org/ftp/python/3.8.2/python-3.8.2-macosx10.9.pkg &> /dev/null
         sudo installer -pkg python-3.8.2-macosx10.9.pkg -target /
     fi
-
-    # Install libomp 5
-    brew unlink libomp
-    brew install https://homebrew.bintray.com/bottles/libomp-5.0.1.high_sierra.bottle.tar.gz
 fi
 
 # Install python dependencies
