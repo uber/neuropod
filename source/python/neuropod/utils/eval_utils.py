@@ -21,7 +21,8 @@ import numpy as np
 from neuropod.utils.env_utils import eval_in_new_process
 from neuropod.loader import load_neuropod
 
-RUN_NATIVE_TESTS = os.getenv("NEUROPOD_RUN_NATIVE_TESTS") is not None
+# Unset or "true" => True
+RUN_NATIVE_TESTS = os.getenv("NEUROPOD_RUN_NATIVE_TESTS", "true") == "true"
 TEST_DATA_FILENAME = "test_data.pkl"
 
 logger = logging.getLogger(__name__)
