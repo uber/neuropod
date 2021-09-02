@@ -150,6 +150,16 @@ def load_neuropod(neuropod_path, _always_use_native=True, **kwargs):
     """
     if _always_use_native:
         return NativeNeuropodExecutor(neuropod_path, **kwargs)
+    else:
+        import warnings
+
+        warnings.warn(
+            "_always_use_native=False is deprecated and will be removed soon. "
+            "Please use the default of `True` which uses the native code path to "
+            "run inference instead of the python implementation. This means it'll "
+            "use the same code path as Neuropod from C++. Java, C, Go, etc.",
+            DeprecationWarning,
+        )
 
     # If we were given a zipfile, extract it to a temp dir and use it
     neuropod_path = zip_loader.extract_neuropod_if_necessary(neuropod_path)
