@@ -6,6 +6,11 @@
 
 It currently supports TensorFlow, PyTorch, TorchScript, Keras and [Ludwig](http://ludwig.ai).
 
+For more information:
+
+ - [Uber Engineering blog post introducing Neuropod](https://eng.uber.com/introducing-neuropod/)
+ - [Talk at NVIDIA GTC Spring 2021](https://www.nvidia.com/en-us/on-demand/session/gtcspring21-s31643/)
+
 ## Why use Neuropod?
 
 #### Run models from any supported framework using one API
