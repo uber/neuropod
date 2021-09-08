@@ -85,7 +85,7 @@ Our build matrix is defined as all combinations of the following:
 
  - Ubuntu 16.04 GPU (in Docker) - Buildkite
  - Ubuntu 16.04 CPU (in Docker) - Buildkite
- - Mac CPU (native) - Travis CI
+ - Mac CPU (native) - GitHub Actions
 
 **Framework versions (each row of the table):**
 
@@ -95,7 +95,11 @@ Our build matrix is defined as all combinations of the following:
 | 10.0 | 1.13.1 | 1.2.0 | 3.5 |
 | 10.0 | 1.14.0 | 1.3.0 | 3.6 |
 | 10.0 | 1.15.0 | 1.4.0 | 3.7 |
-| 10.1 | - | 1.5.0 | 3.8 |
+| 10.1 | 2.2.0 | 1.5.0 | 3.8 |
+| 10.1 | - | 1.6.0 | 3.8 |
+| 10.1 | - | 1.7.0 | 3.8 |
+| 11.2.1 | 2.5.0 | - | 3.8 |
+| 11.2.1 | 2.6.0 | - | 3.8 |
 
 We also have the following ad-hoc builds:
 
