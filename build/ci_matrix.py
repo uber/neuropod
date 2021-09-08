@@ -116,6 +116,7 @@ FRAMEWORK_VERSIONS = [
 
     # Only testing TF
     {"cuda": "11.2.1", "cudnn": "8", "tensorflow": "2.5.0", "torch": "1.7.0", "python": "3.8", "test_frameworks": "tensorflow"},
+    {"cuda": "11.2.1", "cudnn": "8", "tensorflow": "2.6.0", "torch": "1.7.0", "python": "3.8", "test_frameworks": "tensorflow"},
 ]
 
 gh_actions_matrix = []
