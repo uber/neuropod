@@ -187,9 +187,6 @@ java_test(
         "//neuropod/tests/test_data",
     ],
     javacopts = JAVACOPTS,
-    # Tagged as GPU so we have at least one Java GPU test. This helps keep CI scripts simple
-    # TODO(vip): Remove once we have a Java test that actually requires GPU
-    tags = ["gpu"],
     test_class = "com.uber.neuropod.NeuropodTensorAllocatorTest",
     deps = [
         ":neuropod_java_jar",
