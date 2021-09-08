@@ -69,17 +69,17 @@ else
 fi
 
 # GPU tests with trace logging
-bazel test "$@" --sandbox_writable_path="$HOME/.neuropod/pythonpackages/" --test_lang_filters="-java" --test_tag_filters="gpu,-no_trace_logging" --test_env="NEUROPOD_LOG_LEVEL=TRACE" $TEST_TARGETS ||
+bazel test "$@" --sandbox_writable_path="$HOME/.neuropod/pythonpackages/" --test_lang_filters="-java" --test_tag_filters="-no_trace_logging" --test_env="NEUROPOD_LOG_LEVEL=TRACE" $TEST_TARGETS ||
     # Allow an exit code of 4 (no tests run)
     [ "$?" = 4 ]
 
 # GPU tests without trace logging
-bazel test "$@" --sandbox_writable_path="$HOME/.neuropod/pythonpackages/" --test_lang_filters="-java" --test_tag_filters="gpu,no_trace_logging" $TEST_TARGETS ||
+bazel test "$@" --sandbox_writable_path="$HOME/.neuropod/pythonpackages/" --test_lang_filters="-java" --test_tag_filters="no_trace_logging" $TEST_TARGETS ||
     # Allow an exit code of 4 (no tests run)
     [ "$?" = 4 ]
 
 # Java GPU tests
-bazel test "$@" --sandbox_writable_path="$HOME/.neuropod/pythonpackages/" --combined_report=lcov --test_lang_filters="java" --test_tag_filters="gpu" $TEST_TARGETS ||
+bazel test "$@" --sandbox_writable_path="$HOME/.neuropod/pythonpackages/" --combined_report=lcov --test_lang_filters="java" $TEST_TARGETS ||
     # Allow an exit code of 4 (no tests run)
     [ "$?" = 4 ]
 
