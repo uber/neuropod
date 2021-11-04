@@ -148,6 +148,24 @@ java_test(
 )
 
 java_test(
+    name = "TFStringsModelTest",
+    srcs = [
+        "src/test/java/com/uber/neuropod/NeuropodStringsModelTest.java",
+        "src/test/java/com/uber/neuropod/TFStringsModelTest.java",
+    ],
+    data = [
+        "//neuropod/tests/test_data",
+    ],
+    javacopts = JAVACOPTS,
+    tags = ["requires_framework_tensorflow"],
+    test_class = "com.uber.neuropod.TFStringsModelTest",
+    deps = [
+        ":neuropod_java_jar",
+        "@junit",
+    ],
+)
+
+java_test(
     name = "TorchscriptAdditionTest",
     srcs = [
         "src/test/java/com/uber/neuropod/NeuropodAdditionTest.java",
@@ -159,6 +177,24 @@ java_test(
     javacopts = JAVACOPTS,
     tags = ["requires_framework_torchscript"],
     test_class = "com.uber.neuropod.TorchscriptAdditionTest",
+    deps = [
+        ":neuropod_java_jar",
+        "@junit",
+    ],
+)
+
+java_test(
+    name = "TorchscriptStringsModelTest",
+    srcs = [
+        "src/test/java/com/uber/neuropod/NeuropodStringsModelTest.java",
+        "src/test/java/com/uber/neuropod/TorchscriptStringsModelTest.java",
+    ],
+    data = [
+        "//neuropod/tests/test_data",
+    ],
+    javacopts = JAVACOPTS,
+    tags = ["requires_framework_tensorflow"],
+    test_class = "com.uber.neuropod.TorchscriptStringsModelTest",
     deps = [
         ":neuropod_java_jar",
         "@junit",

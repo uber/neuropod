@@ -56,6 +56,11 @@ JNIEXPORT jobject JNICALL Java_com_uber_neuropod_NeuropodTensor_nativeGetBuffer(
         case neuropod::INT64_TENSOR: {
             return njni::createDirectBuffer<int64_t>(env, neuropodTensor);
         }
+        case neuropod::STRING_TENSOR: {
+        // If it is STRING_TENSOR, we would flatten the tensor data and convert it to a string list
+        // we don't need the buffer to store the data
+            return env->NewGlobalRef(NULL);
+        }
         default:
             throw std::runtime_error("unsupported tensor type: " + njni::tensor_type_to_string(tensorType));
         }

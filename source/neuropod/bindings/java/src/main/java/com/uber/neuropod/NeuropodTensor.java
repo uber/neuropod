@@ -44,7 +44,10 @@ public class NeuropodTensor extends NativeClass implements Serializable {
     protected NeuropodTensor(long handle) {
         super(handle);
         isFromJava = false;
-        buffer = nativeGetBuffer(handle).order(ByteOrder.nativeOrder());
+        buffer = nativeGetBuffer(handle);
+        if (buffer != null) {
+            buffer.order(ByteOrder.nativeOrder());
+        }
     }
 
     /**
