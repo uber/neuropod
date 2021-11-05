@@ -193,7 +193,7 @@ java_test(
         "//neuropod/tests/test_data",
     ],
     javacopts = JAVACOPTS,
-    tags = ["requires_framework_tensorflow"],
+    tags = ["requires_framework_torchscript"],
     test_class = "com.uber.neuropod.TorchscriptStringsModelTest",
     deps = [
         ":neuropod_java_jar",
