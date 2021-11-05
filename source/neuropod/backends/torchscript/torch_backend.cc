@@ -287,7 +287,7 @@ torch::Device TorchNeuropodBackend::get_torch_device(NeuropodDeviceType target_d
         return torch::kCPU;
     }
 
-    return torch::Device(torch::kCUDA, static_cast<short>(options_.visible_device));
+    return torch::Device(torch::kCUDA, static_cast<char>(options_.visible_device));
 }
 
 // Run inference
