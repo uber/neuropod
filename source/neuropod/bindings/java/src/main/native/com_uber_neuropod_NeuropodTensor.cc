@@ -57,8 +57,8 @@ JNIEXPORT jobject JNICALL Java_com_uber_neuropod_NeuropodTensor_nativeGetBuffer(
             return njni::createDirectBuffer<int64_t>(env, neuropodTensor);
         }
         case neuropod::STRING_TENSOR: {
-        // If it is STRING_TENSOR, we would flatten the tensor data and convert it to a string list
-        // we don't need the buffer to store the data
+            // If it is STRING_TENSOR, we would flatten the tensor data and convert it to a string list
+            // we don't need the buffer to store the data
             return env->NewGlobalRef(NULL);
         }
         default:
