@@ -75,7 +75,7 @@ std::vector<BackendLoadSpec> get_default_backend_map()
         {"tensorflow",
          "libneuropod_tensorflow_backend.so",
          true,
-         {"1.12.0", "1.13.1", "1.14.0", "1.15.0", "2.2.0", "2.5.0", "2.6.0"}},
+         {"1.12.0", "1.13.1", "1.14.0", "1.15.0", "2.2.0", "2.5.0", "2.6.2"}},
         {"python", "libneuropod_pythonbridge_backend.so", false, {"2.7", "3.5", "3.6", "3.7", "3.8"}}};
 
     // Base directory for Neuropod backends
