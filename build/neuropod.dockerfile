@@ -37,6 +37,9 @@ RUN sudo apt-get update && \
     sudo apt-get install -y "python${NEUROPOD_PYTHON_VERSION}" "python${NEUROPOD_PYTHON_VERSION}-dev" && \
     ln -s "$(which python3)" /usr/bin/python
 
+# For python 3.5, we need to install ffi
+RUN if [ "${NEUROPOD_PYTHON_VERSION}" = "3.5" ] ; then sudo apt-get install -y libffi6 libffi-dev ; fi
+
 # For python 3.8, we need to install distutils
 RUN if [ "${NEUROPOD_PYTHON_VERSION}" = "3.8" ] ; then sudo apt-get install -y "python${NEUROPOD_PYTHON_VERSION}-distutils" ; fi
 
