@@ -78,7 +78,7 @@ jobs:
                       python: 3.8
                       test_frameworks: tensorflow
 
-                    - tf: 2.6.0
+                    - tf: 2.6.2
                       torch: 1.7.0
                       python: 3.8
                       test_frameworks: tensorflow

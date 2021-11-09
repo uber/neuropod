@@ -32,9 +32,9 @@ def _impl(repository_ctx):
             "url": "https://storage.googleapis.com/tensorflow/linux/cpu/tensorflow_cpu-2.5.0rc0-cp38-cp38-manylinux2010_x86_64.whl",
             "sha256": "",
         },
-        "2.6.0-linux-cpu": {
-            "url": "https://storage.googleapis.com/tensorflow/linux/cpu/tensorflow_cpu-2.6.0-cp38-cp38-manylinux2010_x86_64.whl",
-            "sha256": "8322106d9c4d48f8378f6a37aee231415b58c25a7223d96c6e5f1e37f9b129d8",
+        "2.6.2-linux-cpu": {
+            "url": "https://storage.googleapis.com/tensorflow/linux/cpu/tensorflow_cpu-2.6.2-cp38-cp38-manylinux2010_x86_64.whl",
+            "sha256": "1d4ab4b0e1c64370e69b2d3efaae5cacd6d611dd3bfb81e22d86334af617fd59",
         },
 
         # Linux GPU
@@ -62,9 +62,9 @@ def _impl(repository_ctx):
             "url": "https://storage.googleapis.com/tensorflow/linux/gpu/tensorflow_gpu-2.5.0rc0-cp38-cp38-manylinux2010_x86_64.whl",
             "sha256": "",
         },
-        "2.6.0-linux-gpu": {
-            "url": "https://storage.googleapis.com/tensorflow/linux/gpu/tensorflow_gpu-2.6.0-cp38-cp38-manylinux2010_x86_64.whl",
-            "sha256": "80e68a0efba86eea87ea8ec9a1ffd1def48d22db16268af547305bf0ba889746",
+        "2.6.2-linux-gpu": {
+            "url": "https://storage.googleapis.com/tensorflow/linux/gpu/tensorflow_gpu-2.6.2-cp38-cp38-manylinux2010_x86_64.whl",
+            "sha256": "0c373e6b61d989cf5bf55dffda8cde066f3ad56aaafe57a60c223479c351f933",
         },
 
         # Mac CPU
@@ -92,9 +92,9 @@ def _impl(repository_ctx):
             "url": "https://files.pythonhosted.org/packages/ee/b9/35492679a1a35fb9d8e8c075fb5d4bb26b200fbe214c14717d59e996021e/tensorflow-2.5.0rc0-cp38-cp38-macosx_10_11_x86_64.whl",
             "sha256": "",
         },
-        "2.6.0-mac-cpu": {
-            "url": "https://storage.googleapis.com/tensorflow/mac/cpu/tensorflow-2.6.0-cp38-cp38-macosx_10_11_x86_64.whl",
-            "sha256": "2a067d22a356c2cd4753bdd16ee492c55a610f5ebc52713e2954c642f070321c",
+        "2.6.2-mac-cpu": {
+            "url": "https://storage.googleapis.com/tensorflow/mac/cpu/tensorflow-2.6.2-cp38-cp38-macosx_10_11_x86_64.whl",
+            "sha256": "caffa6d919b428901e224f778206d5bac4b553dadc1301409781af971b06e000",
         },
     }
 

@@ -99,7 +99,7 @@ Our build matrix is defined as all combinations of the following:
 | 10.1 | - | 1.6.0 | 3.8 |
 | 10.1 | - | 1.7.0 | 3.8 |
 | 11.2.1 | 2.5.0 | - | 3.8 |
-| 11.2.1 | 2.6.0 | - | 3.8 |
+| 11.2.1 | 2.6.2 | - | 3.8 |
 
 We also have the following ad-hoc builds:
 
