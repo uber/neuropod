@@ -28,6 +28,8 @@ import java.util.List;
  */
 public class NeuropodTensor extends NativeClass implements Serializable {
 
+    // buffer is used to store int32/ing64/float/double data
+    // if the tensor is string tensor, buffer would be null
     protected ByteBuffer buffer;
 
     // This flag is used to separate NeuropodTensor that is created as Input (from java)
@@ -44,7 +46,10 @@ public class NeuropodTensor extends NativeClass implements Serializable {
     protected NeuropodTensor(long handle) {
         super(handle);
         isFromJava = false;
-        buffer = nativeGetBuffer(handle).order(ByteOrder.nativeOrder());
+        buffer = nativeGetBuffer(handle);
+        if (buffer != null) {
+            buffer.order(ByteOrder.nativeOrder());
+        }
     }
 
     /**
