@@ -63,6 +63,16 @@ limitations under the License.
 // The date of the official torch 1.7.0 release
 #define CAFFE2_NIGHTLY_VERSION 20201027
 #endif
+
+#if CAFFE2_VERSION == 10801
+// The date of the official torch 1.8.1 release
+#define CAFFE2_NIGHTLY_VERSION 20210325
+#endif
+
+#if CAFFE2_VERSION == 10900
+// The date of the official torch 1.9.0 release
+#define CAFFE2_NIGHTLY_VERSION 20210615
+#endif
 #endif
 
 namespace neuropod
@@ -162,7 +172,7 @@ protected:
         }
         else
         {
-            out = tensor.to(torch::Device(torch::kCUDA, static_cast<short>(device)));
+            out = tensor.to(torch::Device(torch::kCUDA, static_cast<char>(device)));
         }
 
         return std::make_shared<TorchNeuropodTensor<T>>(std::move(out));

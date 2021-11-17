@@ -89,6 +89,10 @@ def install_pytorch(version):
             if torch_cuda_string != "cu102":
                 version += "+" + torch_cuda_string
 
+        # For 1.8.1 and 1.9.0, they always include the cuda version in the version string
+        if version_base in ["1.8.1", "1.9.0"] and version_date is None:
+            version += "+" + torch_cuda_string
+
     # The Mac 1.3.0 stable release doesn't exist in `torch_stable.html`
     # Use 1.3.0.post2 instead
     if IS_MAC and version_base == "1.3.0" and version_date is None:

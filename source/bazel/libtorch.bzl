@@ -56,6 +56,14 @@ def _impl(repository_ctx):
             "url": "https://download.pytorch.org/libtorch/cpu/libtorch-shared-with-deps-1.7.0%2Bcpu.zip",
             "sha256": "4cf8635fb41774c3b38fcb9955ff86b4ed7eb8e73d1595a09297196b7c28db28",
         },
+        "1.8.1-linux-cpu": {
+            "url": "https://download.pytorch.org/libtorch/cpu/libtorch-shared-with-deps-1.8.1%2Bcpu.zip",
+            "sha256": "b2df0393b3a5445e4e644729c6e0610437af983ddea4b0f5c46e01651a64bd74",
+        },
+        "1.9.0-linux-cpu": {
+            "url": "https://download.pytorch.org/libtorch/cpu/libtorch-shared-with-deps-1.9.0%2Bcpu.zip",
+            "sha256": "",
+        },
 
         # Linux GPU
         "1.1.0-linux-cu90": {
@@ -86,6 +94,14 @@ def _impl(repository_ctx):
             "url": "https://download.pytorch.org/libtorch/cu101/libtorch-shared-with-deps-1.7.0%2Bcu101.zip",
             "sha256": "e0816a692e4540739b6832c118f186b5e65d1fac56edb2048b600b756ae42687",
         },
+        "1.8.1-linux-cu102": {
+            "url": "https://download.pytorch.org/libtorch/cu102/libtorch-shared-with-deps-1.8.1%2Bcu102.zip",
+            "sha256": "b1d82045bba9f69752165ed46dbe1996ecc646a4ff31ce5883192d4b52a84f3e",
+        },
+        "1.9.0-linux-cu102": {
+            "url": "https://download.pytorch.org/libtorch/cu102/libtorch-shared-with-deps-1.9.0%2Bcu102.zip",
+            "sha256": "",
+        },
 
         # Mac CPU
         "1.1.0-mac-cpu": {
@@ -115,6 +131,14 @@ def _impl(repository_ctx):
         "1.7.0-mac-cpu": {
             "url": "https://download.pytorch.org/libtorch/cpu/libtorch-macos-1.7.0.zip",
             "sha256": "2dccb83f1beb16ef3129d9f7af5abafb2f5d9220d0c7da8fde3531bd4ef0e655",
+        },
+        "1.8.1-mac-cpu": {
+            "url": "https://download.pytorch.org/libtorch/cpu/libtorch-macos-1.8.1.zip",
+            "sha256": "",
+        },
+        "1.9.0-mac-cpu": {
+            "url": "https://download.pytorch.org/libtorch/cpu/libtorch-macos-1.9.0.zip",
+            "sha256": "",
         },
     }
 

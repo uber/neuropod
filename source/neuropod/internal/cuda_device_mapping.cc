@@ -59,7 +59,7 @@ bool load_cuda()
     void *cuda_handle = nullptr;
 
     // CUDA suffixes in priority order
-    const auto cuda_suffixes = {"", ".10.1", ".10.0", ".9.0"};
+    const auto cuda_suffixes = {"", ".10.2", ".10.1", ".10.0", ".9.0"};
     for (const std::string &suffix : cuda_suffixes)
     {
         const auto sopath = "libcudart.so" + suffix;
