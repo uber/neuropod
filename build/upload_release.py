@@ -84,7 +84,7 @@ def upload():
 
     # The python package is the same across CPU/GPU and different versions of backends so we'll only upload once for mac and once for linux
     # TODO(vip): Do this better
-    if REQUESTED_TORCH_VERSION != "1.6.0" and REQUESTED_TORCH_VERSION != "1.7.0" and not IS_GPU:
+    if REQUESTED_TORCH_VERSION not in ["1.6.0", "1.7.0", "1.8.1", "1.9.0"] and not IS_GPU:
         # For each OS: For each python version
         # Upload the pythonbridge backend
         upload_package("source/bazel-bin/neuropod/backends/python_bridge/neuropod_pythonbridge_backend.tar.gz", release_id, "{}-python-{}-backend.tar.gz".format(platform, PYTHON_VERSION))
