@@ -53,7 +53,7 @@ def get_string_concat_model_spec(do_fail=False):
     if do_fail:
         expected_out = np.array(["a", "b", "c"])
     else:
-        expected_out = np.array(["apple sauce", "banana pudding", "carrot cake"])
+        expected_out = np.array(["apple 😎 sauce", "banana pudding", "carrot cake"])
 
     return dict(
         input_spec=[
@@ -62,7 +62,7 @@ def get_string_concat_model_spec(do_fail=False):
         ],
         output_spec=[{"name": "out", "dtype": "string", "shape": ("batch_size",)},],
         test_input_data={
-            "x": np.array(["apple", "banana", "carrot"]),
+            "x": np.array(["apple 😎", "banana", "carrot"]),
             "y": np.array(["sauce", "pudding", "cake"]),
         },
         test_expected_out={"out": expected_out,},
