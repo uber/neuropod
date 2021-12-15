@@ -19,22 +19,6 @@ services:
         NEUROPOD_IS_GPU: "true"
     runtime: nvidia
 
-  test-cpu-variant-tf-1_12_0-torch-1_1_0-py2_7:
-    extends: test-base
-    build:
-      args:
-        NEUROPOD_TENSORFLOW_VERSION: 1.12.0
-        NEUROPOD_TORCH_VERSION: 1.1.0
-        NEUROPOD_PYTHON_VERSION: 2.7
-
-  test-cpu-variant-tf-1_13_1-torch-1_2_0-py3_5:
-    extends: test-base
-    build:
-      args:
-        NEUROPOD_TENSORFLOW_VERSION: 1.13.1
-        NEUROPOD_TORCH_VERSION: 1.2.0
-        NEUROPOD_PYTHON_VERSION: 3.5
-
   test-cpu-variant-tf-1_14_0-torch-1_3_0-py3_6:
     extends: test-base
     build:
@@ -106,24 +90,6 @@ services:
         NEUROPOD_TENSORFLOW_VERSION: 2.6.2
         NEUROPOD_TORCH_VERSION: 1.7.0
         NEUROPOD_PYTHON_VERSION: 3.8
-
-  test-gpu-variant-tf-1_12_0-torch-1_1_0-py2_7:
-    extends: test-gpu
-    build:
-      args:
-        NEUROPOD_CUDA_VERSION: 9.0
-        NEUROPOD_TENSORFLOW_VERSION: 1.12.0
-        NEUROPOD_TORCH_VERSION: 1.1.0
-        NEUROPOD_PYTHON_VERSION: 2.7
-
-  test-gpu-variant-tf-1_13_1-torch-1_2_0-py3_5:
-    extends: test-gpu
-    build:
-      args:
-        NEUROPOD_CUDA_VERSION: 10.0
-        NEUROPOD_TENSORFLOW_VERSION: 1.13.1
-        NEUROPOD_TORCH_VERSION: 1.2.0
-        NEUROPOD_PYTHON_VERSION: 3.5
 
   test-gpu-variant-tf-1_14_0-torch-1_3_0-py3_6:
     extends: test-gpu
