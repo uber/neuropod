@@ -921,21 +921,21 @@
 </div>
 <h2 id="loading-a-neuropod">Loading a Neuropod<a class="headerlink" href="#loading-a-neuropod" title="Permanent link">&para;</a></h2>
 <p>The simplest way to load a neuropod is as follows:</p>
-<div class="codehilite"><pre><span></span><span class="cp">#include</span> <span class="cpf">&quot;neuropod/neuropod.hh&quot;</span><span class="cp"></span>
+<div class="codehilite"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;neuropod/neuropod.hh&quot;</span><span class="cp"></span>
 
-<span class="n">Neuropod</span> <span class="nf">neuropod</span><span class="p">(</span><span class="n">PATH_TO_MY_MODEL</span><span class="p">);</span>
+<span class="n">Neuropod</span><span class="w"> </span><span class="nf">neuropod</span><span class="p">(</span><span class="n">PATH_TO_MY_MODEL</span><span class="p">);</span><span class="w"></span>
 </pre></div>
 
 <p>where <code>PATH_TO_MY_MODEL</code> is the path to a model exported using one of the packagers.</p>
 <h3 id="options">Options<a class="headerlink" href="#options" title="Permanent link">&para;</a></h3>
 <p>You can also provide runtime options when loading a model.</p>
 <p>To select what device to run the model on, you can specify the <code>visible_device</code> option:</p>
-<div class="codehilite"><pre><span></span><span class="n">neuropod</span><span class="o">::</span><span class="n">RuntimeOptions</span> <span class="n">opts</span><span class="p">;</span>
+<div class="codehilite"><pre><span></span><span class="n">neuropod</span><span class="o">::</span><span class="n">RuntimeOptions</span><span class="w"> </span><span class="n">opts</span><span class="p">;</span><span class="w"></span>
 
 <span class="c1">// Set the visible device to the first GPU</span>
-<span class="n">opts</span><span class="p">.</span><span class="n">visible_device</span> <span class="o">=</span> <span class="n">Device</span><span class="o">::</span><span class="n">GPU0</span><span class="p">;</span>
+<span class="n">opts</span><span class="p">.</span><span class="n">visible_device</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Device</span><span class="o">::</span><span class="n">GPU0</span><span class="p">;</span><span class="w"></span>
 
-<span class="n">Neuropod</span> <span class="nf">neuropod</span><span class="p">(</span><span class="n">PATH_TO_MY_MODEL</span><span class="p">,</span> <span class="n">opts</span><span class="p">);</span>
+<span class="n">Neuropod</span><span class="w"> </span><span class="nf">neuropod</span><span class="p">(</span><span class="n">PATH_TO_MY_MODEL</span><span class="p">,</span><span class="w"> </span><span class="n">opts</span><span class="p">);</span><span class="w"></span>
 </pre></div>
 
 <p>This defaults to <code>GPU0</code>. If no GPUs are available, Neuropod will attempt to fallback to CPU.</p>
@@ -943,17 +943,17 @@
 <p>For more details, see all the options <a href="https://github.com/uber/neuropod/blob/master/source/neuropod/options.hh">here</a></p>
 <h3 id="get-the-inputs-and-outputs-of-a-model">Get the inputs and outputs of a model<a class="headerlink" href="#get-the-inputs-and-outputs-of-a-model" title="Permanent link">&para;</a></h3>
 <p>To get the inputs and outputs of a model, you can do this:</p>
-<div class="codehilite"><pre><span></span><span class="n">Neuropod</span> <span class="nf">neuropod</span><span class="p">(</span><span class="n">PATH_TO_MY_MODEL</span><span class="p">);</span>
+<div class="codehilite"><pre><span></span><span class="n">Neuropod</span><span class="w"> </span><span class="nf">neuropod</span><span class="p">(</span><span class="n">PATH_TO_MY_MODEL</span><span class="p">);</span><span class="w"></span>
 
 <span class="c1">// Both of these are `std::vector&lt;TensorSpec&gt;`</span>
-<span class="k">const</span> <span class="k">auto</span> <span class="o">&amp;</span><span class="n">inputs</span>  <span class="o">=</span> <span class="n">neuropod</span><span class="p">.</span><span class="n">get_inputs</span><span class="p">();</span>
-<span class="k">const</span> <span class="k">auto</span> <span class="o">&amp;</span><span class="n">outputs</span> <span class="o">=</span> <span class="n">neuropod</span><span class="p">.</span><span class="n">get_outputs</span><span class="p">();</span>
+<span class="k">const</span><span class="w"> </span><span class="k">auto</span><span class="w"> </span><span class="o">&amp;</span><span class="n">inputs</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="n">neuropod</span><span class="p">.</span><span class="n">get_inputs</span><span class="p">();</span><span class="w"></span>
+<span class="k">const</span><span class="w"> </span><span class="k">auto</span><span class="w"> </span><span class="o">&amp;</span><span class="n">outputs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">neuropod</span><span class="p">.</span><span class="n">get_outputs</span><span class="p">();</span><span class="w"></span>
 
-<span class="k">for</span> <span class="p">(</span><span class="k">const</span> <span class="k">auto</span> <span class="o">&amp;</span><span class="nl">item</span> <span class="p">:</span> <span class="n">inputs</span><span class="p">)</span>
-<span class="p">{</span>
-    <span class="c1">// A `TensorSpec` is a struct with a `name`, `dims` and `type`</span>
-    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Tensor name: &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">item</span><span class="p">.</span><span class="n">name</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
-<span class="p">}</span>
+<span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="k">auto</span><span class="w"> </span><span class="o">&amp;</span><span class="nl">item</span> <span class="p">:</span><span class="w"> </span><span class="n">inputs</span><span class="p">)</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="c1">// A `TensorSpec` is a struct with a `name`, `dims` and `type`</span>
+<span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot;Tensor name: &quot;</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">item</span><span class="p">.</span><span class="n">name</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
 </pre></div>
 
 <p>For more details, see <a href="https://github.com/uber/neuropod/blob/master/source/neuropod/internal/config_utils.hh#L25"><code>TensorSpec</code></a></p>
@@ -995,24 +995,24 @@
 </div>
 <p>There are many different ways to create <code>NeuropodTensor</code>s, but all of them start with an <code>allocator</code>.</p>
 <p>To get an allocator for a loaded model, you can do something like:</p>
-<div class="codehilite"><pre><span></span><span class="n">Neuropod</span> <span class="nf">neuropod</span><span class="p">(</span><span class="n">PATH_TO_MY_MODEL</span><span class="p">);</span>
+<div class="codehilite"><pre><span></span><span class="n">Neuropod</span><span class="w"> </span><span class="nf">neuropod</span><span class="p">(</span><span class="n">PATH_TO_MY_MODEL</span><span class="p">);</span><span class="w"></span>
 
-<span class="k">auto</span> <span class="n">allocator</span> <span class="o">=</span> <span class="n">neuropod</span><span class="p">.</span><span class="n">get_tensor_allocator</span><span class="p">();</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">allocator</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">neuropod</span><span class="p">.</span><span class="n">get_tensor_allocator</span><span class="p">();</span><span class="w"></span>
 </pre></div>
 
 <p>For scenarios where a model isn't loaded (e.g. unit tests), you can use a generic tensor allocator:</p>
-<div class="codehilite"><pre><span></span><span class="cp">#include</span> <span class="cpf">&quot;neuropod/core/generic_tensor.hh&quot;</span><span class="cp"></span>
+<div class="codehilite"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;neuropod/core/generic_tensor.hh&quot;</span><span class="cp"></span>
 
-<span class="k">auto</span> <span class="n">allocator</span> <span class="o">=</span> <span class="n">neuropod</span><span class="o">::</span><span class="n">get_generic_tensor_allocator</span><span class="p">();</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">allocator</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">neuropod</span><span class="o">::</span><span class="n">get_generic_tensor_allocator</span><span class="p">();</span><span class="w"></span>
 </pre></div>
 
 <h3 id="allocate-new-memory">Allocate new memory<a class="headerlink" href="#allocate-new-memory" title="Permanent link">&para;</a></h3>
 <p>For this, we just need the dimensions and type of the tensor we want to allocate.</p>
-<div class="codehilite"><pre><span></span><span class="k">auto</span> <span class="n">tensor</span> <span class="o">=</span> <span class="n">allocator</span><span class="o">-&gt;</span><span class="n">allocate_tensor</span><span class="o">&lt;</span><span class="kt">float</span><span class="o">&gt;</span><span class="p">({</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">});</span>
+<div class="codehilite"><pre><span></span><span class="k">auto</span><span class="w"> </span><span class="n">tensor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">allocator</span><span class="o">-&gt;</span><span class="n">allocate_tensor</span><span class="o">&lt;</span><span class="kt">float</span><span class="o">&gt;</span><span class="p">({</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">});</span><span class="w"></span>
 </pre></div>
 
 <p>You can also manually specify the type without using a templated function</p>
-<div class="codehilite"><pre><span></span><span class="k">auto</span> <span class="n">tensor</span> <span class="o">=</span> <span class="n">allocator</span><span class="o">-&gt;</span><span class="n">allocate_tensor</span><span class="p">({</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">},</span> <span class="n">neuropod</span><span class="o">::</span><span class="n">FLOAT_TENSOR</span><span class="p">);</span>
+<div class="codehilite"><pre><span></span><span class="k">auto</span><span class="w"> </span><span class="n">tensor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">allocator</span><span class="o">-&gt;</span><span class="n">allocate_tensor</span><span class="p">({</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">},</span><span class="w"> </span><span class="n">neuropod</span><span class="o">::</span><span class="n">FLOAT_TENSOR</span><span class="p">);</span><span class="w"></span>
 </pre></div>
 
 <p>To do something useful with these tensors, see the <a href="#interacting-with-tensors">Interacting with Tensors</a> section below.</p>
@@ -1031,40 +1031,40 @@
 <p>This deleter function is called once Neuropod (and the underlying libraries) are done using this data. Until this function is called, it is not safe to deallocate the data.</p>
 <p>It is very important to pass in a correct deleter to make sure the memory doesn't get prematurely deallocated. Some examples are below.</p>
 <h4 id="cvmat">cv::Mat<a class="headerlink" href="#cvmat" title="Permanent link">&para;</a></h4>
-<div class="codehilite"><pre><span></span><span class="n">cv</span><span class="o">::</span><span class="n">Mat</span> <span class="n">image</span> <span class="o">=</span> <span class="p">...</span> <span class="c1">// An image from somewhere</span>
-<span class="k">auto</span> <span class="n">tensor</span> <span class="o">=</span> <span class="n">allocator</span><span class="o">-&gt;</span><span class="n">tensor_from_memory</span><span class="o">&lt;</span><span class="kt">uint8_t</span><span class="o">&gt;</span><span class="p">(</span>
-    <span class="c1">// Dimensions</span>
-    <span class="p">{</span><span class="mi">1</span><span class="p">,</span> <span class="n">image</span><span class="p">.</span><span class="n">rows</span><span class="p">,</span> <span class="n">image</span><span class="p">.</span><span class="n">cols</span><span class="p">,</span> <span class="n">image</span><span class="p">.</span><span class="n">channels</span><span class="p">()},</span>
+<div class="codehilite"><pre><span></span><span class="n">cv</span><span class="o">::</span><span class="n">Mat</span><span class="w"> </span><span class="n">image</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="c1">// An image from somewhere</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">tensor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">allocator</span><span class="o">-&gt;</span><span class="n">tensor_from_memory</span><span class="o">&lt;</span><span class="kt">uint8_t</span><span class="o">&gt;</span><span class="p">(</span><span class="w"></span>
+<span class="w">    </span><span class="c1">// Dimensions</span>
+<span class="w">    </span><span class="p">{</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">image</span><span class="p">.</span><span class="n">rows</span><span class="p">,</span><span class="w"> </span><span class="n">image</span><span class="p">.</span><span class="n">cols</span><span class="p">,</span><span class="w"> </span><span class="n">image</span><span class="p">.</span><span class="n">channels</span><span class="p">()},</span><span class="w"></span>
 
-    <span class="c1">// Data</span>
-    <span class="n">image</span><span class="p">.</span><span class="n">data</span><span class="p">,</span>
+<span class="w">    </span><span class="c1">// Data</span>
+<span class="w">    </span><span class="n">image</span><span class="p">.</span><span class="n">data</span><span class="p">,</span><span class="w"></span>
 
-    <span class="c1">// Deleter</span>
-    <span class="p">[</span><span class="n">image</span><span class="p">](</span><span class="kt">void</span> <span class="o">*</span> <span class="n">unused</span><span class="p">)</span> <span class="p">{</span>
-        <span class="c1">// By capturing `image` in this deleter, we ensure</span>
-        <span class="c1">// that the underlying data does not get deallocated</span>
-        <span class="c1">// before we&#39;re done with the tensor.</span>
-    <span class="p">}</span>
-<span class="p">);</span>
+<span class="w">    </span><span class="c1">// Deleter</span>
+<span class="w">    </span><span class="p">[</span><span class="n">image</span><span class="p">](</span><span class="kt">void</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">unused</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="c1">// By capturing `image` in this deleter, we ensure</span>
+<span class="w">        </span><span class="c1">// that the underlying data does not get deallocated</span>
+<span class="w">        </span><span class="c1">// before we&#39;re done with the tensor.</span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="p">);</span><span class="w"></span>
 </pre></div>
 
 <div class="admonition tip">
 <p class="admonition-title">Tip</p>
 <p>You can also specify the type without using a templated function</p>
-<div class="codehilite"><pre><span></span><span class="n">cv</span><span class="o">::</span><span class="n">Mat</span> <span class="n">image</span> <span class="o">=</span> <span class="p">...</span> <span class="c1">// An image from somewhere</span>
-<span class="k">auto</span> <span class="n">tensor</span> <span class="o">=</span> <span class="n">allocator</span><span class="o">-&gt;</span><span class="n">tensor_from_memory</span><span class="p">(</span>
-    <span class="c1">// Dimensions</span>
-    <span class="p">{</span><span class="mi">1</span><span class="p">,</span> <span class="n">image</span><span class="p">.</span><span class="n">rows</span><span class="p">,</span> <span class="n">image</span><span class="p">.</span><span class="n">cols</span><span class="p">,</span> <span class="n">image</span><span class="p">.</span><span class="n">channels</span><span class="p">()},</span>
+<div class="codehilite"><pre><span></span><span class="n">cv</span><span class="o">::</span><span class="n">Mat</span><span class="w"> </span><span class="n">image</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="c1">// An image from somewhere</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">tensor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">allocator</span><span class="o">-&gt;</span><span class="n">tensor_from_memory</span><span class="p">(</span><span class="w"></span>
+<span class="w">    </span><span class="c1">// Dimensions</span>
+<span class="w">    </span><span class="p">{</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">image</span><span class="p">.</span><span class="n">rows</span><span class="p">,</span><span class="w"> </span><span class="n">image</span><span class="p">.</span><span class="n">cols</span><span class="p">,</span><span class="w"> </span><span class="n">image</span><span class="p">.</span><span class="n">channels</span><span class="p">()},</span><span class="w"></span>
 
-    <span class="c1">// Tensor Type</span>
-    <span class="n">get_tensor_type_from_cv_mat</span><span class="p">(</span><span class="n">image</span><span class="p">),</span>
+<span class="w">    </span><span class="c1">// Tensor Type</span>
+<span class="w">    </span><span class="n">get_tensor_type_from_cv_mat</span><span class="p">(</span><span class="n">image</span><span class="p">),</span><span class="w"></span>
 
-    <span class="c1">// Data</span>
-    <span class="n">image</span><span class="p">.</span><span class="n">data</span><span class="p">,</span>
+<span class="w">    </span><span class="c1">// Data</span>
+<span class="w">    </span><span class="n">image</span><span class="p">.</span><span class="n">data</span><span class="p">,</span><span class="w"></span>
 
-    <span class="c1">// Deleter</span>
-    <span class="p">[</span><span class="n">image</span><span class="p">](</span><span class="kt">void</span> <span class="o">*</span> <span class="n">unused</span><span class="p">)</span> <span class="p">{}</span>
-<span class="p">);</span>
+<span class="w">    </span><span class="c1">// Deleter</span>
+<span class="w">    </span><span class="p">[</span><span class="n">image</span><span class="p">](</span><span class="kt">void</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">unused</span><span class="p">)</span><span class="w"> </span><span class="p">{}</span><span class="w"></span>
+<span class="p">);</span><span class="w"></span>
 </pre></div>
 
 </div>
@@ -1073,12 +1073,12 @@
 <p>Utilities for wrapping types from common libraries will be added in a future release.</p>
 </div>
 <h4 id="eigen">Eigen<a class="headerlink" href="#eigen" title="Permanent link">&para;</a></h4>
-<div class="codehilite"><pre><span></span><span class="cp">#include</span> <span class="cpf">&quot;neuropod/conversions/eigen.hh&quot;</span><span class="cp"></span>
+<div class="codehilite"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;neuropod/conversions/eigen.hh&quot;</span><span class="cp"></span>
 
-<span class="k">auto</span> <span class="n">tensor</span> <span class="o">=</span> <span class="n">allocator</span><span class="o">-&gt;</span><span class="n">allocate_tensor</span><span class="o">&lt;</span><span class="kt">float</span><span class="o">&gt;</span><span class="p">({</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">});</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">tensor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">allocator</span><span class="o">-&gt;</span><span class="n">allocate_tensor</span><span class="o">&lt;</span><span class="kt">float</span><span class="o">&gt;</span><span class="p">({</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">});</span><span class="w"></span>
 
 <span class="c1">// Returns an `Eigen::Map`</span>
-<span class="k">auto</span> <span class="n">eigen_map</span> <span class="o">=</span> <span class="n">neuropod</span><span class="o">::</span><span class="n">as_eigen</span><span class="p">(</span><span class="o">*</span><span class="n">tensor</span><span class="p">);</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">eigen_map</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">neuropod</span><span class="o">::</span><span class="n">as_eigen</span><span class="p">(</span><span class="o">*</span><span class="n">tensor</span><span class="p">);</span><span class="w"></span>
 </pre></div>
 
 <p>See <a href="https://eigen.tuxfamily.org/dox/group__TutorialMapClass.html">the Eigen docs</a> for more details.</p>
@@ -1090,44 +1090,44 @@
 <p>These functions are useful for creating test data.</p>
 <h4 id="zeros">zeros<a class="headerlink" href="#zeros" title="Permanent link">&para;</a></h4>
 <p>Returns a tensor of type <code>T</code> and shape <code>input_dims</code> filled with zeros</p>
-<div class="codehilite"><pre><span></span><span class="k">auto</span> <span class="n">zeros</span> <span class="o">=</span> <span class="n">allocator</span><span class="o">-&gt;</span><span class="n">zeros</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">(</span><span class="n">input_dims</span><span class="p">);</span>
+<div class="codehilite"><pre><span></span><span class="k">auto</span><span class="w"> </span><span class="n">zeros</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">allocator</span><span class="o">-&gt;</span><span class="n">zeros</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">(</span><span class="n">input_dims</span><span class="p">);</span><span class="w"></span>
 </pre></div>
 
 <h4 id="ones">ones<a class="headerlink" href="#ones" title="Permanent link">&para;</a></h4>
 <p>Returns a tensor of type <code>T</code> and shape <code>input_dims</code> filled with ones</p>
-<div class="codehilite"><pre><span></span><span class="k">auto</span> <span class="n">ones</span> <span class="o">=</span> <span class="n">allocator</span><span class="o">-&gt;</span><span class="n">ones</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">(</span><span class="n">input_dims</span><span class="p">);</span>
+<div class="codehilite"><pre><span></span><span class="k">auto</span><span class="w"> </span><span class="n">ones</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">allocator</span><span class="o">-&gt;</span><span class="n">ones</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">(</span><span class="n">input_dims</span><span class="p">);</span><span class="w"></span>
 </pre></div>
 
 <h4 id="full">full<a class="headerlink" href="#full" title="Permanent link">&para;</a></h4>
 <p>Returns a tensor of type <code>T</code> and shape <code>input_dims</code> filled with <code>fill_value</code></p>
-<div class="codehilite"><pre><span></span><span class="k">auto</span> <span class="n">full</span> <span class="o">=</span> <span class="n">allocator</span><span class="o">-&gt;</span><span class="n">full</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">(</span><span class="n">input_dims</span><span class="p">,</span> <span class="n">fill_value</span><span class="p">);</span>
+<div class="codehilite"><pre><span></span><span class="k">auto</span><span class="w"> </span><span class="n">full</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">allocator</span><span class="o">-&gt;</span><span class="n">full</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">(</span><span class="n">input_dims</span><span class="p">,</span><span class="w"> </span><span class="n">fill_value</span><span class="p">);</span><span class="w"></span>
 </pre></div>
 
 <h4 id="randn">randn<a class="headerlink" href="#randn" title="Permanent link">&para;</a></h4>
 <p>Returns a tensor of type <code>T</code> and shape <code>input_dims</code> filled with random numbers from a normal distribution with mean <code>mean</code> and standard deviation <code>stddev</code>.</p>
-<div class="codehilite"><pre><span></span><span class="k">auto</span> <span class="n">full</span> <span class="o">=</span> <span class="n">allocator</span><span class="o">-&gt;</span><span class="n">randn</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">(</span><span class="n">input_dims</span><span class="p">,</span> <span class="n">mean</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">stddev</span> <span class="o">=</span> <span class="mi">1</span><span class="p">);</span>
+<div class="codehilite"><pre><span></span><span class="k">auto</span><span class="w"> </span><span class="n">full</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">allocator</span><span class="o">-&gt;</span><span class="n">randn</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">(</span><span class="n">input_dims</span><span class="p">,</span><span class="w"> </span><span class="n">mean</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="n">stddev</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span><span class="w"></span>
 </pre></div>
 
 <h4 id="arange">arange<a class="headerlink" href="#arange" title="Permanent link">&para;</a></h4>
 <p>Returns a 1D tensor of type <code>T</code> containing a sequence of numbers starting at <code>start</code> with a step size of <code>step</code>.</p>
-<div class="codehilite"><pre><span></span><span class="k">auto</span> <span class="n">range1</span> <span class="o">=</span> <span class="n">allocator</span><span class="o">-&gt;</span><span class="n">arange</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">(</span><span class="n">end</span><span class="p">);</span>
-<span class="k">auto</span> <span class="n">range2</span> <span class="o">=</span> <span class="n">allocator</span><span class="o">-&gt;</span><span class="n">arange</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">step</span> <span class="o">=</span> <span class="mi">1</span><span class="p">);</span>
+<div class="codehilite"><pre><span></span><span class="k">auto</span><span class="w"> </span><span class="n">range1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">allocator</span><span class="o">-&gt;</span><span class="n">arange</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">(</span><span class="n">end</span><span class="p">);</span><span class="w"></span>
+<span class="k">auto</span><span class="w"> </span><span class="n">range2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">allocator</span><span class="o">-&gt;</span><span class="n">arange</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">(</span><span class="n">start</span><span class="p">,</span><span class="w"> </span><span class="n">end</span><span class="p">,</span><span class="w"> </span><span class="n">step</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span><span class="w"></span>
 </pre></div>
 
 <p>Example:</p>
 <div class="codehilite"><pre><span></span><span class="c1">// 0, 1, 2, 3, 4</span>
-<span class="k">auto</span> <span class="n">range1</span> <span class="o">=</span> <span class="n">allocator</span><span class="o">-&gt;</span><span class="n">arange</span><span class="o">&lt;</span><span class="kt">float</span><span class="o">&gt;</span><span class="p">(</span><span class="mi">5</span><span class="p">);</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">range1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">allocator</span><span class="o">-&gt;</span><span class="n">arange</span><span class="o">&lt;</span><span class="kt">float</span><span class="o">&gt;</span><span class="p">(</span><span class="mi">5</span><span class="p">);</span><span class="w"></span>
 
 <span class="c1">// 2, 3, 4, 5</span>
-<span class="k">auto</span> <span class="n">range2</span> <span class="o">=</span> <span class="n">allocator</span><span class="o">-&gt;</span><span class="n">arange</span><span class="o">&lt;</span><span class="kt">float</span><span class="o">&gt;</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">6</span><span class="p">);</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">range2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">allocator</span><span class="o">-&gt;</span><span class="n">arange</span><span class="o">&lt;</span><span class="kt">float</span><span class="o">&gt;</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">6</span><span class="p">);</span><span class="w"></span>
 
 <span class="c1">// 0, 2, 4, 6, 8</span>
-<span class="k">auto</span> <span class="n">range3</span> <span class="o">=</span> <span class="n">allocator</span><span class="o">-&gt;</span><span class="n">arange</span><span class="o">&lt;</span><span class="kt">float</span><span class="o">&gt;</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">2</span><span class="p">);</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">range3</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">allocator</span><span class="o">-&gt;</span><span class="n">arange</span><span class="o">&lt;</span><span class="kt">float</span><span class="o">&gt;</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">10</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">);</span><span class="w"></span>
 </pre></div>
 
 <h4 id="eye">eye<a class="headerlink" href="#eye" title="Permanent link">&para;</a></h4>
 <p>Returns an identity matrix of type <code>T</code> and shape (<code>M</code>, <code>N</code>). This matrix has ones on the diagonal and zeros everywhere else.</p>
-<div class="codehilite"><pre><span></span><span class="k">auto</span> <span class="n">eye1</span> <span class="o">=</span> <span class="n">allocator</span><span class="o">-&gt;</span><span class="n">eye</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="n">N</span><span class="p">);</span>
+<div class="codehilite"><pre><span></span><span class="k">auto</span><span class="w"> </span><span class="n">eye1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">allocator</span><span class="o">-&gt;</span><span class="n">eye</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">(</span><span class="n">M</span><span class="p">,</span><span class="w"> </span><span class="n">N</span><span class="p">);</span><span class="w"></span>
 </pre></div>
 
 <p>Example:</p>
@@ -1135,12 +1135,12 @@
 <span class="c1">// 0, 1, 0, 0,</span>
 <span class="c1">// 0, 0, 1, 0,</span>
 <span class="c1">// 0, 0, 0, 1</span>
-<span class="k">auto</span> <span class="n">eye1</span> <span class="o">=</span> <span class="n">allocator</span><span class="o">-&gt;</span><span class="n">eye</span><span class="o">&lt;</span><span class="kt">float</span><span class="o">&gt;</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">);</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">eye1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">allocator</span><span class="o">-&gt;</span><span class="n">eye</span><span class="o">&lt;</span><span class="kt">float</span><span class="o">&gt;</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span><span class="w"> </span><span class="mi">4</span><span class="p">);</span><span class="w"></span>
 
 <span class="c1">// 1, 0, 0, 0, 0, 0, 0,</span>
 <span class="c1">// 0, 1, 0, 0, 0, 0, 0,</span>
 <span class="c1">// 0, 0, 1, 0, 0, 0, 0</span>
-<span class="k">auto</span> <span class="n">eye2</span> <span class="o">=</span> <span class="n">allocator</span><span class="o">-&gt;</span><span class="n">eye</span><span class="o">&lt;</span><span class="kt">float</span><span class="o">&gt;</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">7</span><span class="p">);</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">eye2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">allocator</span><span class="o">-&gt;</span><span class="n">eye</span><span class="o">&lt;</span><span class="kt">float</span><span class="o">&gt;</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="mi">7</span><span class="p">);</span><span class="w"></span>
 </pre></div>
 
 <h2 id="interacting-with-tensors">Interacting with Tensors<a class="headerlink" href="#interacting-with-tensors" title="Permanent link">&para;</a></h2>
@@ -1167,16 +1167,16 @@
 style non_tensor opacity:0.1,fill:#aaa,stroke:#333,stroke-width:4px</div>
 
 <p>To convert from a <code>NeuropodValue</code> to a <code>NeuropodTensor</code>, you can use <code>as_tensor()</code>.</p>
-<div class="codehilite"><pre><span></span><span class="k">auto</span> <span class="n">my_value</span> <span class="o">=</span> <span class="p">...</span>
-<span class="k">auto</span> <span class="n">my_tensor</span> <span class="o">=</span> <span class="n">my_value</span><span class="o">-&gt;</span><span class="n">as_tensor</span><span class="p">();</span>
+<div class="codehilite"><pre><span></span><span class="k">auto</span><span class="w"> </span><span class="n">my_value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">...</span><span class="w"></span>
+<span class="k">auto</span><span class="w"> </span><span class="n">my_tensor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">my_value</span><span class="o">-&gt;</span><span class="n">as_tensor</span><span class="p">();</span><span class="w"></span>
 </pre></div>
 
 <p>To convert from a <code>NeuropodValue</code> or <code>NeuropodTensor</code> to a <code>TypedNeuropodTensor</code> of a specific type, you can use <code>as_typed_tensor&lt;T&gt;()</code>. This does a type-checked downcast to the requested type and throws an error if the requested type does not match the actual type of the tensor.</p>
-<div class="codehilite"><pre><span></span><span class="k">auto</span> <span class="n">my_value</span> <span class="o">=</span> <span class="p">...</span>
-<span class="k">auto</span> <span class="n">my_float_tensor</span> <span class="o">=</span> <span class="n">my_value</span><span class="o">-&gt;</span><span class="n">as_typed_tensor</span><span class="o">&lt;</span><span class="kt">float</span><span class="o">&gt;</span><span class="p">();</span>
+<div class="codehilite"><pre><span></span><span class="k">auto</span><span class="w"> </span><span class="n">my_value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">...</span><span class="w"></span>
+<span class="k">auto</span><span class="w"> </span><span class="n">my_float_tensor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">my_value</span><span class="o">-&gt;</span><span class="n">as_typed_tensor</span><span class="o">&lt;</span><span class="kt">float</span><span class="o">&gt;</span><span class="p">();</span><span class="w"></span>
 
 <span class="c1">// This will throw an error</span>
-<span class="k">auto</span> <span class="n">my_uint_tensor</span> <span class="o">=</span> <span class="n">my_value</span><span class="o">-&gt;</span><span class="n">as_typed_tensor</span><span class="o">&lt;</span><span class="kt">uint8_t</span><span class="o">&gt;</span><span class="p">();</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">my_uint_tensor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">my_value</span><span class="o">-&gt;</span><span class="n">as_typed_tensor</span><span class="o">&lt;</span><span class="kt">uint8_t</span><span class="o">&gt;</span><span class="p">();</span><span class="w"></span>
 </pre></div>
 
 <p>The sections below will go over some more usage and examples.</p>
@@ -1191,54 +1191,54 @@ style non_tensor opacity:0.1,fill:#aaa,stroke:#333,stroke-width:4px</div>
 <h4 id="copy-data-into-a-tensor">Copy data into a tensor<a class="headerlink" href="#copy-data-into-a-tensor" title="Permanent link">&para;</a></h4>
 <p><small>Requires <code>TypedNeuropodTensor&lt;T&gt;</code></small></p>
 <p>If you want to copy in data (and can't wrap it using the <code>tensor_from_memory</code> API above), you can do something like this:</p>
-<div class="codehilite"><pre><span></span><span class="kt">float</span> <span class="o">*</span> <span class="n">my_data</span> <span class="o">=</span> <span class="p">...;</span>
-<span class="kt">size_t</span> <span class="n">num_elements</span> <span class="o">=</span> <span class="p">...;</span>
-<span class="n">tensor</span><span class="o">-&gt;</span><span class="n">copy_from</span><span class="p">(</span><span class="n">my_data</span><span class="p">,</span> <span class="n">num_elements</span><span class="p">);</span>
+<div class="codehilite"><pre><span></span><span class="kt">float</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">my_data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">...;</span><span class="w"></span>
+<span class="kt">size_t</span><span class="w"> </span><span class="n">num_elements</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">...;</span><span class="w"></span>
+<span class="n">tensor</span><span class="o">-&gt;</span><span class="n">copy_from</span><span class="p">(</span><span class="n">my_data</span><span class="p">,</span><span class="w"> </span><span class="n">num_elements</span><span class="p">);</span><span class="w"></span>
 </pre></div>
 
 <p>You can also copy data from a vector:</p>
-<div class="codehilite"><pre><span></span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">float</span><span class="o">&gt;</span> <span class="n">my_data</span><span class="p">;</span>
-<span class="n">tensor</span><span class="o">-&gt;</span><span class="n">copy_from</span><span class="p">(</span><span class="n">my_data</span><span class="p">);</span>
+<div class="codehilite"><pre><span></span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">float</span><span class="o">&gt;</span><span class="w"> </span><span class="n">my_data</span><span class="p">;</span><span class="w"></span>
+<span class="n">tensor</span><span class="o">-&gt;</span><span class="n">copy_from</span><span class="p">(</span><span class="n">my_data</span><span class="p">);</span><span class="w"></span>
 </pre></div>
 
 <h4 id="directly-setget-data">Directly set/get data<a class="headerlink" href="#directly-setget-data" title="Permanent link">&para;</a></h4>
 <p><small>Requires <code>TypedNeuropodTensor&lt;T&gt;</code></small></p>
 <p>You can do this using the accessor interface, which is very similar to PyTorch's accessor interface.</p>
-<div class="codehilite"><pre><span></span><span class="k">auto</span> <span class="n">tensor</span> <span class="o">=</span> <span class="n">allocator</span><span class="o">-&gt;</span><span class="n">allocate_tensor</span><span class="o">&lt;</span><span class="kt">float</span><span class="o">&gt;</span><span class="p">({</span><span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">});</span>
+<div class="codehilite"><pre><span></span><span class="k">auto</span><span class="w"> </span><span class="n">tensor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">allocator</span><span class="o">-&gt;</span><span class="n">allocate_tensor</span><span class="o">&lt;</span><span class="kt">float</span><span class="o">&gt;</span><span class="p">({</span><span class="mi">6</span><span class="p">,</span><span class="w"> </span><span class="mi">6</span><span class="p">});</span><span class="w"></span>
 
 <span class="c1">// 2 is the number of dimensions of this tensor</span>
-<span class="k">auto</span> <span class="n">accessor</span> <span class="o">=</span> <span class="n">tensor</span><span class="o">-&gt;</span><span class="n">accessor</span><span class="o">&lt;</span><span class="mi">2</span><span class="o">&gt;</span><span class="p">();</span>
-<span class="n">accessor</span><span class="p">[</span><span class="mi">5</span><span class="p">][</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">;</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">accessor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">tensor</span><span class="o">-&gt;</span><span class="n">accessor</span><span class="o">&lt;</span><span class="mi">2</span><span class="o">&gt;</span><span class="p">();</span><span class="w"></span>
+<span class="n">accessor</span><span class="p">[</span><span class="mi">5</span><span class="p">][</span><span class="mi">3</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.0</span><span class="p">;</span><span class="w"></span>
 </pre></div>
 
 <p>Range-based for loops work with accessors as well:</p>
-<div class="codehilite"><pre><span></span><span class="k">auto</span> <span class="n">tensor</span> <span class="o">=</span> <span class="n">allocator</span><span class="o">-&gt;</span><span class="n">allocate_tensor</span><span class="o">&lt;</span><span class="kt">float</span><span class="o">&gt;</span><span class="p">({</span><span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">});</span>
+<div class="codehilite"><pre><span></span><span class="k">auto</span><span class="w"> </span><span class="n">tensor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">allocator</span><span class="o">-&gt;</span><span class="n">allocate_tensor</span><span class="o">&lt;</span><span class="kt">float</span><span class="o">&gt;</span><span class="p">({</span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span><span class="p">});</span><span class="w"></span>
 
 <span class="c1">// 2 is the number of dimensions of this tensor</span>
-<span class="k">auto</span> <span class="n">accessor</span> <span class="o">=</span> <span class="n">tensor</span><span class="o">-&gt;</span><span class="n">accessor</span><span class="o">&lt;</span><span class="mi">2</span><span class="o">&gt;</span><span class="p">();</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">accessor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">tensor</span><span class="o">-&gt;</span><span class="n">accessor</span><span class="o">&lt;</span><span class="mi">2</span><span class="o">&gt;</span><span class="p">();</span><span class="w"></span>
 
-<span class="k">for</span> <span class="p">(</span><span class="k">const</span> <span class="k">auto</span> <span class="o">&amp;</span><span class="nl">row</span> <span class="p">:</span> <span class="n">accessor</span><span class="p">)</span>
-<span class="p">{</span>
-    <span class="k">for</span> <span class="p">(</span><span class="k">const</span> <span class="k">auto</span> <span class="o">&amp;</span><span class="nl">item</span> <span class="p">:</span> <span class="n">row</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="c1">// Do something</span>
-    <span class="p">}</span>
-<span class="p">}</span>
+<span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="k">auto</span><span class="w"> </span><span class="o">&amp;</span><span class="nl">row</span> <span class="p">:</span><span class="w"> </span><span class="n">accessor</span><span class="p">)</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="k">auto</span><span class="w"> </span><span class="o">&amp;</span><span class="nl">item</span> <span class="p">:</span><span class="w"> </span><span class="n">row</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="c1">// Do something</span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
 </pre></div>
 
 <p>Example with string tensors:</p>
-<div class="codehilite"><pre><span></span><span class="k">auto</span> <span class="n">tensor</span> <span class="o">=</span> <span class="n">allocator</span><span class="o">-&gt;</span><span class="n">allocate_tensor</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;</span><span class="p">({</span><span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">});</span>
+<div class="codehilite"><pre><span></span><span class="k">auto</span><span class="w"> </span><span class="n">tensor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">allocator</span><span class="o">-&gt;</span><span class="n">allocate_tensor</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;</span><span class="p">({</span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span><span class="p">});</span><span class="w"></span>
 
 <span class="c1">// 2 is the number of dimensions of this tensor</span>
-<span class="k">auto</span> <span class="n">accessor</span> <span class="o">=</span> <span class="n">tensor</span><span class="o">-&gt;</span><span class="n">accessor</span><span class="o">&lt;</span><span class="mi">2</span><span class="o">&gt;</span><span class="p">();</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">accessor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">tensor</span><span class="o">-&gt;</span><span class="n">accessor</span><span class="o">&lt;</span><span class="mi">2</span><span class="o">&gt;</span><span class="p">();</span><span class="w"></span>
 
-<span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">3</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
-<span class="p">{</span>
-    <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">j</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">j</span> <span class="o">&lt;</span> <span class="mi">5</span><span class="p">;</span> <span class="n">j</span><span class="o">++</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="n">accessor</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">std</span><span class="o">::</span><span class="n">to_string</span><span class="p">(</span><span class="n">i</span> <span class="o">*</span> <span class="mi">5</span> <span class="o">+</span> <span class="n">j</span><span class="p">);</span>
-    <span class="p">}</span>
-<span class="p">}</span>
+<span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">3</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">j</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">j</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">5</span><span class="p">;</span><span class="w"> </span><span class="n">j</span><span class="o">++</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">accessor</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">to_string</span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">5</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">j</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
 </pre></div>
 
 <p>Individual element access with accessors is very efficient and <a href="https://github.com/uber/neuropod/blob/master/source/neuropod/tests/benchmark_accessor.cc">comparable to raw pointer</a> operations during an optimized build.</p>
@@ -1248,22 +1248,22 @@ style non_tensor opacity:0.1,fill:#aaa,stroke:#333,stroke-width:4px</div>
 </div>
 <h4 id="get-the-dimensions-of-a-tensor">Get the dimensions of a tensor<a class="headerlink" href="#get-the-dimensions-of-a-tensor" title="Permanent link">&para;</a></h4>
 <p><small>Requires <code>NeuropodTensor</code></small></p>
-<div class="codehilite"><pre><span></span><span class="k">const</span> <span class="k">auto</span> <span class="o">&amp;</span><span class="n">dims</span> <span class="o">=</span> <span class="n">tensor</span><span class="o">-&gt;</span><span class="n">get_dims</span><span class="p">();</span>
+<div class="codehilite"><pre><span></span><span class="k">const</span><span class="w"> </span><span class="k">auto</span><span class="w"> </span><span class="o">&amp;</span><span class="n">dims</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">tensor</span><span class="o">-&gt;</span><span class="n">get_dims</span><span class="p">();</span><span class="w"></span>
 </pre></div>
 
 <h4 id="get-the-number-of-elements-in-a-tensor">Get the number of elements in a tensor<a class="headerlink" href="#get-the-number-of-elements-in-a-tensor" title="Permanent link">&para;</a></h4>
 <p><small>Requires <code>NeuropodTensor</code></small></p>
-<div class="codehilite"><pre><span></span><span class="k">auto</span> <span class="n">num_elements</span> <span class="o">=</span> <span class="n">tensor</span><span class="o">-&gt;</span><span class="n">get_num_elements</span><span class="p">();</span>
+<div class="codehilite"><pre><span></span><span class="k">auto</span><span class="w"> </span><span class="n">num_elements</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">tensor</span><span class="o">-&gt;</span><span class="n">get_num_elements</span><span class="p">();</span><span class="w"></span>
 </pre></div>
 
 <h4 id="get-the-type-of-a-tensor">Get the type of a tensor<a class="headerlink" href="#get-the-type-of-a-tensor" title="Permanent link">&para;</a></h4>
 <p><small>Requires <code>NeuropodTensor</code></small></p>
-<div class="codehilite"><pre><span></span><span class="k">auto</span> <span class="n">tensor_type</span> <span class="o">=</span> <span class="n">tensor</span><span class="o">-&gt;</span><span class="n">get_tensor_type</span><span class="p">();</span>
+<div class="codehilite"><pre><span></span><span class="k">auto</span><span class="w"> </span><span class="n">tensor_type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">tensor</span><span class="o">-&gt;</span><span class="n">get_tensor_type</span><span class="p">();</span><span class="w"></span>
 </pre></div>
 
 <h4 id="get-a-raw-pointer-to-the-underlying-data">Get a raw pointer to the underlying data<a class="headerlink" href="#get-a-raw-pointer-to-the-underlying-data" title="Permanent link">&para;</a></h4>
 <p><small>Requires <code>TypedNeuropodTensor&lt;T&gt;</code></small></p>
-<div class="codehilite"><pre><span></span><span class="k">auto</span> <span class="n">data</span> <span class="o">=</span> <span class="n">tensor</span><span class="o">-&gt;</span><span class="n">get_raw_data_ptr</span><span class="p">();</span>
+<div class="codehilite"><pre><span></span><span class="k">auto</span><span class="w"> </span><span class="n">data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">tensor</span><span class="o">-&gt;</span><span class="n">get_raw_data_ptr</span><span class="p">();</span><span class="w"></span>
 </pre></div>
 
 <div class="admonition note">
@@ -1272,7 +1272,7 @@ style non_tensor opacity:0.1,fill:#aaa,stroke:#333,stroke-width:4px</div>
 </div>
 <h4 id="get-the-data-as-a-vector">Get the data as a vector<a class="headerlink" href="#get-the-data-as-a-vector" title="Permanent link">&para;</a></h4>
 <p><small>Requires <code>TypedNeuropodTensor&lt;T&gt;</code></small></p>
-<div class="codehilite"><pre><span></span><span class="k">auto</span> <span class="n">data</span> <span class="o">=</span> <span class="n">tensor</span><span class="o">-&gt;</span><span class="n">get_data_as_vector</span><span class="p">();</span>
+<div class="codehilite"><pre><span></span><span class="k">auto</span><span class="w"> </span><span class="n">data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">tensor</span><span class="o">-&gt;</span><span class="n">get_data_as_vector</span><span class="p">();</span><span class="w"></span>
 </pre></div>
 
 <div class="admonition warning">
@@ -1281,49 +1281,49 @@ style non_tensor opacity:0.1,fill:#aaa,stroke:#333,stroke-width:4px</div>
 </div>
 <h2 id="inference">Inference<a class="headerlink" href="#inference" title="Permanent link">&para;</a></h2>
 <p>The basic inference method of a neuropod looks like this:</p>
-<div class="codehilite"><pre><span></span><span class="n">std</span><span class="o">::</span><span class="n">unique_ptr</span><span class="o">&lt;</span><span class="n">NeuropodValueMap</span><span class="o">&gt;</span> <span class="n">infer</span><span class="p">(</span><span class="k">const</span> <span class="n">NeuropodValueMap</span> <span class="o">&amp;</span><span class="n">inputs</span><span class="p">);</span>
+<div class="codehilite"><pre><span></span><span class="n">std</span><span class="o">::</span><span class="n">unique_ptr</span><span class="o">&lt;</span><span class="n">NeuropodValueMap</span><span class="o">&gt;</span><span class="w"> </span><span class="n">infer</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">NeuropodValueMap</span><span class="w"> </span><span class="o">&amp;</span><span class="n">inputs</span><span class="p">);</span><span class="w"></span>
 </pre></div>
 
 <p>A <code>NeuropodValueMap</code> is just a map from <code>std::string</code> to <code>std::shared_ptr&lt;NeuropodValue&gt;</code></p>
 <p>Interacting with it is identical to interacting with a <code>std::unordered_map</code>.</p>
 <p>For example:</p>
 <div class="codehilite"><pre><span></span><span class="c1">// Get an allocator</span>
-<span class="k">auto</span> <span class="n">alloctor</span> <span class="o">=</span> <span class="n">neuropod</span><span class="p">.</span><span class="n">get_tensor_allocator</span><span class="p">();</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">alloctor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">neuropod</span><span class="p">.</span><span class="n">get_tensor_allocator</span><span class="p">();</span><span class="w"></span>
 
 <span class="c1">// Create some tensors</span>
-<span class="k">auto</span> <span class="n">x</span> <span class="o">=</span> <span class="n">allocator</span><span class="o">-&gt;</span><span class="n">randn</span><span class="o">&lt;</span><span class="kt">float</span><span class="o">&gt;</span><span class="p">({</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">});</span>
-<span class="k">auto</span> <span class="n">y</span> <span class="o">=</span> <span class="n">allocator</span><span class="o">-&gt;</span><span class="n">ones</span><span class="o">&lt;</span><span class="kt">float</span><span class="o">&gt;</span><span class="p">({</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">});</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">allocator</span><span class="o">-&gt;</span><span class="n">randn</span><span class="o">&lt;</span><span class="kt">float</span><span class="o">&gt;</span><span class="p">({</span><span class="mi">5</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span><span class="p">});</span><span class="w"></span>
+<span class="k">auto</span><span class="w"> </span><span class="n">y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">allocator</span><span class="o">-&gt;</span><span class="n">ones</span><span class="o">&lt;</span><span class="kt">float</span><span class="o">&gt;</span><span class="p">({</span><span class="mi">5</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span><span class="p">});</span><span class="w"></span>
 
 <span class="c1">// Run inference</span>
-<span class="k">const</span> <span class="k">auto</span> <span class="n">output_data</span> <span class="o">=</span> <span class="n">neuropod</span><span class="p">.</span><span class="n">infer</span><span class="p">({</span>
-    <span class="p">{</span><span class="s">&quot;x&quot;</span><span class="p">,</span> <span class="n">x</span><span class="p">},</span>
-    <span class="p">{</span><span class="s">&quot;y&quot;</span><span class="p">,</span> <span class="n">y</span><span class="p">}</span>
-<span class="p">});</span>
+<span class="k">const</span><span class="w"> </span><span class="k">auto</span><span class="w"> </span><span class="n">output_data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">neuropod</span><span class="p">.</span><span class="n">infer</span><span class="p">({</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="s">&quot;x&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">x</span><span class="p">},</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="s">&quot;y&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="p">}</span><span class="w"></span>
+<span class="p">});</span><span class="w"></span>
 
 <span class="c1">// Get the outputs</span>
-<span class="k">auto</span> <span class="n">z</span> <span class="o">=</span> <span class="n">output_data</span><span class="o">-&gt;</span><span class="n">at</span><span class="p">(</span><span class="s">&quot;z&quot;</span><span class="p">)</span><span class="o">-&gt;</span><span class="n">as_typed_tensor</span><span class="o">&lt;</span><span class="kt">float</span><span class="o">&gt;</span><span class="p">();</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">z</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">output_data</span><span class="o">-&gt;</span><span class="n">at</span><span class="p">(</span><span class="s">&quot;z&quot;</span><span class="p">)</span><span class="o">-&gt;</span><span class="n">as_typed_tensor</span><span class="o">&lt;</span><span class="kt">float</span><span class="o">&gt;</span><span class="p">();</span><span class="w"></span>
 </pre></div>
 
 <p>You can also get a subset of the model's output by providing a list of requested outputs:</p>
-<div class="codehilite"><pre><span></span><span class="n">std</span><span class="o">::</span><span class="n">unique_ptr</span><span class="o">&lt;</span><span class="n">NeuropodValueMap</span><span class="o">&gt;</span> <span class="n">infer</span><span class="p">(</span><span class="k">const</span> <span class="n">NeuropodValueMap</span> <span class="o">&amp;</span><span class="n">inputs</span><span class="p">,</span> <span class="k">const</span> <span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;</span> <span class="n">requested_outputs</span><span class="p">);</span>
+<div class="codehilite"><pre><span></span><span class="n">std</span><span class="o">::</span><span class="n">unique_ptr</span><span class="o">&lt;</span><span class="n">NeuropodValueMap</span><span class="o">&gt;</span><span class="w"> </span><span class="n">infer</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">NeuropodValueMap</span><span class="w"> </span><span class="o">&amp;</span><span class="n">inputs</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;</span><span class="w"> </span><span class="n">requested_outputs</span><span class="p">);</span><span class="w"></span>
 </pre></div>
 
 <p>For example, if you wanted to return a map containing only the tensor "z", you could do this:</p>
-<div class="codehilite"><pre><span></span><span class="k">const</span> <span class="k">auto</span> <span class="n">output_data</span> <span class="o">=</span> <span class="n">neuropod</span><span class="p">.</span><span class="n">infer</span><span class="p">(</span><span class="n">input_data</span><span class="p">,</span> <span class="p">{</span><span class="s">&quot;z&quot;</span><span class="p">});</span>
+<div class="codehilite"><pre><span></span><span class="k">const</span><span class="w"> </span><span class="k">auto</span><span class="w"> </span><span class="n">output_data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">neuropod</span><span class="p">.</span><span class="n">infer</span><span class="p">(</span><span class="n">input_data</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="s">&quot;z&quot;</span><span class="p">});</span><span class="w"></span>
 </pre></div>
 
 <h2 id="serialization">Serialization<a class="headerlink" href="#serialization" title="Permanent link">&para;</a></h2>
 <p>All built-in <code>NeuropodValue</code> types are serializable. Furthermore, <code>NeuropodValueMap</code> is also serializable.</p>
 <div class="codehilite"><pre><span></span><span class="c1">// A stream to serialize to. Any ostream is allowed, but we use a</span>
 <span class="c1">// stringstream in this example</span>
-<span class="n">std</span><span class="o">::</span><span class="n">stringstream</span> <span class="n">ss</span><span class="p">;</span>
+<span class="n">std</span><span class="o">::</span><span class="n">stringstream</span><span class="w"> </span><span class="n">ss</span><span class="p">;</span><span class="w"></span>
 
-<span class="n">neuropod</span><span class="o">::</span><span class="n">NeuropodValueMap</span> <span class="n">data</span> <span class="o">=</span> <span class="p">...;</span>
-<span class="n">neuropod</span><span class="o">::</span><span class="n">serialize</span><span class="p">(</span><span class="n">my_stream</span><span class="p">,</span> <span class="n">data</span><span class="p">);</span>
+<span class="n">neuropod</span><span class="o">::</span><span class="n">NeuropodValueMap</span><span class="w"> </span><span class="n">data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">...;</span><span class="w"></span>
+<span class="n">neuropod</span><span class="o">::</span><span class="n">serialize</span><span class="p">(</span><span class="n">my_stream</span><span class="p">,</span><span class="w"> </span><span class="n">data</span><span class="p">);</span><span class="w"></span>
 </pre></div>
 
 <p>Similarly, deserializing is just as easy.</p>
-<div class="codehilite"><pre><span></span><span class="k">auto</span> <span class="n">deserialized</span> <span class="o">=</span> <span class="n">neuropod</span><span class="o">::</span><span class="n">deserialize</span><span class="o">&lt;</span><span class="n">neuropod</span><span class="o">::</span><span class="n">NeuropodValueMap</span><span class="o">&gt;</span><span class="p">(</span><span class="n">ss</span><span class="p">,</span> <span class="n">allocator</span><span class="p">);</span>
+<div class="codehilite"><pre><span></span><span class="k">auto</span><span class="w"> </span><span class="n">deserialized</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">neuropod</span><span class="o">::</span><span class="n">deserialize</span><span class="o">&lt;</span><span class="n">neuropod</span><span class="o">::</span><span class="n">NeuropodValueMap</span><span class="o">&gt;</span><span class="p">(</span><span class="n">ss</span><span class="p">,</span><span class="w"> </span><span class="n">allocator</span><span class="p">);</span><span class="w"></span>
 </pre></div>
 
 <div class="admonition note">

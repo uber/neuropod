@@ -980,11 +980,11 @@
 <h3 id="ludwig">Ludwig<a class="headerlink" href="#ludwig" title="Permanent link">&para;</a></h3>
 <p>Ludwig contains a utility to export a model as a neuropod.
 If we train a Ludwig model like this:</p>
-<div class="codehilite"><pre><span></span><span class="err">ludwig train --data_csv &lt;MY_DATA&gt;PATH&gt; --model_definition &lt;MY_MODEL_DEFINITION&gt; --output_directory &lt;LUDWIG_OUTPUT_DIRECTORY&gt;</span>
+<div class="codehilite"><pre><span></span>ludwig train --data_csv &lt;MY_DATA&gt;PATH&gt; --model_definition &lt;MY_MODEL_DEFINITION&gt; --output_directory &lt;LUDWIG_OUTPUT_DIRECTORY&gt;
 </pre></div>
 
 <p>We can package it as a neuropod by running:</p>
-<div class="codehilite"><pre><span></span><span class="err">python -m ludwig.utils.neuropod_utils --ludwig_model_path &lt;LUDWIG_OUTPUT_DIRECTORY&gt;/&lt;MODEL_NAME&gt;/model --neuropod_path &lt;NEUROPOD_OUTPUT_PATH&gt;</span>
+<div class="codehilite"><pre><span></span>python -m ludwig.utils.neuropod_utils --ludwig_model_path &lt;LUDWIG_OUTPUT_DIRECTORY&gt;/&lt;MODEL_NAME&gt;/model --neuropod_path &lt;NEUROPOD_OUTPUT_PATH&gt;
 </pre></div>
 
 <p>By default the package will be a ZIP file, but you can specify <code>--package_as_dir</code> if you prefer the output Neuropod package to be a directory.
@@ -1011,42 +1011,42 @@ Also note that the Python version should be 3.7+.</p>
 </pre></div>
 
 <h3 id="from-c">From C++<a class="headerlink" href="#from-c" title="Permanent link">&para;</a></h3>
-<div class="codehilite"><pre><span></span><span class="cp">#include</span> <span class="cpf">&quot;neuropod/neuropod.hh&quot;</span><span class="cp"></span>
+<div class="codehilite"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;neuropod/neuropod.hh&quot;</span><span class="cp"></span>
 
-<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>
-<span class="p">{</span>
-    <span class="k">const</span> <span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int64_t</span><span class="o">&gt;</span> <span class="n">shape</span> <span class="o">=</span> <span class="p">{</span><span class="mi">4</span><span class="p">};</span>
+<span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int64_t</span><span class="o">&gt;</span><span class="w"> </span><span class="n">shape</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="mi">4</span><span class="p">};</span><span class="w"></span>
 
-    <span class="c1">// To show two different ways of adding data, one of our inputs is an array</span>
-    <span class="c1">// and the other is a vector.</span>
-    <span class="k">const</span> <span class="kt">float</span><span class="p">[]</span>            <span class="n">x_data</span> <span class="o">=</span> <span class="p">{</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">};</span>
-    <span class="k">const</span> <span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">float</span><span class="o">&gt;</span> <span class="n">y_data</span> <span class="o">=</span> <span class="p">{</span><span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">8</span><span class="p">};</span>
+<span class="w">    </span><span class="c1">// To show two different ways of adding data, one of our inputs is an array</span>
+<span class="w">    </span><span class="c1">// and the other is a vector.</span>
+<span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="kt">float</span><span class="p">[]</span><span class="w">            </span><span class="n">x_data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="mi">4</span><span class="p">};</span><span class="w"></span>
+<span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">float</span><span class="o">&gt;</span><span class="w"> </span><span class="n">y_data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="mi">5</span><span class="p">,</span><span class="w"> </span><span class="mi">6</span><span class="p">,</span><span class="w"> </span><span class="mi">7</span><span class="p">,</span><span class="w"> </span><span class="mi">8</span><span class="p">};</span><span class="w"></span>
 
-    <span class="c1">// Load the neuropod</span>
-    <span class="n">Neuropod</span> <span class="n">neuropod</span><span class="p">(</span><span class="n">ADDITION_MODEL_PATH</span><span class="p">);</span>
+<span class="w">    </span><span class="c1">// Load the neuropod</span>
+<span class="w">    </span><span class="n">Neuropod</span><span class="w"> </span><span class="n">neuropod</span><span class="p">(</span><span class="n">ADDITION_MODEL_PATH</span><span class="p">);</span><span class="w"></span>
 
-    <span class="c1">// Add the input data using two different signatures of `copy_from`</span>
-    <span class="c1">// (one with a pointer and size, one with a vector)</span>
-    <span class="k">auto</span> <span class="n">x_tensor</span> <span class="o">=</span> <span class="n">neuropod</span><span class="p">.</span><span class="n">allocate_tensor</span><span class="o">&lt;</span><span class="kt">float</span><span class="o">&gt;</span><span class="p">(</span><span class="n">shape</span><span class="p">);</span>
-    <span class="n">x_tensor</span><span class="o">-&gt;</span><span class="n">copy_from</span><span class="p">(</span><span class="n">x_data</span><span class="p">,</span> <span class="mi">4</span><span class="p">);</span>
+<span class="w">    </span><span class="c1">// Add the input data using two different signatures of `copy_from`</span>
+<span class="w">    </span><span class="c1">// (one with a pointer and size, one with a vector)</span>
+<span class="w">    </span><span class="k">auto</span><span class="w"> </span><span class="n">x_tensor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">neuropod</span><span class="p">.</span><span class="n">allocate_tensor</span><span class="o">&lt;</span><span class="kt">float</span><span class="o">&gt;</span><span class="p">(</span><span class="n">shape</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">x_tensor</span><span class="o">-&gt;</span><span class="n">copy_from</span><span class="p">(</span><span class="n">x_data</span><span class="p">,</span><span class="w"> </span><span class="mi">4</span><span class="p">);</span><span class="w"></span>
 
-    <span class="k">auto</span> <span class="n">y_tensor</span> <span class="o">=</span> <span class="n">neuropod</span><span class="p">.</span><span class="n">allocate_tensor</span><span class="o">&lt;</span><span class="kt">float</span><span class="o">&gt;</span><span class="p">(</span><span class="n">shape</span><span class="p">);</span>
-    <span class="n">y_tensor</span><span class="o">-&gt;</span><span class="n">copy_from</span><span class="p">(</span><span class="n">y_data</span><span class="p">);</span>
+<span class="w">    </span><span class="k">auto</span><span class="w"> </span><span class="n">y_tensor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">neuropod</span><span class="p">.</span><span class="n">allocate_tensor</span><span class="o">&lt;</span><span class="kt">float</span><span class="o">&gt;</span><span class="p">(</span><span class="n">shape</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">y_tensor</span><span class="o">-&gt;</span><span class="n">copy_from</span><span class="p">(</span><span class="n">y_data</span><span class="p">);</span><span class="w"></span>
 
-    <span class="c1">// Run inference</span>
-    <span class="k">const</span> <span class="k">auto</span> <span class="n">output_data</span> <span class="o">=</span> <span class="n">neuropod</span><span class="p">.</span><span class="n">infer</span><span class="p">({</span>
-        <span class="p">{</span><span class="s">&quot;x&quot;</span><span class="p">,</span> <span class="n">x_tensor</span><span class="p">},</span>
-        <span class="p">{</span><span class="s">&quot;y&quot;</span><span class="p">,</span> <span class="n">y_tensor</span><span class="p">}</span>
-    <span class="p">});</span>
+<span class="w">    </span><span class="c1">// Run inference</span>
+<span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="k">auto</span><span class="w"> </span><span class="n">output_data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">neuropod</span><span class="p">.</span><span class="n">infer</span><span class="p">({</span><span class="w"></span>
+<span class="w">        </span><span class="p">{</span><span class="s">&quot;x&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">x_tensor</span><span class="p">},</span><span class="w"></span>
+<span class="w">        </span><span class="p">{</span><span class="s">&quot;y&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">y_tensor</span><span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="p">});</span><span class="w"></span>
 
-    <span class="k">const</span> <span class="k">auto</span> <span class="n">out_tensor</span> <span class="o">=</span> <span class="n">output_data</span><span class="o">-&gt;</span><span class="n">at</span><span class="p">(</span><span class="s">&quot;out&quot;</span><span class="p">);</span>
+<span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="k">auto</span><span class="w"> </span><span class="n">out_tensor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">output_data</span><span class="o">-&gt;</span><span class="n">at</span><span class="p">(</span><span class="s">&quot;out&quot;</span><span class="p">);</span><span class="w"></span>
 
-    <span class="c1">// {6, 8, 10, 12}</span>
-    <span class="k">const</span> <span class="k">auto</span> <span class="n">out_vector</span> <span class="o">=</span> <span class="n">out_tensor</span><span class="o">-&gt;</span><span class="n">as_typed_tensor</span><span class="o">&lt;</span><span class="kt">float</span><span class="o">&gt;</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">get_data_as_vector</span><span class="p">();</span>
+<span class="w">    </span><span class="c1">// {6, 8, 10, 12}</span>
+<span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="k">auto</span><span class="w"> </span><span class="n">out_vector</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">out_tensor</span><span class="o">-&gt;</span><span class="n">as_typed_tensor</span><span class="o">&lt;</span><span class="kt">float</span><span class="o">&gt;</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">get_data_as_vector</span><span class="p">();</span><span class="w"></span>
 
-    <span class="c1">// {4}</span>
-    <span class="k">const</span> <span class="k">auto</span> <span class="n">out_shape</span>  <span class="o">=</span> <span class="n">out_tensor</span><span class="o">-&gt;</span><span class="n">get_dims</span><span class="p">();</span>
-<span class="p">}</span>
+<span class="w">    </span><span class="c1">// {4}</span>
+<span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="k">auto</span><span class="w"> </span><span class="n">out_shape</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="n">out_tensor</span><span class="o">-&gt;</span><span class="n">get_dims</span><span class="p">();</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
 </pre></div>
 
 <div class="admonition note">

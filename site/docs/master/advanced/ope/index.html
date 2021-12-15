@@ -449,9 +449,9 @@
                 <h1 id="out-of-process-execution">Out-of-Process Execution<a class="headerlink" href="#out-of-process-execution" title="Permanent link">&para;</a></h1>
 <p>Neuropod can run models in different processes using an optimized shared memory implementation with extremely low overhead (~100 to 500 microseconds).</p>
 <p>To run a model in another process, set the <code>use_ope</code> option when loading a model:</p>
-<div class="codehilite"><pre><span></span><span class="n">neuropod</span><span class="o">::</span><span class="n">RuntimeOptions</span> <span class="n">opts</span><span class="p">;</span>
-<span class="n">opts</span><span class="p">.</span><span class="n">use_ope</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
-<span class="n">Neuropod</span> <span class="nf">model</span><span class="p">(</span><span class="n">neuropod_path</span><span class="p">,</span> <span class="n">opts</span><span class="p">);</span>
+<div class="codehilite"><pre><span></span><span class="n">neuropod</span><span class="o">::</span><span class="n">RuntimeOptions</span><span class="w"> </span><span class="n">opts</span><span class="p">;</span><span class="w"></span>
+<span class="n">opts</span><span class="p">.</span><span class="n">use_ope</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span><span class="w"></span>
+<span class="n">Neuropod</span><span class="w"> </span><span class="nf">model</span><span class="p">(</span><span class="n">neuropod_path</span><span class="p">,</span><span class="w"> </span><span class="n">opts</span><span class="p">);</span><span class="w"></span>
 </pre></div>
 
 <p>Nothing else should need to change.</p>

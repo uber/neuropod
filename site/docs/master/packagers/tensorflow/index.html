@@ -779,26 +779,26 @@
                 
                 <h2 id="create_tensorflow_neuropod">create_tensorflow_neuropod<a class="headerlink" href="#create_tensorflow_neuropod" title="Permanent link">&para;</a></h2>
 <p>Packages a TensorFlow model as a neuropod package.
-<div class="codehilite"><pre><span></span><span class="err">create_tensorflow_neuropod(</span>
-<span class="err">    neuropod_path,</span>
-<span class="err">    model_name,</span>
-<span class="err">    input_spec,</span>
-<span class="err">    output_spec,</span>
-<span class="err">    node_name_mapping = None,</span>
-<span class="err">    frozen_graph_path = None,</span>
-<span class="err">    graph_def = None,</span>
-<span class="err">    saved_model_dir = None,</span>
-<span class="err">    trackable_obj = None,</span>
-<span class="err">    init_op_names = [],</span>
-<span class="err">    platform_version_semver = *,</span>
-<span class="err">    input_tensor_device = None,</span>
-<span class="err">    default_input_tensor_device = GPU,</span>
-<span class="err">    custom_ops = [],</span>
-<span class="err">    package_as_zip = True,</span>
-<span class="err">    test_input_data = None,</span>
-<span class="err">    test_expected_out = None,</span>
-<span class="err">    persist_test_data = True,</span>
-<span class="err">)</span>
+<div class="codehilite"><pre><span></span>create_tensorflow_neuropod(
+    neuropod_path,
+    model_name,
+    input_spec,
+    output_spec,
+    node_name_mapping = None,
+    frozen_graph_path = None,
+    graph_def = None,
+    saved_model_dir = None,
+    trackable_obj = None,
+    init_op_names = [],
+    platform_version_semver = *,
+    input_tensor_device = None,
+    default_input_tensor_device = GPU,
+    custom_ops = [],
+    package_as_zip = True,
+    test_input_data = None,
+    test_expected_out = None,
+    persist_test_data = True,
+)
 </pre></div></p>
 <h3 id="params">Params:<a class="headerlink" href="#params" title="Permanent link">&para;</a></h3>
 <h4 id="neuropod_path">neuropod_path<a class="headerlink" href="#neuropod_path" title="Permanent link">&para;</a></h4>
@@ -813,10 +813,10 @@ dimensions of the input are validated against that tuple.  A value of
 <code>dtype</code> can be any valid numpy datatype string.</p>
 <div class="admonition note">
 <p><strong><em>Example</em></strong>:
-<div class="codehilite"><pre><span></span><span class="err">[</span>
-<span class="err">    {&quot;name&quot;: &quot;x&quot;, &quot;dtype&quot;: &quot;float32&quot;, &quot;shape&quot;: (None,)},</span>
-<span class="err">    {&quot;name&quot;: &quot;y&quot;, &quot;dtype&quot;: &quot;float32&quot;, &quot;shape&quot;: (None,)},</span>
-<span class="err">]</span>
+<div class="codehilite"><pre><span></span>[
+    {&quot;name&quot;: &quot;x&quot;, &quot;dtype&quot;: &quot;float32&quot;, &quot;shape&quot;: (None,)},
+    {&quot;name&quot;: &quot;y&quot;, &quot;dtype&quot;: &quot;float32&quot;, &quot;shape&quot;: (None,)},
+]
 </pre></div></p>
 </div>
 <h4 id="output_spec">output_spec<a class="headerlink" href="#output_spec" title="Permanent link">&para;</a></h4>
@@ -824,9 +824,9 @@ dimensions of the input are validated against that tuple.  A value of
 the <code>input_spec</code> parameter for more details.</p>
 <div class="admonition note">
 <p><strong><em>Example</em></strong>:
-<div class="codehilite"><pre><span></span><span class="err">[</span>
-<span class="err">    {&quot;name&quot;: &quot;out&quot;, &quot;dtype&quot;: &quot;float32&quot;, &quot;shape&quot;: (None,)},</span>
-<span class="err">]</span>
+<div class="codehilite"><pre><span></span>[
+    {&quot;name&quot;: &quot;out&quot;, &quot;dtype&quot;: &quot;float32&quot;, &quot;shape&quot;: (None,)},
+]
 </pre></div></p>
 </div>
 <h4 id="node_name_mapping">node_name_mapping<a class="headerlink" href="#node_name_mapping" title="Permanent link">&para;</a></h4>
@@ -835,11 +835,11 @@ the <code>input_spec</code> parameter for more details.</p>
 optional. Required unless using a saved model.</p>
 <div class="admonition note">
 <p><strong><em>Example</em></strong>:
-<div class="codehilite"><pre><span></span><span class="err">{</span>
-<span class="err">    &quot;x&quot;: &quot;some_namespace/in_x:0&quot;,</span>
-<span class="err">    &quot;y&quot;: &quot;some_namespace/in_y:0&quot;,</span>
-<span class="err">    &quot;out&quot;: &quot;some_namespace/out:0&quot;,</span>
-<span class="err">}</span>
+<div class="codehilite"><pre><span></span>{
+    &quot;x&quot;: &quot;some_namespace/in_x:0&quot;,
+    &quot;y&quot;: &quot;some_namespace/in_y:0&quot;,
+    &quot;out&quot;: &quot;some_namespace/out:0&quot;,
+}
 </pre></div></p>
 </div>
 <h4 id="frozen_graph_path">frozen_graph_path<a class="headerlink" href="#frozen_graph_path" title="Permanent link">&para;</a></h4>
@@ -896,7 +896,7 @@ to CPU.</p>
 <p>See the docstring for <code>load_neuropod</code> for more info.</p>
 <div class="admonition note">
 <p><strong><em>Example</em></strong>:
-<div class="codehilite"><pre><span></span><span class="err">{&quot;x&quot;: &quot;GPU&quot;}</span>
+<div class="codehilite"><pre><span></span>{&quot;x&quot;: &quot;GPU&quot;}
 </pre></div></p>
 </div>
 <h4 id="default_input_tensor_device">default_input_tensor_device<a class="headerlink" href="#default_input_tensor_device" title="Permanent link">&para;</a></h4>
@@ -911,7 +911,7 @@ that the custom ops were built for. It is the user's responsibility to ensure th
 custom ops are built for the correct platform.</p>
 <div class="admonition note">
 <p><strong><em>Example</em></strong>:
-<div class="codehilite"><pre><span></span><span class="err">[&quot;/path/to/my/custom_op.so&quot;]</span>
+<div class="codehilite"><pre><span></span>[&quot;/path/to/my/custom_op.so&quot;]
 </pre></div></p>
 </div>
 <h4 id="package_as_zip">package_as_zip<a class="headerlink" href="#package_as_zip" title="Permanent link">&para;</a></h4>
@@ -926,10 +926,10 @@ successfully. Must be provided if <code>test_expected_out</code> is provided.</p
 <p>Throws a ValueError if inference failed.</p>
 <div class="admonition note">
 <p><strong><em>Example</em></strong>:
-<div class="codehilite"><pre><span></span><span class="err">{</span>
-<span class="err">    &quot;x&quot;: np.arange(5),</span>
-<span class="err">    &quot;y&quot;: np.arange(5),</span>
-<span class="err">}</span>
+<div class="codehilite"><pre><span></span>{
+    &quot;x&quot;: np.arange(5),
+    &quot;y&quot;: np.arange(5),
+}
 </pre></div></p>
 </div>
 <h4 id="test_expected_out">test_expected_out<a class="headerlink" href="#test_expected_out" title="Permanent link">&para;</a></h4>
@@ -938,9 +938,9 @@ successfully. Must be provided if <code>test_expected_out</code> is provided.</p
 does not match the expected output.</p>
 <div class="admonition note">
 <p><strong><em>Example</em></strong>:
-<div class="codehilite"><pre><span></span><span class="err">{</span>
-<span class="err">    &quot;out&quot;: np.arange(5) + np.arange(5)</span>
-<span class="err">}</span>
+<div class="codehilite"><pre><span></span>{
+    &quot;out&quot;: np.arange(5) + np.arange(5)
+}
 </pre></div></p>
 </div>
 <h4 id="persist_test_data">persist_test_data<a class="headerlink" href="#persist_test_data" title="Permanent link">&para;</a></h4>

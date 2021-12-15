@@ -765,25 +765,25 @@
                 
                 <h2 id="create_python_neuropod">create_python_neuropod<a class="headerlink" href="#create_python_neuropod" title="Permanent link">&para;</a></h2>
 <p>Packages arbitrary python code as a neuropod package.
-<div class="codehilite"><pre><span></span><span class="err">create_python_neuropod(</span>
-<span class="err">    neuropod_path,</span>
-<span class="err">    model_name,</span>
-<span class="err">    data_paths,</span>
-<span class="err">    code_path_spec,</span>
-<span class="err">    entrypoint_package,</span>
-<span class="err">    entrypoint,</span>
-<span class="err">    input_spec,</span>
-<span class="err">    output_spec,</span>
-<span class="err">    requirements = None,</span>
-<span class="err">    platform_version_semver = *,</span>
-<span class="err">    input_tensor_device = None,</span>
-<span class="err">    default_input_tensor_device = GPU,</span>
-<span class="err">    custom_ops = [],</span>
-<span class="err">    package_as_zip = True,</span>
-<span class="err">    test_input_data = None,</span>
-<span class="err">    test_expected_out = None,</span>
-<span class="err">    persist_test_data = True,</span>
-<span class="err">)</span>
+<div class="codehilite"><pre><span></span>create_python_neuropod(
+    neuropod_path,
+    model_name,
+    data_paths,
+    code_path_spec,
+    entrypoint_package,
+    entrypoint,
+    input_spec,
+    output_spec,
+    requirements = None,
+    platform_version_semver = *,
+    input_tensor_device = None,
+    default_input_tensor_device = GPU,
+    custom_ops = [],
+    package_as_zip = True,
+    test_input_data = None,
+    test_expected_out = None,
+    persist_test_data = True,
+)
 </pre></div></p>
 <h3 id="params">Params:<a class="headerlink" href="#params" title="Permanent link">&para;</a></h3>
 <h4 id="neuropod_path">neuropod_path<a class="headerlink" href="#neuropod_path" title="Permanent link">&para;</a></h4>
@@ -794,10 +794,10 @@
 <p>A list of dicts containing the paths to any data files that needs to be packaged.</p>
 <div class="admonition note">
 <p><strong><em>Example</em></strong>:
-<div class="codehilite"><pre><span></span><span class="err">[{</span>
-<span class="err">    path: &quot;/path/to/myfile.txt&quot;,</span>
-<span class="err">    packaged_name: &quot;newfilename.txt&quot;</span>
-<span class="err">}]</span>
+<div class="codehilite"><pre><span></span>[{
+    path: &quot;/path/to/myfile.txt&quot;,
+    packaged_name: &quot;newfilename.txt&quot;
+}]
 </pre></div></p>
 </div>
 <h4 id="code_path_spec">code_path_spec<a class="headerlink" href="#code_path_spec" title="Permanent link">&para;</a></h4>
@@ -805,10 +805,10 @@
 *.pyc files are ignored.</p>
 <div class="admonition note">
 <p>This is specified as follows:
-<div class="codehilite"><pre><span></span><span class="err">[{</span>
-<span class="err">    &quot;python_root&quot;: &quot;/some/path/to/a/python/root&quot;,</span>
-<span class="err">    &quot;dirs_to_package&quot;: [&quot;relative/path/to/package&quot;]</span>
-<span class="err">}, ...]</span>
+<div class="codehilite"><pre><span></span>[{
+    &quot;python_root&quot;: &quot;/some/path/to/a/python/root&quot;,
+    &quot;dirs_to_package&quot;: [&quot;relative/path/to/package&quot;]
+}, ...]
 </pre></div></p>
 </div>
 <h4 id="entrypoint_package">entrypoint_package<a class="headerlink" href="#entrypoint_package" title="Permanent link">&para;</a></h4>
@@ -823,14 +823,14 @@ a directory containing the packaged data as its first parameter.</p>
 <div class="admonition note">
 <p>For example,
 a function like:</p>
-<p><div class="codehilite"><pre><span></span><span class="n">def</span> <span class="n">neuropod_init</span><span class="p">(</span><span class="n">data_path</span><span class="p">):</span>
+<p><div class="codehilite"><pre><span></span><span class="nv">def</span> <span class="nv">neuropod_init</span><span class="ss">(</span><span class="nv">data_path</span><span class="ss">)</span>:
 
-    <span class="n">def</span> <span class="n">addition_model</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
-        <span class="k">return</span> <span class="err">{</span>
-            <span class="ss">&quot;output&quot;</span><span class="p">:</span> <span class="n">x</span> <span class="o">+</span> <span class="n">y</span>
-        <span class="err">}</span>
+    <span class="nv">def</span> <span class="nv">addition_model</span><span class="ss">(</span><span class="nv">x</span>, <span class="nv">y</span><span class="ss">)</span>:
+        <span class="k">return</span> {
+            <span class="s2">&quot;</span><span class="s">output</span><span class="s2">&quot;</span>: <span class="nv">x</span> <span class="o">+</span> <span class="nv">y</span>
+        }
 
-    <span class="k">return</span> <span class="n">addition_model</span>
+    <span class="k">return</span> <span class="nv">addition_model</span>
 </pre></div>
 contained in the package 'my.awesome.addition_model' would have
 <code>entrypoint_package='my.awesome.addition_model'</code> and
@@ -844,10 +844,10 @@ dimensions of the input are validated against that tuple.  A value of
 <code>dtype</code> can be any valid numpy datatype string.</p>
 <div class="admonition note">
 <p><strong><em>Example</em></strong>:
-<div class="codehilite"><pre><span></span><span class="err">[</span>
-<span class="err">    {&quot;name&quot;: &quot;x&quot;, &quot;dtype&quot;: &quot;float32&quot;, &quot;shape&quot;: (None,)},</span>
-<span class="err">    {&quot;name&quot;: &quot;y&quot;, &quot;dtype&quot;: &quot;float32&quot;, &quot;shape&quot;: (None,)},</span>
-<span class="err">]</span>
+<div class="codehilite"><pre><span></span>[
+    {&quot;name&quot;: &quot;x&quot;, &quot;dtype&quot;: &quot;float32&quot;, &quot;shape&quot;: (None,)},
+    {&quot;name&quot;: &quot;y&quot;, &quot;dtype&quot;: &quot;float32&quot;, &quot;shape&quot;: (None,)},
+]
 </pre></div></p>
 </div>
 <h4 id="output_spec">output_spec<a class="headerlink" href="#output_spec" title="Permanent link">&para;</a></h4>
@@ -855,9 +855,9 @@ dimensions of the input are validated against that tuple.  A value of
 the <code>input_spec</code> parameter for more details.</p>
 <div class="admonition note">
 <p><strong><em>Example</em></strong>:
-<div class="codehilite"><pre><span></span><span class="err">[</span>
-<span class="err">    {&quot;name&quot;: &quot;out&quot;, &quot;dtype&quot;: &quot;float32&quot;, &quot;shape&quot;: (None,)},</span>
-<span class="err">]</span>
+<div class="codehilite"><pre><span></span>[
+    {&quot;name&quot;: &quot;out&quot;, &quot;dtype&quot;: &quot;float32&quot;, &quot;shape&quot;: (None,)},
+]
 </pre></div></p>
 </div>
 <h4 id="requirements">requirements<a class="headerlink" href="#requirements" title="Permanent link">&para;</a></h4>
@@ -866,8 +866,8 @@ the <code>input_spec</code> parameter for more details.</p>
 (specified in a format that pip understands)</p>
 <div class="admonition note">
 <p><strong><em>Example</em></strong>:
-<div class="codehilite"><pre><span></span><span class="err">tensorflow=1.15.0</span>
-<span class="err">numpy=1.8</span>
+<div class="codehilite"><pre><span></span>tensorflow=1.15.0
+numpy=1.8
 </pre></div></p>
 </div>
 <h4 id="platform_version_semver">platform_version_semver<a class="headerlink" href="#platform_version_semver" title="Permanent link">&para;</a></h4>
@@ -900,7 +900,7 @@ to CPU.</p>
 <p>See the docstring for <code>load_neuropod</code> for more info.</p>
 <div class="admonition note">
 <p><strong><em>Example</em></strong>:
-<div class="codehilite"><pre><span></span><span class="err">{&quot;x&quot;: &quot;GPU&quot;}</span>
+<div class="codehilite"><pre><span></span>{&quot;x&quot;: &quot;GPU&quot;}
 </pre></div></p>
 </div>
 <h4 id="default_input_tensor_device">default_input_tensor_device<a class="headerlink" href="#default_input_tensor_device" title="Permanent link">&para;</a></h4>
@@ -915,7 +915,7 @@ that the custom ops were built for. It is the user's responsibility to ensure th
 custom ops are built for the correct platform.</p>
 <div class="admonition note">
 <p><strong><em>Example</em></strong>:
-<div class="codehilite"><pre><span></span><span class="err">[&quot;/path/to/my/custom_op.so&quot;]</span>
+<div class="codehilite"><pre><span></span>[&quot;/path/to/my/custom_op.so&quot;]
 </pre></div></p>
 </div>
 <h4 id="package_as_zip">package_as_zip<a class="headerlink" href="#package_as_zip" title="Permanent link">&para;</a></h4>
@@ -930,10 +930,10 @@ successfully. Must be provided if <code>test_expected_out</code> is provided.</p
 <p>Throws a ValueError if inference failed.</p>
 <div class="admonition note">
 <p><strong><em>Example</em></strong>:
-<div class="codehilite"><pre><span></span><span class="err">{</span>
-<span class="err">    &quot;x&quot;: np.arange(5),</span>
-<span class="err">    &quot;y&quot;: np.arange(5),</span>
-<span class="err">}</span>
+<div class="codehilite"><pre><span></span>{
+    &quot;x&quot;: np.arange(5),
+    &quot;y&quot;: np.arange(5),
+}
 </pre></div></p>
 </div>
 <h4 id="test_expected_out">test_expected_out<a class="headerlink" href="#test_expected_out" title="Permanent link">&para;</a></h4>
@@ -942,9 +942,9 @@ successfully. Must be provided if <code>test_expected_out</code> is provided.</p
 does not match the expected output.</p>
 <div class="admonition note">
 <p><strong><em>Example</em></strong>:
-<div class="codehilite"><pre><span></span><span class="err">{</span>
-<span class="err">    &quot;out&quot;: np.arange(5) + np.arange(5)</span>
-<span class="err">}</span>
+<div class="codehilite"><pre><span></span>{
+    &quot;out&quot;: np.arange(5) + np.arange(5)
+}
 </pre></div></p>
 </div>
 <h4 id="persist_test_data">persist_test_data<a class="headerlink" href="#persist_test_data" title="Permanent link">&para;</a></h4>
