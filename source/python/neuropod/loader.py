@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import os
-from neuropod.utils import config_utils, zip_loader
 
 from neuropod.registry import _REGISTERED_BACKENDS
 from neuropod.utils.dtype_utils import maybe_convert_bindings_types
@@ -151,38 +150,12 @@ def load_neuropod(neuropod_path, _always_use_native=True, **kwargs):
     if _always_use_native:
         return NativeNeuropodExecutor(neuropod_path, **kwargs)
     else:
-        import warnings
-
-        warnings.warn(
-            "_always_use_native=False is deprecated and will be removed soon. "
-            "Please use the default of `True` which uses the native code path to "
-            "run inference instead of the python implementation. This means it'll "
-            "use the same code path as Neuropod from C++. Java, C, Go, etc.",
-            DeprecationWarning,
-        )
-
-    # If we were given a zipfile, extract it to a temp dir and use it
-    neuropod_path = zip_loader.extract_neuropod_if_necessary(neuropod_path)
-
-    # Figure out what type of neuropod this is
-    neuropod_config = config_utils.read_neuropod_config(neuropod_path)
-    platform = neuropod_config["platform"]
-
-    if platform == "python":
-        from neuropod.backends.python.executor import PythonNeuropodExecutor
-
-        return PythonNeuropodExecutor(neuropod_path, **kwargs)
-    elif platform == "torchscript":
-        from neuropod.backends.torchscript.executor import TorchScriptNeuropodExecutor
-
-        return TorchScriptNeuropodExecutor(neuropod_path, **kwargs)
-    elif platform == "tensorflow":
-        from neuropod.backends.tensorflow.executor import TensorflowNeuropodExecutor
-
-        return TensorflowNeuropodExecutor(neuropod_path, **kwargs)
-    else:
         raise ValueError(
-            "Invalid platform found in neuropod config: {}".format(platform)
+            "_always_use_native=False has been removed (after having a deprecation warning for 3 months). "
+            "It was originally intended to be a workaround for edge cases as the native implementation "
+            "was being built. Please remove `_always_use_native=False` as an argument to `load_neuropod`. "
+            "This means that Neuropod will use the native code path to run inference (the same code path "
+            "used by Neuropod from C++. Java, C, Go, etc.)"
         )
 
 
