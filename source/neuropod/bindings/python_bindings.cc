@@ -42,7 +42,7 @@ TensorType get_array_type(py::array &array)
 
     // Strings need to be handled separately because `py::isinstance` does not do
     // what we want in this case.
-    if (array.dtype().kind() == 'S')
+    if (array.dtype().kind() == 'S' || array.dtype().kind() == 'U')
     {
         return STRING_TENSOR;
     }
@@ -149,6 +149,8 @@ py::array tensor_to_numpy(std::shared_ptr<NeuropodTensor> value)
         NEUROPOD_ERROR("Error converting value to tensor");
     }
 
+    auto dims = tensor->get_dims();
+
     // Handle string tensors
     if (tensor->get_tensor_type() == STRING_TENSOR)
     {
@@ -156,16 +158,41 @@ py::array tensor_to_numpy(std::shared_ptr<NeuropodTensor> value)
         // type of the resulting array in this case
         if (tensor->get_num_elements() == 0)
         {
-            return py::array_t<std::array<char, 1>>(tensor->get_dims());
+            return py::array_t<std::array<char, 1>>(dims);
         }
 
-        // This makes a copy
-        auto arr = py::array(py::cast(tensor->as_typed_tensor<std::string>()->get_data_as_vector()));
-        arr.resize(tensor->get_dims());
+        // We need to return as bytes to python since we don't know what encoding this has
+
+        // Get the data as a string vector
+        auto data_vec = tensor->as_typed_tensor<std::string>()->get_data_as_vector();
+
+        // Maybe there's a better way of doing this
+        size_t max_item_size_bytes = 0;
+        for (const auto &item : data_vec)
+        {
+            max_item_size_bytes = std::max(item.size(), max_item_size_bytes);
+        }
+
+        // Set up an array with the right format
+        py::dtype dt(fmt::format("|S{}", max_item_size_bytes));
+        auto      arr = py::array(dt, size_t{tensor->get_num_elements()});
+
+        // Zero the whole array
+        memset(arr.mutable_data(), 0, arr.nbytes());
+
+        // Copy in the data
+        // This is unfortunate, but because there isn't really a standard underlying string tensor format
+        // across frameworks, we need to make a copy
+        for (size_t i = 0; i < data_vec.size(); i++)
+        {
+            memcpy(arr.mutable_data(i), data_vec.at(i).data(), data_vec.at(i).size());
+        }
+
+        // Resize to target dims
+        arr.resize(dims);
         return arr;
     }
 
-    auto dims = tensor->get_dims();
     auto data = internal::NeuropodTensorRawDataAccess::get_untyped_data_ptr(*tensor);
 
     // Make sure we don't deallocate the tensor until the numpy array is deallocated

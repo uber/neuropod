@@ -200,10 +200,6 @@ void PythonBridge::load_model_internal()
     // Get the python neuropod loader
     py::object load_neuropod = py::module::import("_neuropod_native_bootstrap.executor").attr("NativePythonExecutor");
 
-    // Converts from unicode to ascii for python 3 string arrays
-    maybe_convert_bindings_types_ = stdx::make_unique<py::object>(
-        py::module::import("_neuropod_native_bootstrap.dtype_utils").attr("maybe_convert_bindings_types"));
-
     // Make sure that the model is local
     // Note: we could also delegate this to the python implementation
     const auto local_path = loader_->ensure_local();
@@ -218,7 +214,6 @@ PythonBridge::~PythonBridge()
     py::gil_scoped_acquire gil;
 
     // Delete the stored objects
-    maybe_convert_bindings_types_.reset();
     neuropod_.reset();
 
     // Write coverage info if necessary
@@ -248,10 +243,7 @@ std::unique_ptr<NeuropodValueMap> PythonBridge::infer_internal(const NeuropodVal
     py::dict model_inputs = to_numpy_dict(const_cast<NeuropodValueMap &>(inputs));
 
     // Run inference
-    auto model_outputs_raw = neuropod_->attr("forward")(model_inputs).cast<py::dict>();
-
-    // Postprocess for python 3
-    auto model_outputs = (*maybe_convert_bindings_types_)(model_outputs_raw).cast<py::dict>();
+    auto model_outputs = neuropod_->attr("forward")(model_inputs).cast<py::dict>();
 
     // Get the outputs
     auto outputs = from_numpy_dict(*get_tensor_allocator(), model_outputs);
