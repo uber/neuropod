@@ -1,0 +1,32 @@
+{
+  "variables": {
+    "region": "us-east-1",
+    "instance_type": "p2.xlarge"
+  },
+
+  "builders": [
+    {
+      "type": "amazon-ebs",
+      "region": "{{user `region`}}",
+      "source_ami": "{{user `source_ami`}}",
+      "instance_type": "{{user `instance_type`}}",
+      "ssh_username": "ec2-user",
+      "ami_name": "neuropod-buildkite-stack-gpu-{{isotime | clean_resource_name}}",
+      "ami_description": "Buildkite Elastic Stack AMI w/ GPU support",
+      "ami_groups": ["all"],
+      "temporary_security_group_source_cidrs": ["{{user `public_ip`}}/32"]
+    }
+  ],
+  "provisioners": [
+    {
+      "type": "shell",
+      "script": "install-nvidia-container-toolkit.sh"
+    },
+    {
+      "type": "shell",
+      "inline": [
+        "rm /home/ec2-user/.ssh/authorized_keys"
+      ]
+    }
+  ]
+}
