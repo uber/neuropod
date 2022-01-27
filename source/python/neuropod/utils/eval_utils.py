@@ -18,11 +18,8 @@ import pickle
 
 import numpy as np
 
-from neuropod.utils.env_utils import eval_in_new_process
 from neuropod.loader import load_neuropod
 
-# Unset or "true" => True
-RUN_NATIVE_TESTS = os.getenv("NEUROPOD_RUN_NATIVE_TESTS", "true") == "true"
 TEST_DATA_FILENAME = "test_data.pkl"
 
 logger = logging.getLogger(__name__)
@@ -77,21 +74,9 @@ def load_and_test_neuropod(
 
     Raises a ValueError if the outputs don't match the expected values
     """
-    if RUN_NATIVE_TESTS:
-        # Load the model using native out-of-process execution
-        model = load_neuropod(neuropod_path, **neuropod_load_args)
-        out = model.infer(test_input_data)
-    else:
-        # Run the evaluation in a new process. This is important to make sure
-        # custom ops are being tested correctly
-        args = neuropod_load_args.copy()
-
-        # By default, we use the native bindings to run the model
-        args["_always_use_native"] = False
-
-        out = eval_in_new_process(
-            neuropod_path, test_input_data, neuropod_load_args=args
-        )
+    # Load the model using native out-of-process execution
+    model = load_neuropod(neuropod_path, **neuropod_load_args)
+    out = model.infer(test_input_data)
 
     # Check the output
     if test_expected_out is not None:

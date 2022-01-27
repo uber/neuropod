@@ -10,7 +10,6 @@ from testpath.tempdir import TemporaryDirectory
 
 from neuropod.loader import load_neuropod
 from neuropod.packagers import create_python_neuropod
-from neuropod.utils.eval_utils import RUN_NATIVE_TESTS
 from neuropod.tests.utils import requires_frameworks
 
 # From the example at https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LinearRegression.html
@@ -35,10 +34,6 @@ def get_model(_):
 
 
 @requires_frameworks("python")
-@unittest.skipIf(
-    not RUN_NATIVE_TESTS,
-    "Specifying python deps are only supported by the native bindings",
-)
 class TestPythonDeps(unittest.TestCase):
     def package_sklearn_model(self, test_dir):
         neuropod_path = os.path.join(test_dir, "test_neuropod")

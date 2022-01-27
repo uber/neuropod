@@ -74,8 +74,8 @@ class TestPythonIsolation(unittest.TestCase):
                 path1 = self.package_dummy_model(test_dir1, 1.0)
                 path2 = self.package_dummy_model(test_dir2, 2.0)
 
-                with load_neuropod(path1, _always_use_native=False) as n1:
-                    with load_neuropod(path2, _always_use_native=False) as n2:
+                with load_neuropod(path1) as n1:
+                    with load_neuropod(path2) as n2:
                         input_data = {"x": np.array([0], dtype=np.float32)}
                         self.assertEqual(n1.infer(input_data)["out"][0], 1.0)
                         self.assertEqual(n2.infer(input_data)["out"][0], 2.0)

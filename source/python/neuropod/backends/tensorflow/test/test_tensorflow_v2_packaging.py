@@ -23,7 +23,6 @@ from neuropod.tests.utils import (
     check_addition_model,
     requires_frameworks,
 )
-from neuropod.utils.eval_utils import RUN_NATIVE_TESTS
 
 
 def create_tf_addition_model():
@@ -82,35 +81,17 @@ class TestTensorflowV2Packaging(unittest.TestCase):
         with self.assertRaises(ValueError):
             self.package_simple_addition_model(do_fail=True)
 
-    #
-    # Note: The following tests only run against the native bindings. This is okay because the
-    # native bindings are the default inference implementation (and will soon be the only
-    # inference implementation)
-    #
-
-    @unittest.skipIf(
-        not RUN_NATIVE_TESTS,
-        "Target versions are only supported by the native bindings",
-    )
     def test_simple_addition_model_invalid_target_version(self):
         # Tests a case where the target platform is an invalid version or range
         with self.assertRaises(RuntimeError):
             self.package_simple_addition_model(platform_version_semver="a.b.c")
 
-    @unittest.skipIf(
-        not RUN_NATIVE_TESTS,
-        "Target versions are only supported by the native bindings",
-    )
     def test_simple_addition_model_no_matching_version(self):
         # Tests a case where the target platform version is not one that is
         # available
         with self.assertRaises(RuntimeError):
             self.package_simple_addition_model(platform_version_semver="0.0.1")
 
-    @unittest.skipIf(
-        not RUN_NATIVE_TESTS,
-        "Target versions are only supported by the native bindings",
-    )
     def test_simple_addition_model_matching_range(self):
         # Tests a case where we have an appropraite backend for the target range
         self.package_simple_addition_model(platform_version_semver="2.0.0 - 3.0.0")
