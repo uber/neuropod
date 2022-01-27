@@ -46,7 +46,6 @@ class PythonBridge : public NeuropodBackendWithDefaultAllocator<GenericNeuropodT
 {
 private:
     std::unique_ptr<py::object> neuropod_;
-    std::unique_ptr<py::object> maybe_convert_bindings_types_;
 
 public:
     PythonBridge(const std::string &             neuropod_path,

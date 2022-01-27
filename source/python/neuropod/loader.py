@@ -13,9 +13,9 @@
 # limitations under the License.
 
 import os
+import numpy as np
 
 from neuropod.registry import _REGISTERED_BACKENDS
-from neuropod.utils.dtype_utils import maybe_convert_bindings_types
 
 # Add the script's directory to the PATH so we can find the worker binary
 os.environ["PATH"] += ":" + os.path.dirname(os.path.realpath(__file__))
@@ -125,8 +125,19 @@ class NativeNeuropodExecutor:
                     matches the spec in the neuropod config for the loaded model. All the keys
                     in this dict are strings and all the values are numpy arrays.
         """
-        inputs = maybe_convert_bindings_types(inputs)
-        return self.model.infer(inputs)
+        # Convert unicode to bytes before running inference
+        for key, value in inputs.items():
+            if value.dtype.type == np.unicode_:
+                inputs[key] = np.char.encode(value, encoding="UTF-8")
+
+        out = self.model.infer(inputs)
+
+        # Convert bytes to unicode
+        for key, value in out.items():
+            if value.dtype.type == np.bytes_:
+                out[key] = np.char.decode(value, encoding="UTF-8")
+
+        return out
 
     def __enter__(self):
         # Needed in order to be used as a contextmanager

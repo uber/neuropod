@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import six
 import numpy as np
 
 
@@ -32,14 +31,3 @@ def get_dtype_name(arg):
         return "string"
 
     return name
-
-
-def maybe_convert_bindings_types(items):
-    if six.PY3:
-        # Python 3 uses unicode for strings. We need to convert before passing to
-        # the native bindings
-        for key, value in items.items():
-            if value.dtype.type == np.str_:
-                items[key] = value.astype(np.string_)
-
-    return items

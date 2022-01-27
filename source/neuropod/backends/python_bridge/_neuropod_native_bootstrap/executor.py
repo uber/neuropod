@@ -158,10 +158,10 @@ class NativePythonExecutor:
         :returns:   A dict mapping output names to values. All the keys
                     in this dict are strings and all the values are numpy arrays.
         """
-        # Convert unicode to string
+        # Convert bytes to unicode
         for k, v in inputs.items():
-            if v.dtype.type == np.unicode_:
-                inputs[k] = v.astype("str")
+            if v.dtype.type == np.bytes_:
+                inputs[k] = np.char.decode(v, encoding="UTF-8")
 
         out = self.model(**inputs)
 
@@ -174,9 +174,9 @@ class NativePythonExecutor:
                     )
                 )
 
-        # Convert unicode to string
+        # Convert unicode to bytes
         for k, v in out.items():
             if v.dtype.type == np.unicode_:
-                out[k] = v.astype("str")
+                out[k] = np.char.encode(v, encoding="UTF-8")
 
         return out
