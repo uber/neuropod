@@ -64,7 +64,7 @@ def upload():
     # Only upload the main library on one build (because we don't need to upload once per backend version)
     # This is also not CPU/GPU dependent
     # For each OS:
-    if REQUESTED_TF_VERSION == "1.12.0" and not IS_GPU:
+    if REQUESTED_TF_VERSION == "1.14.0" and not IS_GPU:
         upload_package(
             "source/bazel-bin/neuropod/libneuropod.tar.gz",
             release_id,
