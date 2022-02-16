@@ -64,6 +64,10 @@ def _impl(repository_ctx):
             "url": "https://download.pytorch.org/libtorch/cpu/libtorch-shared-with-deps-1.9.0%2Bcpu.zip",
             "sha256": "",
         },
+        "1.10.2-linux-cpu": {
+            "url": "https://download.pytorch.org/libtorch/cpu/libtorch-shared-with-deps-1.10.2%2Bcpu.zip",
+            "sha256": "fa3fad287c677526277f64d12836266527d403f21f41cc2e7fb9d904969d4c4a",
+        },
 
         # Linux GPU
         "1.1.0-linux-cu90": {
@@ -102,6 +106,10 @@ def _impl(repository_ctx):
             "url": "https://download.pytorch.org/libtorch/cu102/libtorch-shared-with-deps-1.9.0%2Bcu102.zip",
             "sha256": "",
         },
+        "1.10.2-linux-cu102": {
+            "url": "https://download.pytorch.org/libtorch/cu102/libtorch-shared-with-deps-1.10.2%2Bcu102.zip",
+            "sha256": "206ab3f44d482a1d9837713cafbde9dd9d7907efac2dc94f1dc86e9a1101296f",
+        },
 
         # Mac CPU
         "1.1.0-mac-cpu": {
@@ -139,6 +147,10 @@ def _impl(repository_ctx):
         "1.9.0-mac-cpu": {
             "url": "https://download.pytorch.org/libtorch/cpu/libtorch-macos-1.9.0.zip",
             "sha256": "",
+        },
+        "1.10.2-mac-cpu": {
+            "url": "https://download.pytorch.org/libtorch/cpu/libtorch-macos-1.10.2.zip",
+            "sha256": "d1711e844dc69c2338adfc8ce634806a9ae36e54328afbe501bafd2d70f550e2",
         },
     }
 

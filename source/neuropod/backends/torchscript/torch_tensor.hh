@@ -73,6 +73,11 @@ limitations under the License.
 // The date of the official torch 1.9.0 release
 #define CAFFE2_NIGHTLY_VERSION 20210615
 #endif
+
+#if CAFFE2_VERSION == 11002
+// The date of the official torch 1.10.2 release
+#define CAFFE2_NIGHTLY_VERSION 20220127
+#endif
 #endif
 
 namespace neuropod
