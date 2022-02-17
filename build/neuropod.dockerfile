@@ -4,7 +4,7 @@
 # FROM ubuntu:16.04 as neuropod-base
 ARG NEUROPOD_CUDA_VERSION=10.0
 ARG NEUROPOD_CUDNN_VERSION=7
-FROM nvidia/cuda:${NEUROPOD_CUDA_VERSION}-cudnn${NEUROPOD_CUDNN_VERSION}-runtime-ubuntu16.04 as neuropod-base
+FROM nvidia/cuda:${NEUROPOD_CUDA_VERSION}-cudnn${NEUROPOD_CUDNN_VERSION}-runtime-ubuntu18.04 as neuropod-base
 
 # Use utf8
 ENV LC_ALL=C.UTF-8
@@ -34,14 +34,10 @@ ENV NEUROPOD_PYTHON_VERSION=$NEUROPOD_PYTHON_VERSION
 
 # Install python
 RUN sudo apt-get update && \
-    sudo apt-get install -y "python${NEUROPOD_PYTHON_VERSION}" "python${NEUROPOD_PYTHON_VERSION}-dev" && \
+    sudo apt-get install -y "python${NEUROPOD_PYTHON_VERSION}" \
+                            "python${NEUROPOD_PYTHON_VERSION}-dev" \
+                            "python${NEUROPOD_PYTHON_VERSION}-distutils" && \
     ln -s "$(which python3)" /usr/bin/python
-
-# For python 3.5, we need to install ffi
-RUN if [ "${NEUROPOD_PYTHON_VERSION}" = "3.5" ] ; then sudo apt-get install -y libffi6 libffi-dev ; fi
-
-# For python 3.8, we need to install distutils
-RUN if [ "${NEUROPOD_PYTHON_VERSION}" = "3.8" ] ; then sudo apt-get install -y "python${NEUROPOD_PYTHON_VERSION}-distutils" ; fi
 
 # Copy the python code into the image
 RUN mkdir -p /usr/src/source/python /usr/src/source/neuropod/python

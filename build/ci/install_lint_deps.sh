@@ -2,12 +2,12 @@
 set -e
 
 # We need a newer version of libstdc++ for infer to run
-# We also need python3.6 for black to run
+# We also need python3.8 for black to run
 apt-get install -y --no-install-recommends software-properties-common
 add-apt-repository -y ppa:ubuntu-toolchain-r/test
 add-apt-repository -y ppa:deadsnakes/ppa
 apt-get update
-apt-get install -y --no-install-recommends libstdc++6 python3.6 python3.6-dev tzdata jq
+DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends libstdc++6 python3.8 python3.8-dev tzdata jq
 apt-get install -y git
 
 # Install infer
@@ -21,8 +21,8 @@ wget https://raw.githubusercontent.com/Sarcasm/run-clang-format/de6e8ca07d171a7f
 
 # Install pip, black, and flake8
 wget https://bootstrap.pypa.io/get-pip.py
-python3.6 get-pip.py
-python3.6 -m pip install black==19.10b0 flake8
+python3.8 get-pip.py
+python3.8 -m pip install black==19.10b0 flake8
 
 # Get buildifier (for linting bazel files)
 wget https://github.com/bazelbuild/buildtools/releases/download/2.2.1/buildifier -O /tmp/buildifier
