@@ -18,6 +18,8 @@ limitations under the License.
 #include "jclass_register.h"
 #include "neuropod/neuropod.hh"
 
+#include <codecvt>
+#include <locale>
 #include <sstream>
 #include <stdexcept>
 #include <string>
@@ -32,15 +34,29 @@ const std::string TENSOR_TYPE = "Lcom/uber/neuropod/TensorType;";
 
 std::string to_string(JNIEnv *env, jstring target)
 {
-    const char *raw = env->GetStringUTFChars(target, nullptr);
+    // Get as UTF-16
+    const auto raw = env->GetStringChars(target, nullptr);
     if (!raw || env->ExceptionCheck())
     {
         throw std::runtime_error("invalid jstring in to_string");
     }
 
-    std::string res(raw);
-    env->ReleaseStringUTFChars(target, raw);
+    // Convert to UTF-8
+    std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> converter;
+    std::string res = converter.to_bytes(reinterpret_cast<const char16_t *>(raw));
+
+    env->ReleaseStringChars(target, raw);
     return res;
+}
+
+jstring to_jstring(JNIEnv *env, const std::string &source)
+{
+    // Convert to UTF-16
+    std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> converter;
+    std::u16string                                                    dest = converter.from_bytes(source);
+
+    // Create a Java string from it
+    return env->NewString(reinterpret_cast<const jchar *>(dest.data()), dest.length());
 }
 
 jclass find_class(JNIEnv *env, const std::string &name)

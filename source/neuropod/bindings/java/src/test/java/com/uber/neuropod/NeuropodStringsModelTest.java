@@ -51,7 +51,7 @@ public class NeuropodStringsModelTest {
     TensorType type = TensorType.STRING_TENSOR;
 
     List<String> bufferX = new ArrayList<String>();
-    bufferX.add("apple");
+    bufferX.add("applé🅫");
     bufferX.add("banana");
     NeuropodTensor tensorX = allocator.copyFrom(bufferX, new long[]{2L});
     inputs.put("x", tensorX);
@@ -74,7 +74,7 @@ public class NeuropodStringsModelTest {
     assertEquals(2, out.getNumberOfElements());
     assertEquals(TensorType.STRING_TENSOR, out.getTensorType());
 
-    assertEquals("apple sauce" , outStrings.get(0));
+    assertEquals("applé🅫 sauce" , outStrings.get(0));
     assertEquals("banana pudding" , outStrings.get(1));
 
     try {
