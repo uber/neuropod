@@ -202,6 +202,24 @@ java_test(
 )
 
 java_test(
+    name = "PythonStringsModelTest",
+    srcs = [
+        "src/test/java/com/uber/neuropod/NeuropodStringsModelTest.java",
+        "src/test/java/com/uber/neuropod/PythonStringsModelTest.java",
+    ],
+    data = [
+        "//neuropod/tests/test_data",
+    ],
+    javacopts = JAVACOPTS,
+    tags = ["requires_framework_python"],
+    test_class = "com.uber.neuropod.PythonStringsModelTest",
+    deps = [
+        ":neuropod_java_jar",
+        "@junit",
+    ],
+)
+
+java_test(
     name = "TensorSpecTest",
     srcs = ["src/test/java/com/uber/neuropod/TensorSpecTest.java"],
     data = [

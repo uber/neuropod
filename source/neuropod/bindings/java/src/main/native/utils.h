@@ -28,8 +28,11 @@ namespace neuropod
 namespace jni
 {
 
-// Convert jstring to cpp string
+// Convert jstring to UTF-8 encoded cpp string
 std::string to_string(JNIEnv *env, jstring target);
+
+// Convert UTF-8 encoded cpp string to a jstring
+jstring to_jstring(JNIEnv *env, const std::string &source);
 
 // A wrapper for env->FindClass, will throw a cpp exception if the find fails.
 jclass find_class(JNIEnv *env, const std::string &name);

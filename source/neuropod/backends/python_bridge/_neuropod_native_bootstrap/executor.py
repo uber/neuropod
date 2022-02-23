@@ -161,7 +161,10 @@ class NativePythonExecutor:
         # Convert bytes to unicode
         for k, v in inputs.items():
             if v.dtype.type == np.bytes_:
-                inputs[k] = np.char.decode(v, encoding="UTF-8")
+                try:
+                    inputs[k] = np.char.decode(v, encoding="UTF-8")
+                except UnicodeDecodeError:
+                    raise ValueError("Error in UTF-8 decoding: {}".format(v))
 
         out = self.model(**inputs)
 

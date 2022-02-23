@@ -149,7 +149,7 @@ JNIEXPORT jobject JNICALL Java_com_uber_neuropod_NeuropodTensor_nativeToStringLi
         for (size_t i = 0; i < size; ++i)
         {
             const std::string &elem          = flatAccessor[i];
-            jstring            convertedElem = env->NewStringUTF(elem.c_str());
+            jstring            convertedElem = njni::to_jstring(env, elem);
             env->CallBooleanMethod(ret, njni::java_util_ArrayList_add, convertedElem);
             env->DeleteLocalRef(convertedElem);
         }
@@ -174,7 +174,7 @@ JNIEXPORT jstring JNICALL Java_com_uber_neuropod_NeuropodTensor_nativeGetString(
                                 ->as_tensor()
                                 ->as_typed_tensor<std::string>();
         const std::string &elem = stringTensor->flat()[index];
-        return env->NewStringUTF(elem.c_str());
+        return njni::to_jstring(env, elem);
     }
     catch (const std::exception &e)
     {
