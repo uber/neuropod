@@ -24,6 +24,7 @@ from neuropod.tests.utils import requires_frameworks
 
 # From the example at https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LinearRegression.html
 SKLEARN_MODEL_SOURCE = """
+import sysconfig
 import numpy as np
 from sklearn.linear_model import LinearRegression
 
@@ -39,6 +40,8 @@ def model(x):
     }
 
 def get_model(_):
+    print("CONFIG", sysconfig.get_config_vars())
+    print("PATHS", sysconfig.get_paths())
     return model
 """
 
@@ -74,6 +77,7 @@ class TestPythonDeps(unittest.TestCase):
             requirements="""
             # Requirements for this model
             scikit-learn=={}
+            thriftrw==1.8.1
             """.format(
                 "0.20.0" if sys.version_info.major == 2 else "0.22.0"
             ),
