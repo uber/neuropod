@@ -27,6 +27,7 @@ PACKAGE_BASE_DIR = os.path.abspath(
     )
 )
 
+LOG_PY_DEPS = os.getenv("NEUROPOD_LOG_PY_DEPS") is not None
 
 def create_if_not_exists(path):
     # Messy because this needs to be python2 + 3 compatible
@@ -114,6 +115,13 @@ def _load_deps_internal(lockfile_contents):
     """
     See `load_deps` above for details
     """
+
+    print(
+        "Neuropod Info: Installing python packages required by the current model. "
+        "If this takes a long time, set NEUROPOD_LOG_PY_DEPS to log all dependencies of the model "
+        "and consider preinstalling large dependencies using `neuropod.backends.python.utils.preinstall_deps`"
+    )
+
     requirements = []
     for line in lockfile_contents.splitlines():
         # Remove comments
@@ -150,6 +158,9 @@ def _load_deps_internal(lockfile_contents):
 
         # Check if we need to install the package
         if not os.path.exists(req_path + ".complete"):
+            if LOG_PY_DEPS:
+                print("[Neuropod] Installing python package required by model: {}...".format(requirement))
+
             # Acquire a lock
             # TODO(vip): it's possible that this'll conflict with a package if the version ends in `.lock`
             lock = FileLock(req_path + ".lock")
@@ -162,6 +173,9 @@ def _load_deps_internal(lockfile_contents):
 
                     # Mark the installation as complete
                     open(req_path + ".complete", "a").close()
+        else:
+            if LOG_PY_DEPS:
+                print("[Neuropod] Python package required by model already installed: {}...".format(requirement))
 
         # Add this package to the pythonpath
         sys.path.insert(
