@@ -39,7 +39,7 @@ build:profile -c dbg --copt='-fno-omit-frame-pointer'
 test --test_output=errors
 
 # Pass certain env vars through to tests
-test --test_env=LLVM_PROFILE_FILE --test_env=COVERAGE_PROCESS_START --test_env=PATH --test_env=PYTHONPATH --test_env=NEUROPOD_BASE_DIR --test_env=NEUROPOD_ENABLE_PYTHON_ISOLATION
+test --test_env=LLVM_PROFILE_FILE --test_env=COVERAGE_PROCESS_START --test_env=PATH --test_env=PYTHONPATH --test_env=NEUROPOD_BASE_DIR --test_env=NEUROPOD_DISABLE_PYTHON_ISOLATION
 
 # Build with warnings as errors in CI
 build:ci --copt='-Werror'

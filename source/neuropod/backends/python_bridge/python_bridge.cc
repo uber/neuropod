@@ -117,7 +117,7 @@ std::unique_ptr<py::gil_scoped_release> maybe_initialize()
         (sodir / ("opt/python" + std::to_string(PY_MAJOR_VERSION) + "." + std::to_string(PY_MINOR_VERSION))).string();
 #endif
 
-    if (std::getenv("NEUROPOD_ENABLE_PYTHON_ISOLATION") != nullptr)
+    if (std::getenv("NEUROPOD_DISABLE_PYTHON_ISOLATION") == nullptr)
     {
         // Isolate from the environment, set PYTOHNHOME to the packaged python environment
         SPDLOG_TRACE("Setting PYTHONHOME to isolated environment at {}", pythonhome);
