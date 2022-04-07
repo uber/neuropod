@@ -307,7 +307,7 @@ std::unique_ptr<NeuropodValueMap> TorchNeuropodBackend::infer_internal(const Neu
     bool has_class_type = false;
 
     // Torch 1.10.2 adds UnionType support in TorchScript
-    bool is_union_value_type = false;
+    bool dict_value_is_union_type = false;
 
 #if CAFFE2_NIGHTLY_VERSION >= 20190717
     if (arguments.size() > 0 && arguments.at(0).type()->kind() == c10::TypeKind::ClassType)
@@ -327,14 +327,16 @@ std::unique_ptr<NeuropodValueMap> TorchNeuropodBackend::infer_internal(const Neu
     }
 
 #if CAFFE2_NIGHTLY_VERSION >= 20220127
-    if (is_dict_input && *arguments.at(has_class_type ? 1 : 0).type()->cast<torch::DictType>()->getValueType()->isUnionType()) {
-        is_union_value_type = true;
+    if (is_dict_input && arguments.at(has_class_type ? 1 : 0).type()->cast<torch::DictType>()->getValueType()->kind() ==
+                             c10::TypeKind::UnionType)
+    {
+        dict_value_is_union_type = true;
     }
 #endif
 
     // Define the vector of inputs and add the inputs
     std::vector<torch::jit::IValue> torch_inputs(arguments.size() - (has_class_type ? 1 : 0));
-    if (is_dict_input && !is_union_value_type)
+    if (is_dict_input && !dict_value_is_union_type)
     {
         // This model expects a dict as input
         MAKE_DICT(tensor_input_dict, torch::Tensor);
@@ -372,27 +374,19 @@ std::unique_ptr<NeuropodValueMap> TorchNeuropodBackend::infer_internal(const Neu
             torch_inputs.at(0) = str_input_dict;
         }
     }
-#if CAFFE2_NIGHTLY_VERSION >= 20190717
+#if CAFFE2_NIGHTLY_VERSION >= 20220127
     // In Torch 1.10.2, TorchScript introduced UnionType and it now supports Dict[str, Union[List[str], torch.Tensor]]
     // as model input type. We would like to support this input type in neuropod torchscript backend
-    else if (is_dict_input && is_union_value_type) {
-        const auto value_type = *torch::UnionType::create({torch::ListType::ofStrings(), torch::TensorType::get()});
-        MAKE_DICT(input_dict, value_type);
+    else if (is_dict_input && dict_value_is_union_type)
+    {
+        const auto &value_type_ptr = torch::UnionType::create({torch::ListType::ofStrings(), torch::TensorType::get()});
+        c10::impl::GenericDict input_dict(torch::StringType::get(), value_type_ptr);
 
         for (const auto &entry : inputs)
         {
             const auto &value = get_ivalue_from_torch_tensor(entry.second);
-
-            if (value.isTensor())
-            {
-                DICT_INSERT(tensor_input_dict, entry.first, value.toTensor());
-            }
-            else
-            {
-                DICT_INSERT(str_input_dict, entry.first, c10::impl::toTypedList<std::string>(value.toList()));
-            }
+            input_dict.insert(entry.first, value);
         }
-
         torch_inputs.at(0) = input_dict;
     }
 #endif

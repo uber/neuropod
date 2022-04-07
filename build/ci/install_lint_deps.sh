@@ -22,6 +22,8 @@ wget https://raw.githubusercontent.com/Sarcasm/run-clang-format/de6e8ca07d171a7f
 # Install pip, black, and flake8
 wget https://bootstrap.pypa.io/get-pip.py
 python3.8 get-pip.py
+# pin click to 8.0.4 since default click version 8.1.0 is not compatible with black version 19.10b0
+python3.8 -m pip install click==8.0.4
 python3.8 -m pip install black==19.10b0 flake8
 
 # Get buildifier (for linting bazel files)
