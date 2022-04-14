@@ -1,0 +1,37 @@
+{
+    "name": "mixed_str_num_inputs_model",
+    "platform": "torchscript",
+    "platform_version_semver": "*",
+    "input_spec": [
+        {
+            "name": "a",
+            "dtype": "string",
+            "shape": [
+                null
+            ]
+        },
+        {
+            "name": "b",
+            "dtype": "float32",
+            "shape": [
+                null,
+                1
+            ]
+        }
+    ],
+    "output_spec": [
+        {
+            "name": "c",
+            "dtype": "float32",
+            "shape": [
+                null,
+                2
+            ]
+        }
+    ],
+    "custom_ops": [],
+    "input_tensor_device": {
+        "a": "GPU",
+        "b": "GPU"
+    }
+}
