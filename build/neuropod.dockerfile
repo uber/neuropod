@@ -10,8 +10,16 @@ FROM nvidia/cuda:${NEUROPOD_CUDA_VERSION}-cudnn${NEUROPOD_CUDNN_VERSION}-runtime
 ENV LC_ALL=C.UTF-8
 ENV LANG=C.UTF-8
 
-# We use sudo in the build scripts
-RUN apt-get update && apt-get install -y sudo
+# NVIDIA updated their signing keys so we need to fetch the new ones
+# TODO: remove this once they fix the cuda docker images
+
+# Install sudo because we use it in the build scripts
+RUN apt-key del 7fa2af80 && \
+    apt-key del 3bf863cc && \
+    apt-key adv --fetch-keys https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/x86_64/3bf863cc.pub && \
+    apt-key adv --fetch-keys https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/x86_64/7fa2af80.pub && \
+    apt-get update && \
+    apt-get install -y sudo
 
 # Create folder structure needed for installing dependencies
 RUN mkdir -p /usr/src/build
