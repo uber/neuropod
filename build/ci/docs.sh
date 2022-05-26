@@ -5,7 +5,7 @@ set -e
 source .neuropod_venv/bin/activate
 
 # Install deps for the docs
-pip install -U mkdocs==1.0.4 mkdocs-material==4.6.0
+pip install mkdocs-material=="8.*"
 
 # Make sure we can build the docs
 python ./build/ci/set_status.py --context "docs/build" --description "Build the docs" \
