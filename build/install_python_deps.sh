@@ -13,10 +13,9 @@ ${NEUROPOD_PYTHON_BINARY} -m pip install virtualenv==16.7.9
 ${NEUROPOD_PYTHON_BINARY} -m virtualenv .neuropod_venv
 source .neuropod_venv/bin/activate
 
-# Install deps for the python interface
-# (the -f flag tells pip where to find the torch nightly builds)
+# Install deps for the python interface and tests
 pushd source/python
-pip install -U pip setuptools numpy coverage requests[security]
+pip install -U pip setuptools numpy coverage requests[security] protobuf==3.19.4
 python setup.py egg_info
 cat neuropod.egg-info/requires.txt | sed '/^\[/ d' | paste -sd " " - | xargs pip install
 popd
