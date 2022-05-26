@@ -19,13 +19,31 @@ package(
 cc_library(
     name = "minizip",
     srcs = glob([
-        "**/*.c",
-    ], exclude = ["minizip.c", "miniunz.c", "iowin32.c", "iowin32.h"]),
+        "*.c",
+    ], exclude = glob([
+        "minizip.c",
+        "minigzip.c",
+        "*_win32.c",
+        "mz_crypt_apple.c",
+        "mz_crypt_openssl.c",
+        "mz_strm_bzip.c",
+        "mz_strm_libcomp.c",
+        "mz_strm_lzma.c",
+        "mz_strm_zstd.c",
+    ])),
     hdrs = glob([
-        "**/*.h",
+        "*.h",
     ]),
     includes = [
         "."
+    ],
+    copts = [
+        "-DZLIB_COMPAT",
+        "-DMZ_ZIP_NO_CRYPTO",
+        "-DHAVE_ZLIB",
+
+        # Don't warn in third party libs
+        "-Wno-everything",
     ],
     deps = [
         "@zlib_repo//:zlib",

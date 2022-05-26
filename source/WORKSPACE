@@ -121,19 +121,11 @@ http_archive(
 )
 
 http_archive(
-    name = "zipper_repo",
-    build_file = "@//deps:BUILD.zipper",
-    sha256 = "ab64b4dd7c43eddd8cdc0935e578fd8d62d3be26696dc6f3acd2cbfc7538831c",
-    strip_prefix = "zipper-1.0.1",
-    url = "https://github.com/sebastiandev/zipper/archive/v1.0.1.zip",
-)
-
-http_archive(
     name = "minizip_repo",
     build_file = "@//deps:BUILD.minizip",
-    sha256 = "a83155b27ddc0843e5d4f8b637011fc4321a59278bb50a18be02afd62d4def47",
-    strip_prefix = "minizip-e3a8cb79a034cb4f2ffc3abb6bd916ffa8678fed",
-    url = "https://github.com/sebastiandev/minizip/archive/e3a8cb79a034cb4f2ffc3abb6bd916ffa8678fed.zip",
+    sha256 = "518e5b0f4e5529f2f939c4234f0101478142ca9b03e8afb2e17ae48742b008bc",
+    strip_prefix = "minizip-ng-3.0.6",
+    url = "https://github.com/zlib-ng/minizip-ng/archive/refs/tags/3.0.6.zip",
 )
 
 http_archive(

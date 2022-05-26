@@ -258,6 +258,7 @@ def _create_neuropod(
     test_input_data=None,
     test_expected_out=None,
     persist_test_data=True,
+    zip_compression=zipfile.ZIP_DEFLATED,
     **kwargs
 ):
     if package_as_zip:
@@ -305,7 +306,7 @@ def _create_neuropod(
                 )
             )
 
-        zf = zipfile.ZipFile(neuropod_path, "w", zipfile.ZIP_DEFLATED)
+        zf = zipfile.ZipFile(neuropod_path, "w", zip_compression)
         _zipdir(package_path, zf)
         zf.close()
 
