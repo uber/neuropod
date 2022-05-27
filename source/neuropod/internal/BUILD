@@ -43,9 +43,9 @@ neuropod_cc_library(
         "@boost_repo//:boost",
         "@filesystem_repo//:filesystem",
         "@libjsoncpp_repo//:libjsoncpp",
+        "@minizip_repo//:minizip",
         "@picosha2_repo//:picosha2",
         "@semver_repo//:semver",
-        "@zipper_repo//:zipper",
     ],
     alwayslink = True,
 )

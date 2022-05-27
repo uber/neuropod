@@ -24,8 +24,12 @@ limitations under the License.
 #include <iterator>
 #include <sstream>
 
+#include <mz.h>
+#include <mz_strm.h>
+#include <mz_strm_os.h>
+#include <mz_zip.h>
+#include <mz_zip_rw.h>
 #include <picosha2.h>
-#include <unzipper.h>
 
 namespace neuropod
 {
@@ -77,7 +81,7 @@ public:
 class ZipLoader : public NeuropodLoader
 {
 private:
-    zipper::Unzipper unzipper_;
+    void *zip_reader_;
 
     // Whether or not we unzipped the archive
     bool did_unzip_;
@@ -86,10 +90,22 @@ private:
     std::string tempdir_;
 
 public:
-    explicit ZipLoader(const std::string neuropod_path) : unzipper_(neuropod_path), did_unzip_(false) {}
+    explicit ZipLoader(const std::string neuropod_path) : did_unzip_(false)
+    {
+        // Create a zip reader and open the file
+        mz_zip_reader_create(&zip_reader_);
+        auto err = mz_zip_reader_open_file(zip_reader_, neuropod_path.c_str());
+        if (err != MZ_OK)
+        {
+            NEUROPOD_ERROR("Error opening zip stream for neuropod model at {}", neuropod_path);
+        }
+    }
 
     ~ZipLoader() override
     {
+        mz_zip_reader_close(zip_reader_);
+        mz_zip_reader_delete(&zip_reader_);
+
         if (did_unzip_)
         {
             // Delete the folder
@@ -100,8 +116,46 @@ public:
     std::unique_ptr<std::istream> get_istream_for_file(const std::string &path) override
     {
         auto out = stdx::make_unique<std::stringstream>();
-        if (!unzipper_.extractEntryToStream(path, *out))
+
+        // Find the file we're looking for
+        auto err = mz_zip_reader_locate_entry(zip_reader_, path.c_str(), 1);
+        if (err != MZ_OK)
         {
+            SPDLOG_TRACE("Couldn't find file in zip: {}", path);
+            return nullptr;
+        }
+
+        // Open it
+        err = mz_zip_reader_entry_open(zip_reader_);
+        if (err != MZ_OK)
+        {
+            SPDLOG_TRACE("Couldn't open file '{}' in zip file: {}", path, err);
+            return nullptr;
+        }
+
+        char    buf[4096];
+        int32_t bytes_read = 0;
+
+        do
+        {
+            // Read chunks and write to the output stream
+            bytes_read = mz_zip_reader_entry_read(zip_reader_, buf, sizeof(buf));
+            if (bytes_read < 0)
+            {
+                err = bytes_read;
+                break;
+            }
+
+            out->write(buf, bytes_read);
+        } while (bytes_read > 0);
+
+        // Close the reader
+        mz_zip_reader_entry_close(zip_reader_);
+
+        // Make sure we correctly read the file
+        if (err != MZ_OK)
+        {
+            SPDLOG_TRACE("Error reading zip file entry: {}", err);
             return nullptr;
         }
 
@@ -138,7 +192,10 @@ public:
         }
 
         // Unzip into the tempdir
-        unzipper_.extract(tempdir);
+        if (mz_zip_reader_save_all(zip_reader_, tempdir) != MZ_OK)
+        {
+            NEUROPOD_ERROR("Error unzipping neuropod model");
+        }
 
         // Update metadata to make sure we cleanup
         did_unzip_ = true;

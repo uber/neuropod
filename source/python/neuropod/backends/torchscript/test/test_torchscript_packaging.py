@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import collections
+import zipfile
 import numpy as np
 import os
 import torch
@@ -35,6 +36,23 @@ class AdditionModel(torch.jit.ScriptModule):
     """
     A simple addition model
     """
+
+    @torch.jit.script_method
+    def forward(self, x, y):
+        return {"out": x + y}
+
+
+class LargeModel(torch.jit.ScriptModule):
+    """
+    A large model
+    """
+
+    def __init__(self):
+        super().__init__()
+        # 4 bytes * 1024 * 1024 * 768 = 3gb
+        self.embedding = torch.nn.Embedding(
+            num_embeddings=1024 * 1024, embedding_dim=768
+        )
 
     @torch.jit.script_method
     def forward(self, x, y):
@@ -148,6 +166,22 @@ class TestTorchScriptPackaging(unittest.TestCase):
         # Tests a case where the output does not match the expected output
         with self.assertRaises(ValueError):
             self.package_simple_addition_model(do_fail=True)
+
+    def test_large_model(self):
+        with TemporaryDirectory() as test_dir:
+            neuropod_path = os.path.join(test_dir, "test_neuropod")
+
+            # `create_torchscript_neuropod` runs inference with the test data immediately
+            # after creating the neuropod. Raises a ValueError if the model output
+            # does not match the expected output.
+            create_torchscript_neuropod(
+                neuropod_path=neuropod_path,
+                model_name="addition_model",
+                module=LargeModel(),
+                zip_compression=zipfile.ZIP_STORED,
+                # Get the input/output spec along with test data
+                **get_addition_model_spec(do_fail=False)
+            )
 
     def package_mixed_types_model(self, do_fail=False):
         with TemporaryDirectory() as test_dir:
