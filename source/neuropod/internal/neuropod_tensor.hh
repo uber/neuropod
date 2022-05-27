@@ -16,7 +16,6 @@ limitations under the License.
 #pragma once
 
 #include "neuropod/internal/error_utils_header_only.hh"
-#include "neuropod/internal/memory_utils.hh"
 #include "neuropod/internal/tensor_accessor.hh"
 #include "neuropod/internal/type_macros.hh"
 #include "neuropod/options.hh"
@@ -642,9 +641,9 @@ protected:
 };
 
 // Utility to make a tensor of a specific type
-#define MAKE_TENSOR(CPP_TYPE, NEUROPOD_TYPE)                                              \
-    case NEUROPOD_TYPE: {                                                                 \
-        return stdx::make_unique<TensorClass<CPP_TYPE>>(std::forward<Params>(params)...); \
+#define MAKE_TENSOR(CPP_TYPE, NEUROPOD_TYPE)                                             \
+    case NEUROPOD_TYPE: {                                                                \
+        return std::make_unique<TensorClass<CPP_TYPE>>(std::forward<Params>(params)...); \
     }
 
 template <template <class> class TensorClass, typename... Params>

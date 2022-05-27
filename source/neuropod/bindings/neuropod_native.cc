@@ -144,7 +144,7 @@ template <typename... Params>
 std::unique_ptr<Neuropod> make_neuropod(py::kwargs kwargs, Params &&... params)
 {
     auto options = get_options_from_kwargs(kwargs);
-    return stdx::make_unique<Neuropod>(std::forward<Params>(params)..., options);
+    return std::make_unique<Neuropod>(std::forward<Params>(params)..., options);
 }
 
 } // namespace

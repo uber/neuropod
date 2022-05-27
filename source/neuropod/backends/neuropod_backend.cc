@@ -219,7 +219,7 @@ NeuropodBackend::NeuropodBackend(const std::string &neuropod_path, RuntimeOption
     : model_config_(load_model_config(neuropod_path)),
       neuropod_path_(neuropod_path),
       options_(std::move(options)),
-      sealer_(stdx::make_unique<Sealer>(get_device_mapping(*model_config_, options_)))
+      sealer_(std::make_unique<Sealer>(get_device_mapping(*model_config_, options_)))
 {
     loader_ = get_loader(neuropod_path);
 }
@@ -301,7 +301,7 @@ std::unique_ptr<NeuropodValueMap> NeuropodBackend::infer_internal(const Neuropod
 
     // Run inference and get all the outputs
     auto data = infer_internal(inputs);
-    auto out  = stdx::make_unique<NeuropodValueMap>();
+    auto out  = std::make_unique<NeuropodValueMap>();
 
     // Filter to the requested outputs
     for (const auto &tensor_name : requested_outputs)

@@ -165,7 +165,7 @@ std::unique_ptr<py::gil_scoped_release> maybe_initialize()
 
     // TODO: shutdown the interpreter once we know that there are no more python objects left
     // atexit(py::finalize_interpreter);
-    return stdx::make_unique<py::gil_scoped_release>();
+    return std::make_unique<py::gil_scoped_release>();
 }
 
 // Handle interpreter startup and shutdown
@@ -205,7 +205,7 @@ void PythonBridge::load_model_internal()
     const auto local_path = loader_->ensure_local();
 
     // Load the neuropod and save a reference to it
-    neuropod_ = stdx::make_unique<py::object>(load_neuropod(local_path));
+    neuropod_ = std::make_unique<py::object>(load_neuropod(local_path));
 }
 
 PythonBridge::~PythonBridge()
@@ -249,7 +249,7 @@ std::unique_ptr<NeuropodValueMap> PythonBridge::infer_internal(const NeuropodVal
     auto outputs = from_numpy_dict(*get_tensor_allocator(), model_outputs);
 
     // We need a unique pointer
-    return stdx::make_unique<NeuropodValueMap>(std::move(outputs));
+    return std::make_unique<NeuropodValueMap>(std::move(outputs));
 }
 
 REGISTER_NEUROPOD_BACKEND(PythonBridge, "python", PY_VERSION)

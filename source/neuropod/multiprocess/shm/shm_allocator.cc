@@ -17,7 +17,6 @@ limitations under the License.
 
 #include "fmt/ranges.h"
 #include "neuropod/internal/error_utils.hh"
-#include "neuropod/internal/memory_utils.hh"
 
 #include <boost/interprocess/sync/interprocess_mutex.hpp>
 #include <boost/interprocess/sync/scoped_lock.hpp>
@@ -189,7 +188,7 @@ public:
 };
 
 SHMAllocator::SHMAllocator()
-    : allocation_cache_(stdx::make_unique<AllocationCache>()), load_cache_(stdx::make_unique<LoadCache>())
+    : allocation_cache_(std::make_unique<AllocationCache>()), load_cache_(std::make_unique<LoadCache>())
 {
 }
 

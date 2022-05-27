@@ -171,7 +171,7 @@ void insert_value_in_output(NeuropodValueMap & output,
             (!has_type && list[0].isString()))
         {
             // Make a TorchNeuropodTensor
-            auto neuropod_tensor = stdx::make_unique<TorchNeuropodTensor<std::string>>(tensor);
+            auto neuropod_tensor = std::make_unique<TorchNeuropodTensor<std::string>>(tensor);
 
             // Add it to our output
             auto &to_set = output[name];
@@ -416,7 +416,7 @@ std::unique_ptr<NeuropodValueMap> TorchNeuropodBackend::infer_internal(const Neu
     c10::IValue result = model_->forward(torch_inputs);
 
     // Get outputs
-    auto to_return = stdx::make_unique<NeuropodValueMap>();
+    auto to_return = std::make_unique<NeuropodValueMap>();
 
     if (result.isGenericDict())
     {

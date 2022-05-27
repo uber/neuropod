@@ -16,7 +16,6 @@ limitations under the License.
 #pragma once
 
 #include "neuropod/internal/error_utils.hh"
-#include "neuropod/internal/memory_utils.hh"
 
 #include <boost/pfr/precise.hpp>
 
@@ -151,7 +150,7 @@ inline void ipc_deserialize(std::istream &in, std::string &item)
     else
     {
         // We need to allocate a larger buffer
-        auto buffer = stdx::make_unique<char[]>(length);
+        auto buffer = std::make_unique<char[]>(length);
         detail::checked_read(in, buffer.get(), length);
 
         // Set the content of `item`

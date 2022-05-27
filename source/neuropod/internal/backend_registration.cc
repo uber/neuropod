@@ -46,7 +46,7 @@ std::unique_ptr<std::unordered_map<std::string, BackendInfo>> registered_backend
 void init_registrar_if_needed()
 {
     std::call_once(registrar_initialized, []() {
-        registered_backends_by_type = stdx::make_unique<std::unordered_map<std::string, BackendInfo>>();
+        registered_backends_by_type = std::make_unique<std::unordered_map<std::string, BackendInfo>>();
 
         // Make sure our logging is initialized
         init_logging();

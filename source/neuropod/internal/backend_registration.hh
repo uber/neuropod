@@ -16,7 +16,6 @@ limitations under the License.
 #pragma once
 
 #include "neuropod/internal/config_utils.hh"
-#include "neuropod/internal/memory_utils.hh"
 
 #include <memory>
 #include <string>
@@ -38,7 +37,7 @@ typedef std::unique_ptr<NeuropodBackend> (*BackendFactoryFunction)(const std::st
 template <typename T>
 std::unique_ptr<NeuropodBackend> createNeuropodBackend(const std::string &neuropod_path, const RuntimeOptions &options)
 {
-    return stdx::make_unique<T>(neuropod_path, options);
+    return std::make_unique<T>(neuropod_path, options);
 }
 
 // Register a backend for a set of specific types

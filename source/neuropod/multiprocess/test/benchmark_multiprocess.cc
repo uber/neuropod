@@ -26,7 +26,7 @@ struct load_in_process
 {
     std::unique_ptr<neuropod::Neuropod> operator()(const std::string &path)
     {
-        return neuropod::stdx::make_unique<neuropod::Neuropod>(path);
+        return neuropod::std::make_unique<neuropod::Neuropod>(path);
     }
 };
 
@@ -36,7 +36,7 @@ struct load_out_of_process
     {
         neuropod::RuntimeOptions opts;
         opts.use_ope = true;
-        return neuropod::stdx::make_unique<neuropod::Neuropod>(path, opts);
+        return neuropod::std::make_unique<neuropod::Neuropod>(path, opts);
     }
 };
 

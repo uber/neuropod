@@ -33,8 +33,8 @@ std::unique_ptr<std::unordered_map<std::string, deserialize_fn_t>> registered_de
 void init_registrar_if_needed()
 {
     std::call_once(registrar_initialized, []() {
-        registered_serializers   = stdx::make_unique<std::unordered_map<std::string, serialize_fn_t>>();
-        registered_deserializers = stdx::make_unique<std::unordered_map<std::string, deserialize_fn_t>>();
+        registered_serializers   = std::make_unique<std::unordered_map<std::string, serialize_fn_t>>();
+        registered_deserializers = std::make_unique<std::unordered_map<std::string, deserialize_fn_t>>();
     });
 }
 

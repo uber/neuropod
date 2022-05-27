@@ -27,7 +27,7 @@ TEST(test_ipc_message_queue, simple)
     {
         // A tensor allocator that allocates tensors in shared memory
         std::unique_ptr<neuropod::NeuropodTensorAllocator> allocator =
-            neuropod::stdx::make_unique<neuropod::DefaultTensorAllocator<neuropod::SHMNeuropodTensor>>();
+            neuropod::std::make_unique<neuropod::DefaultTensorAllocator<neuropod::SHMNeuropodTensor>>();
 
         // Store tensors we allocate so they don't go out of scope
         neuropod::NeuropodValueMap sender_map;
