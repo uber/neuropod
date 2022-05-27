@@ -385,7 +385,7 @@ std::unique_ptr<NeuropodValueMap> TensorflowNeuropodBackend::infer_internal(
     check_tf_status(session_->RunCallable(handle, tf_inputs, &outputs, nullptr));
 
     // Read the outputs and wrap them in `NeuropodTensor`s
-    auto   to_return = stdx::make_unique<NeuropodValueMap>();
+    auto   to_return = std::make_unique<NeuropodValueMap>();
     size_t position  = 0;
     for (const auto &item : tensor_fetches)
     {

@@ -16,7 +16,6 @@ limitations under the License.
 #include "neuropod/internal/neuropod_loader.hh"
 
 #include "neuropod/internal/error_utils.hh"
-#include "neuropod/internal/memory_utils.hh"
 
 #include <ghc/filesystem.hpp>
 
@@ -48,7 +47,7 @@ public:
 
     std::unique_ptr<std::istream> get_istream_for_file(const std::string &path) override
     {
-        auto ret = stdx::make_unique<std::ifstream>(get_file_path(path));
+        auto ret = std::make_unique<std::ifstream>(get_file_path(path));
         if (!(*ret))
         {
             return nullptr;
@@ -99,7 +98,7 @@ public:
 
     std::unique_ptr<std::istream> get_istream_for_file(const std::string &path) override
     {
-        auto out = stdx::make_unique<std::stringstream>();
+        auto out = std::make_unique<std::stringstream>();
         if (!unzipper_.extractEntryToStream(path, *out))
         {
             return nullptr;
@@ -174,10 +173,10 @@ std::unique_ptr<NeuropodLoader> get_loader(const std::string &neuropod_path)
 
     if (fs::is_directory(neuropod_path))
     {
-        return stdx::make_unique<LocalLoader>(neuropod_path);
+        return std::make_unique<LocalLoader>(neuropod_path);
     }
 
-    return stdx::make_unique<ZipLoader>(neuropod_path);
+    return std::make_unique<ZipLoader>(neuropod_path);
 }
 
 } // namespace neuropod

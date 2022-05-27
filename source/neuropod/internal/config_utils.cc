@@ -264,7 +264,7 @@ std::unique_ptr<ModelConfig> load_model_config(std::istream &input_stream)
     }
 
     // Not directly using make_unique because of brace initialization
-    return stdx::make_unique<ModelConfig>(
+    return std::make_unique<ModelConfig>(
         ModelConfig{name, platform, platform_version_semver, inputs, outputs, custom_ops, input_tensor_device});
 }
 

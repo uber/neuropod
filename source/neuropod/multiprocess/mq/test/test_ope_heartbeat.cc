@@ -59,7 +59,7 @@ public:
 
 TEST(test_ope_heartbeat, basic)
 {
-    auto test_channel = neuropod::stdx::make_unique<TestChannel>();
+    auto test_channel = neuropod::std::make_unique<TestChannel>();
 
     // Create a controller
     neuropod::detail::HeartbeatController controller(*test_channel);

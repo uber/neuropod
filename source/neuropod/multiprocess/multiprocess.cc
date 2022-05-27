@@ -271,7 +271,7 @@ protected:
         }
 
         // Load the returned tensors
-        auto to_return = stdx::make_unique<NeuropodValueMap>();
+        auto to_return = std::make_unique<NeuropodValueMap>();
         received.get(*to_return);
 
         if (free_memory_every_cycle_)
@@ -309,7 +309,7 @@ std::unique_ptr<NeuropodBackend> load_neuropod_ope(const std::string &          
     if (control_queue_name.empty())
     {
         // Start a new worker
-        return stdx::make_unique<MultiprocessNeuropodBackend>(
+        return std::make_unique<MultiprocessNeuropodBackend>(
             neuropod_path, options, free_memory_every_cycle, default_backend_overrides);
     }
 
@@ -321,7 +321,7 @@ std::unique_ptr<NeuropodBackend> load_neuropod_ope(const std::string &          
     }
 
     // Use an existing worker
-    return stdx::make_unique<MultiprocessNeuropodBackend>(neuropod_path, control_queue_name, free_memory_every_cycle);
+    return std::make_unique<MultiprocessNeuropodBackend>(neuropod_path, control_queue_name, free_memory_every_cycle);
 }
 
 } // namespace neuropod

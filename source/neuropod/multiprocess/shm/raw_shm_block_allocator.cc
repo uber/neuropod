@@ -16,7 +16,6 @@ limitations under the License.
 #include "neuropod/multiprocess/shm/raw_shm_block_allocator.hh"
 
 #include "neuropod/internal/error_utils.hh"
-#include "neuropod/internal/memory_utils.hh"
 
 #include <boost/interprocess/mapped_region.hpp>
 #include <boost/interprocess/shared_memory_object.hpp>
@@ -98,14 +97,14 @@ public:
         : uuid_(uuid_generator())
     {
         // Create a block of shared memory
-        shm_ = stdx::make_unique<ipc::shared_memory_object>(
+        shm_ = std::make_unique<ipc::shared_memory_object>(
             ipc::create_only, get_key_from_uuid(uuid_).c_str(), ipc::read_write);
 
         // Set the size
         shm_->truncate(sizeof(RawSHMBlockInternal) + size_bytes);
 
         // Map into memory
-        region_ = stdx::make_unique<ipc::mapped_region>(*shm_, ipc::read_write);
+        region_ = std::make_unique<ipc::mapped_region>(*shm_, ipc::read_write);
 
         // Get a pointer to the struct and initialize it
         block_ = new (region_->get_address()) RawSHMBlockInternal;
@@ -125,10 +124,10 @@ public:
         const auto shm_key = get_key_from_uuid(uuid_);
 
         // Load a chunk of shared memory
-        shm_ = stdx::make_unique<ipc::shared_memory_object>(ipc::open_only, shm_key.c_str(), ipc::read_write);
+        shm_ = std::make_unique<ipc::shared_memory_object>(ipc::open_only, shm_key.c_str(), ipc::read_write);
 
         // Map into memory
-        region_ = stdx::make_unique<ipc::mapped_region>(*shm_, ipc::read_write);
+        region_ = std::make_unique<ipc::mapped_region>(*shm_, ipc::read_write);
 
         // Get a pointer to the struct
         block_ = static_cast<RawSHMBlockInternal *>(region_->get_address());

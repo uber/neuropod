@@ -15,7 +15,6 @@ limitations under the License.
 
 #pragma once
 
-#include "neuropod/internal/memory_utils.hh"
 #include "neuropod/internal/tensor_types.hh"
 
 #include <memory>

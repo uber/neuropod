@@ -25,7 +25,7 @@ namespace neuropod
 
 std::unique_ptr<NeuropodTensorAllocator> get_generic_tensor_allocator()
 {
-    return stdx::make_unique<DefaultTensorAllocator<GenericNeuropodTensor>>();
+    return std::make_unique<DefaultTensorAllocator<GenericNeuropodTensor>>();
 }
 
 } // namespace neuropod

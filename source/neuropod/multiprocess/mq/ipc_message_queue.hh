@@ -17,7 +17,6 @@ limitations under the License.
 
 #include "neuropod/internal/blocking_spsc_queue.hh"
 #include "neuropod/internal/error_utils.hh"
-#include "neuropod/internal/memory_utils.hh"
 #include "neuropod/multiprocess/mq/heartbeat.hh"
 #include "neuropod/multiprocess/mq/wire_format.hh"
 

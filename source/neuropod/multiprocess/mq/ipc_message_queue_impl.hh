@@ -34,10 +34,10 @@ constexpr auto MAX_QUEUE_SIZE = 20;
 template <typename UserPayloadType>
 inline std::unique_ptr<ipc::message_queue> make_queue(const std::string &control_queue_name_, const std::string &suffix)
 {
-    return stdx::make_unique<ipc::message_queue>(ipc::open_or_create,
-                                                 ("neuropod_" + control_queue_name_ + suffix).c_str(),
-                                                 MAX_QUEUE_SIZE,
-                                                 sizeof(WireFormat<UserPayloadType>));
+    return std::make_unique<ipc::message_queue>(ipc::open_or_create,
+                                                ("neuropod_" + control_queue_name_ + suffix).c_str(),
+                                                MAX_QUEUE_SIZE,
+                                                sizeof(WireFormat<UserPayloadType>));
 }
 
 template <typename UserPayloadType>
@@ -67,7 +67,7 @@ void IPCMessageQueue<UserPayloadType>::read_worker_loop()
                           boost::posix_time::milliseconds(detail::MESSAGE_TIMEOUT_MS);
 
         // Get a message
-        auto         received = stdx::make_unique<WireFormat>();
+        auto         received = std::make_unique<WireFormat>();
         size_t       received_size;
         unsigned int priority;
         bool         successful_read =
@@ -196,8 +196,8 @@ IPCMessageQueue<UserPayloadType>::IPCMessageQueue(const std::string &control_que
       control_queue_name_(control_queue_name),
       send_queue_(detail::make_send_queue<UserPayloadType>(control_queue_name_, type)),
       recv_queue_(detail::make_recv_queue<UserPayloadType>(control_queue_name_, type)),
-      heartbeat_controller_(stdx::make_unique<detail::HeartbeatController>(*this)),
-      transferrable_controller_(stdx::make_unique<detail::TransferrableController>()),
+      heartbeat_controller_(std::make_unique<detail::HeartbeatController>(*this)),
+      transferrable_controller_(std::make_unique<detail::TransferrableController>()),
       lost_heartbeat_(false),
       read_worker_(&IPCMessageQueue<UserPayloadType>::read_worker_loop, this)
 {

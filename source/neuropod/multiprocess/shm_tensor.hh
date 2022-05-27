@@ -192,7 +192,7 @@ public:
                       const SHMBlockID &          block_id)
         : TypedNeuropodTensor<std::string>(copy_and_strip_last_dim(dims)), write_buffer_(this->get_num_elements())
     {
-        auto byte_block = stdx::make_unique<SHMNeuropodTensor<uint8_t>>(dims, std::move(block), data, block_id);
+        auto byte_block = std::make_unique<SHMNeuropodTensor<uint8_t>>(dims, std::move(block), data, block_id);
 
         auto base_ptr = byte_block->get_raw_data_ptr();
         auto max_len  = dims[dims.size() - 1];
@@ -229,7 +229,7 @@ public:
         dims_copy.push_back(max_len);
 
         // TODO(vip): We can optimize this
-        last_shm_block_ = stdx::make_unique<SHMNeuropodTensor<uint8_t>>(dims_copy);
+        last_shm_block_ = std::make_unique<SHMNeuropodTensor<uint8_t>>(dims_copy);
         last_shm_block_->overwrite_type(STRING_TENSOR);
 
         // Copy data in
