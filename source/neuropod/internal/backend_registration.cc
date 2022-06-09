@@ -53,10 +53,8 @@ void init_registrar_if_needed()
     });
 }
 
-std::vector<BackendLoadSpec> get_default_backend_map()
+void populate_default_backend_map(const std::string &neuropod_version, std::vector<BackendLoadSpec> &out)
 {
-    std::vector<BackendLoadSpec> out;
-
     // A structure to store some basic info about frameworks we support
     struct FrameworkInfo
     {
@@ -113,7 +111,7 @@ std::vector<BackendLoadSpec> get_default_backend_map()
                         //  "/usr/local/lib/neuropod/0.2.0/backends/torchscript_1.4.0/libneuropod_torchscript_backend.so"
                         // Ex:
                         //  "/usr/local/lib/neuropod/0.2.0/backends/torchscript_1.4.0_gpu/libneuropod_torchscript_backend.so"
-                        item.path = neuropod_base_dir + ("/" NEUROPOD_VERSION "/backends/") + framework.type + "_" +
+                        item.path = neuropod_base_dir + ("/" + neuropod_version + "/backends/") + framework.type + "_" +
                                     version + (is_gpu ? "_gpu" : "") + "/" + framework.soname;
                     }
                     else
@@ -125,6 +123,25 @@ std::vector<BackendLoadSpec> get_default_backend_map()
                 }
             }
         }
+    }
+}
+
+std::vector<BackendLoadSpec> get_default_backend_map()
+{
+    // Reverse priority order (highest priority at the end of the vector)
+    std::vector<BackendLoadSpec> out;
+
+    // TODO: improve this once we have a long term strategy on ABI compatibility
+    //
+    // If we decide not to break ABI compatibility within a given major version,
+    // maybe we just filter the folders in NEUROPOD_BASE_DIR instead of listing
+    // all possible versions
+    std::vector<std::string> supported_versions = {"0.3.0rc6", "0.3.0rc7"};
+    assert(supported_versions.back() == NEUROPOD_VERSION);
+
+    for (const auto &version : supported_versions)
+    {
+        populate_default_backend_map(version, out);
     }
 
     return out;

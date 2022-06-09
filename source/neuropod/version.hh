@@ -32,13 +32,13 @@ namespace neuropod
 
 // These are allowed to be 4 bits each
 #define NEUROPOD_RELEASE_LEVEL NEUROPOD_RELEASE_LEVEL_RELEASE_CANDIDATE
-#define NEUROPOD_RELEASE_SERIAL 6
+#define NEUROPOD_RELEASE_SERIAL 7
 
 static_assert(NEUROPOD_RELEASE_LEVEL < 16, "NEUROPOD_RELEASE_LEVEL must be in the range 0 to 15 (4 bits)");
 static_assert(NEUROPOD_RELEASE_SERIAL < 16, "NEUROPOD_RELEASE_SERIAL must be in the range 0 to 15 (4 bits)");
 
 // The version as a string
-#define NEUROPOD_VERSION "0.3.0rc6"
+#define NEUROPOD_VERSION "0.3.0rc7"
 
 // Version as a single 4-byte hex number, e.g. 0x010502B2 == 1.5.2b2.
 // Use this for numeric comparisons
