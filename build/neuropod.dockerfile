@@ -29,15 +29,8 @@ COPY build/install_system_deps.sh /usr/src/build/install_system_deps.sh
 # Install system dependencies
 RUN /usr/src/build/install_system_deps.sh
 
-# Prefetch llvm because it's large
-COPY build/workspace_prefetch /usr/src/source/WORKSPACE
-COPY source/.bazelversion /usr/src/source/.bazelversion
-COPY source/bazel/toolchain.patch /usr/src/source/bazel/toolchain.patch
-COPY source/bazel/BUILD /usr/src/source/bazel/BUILD
-RUN cd source && bazel sync
-
 # The python version to use. Should be set to `2.7`, `3.5`, etc.
-ARG NEUROPOD_PYTHON_VERSION=2.7
+ARG NEUROPOD_PYTHON_VERSION=3.8
 ENV NEUROPOD_PYTHON_VERSION=$NEUROPOD_PYTHON_VERSION
 
 # Install python
@@ -54,8 +47,8 @@ COPY build/install_frameworks.py /usr/src/build/install_frameworks.py
 COPY source/python/setup.py /usr/src/source/python/setup.py
 
 # Optional overrides
-ARG NEUROPOD_TENSORFLOW_VERSION
-ARG NEUROPOD_TORCH_VERSION
+ARG NEUROPOD_TENSORFLOW_VERSION=2.2.0
+ARG NEUROPOD_TORCH_VERSION=1.9.0
 ARG NEUROPOD_IS_GPU
 ARG NEUROPOD_CUDA_VERSION
 
