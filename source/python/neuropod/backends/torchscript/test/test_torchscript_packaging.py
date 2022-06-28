@@ -136,6 +136,18 @@ class NamedTupleModel(torch.jit.ScriptModule):
         return SomeNamedTuple(sum=x + y, difference=x - y, product=x * y)
 
 
+class SplitterModel(torch.jit.ScriptModule):
+    """
+    This model returns a non-contiguous output
+    """
+
+    @torch.jit.script_method
+    def forward(self, x):
+        x1 = x[:, :2]
+        x2 = x[:, 2:]
+        return {"x1": x1, "x2": x2}
+
+
 @requires_frameworks("torchscript")
 class TestTorchScriptPackaging(unittest.TestCase):
     def package_simple_addition_model(self, do_fail=False):
@@ -279,6 +291,26 @@ class TestTorchScriptPackaging(unittest.TestCase):
         # Tests a model that returns both tensors and "string tensors"
         with self.assertRaises(ValueError):
             self.package_named_tuple_model(do_fail=True)
+
+    def test_noncontiguous_array(self):
+        # Test a non-contiguous output
+        x = np.arange(16).astype(np.int64).reshape(4, 4)
+
+        with TemporaryDirectory() as test_dir:
+            neuropod_path = os.path.join(test_dir, "test_neuropod")
+
+            create_torchscript_neuropod(
+                neuropod_path=neuropod_path,
+                model_name="splitter",
+                module=SplitterModel(),
+                input_spec=[{"name": "x", "dtype": "int64", "shape": (4, 4)}],
+                output_spec=[
+                    {"name": "x1", "dtype": "int64", "shape": (4, 2)},
+                    {"name": "x2", "dtype": "int64", "shape": (4, 2)},
+                ],
+                test_input_data={"x": x},
+                test_expected_out={"x1": x[:, :2], "x2": x[:, 2:]},
+            )
 
 
 if __name__ == "__main__":

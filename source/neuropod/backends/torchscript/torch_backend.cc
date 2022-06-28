@@ -130,7 +130,8 @@ void insert_value_in_output(NeuropodValueMap & output,
         // Torch tensor
         // Transfer it to CPU
         // .to(device) is a no-op if the tensor is already transferred
-        auto tensor = value.toTensor().to(torch::kCPU);
+        // .contiguous() is a no-op if the tensor is already contiguous
+        auto tensor = value.toTensor().to(torch::kCPU).contiguous();
 
         // Get the type and make a TorchNeuropodTensor
         auto neuropod_tensor_type = get_neuropod_type_from_torch_type(tensor.scalar_type());
