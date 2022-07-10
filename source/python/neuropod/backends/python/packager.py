@@ -154,4 +154,5 @@ def create_python_neuropod(
         json.dump(
             {"entrypoint_package": entrypoint_package, "entrypoint": entrypoint},
             config_file,
+            sort_keys=True,
         )
