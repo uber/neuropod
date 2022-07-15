@@ -14,6 +14,7 @@
 
 import datetime
 import inspect
+import json
 import os
 import tempfile
 import time
@@ -21,6 +22,7 @@ import shutil
 import zipfile
 
 from neuropod.utils import config_utils
+from neuropod.utils.hash_utils import sha256sum
 from neuropod.utils.eval_utils import save_test_data, load_and_test_neuropod
 
 # Set a consistent time on the files we're zipping so the hash of the zipfile is the same
@@ -296,6 +298,21 @@ def _create_neuropod(
     # Persist the test data
     if test_input_data is not None and persist_test_data:
         save_test_data(package_path, test_input_data, test_expected_out)
+
+    # Write the manifest
+    manifest_files = {}
+    for root, _, filenames in os.walk(package_path):
+        for filename in filenames:
+            filepath = os.path.join(root, filename)
+            relpath = os.path.relpath(filepath, package_path)
+
+            # Compute the sha256
+            manifest_files[relpath] = sha256sum(filepath)
+
+    with open(os.path.join(package_path, "manifest.json"), "w") as manifest_file:
+        manifest = {"manifest_version": 1, "files": manifest_files}
+
+        json.dump(manifest, manifest_file, indent=4, sort_keys=True)
 
     # Zip the directory if necessary
     if package_as_zip:

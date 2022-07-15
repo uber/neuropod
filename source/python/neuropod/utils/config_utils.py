@@ -255,7 +255,7 @@ def write_neuropod_config(
         validate_neuropod_config(config)
 
         # Write out the config as JSON
-        json.dump(config, config_file, indent=4)
+        json.dump(config, config_file, indent=4, sort_keys=True)
 
 
 def read_neuropod_config(neuropod_path):
