@@ -234,6 +234,9 @@ TorchNeuropodBackend::TorchNeuropodBackend(const std::string &neuropod_path, con
 
 void TorchNeuropodBackend::load_model_internal()
 {
+    at::globalContext().setDeterministicCuDNN(options_.torch_cudnn_deterministic);
+    at::globalContext().setBenchmarkCuDNN(options_.torch_cudnn_benchmark);
+
     // Get the model from the neuropod
     auto graph_stream = loader_->get_istream_for_file("0/data/model.pt");
 
@@ -295,6 +298,12 @@ torch::Device TorchNeuropodBackend::get_torch_device(NeuropodDeviceType target_d
 std::unique_ptr<NeuropodValueMap> TorchNeuropodBackend::infer_internal(const NeuropodValueMap &inputs)
 {
     torch::NoGradGuard guard;
+
+    // Seed if we need to
+    if (options_.seed >= 0)
+    {
+        torch::manual_seed(options_.seed);
+    }
 
     // Get inference schema
     const auto &method    = model_->get_method("forward");

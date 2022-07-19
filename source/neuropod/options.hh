@@ -75,6 +75,23 @@ struct RuntimeOptions
 
     // Whether or not to disable shape and type checking when running inference
     bool disable_shape_and_type_checking = false;
+
+    // EXPERIMENTAL
+    // A seed to use when running a graph
+    // Note: this currently only applies to TorchScript models
+    int64_t seed = -1;
+
+    // EXPERIMENTAL
+    // Whether or not to run in deterministic mode. See https://pytorch.org/docs/stable/notes/randomness.html#cudnn
+    // Note: this currently only applies to TorchScript models and affects all torchscript models in the process.
+    // Should only be used with OPE to avoid this issue.
+    bool torch_cudnn_deterministic = false;
+
+    // EXPERIMENTAL
+    // Whether or not to enable cudnn benchmark. See https://pytorch.org/docs/stable/notes/randomness.html#cudnn
+    // Note: this currently only applies to TorchScript models and affects all torchscript models in the process.
+    // Should only be used with OPE to avoid this issue.
+    bool torch_cudnn_benchmark = false;
 };
 
 } // namespace neuropod
