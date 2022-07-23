@@ -32,7 +32,7 @@ on:
   pull_request:
 jobs:
     build:
-        runs-on: macos-10.15
+        runs-on: macos-12
         name: TF ${{{{ matrix.tf }}}}, Torch ${{{{ matrix.torch }}}}, Python ${{{{ matrix.python }}}}
         env:
             NEUROPOD_TENSORFLOW_VERSION: ${{{{ matrix.tf }}}}
