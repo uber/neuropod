@@ -107,6 +107,7 @@ FRAMEWORK_VERSIONS = [
     {"cuda": "10.0", "tensorflow": "1.14.0", "torch": "1.3.0", "python": "3.6"},
     {"cuda": "10.0", "tensorflow": "1.15.0", "torch": "1.4.0", "python": "3.7"},
     {"cuda": "10.1", "tensorflow": "2.2.0", "torch": "1.5.0", "python": "3.8"},
+    {"cuda": "10.1", "tensorflow": "2.2.0", "torch": "1.5.0", "python": "3.9"},
 
     # No need to rerun tensorflow tests for 2.2.0 on py3.8
     {"cuda": "10.1", "tensorflow": "2.2.0", "torch": "1.6.0", "python": "3.8", "test_frameworks": "torchscript,python"},
@@ -114,10 +115,12 @@ FRAMEWORK_VERSIONS = [
     {"cuda": "10.2", "tensorflow": "2.2.0", "torch": "1.8.1", "python": "3.8", "test_frameworks": "torchscript,python"},
     {"cuda": "10.2", "tensorflow": "2.2.0", "torch": "1.9.0", "python": "3.8", "test_frameworks": "torchscript,python"},
     {"cuda": "10.2", "tensorflow": "2.2.0", "torch": "1.10.2", "python": "3.8", "test_frameworks": "torchscript,python"},
+    {"cuda": "10.2", "tensorflow": "2.2.0", "torch": "1.10.2", "python": "3.9", "test_frameworks": "torchscript,python"},
 
     # Only testing TF
     {"cuda": "11.2.1", "cudnn": "8", "tensorflow": "2.5.0", "torch": "1.7.0", "python": "3.8", "test_frameworks": "tensorflow"},
     {"cuda": "11.2.1", "cudnn": "8", "tensorflow": "2.6.2", "torch": "1.7.0", "python": "3.8", "test_frameworks": "tensorflow"},
+    {"cuda": "11.2.1", "cudnn": "8", "tensorflow": "2.6.2", "torch": "1.7.0", "python": "3.9", "test_frameworks": "tensorflow"},
 ]
 
 gh_actions_matrix = []
