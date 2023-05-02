@@ -39,12 +39,12 @@ jobs:
             matrix:
                 include:
                     - tf: 2.5.0
-                      torch: 1.7.0
+                      torch: 1.7.1
                       python: 3.9
                       test_frameworks: tensorflow
 
                     - tf: 2.6.2
-                      torch: 1.7.0
+                      torch: 1.7.1
                       python: 3.9
                       test_frameworks: tensorflow
 
