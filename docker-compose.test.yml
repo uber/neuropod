@@ -43,14 +43,6 @@ services:
         NEUROPOD_TORCH_VERSION: 1.5.0
         NEUROPOD_PYTHON_VERSION: 3.8
 
-  test-cpu-variant-tf-2_2_0-torch-1_5_0-py3_9:
-    extends: test-base
-    build:
-      args:
-        NEUROPOD_TENSORFLOW_VERSION: 2.2.0
-        NEUROPOD_TORCH_VERSION: 1.5.0
-        NEUROPOD_PYTHON_VERSION: 3.9
-
   test-cpu-variant-tf-2_2_0-torch-1_6_0-py3_8:
     extends: test-base
     build:
@@ -91,14 +83,6 @@ services:
         NEUROPOD_TORCH_VERSION: 1.10.2
         NEUROPOD_PYTHON_VERSION: 3.8
 
-  test-cpu-variant-tf-2_2_0-torch-1_10_2-py3_9:
-    extends: test-base
-    build:
-      args:
-        NEUROPOD_TENSORFLOW_VERSION: 2.2.0
-        NEUROPOD_TORCH_VERSION: 1.10.2
-        NEUROPOD_PYTHON_VERSION: 3.9
-
   test-cpu-variant-tf-2_5_0-torch-1_7_0-py3_8:
     extends: test-base
     build:
@@ -106,6 +90,14 @@ services:
         NEUROPOD_TENSORFLOW_VERSION: 2.5.0
         NEUROPOD_TORCH_VERSION: 1.7.0
         NEUROPOD_PYTHON_VERSION: 3.8
+
+  test-cpu-variant-tf-2_5_0-torch-1_7_0-py3_9:
+    extends: test-base
+    build:
+      args:
+        NEUROPOD_TENSORFLOW_VERSION: 2.5.0
+        NEUROPOD_TORCH_VERSION: 1.7.0
+        NEUROPOD_PYTHON_VERSION: 3.9
 
   test-cpu-variant-tf-2_6_2-torch-1_7_0-py3_8:
     extends: test-base
@@ -149,15 +141,6 @@ services:
         NEUROPOD_TENSORFLOW_VERSION: 2.2.0
         NEUROPOD_TORCH_VERSION: 1.5.0
         NEUROPOD_PYTHON_VERSION: 3.8
-
-  test-gpu-variant-tf-2_2_0-torch-1_5_0-py3_9:
-    extends: test-gpu
-    build:
-      args:
-        NEUROPOD_CUDA_VERSION: 10.1
-        NEUROPOD_TENSORFLOW_VERSION: 2.2.0
-        NEUROPOD_TORCH_VERSION: 1.5.0
-        NEUROPOD_PYTHON_VERSION: 3.9
 
   test-gpu-variant-tf-2_2_0-torch-1_6_0-py3_8:
     extends: test-gpu
@@ -204,15 +187,6 @@ services:
         NEUROPOD_TORCH_VERSION: 1.10.2
         NEUROPOD_PYTHON_VERSION: 3.8
 
-  test-gpu-variant-tf-2_2_0-torch-1_10_2-py3_9:
-    extends: test-gpu
-    build:
-      args:
-        NEUROPOD_CUDA_VERSION: 10.2
-        NEUROPOD_TENSORFLOW_VERSION: 2.2.0
-        NEUROPOD_TORCH_VERSION: 1.10.2
-        NEUROPOD_PYTHON_VERSION: 3.9
-
   test-gpu-variant-tf-2_5_0-torch-1_7_0-py3_8:
     extends: test-gpu
     build:
@@ -222,6 +196,16 @@ services:
         NEUROPOD_TENSORFLOW_VERSION: 2.5.0
         NEUROPOD_TORCH_VERSION: 1.7.0
         NEUROPOD_PYTHON_VERSION: 3.8
+
+  test-gpu-variant-tf-2_5_0-torch-1_7_0-py3_9:
+    extends: test-gpu
+    build:
+      args:
+        NEUROPOD_CUDA_VERSION: 11.2.1
+        NEUROPOD_CUDNN_VERSION: 8
+        NEUROPOD_TENSORFLOW_VERSION: 2.5.0
+        NEUROPOD_TORCH_VERSION: 1.7.0
+        NEUROPOD_PYTHON_VERSION: 3.9
 
   test-gpu-variant-tf-2_6_2-torch-1_7_0-py3_8:
     extends: test-gpu
