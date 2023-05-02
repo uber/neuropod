@@ -9,7 +9,7 @@ wget https://bootstrap.pypa.io/pip/3.6/get-pip.py -O /tmp/get-pip.py
 ${NEUROPOD_PYTHON_BINARY} /tmp/get-pip.py
 
 # Setup a virtualenv
-${NEUROPOD_PYTHON_BINARY} -m pip install virtualenv==16.7.9
+${NEUROPOD_PYTHON_BINARY} -m pip install virtualenv
 ${NEUROPOD_PYTHON_BINARY} -m virtualenv .neuropod_venv
 source .neuropod_venv/bin/activate
 

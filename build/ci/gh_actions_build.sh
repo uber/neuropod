@@ -33,6 +33,9 @@ if [[ $(uname -s) == 'Darwin' ]]; then
     elif [[ "${NEUROPOD_PYTHON_VERSION}" == "3.8" ]]; then
         wget https://www.python.org/ftp/python/3.8.2/python-3.8.2-macosx10.9.pkg &> /dev/null
         sudo installer -pkg python-3.8.2-macosx10.9.pkg -target /
+    elif [[ "${NEUROPOD_PYTHON_VERSION}" == "3.9" ]]; then
+        wget https://www.python.org/ftp/python/3.9.13/python-3.9.13-macosx10.9.pkg &> /dev/null
+        sudo installer -pkg python-3.9.13-macosx10.9.pkg -target /
     fi
 fi
 
